@@ -1,0 +1,70 @@
+{{define "title"}}Biomarkers — Macro Longevity{{end}}
+
+{{define "content"}}
+<section class="page-header">
+    <div class="section-inner">
+        <h1 class="page-title">Essential Longevity Biomarkers</h1>
+        <p class="page-desc">
+            Know your numbers. Each biomarker includes the optimal range, why it matters
+            for longevity, and how to improve it on any budget.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-inner">
+        <div class="biomarker-grid">
+            {{range .Biomarkers}}
+            <article class="biomarker-card" id="{{.ID}}">
+                <div class="biomarker-header">
+                    <span class="biomarker-icon">{{.Icon}}</span>
+                    <div class="biomarker-title-group">
+                        <h2 class="biomarker-name">{{.Name}}</h2>
+                        <span class="biomarker-category">{{.Category}}</span>
+                    </div>
+                    <span class="biomarker-risk biomarker-risk-{{.RiskLevel}}">{{.RiskLevel}}</span>
+                </div>
+
+                <p class="biomarker-desc">{{.Description}}</p>
+
+                <div class="biomarker-ranges">
+                    <div class="range-item">
+                        <span class="range-label">Optimal Range</span>
+                        <span class="range-value">{{.OptimalRange}}</span>
+                    </div>
+                    <div class="range-item">
+                        <span class="range-label">Optimal Level</span>
+                        <span class="range-value range-optimal">{{.OptimalLevel}}</span>
+                    </div>
+                </div>
+
+                <div class="biomarker-importance">
+                    <h4>Why It Matters</h4>
+                    <p>{{.Importance}}</p>
+                </div>
+
+                <div class="biomarker-how-to">
+                    <h4>How to Improve</h4>
+                    <ul class="checklist">
+                        {{range .HowToImprove}}
+                        <li>{{.}}</li>
+                        {{end}}
+                    </ul>
+                </div>
+
+                {{if .BudgetTips}}
+                <div class="biomarker-budget">
+                    <h4>💡 Budget Tips</h4>
+                    <ul class="checklist checklist-budget">
+                        {{range .BudgetTips}}
+                        <li>{{.}}</li>
+                        {{end}}
+                    </ul>
+                </div>
+                {{end}}
+            </article>
+            {{end}}
+        </div>
+    </div>
+</section>
+{{end}}

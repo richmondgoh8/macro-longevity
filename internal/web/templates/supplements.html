@@ -1,0 +1,81 @@
+{{define "title"}}Supplement Stack — Macro Longevity{{end}}
+
+{{define "content"}}
+<section class="page-header">
+    <div class="section-inner">
+        <h1 class="page-title">Essential Supplement Stack</h1>
+        <p class="page-desc">
+            The supplements with the strongest evidence for longevity, biomarker improvement,
+            and value. Each includes dosing, timing, and budget-friendly options.
+        </p>
+        <div class="page-note">
+            <strong>Disclaimer:</strong> Not medical advice. Always consult your physician
+            before starting a new supplement regimen, especially if you take medication.
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-inner">
+        <div class="supplement-grid">
+            {{range .Supplements}}
+            <article class="supplement-card" id="{{.ID}}">
+                <div class="supplement-header">
+                    <div>
+                        <h2 class="supplement-name">{{.Name}}</h2>
+                        <p class="supplement-desc">{{.Description}}</p>
+                    </div>
+                </div>
+
+                <div class="supplement-detail-grid">
+                    <div class="supplement-detail">
+                        <span class="detail-label">Dosage</span>
+                        <span class="detail-value">{{.Dosage}}</span>
+                    </div>
+                    <div class="supplement-detail">
+                        <span class="detail-label">Timing</span>
+                        <span class="detail-value">{{.Timing}}</span>
+                    </div>
+                </div>
+
+                <div class="supplement-benefits">
+                    <h4>Benefits</h4>
+                    <ul class="checklist">
+                        {{range .Benefits}}
+                        <li>{{.}}</li>
+                        {{end}}
+                    </ul>
+                </div>
+
+                <div class="supplement-budget">
+                    <h4>💰 Budget Options</h4>
+                    <ul class="checklist checklist-budget">
+                        {{range .BudgetOptions}}
+                        <li>{{.}}</li>
+                        {{end}}
+                    </ul>
+                </div>
+
+                {{if .Biomarkers}}
+                <div class="supplement-targets">
+                    <h4>Targets</h4>
+                    <div class="tag-group">
+                        {{range .Biomarkers}}
+                        <a href="/biomarkers#{{.}}" class="tag tag-biomarker">{{.}}</a>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+
+                {{if .Notes}}
+                <div class="supplement-notes">
+                    <h4>Notes</h4>
+                    <p>{{.Notes}}</p>
+                </div>
+                {{end}}
+            </article>
+            {{end}}
+        </div>
+    </div>
+</section>
+{{end}}
