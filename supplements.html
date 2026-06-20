@@ -17,6 +17,9 @@
                 <span class="nav-logo-icon">⟁</span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
+            <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
                 <a href="/biomarkers.html" class="nav-link">Biomarkers</a>
@@ -65,5 +68,14 @@
     <script src="/js/data.js"></script>
     <script src="/js/render.js"></script>
     <script>renderSupplements()</script>
+
+    <script>
+        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); }
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
+                document.querySelector('.nav').classList.remove('nav-open');
+            }
+        });
+    </script>
 </body>
 </html>
