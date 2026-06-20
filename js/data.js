@@ -470,834 +470,1693 @@ const BIOMARKERS = [
   },
 ];
 
-const FOODS = [
+const MEAL_CATEGORIES = ["breakfast", "lunch", "dinner"];
+
+const MEAL_LABELS = {
+  breakfast: "🌅 Breakfast",
+  lunch: "☀️ Lunch",
+  dinner: "🌙 Dinner",
+};
+
+const MEALS = [
   {
-    id: "chicken-breast",
-    name: "Chicken Breast",
-    category: "Protein",
-    description: "Lean, high-protein meat — the budget-friendly staple for muscle maintenance and metabolic health. 31g protein per 100g with minimal fat.",
-    benefits: [
-      "31g protein per 100g for muscle protein synthesis",
-      "Low saturated fat — heart-friendly protein source",
-      "Rich in B3 (niacin), B6, and selenium",
-      "High satiety — helps with calorie control",
+    id: "overnight-oats",
+    name: "High-Protein Overnight Oats",
+    category: "breakfast",
+    description: "No-cook, prep-ahead breakfast. Creamy, satisfying, and packed with fiber and protein. Mix creatine in for zero extra effort.",
+    prepTime: "5 min prep, overnight set",
+    cookTime: "0 min",
+    ingredients: [
+      "40g rolled oats",
+      "1 scoop vanilla protein powder (or 20g collagen)",
+      "200ml milk (or unsweetened almond milk)",
+      "1 tbsp chia seeds",
+      "50g frozen berries",
+      "1 tbsp almond butter",
+      "5g creatine monohydrate (optional — stir in)",
     ],
+    instructions: [
+      "Mix oats, protein powder, chia seeds, milk, and creatine in a jar. Stir well.",
+      "Top with frozen berries. Refrigerate overnight (or minimum 4 hours).",
+      "In the morning, stir, top with almond butter, and eat cold or microwave 1 min.",
+    ],
+    supplementPairing: "💊 Creatine Monohydrate — stir 5g into the oats before refrigerating. No taste, dissolves completely overnight.",
+    variations: [
+      "🍫 Chocolate: add 1 tbsp cocoa powder, use chocolate protein, top with dark chocolate shavings.",
+      "🥜 Peanut Butter: skip almond butter, use 1.5 tbsp peanut butter + 1/2 banana sliced.",
+      "🥥 Tropical: use coconut milk, top with mango chunks + toasted coconut flakes + macadamia nuts.",
+      "🍎 Apple Cinnamon: add 1/2 grated apple + 1 tsp cinnamon + 2 tbsp walnuts.",
+    ],
+    costPerServing: "SGD 1.80",
+    protein: "35g",
+    calories: "~420",
+    biomarkers: ["hba1c", "apob", "fasting-glucose"],
+  },
+  {
+    id: "savory-scrambled-eggs",
+    name: "Eggs (4 Ways)",
+    category: "breakfast",
+    description: "Perfect eggs any style — the ultimate fast breakfast. High protein, endless variety, and the perfect vehicle for your AM supplements.",
+    prepTime: "2 min",
+    cookTime: "3 min",
+    ingredients: [
+      "3 large eggs (FairPrice: SGD 1.35)",
+      "1 tbsp butter or ghee",
+      "Salt and pepper",
+    ],
+    methods: [
+      {
+        name: "Scrambled",
+        cookTime: "3 min",
+        costPerServing: "SGD 1.50",
+        instructions: [
+          "Crack eggs into a bowl, add a splash of water, whisk vigorously.",
+          "Melt butter in a non-stick pan over medium-low heat.",
+          "Pour in eggs. Let sit 10 sec, then push gently with a spatula, folding continuously.",
+          "Remove from heat when still slightly wet. Season with salt and pepper.",
+        ],
+        supplementPairing: "💊 Vitamin D3+K2 — take with eggs (fat helps absorption). 💊 B-Complex — take alongside.",
+      },
+      {
+        name: "Fried",
+        cookTime: "3 min",
+        costPerServing: "SGD 1.50",
+        instructions: [
+          "Heat butter in a non-stick pan over medium heat until sizzling.",
+          "Crack eggs gently into the pan. Season with salt and pepper.",
+          "Cook 2-3 min until whites are set (sunny side up). For over-easy: flip, cook 30 sec.",
+        ],
+        supplementPairing: "💊 Vitamin D3+K2 — take with eggs (butter helps absorption).",
+      },
+      {
+        name: "Poached",
+        cookTime: "4 min",
+        costPerServing: "SGD 1.50",
+        instructions: [
+          "Bring a small pot of water to a gentle simmer (not boiling). Add a splash of vinegar.",
+          "Crack egg into a small bowl. Swirl the water to create a vortex.",
+          "Gently slide egg into the centre. Cook 3 min for runny yolk, 4 min for set.",
+          "Remove with slotted spoon. Drain on paper towel. Season.",
+        ],
+        supplementPairing: "💊 Vitamin D3+K2 — the yolks provide the fat for absorption.",
+      },
+      {
+        name: "Boiled",
+        cookTime: "10 min",
+        costPerServing: "SGD 0.90 (3 eggs)",
+        instructions: [
+          "Place eggs in a pot, cover with cold water by 1 inch.",
+          "Bring to a rolling boil. Cover, remove from heat.",
+          "Let sit 7 min (jammy) or 10 min (hard).",
+          "Transfer to ice bath for 5 min. Peel under running water.",
+        ],
+        supplementPairing: "💊 Vitamin D3+K2 — take with your eggs (yolks have fat).",
+      },
+    ],
+    variations: [
+      "🧀 Cheesy (Scrambled): add 30g grated cheddar just before removing from heat.",
+      "🌶️ Spicy (Fried): add chili flakes + smoked paprika to the butter.",
+      "🥑 Serve any style over half an avocado with flaky salt and olive oil.",
+      "🍅 Add cherry tomatoes + fresh basil to scrambled eggs for extra vegetables.",
+    ],
+    costPerServing: "SGD 1.50",
+    protein: "18g",
+    calories: "~280",
+    biomarkers: ["vitamin-d", "hdl-c"],
+  },
+  {
+    id: "greek-yogurt-bowl",
+    name: "Greek Yogurt & Berry Bowl",
+    category: "breakfast",
+    description: "Highest protein-per-dollar breakfast. No cooking, 3 minutes, and endlessly customizable. Double the protein of regular yogurt.",
+    prepTime: "3 min",
+    cookTime: "0 min",
+    ingredients: [
+      "200g plain full-fat Greek yogurt",
+      "1/2 cup frozen mixed berries",
+      "1 tbsp chia seeds",
+      "1 tbsp flax seeds (ground)",
+      "1 tbsp almond butter or crushed walnuts",
+    ],
+    instructions: [
+      "Scoop yogurt into a bowl.",
+      "Top with frozen berries (they thaw in 2-3 min), chia seeds, flax, and nuts.",
+      "Stir and eat. Add a splash of milk if too thick.",
+    ],
+    supplementPairing: "💊 Magnesium Glycinate — take 30 min before bed previous night (sleep quality). 💊 Omega-3 — take with lunch (not breakfast, better with fat later).",
+    variations: [
+      "🫐 Mixed Berry: use frozen wild blueberries + raspberries + blackberries.",
+      "🍑 Peach & Granola: use frozen peaches + 2 tbsp granola + drizzle of honey.",
+      "🥜 High-Protein: add 1 scoop vanilla protein powder + 1/2 banana + peanut butter.",
+      "🍋 Lemon Poppy: add zest of 1/2 lemon + 1 tsp poppy seeds + touch of maple syrup.",
+    ],
+    costPerServing: "SGD 2.00",
+    protein: "20g",
+    calories: "~350",
+    biomarkers: ["hscrp", "hdl-c", "vitamin-d"],
+  },
+  {
+    id: "green-protein-smoothie",
+    name: "Green Protein Smoothie",
+    category: "breakfast",
+    description: "The fastest way to get greens + protein + creatine in one glass. Drink on the go, no excuses.",
+    prepTime: "3 min",
+    cookTime: "0 min",
+    ingredients: [
+      "1 scoop vanilla or unflavoured protein powder",
+      "1 cup unsweetened almond milk",
+      "1 large handful spinach (or 2 cubes frozen spinach)",
+      "1/2 frozen banana",
+      "1 tbsp almond butter",
+      "5g creatine monohydrate (optional)",
+    ],
+    instructions: [
+      "Add all ingredients to a blender. Liquid first, then soft, then powders.",
+      "Blend on high for 30-45 sec until completely smooth.",
+      "Pour and go. Rinse blender immediately.",
+    ],
+    supplementPairing: "💊 Creatine Monohydrate — dissolves perfectly in smoothies, completely tasteless.",
+    variations: [
+      "🌿 Minty: add 5-6 fresh mint leaves + 1 tbsp cacao nibs.",
+      "🍓 Berry: swap banana for 1/2 cup frozen mixed berries, omit spinach (kale works).",
+      "🥥 Green Goddess: use coconut milk, add 1/4 avocado + 1 tsp spirulina powder.",
+      "☕ Coffee: swap 1/2 cup milk for cold brew coffee, add 1 tbsp cacao powder.",
+    ],
+    costPerServing: "SGD 2.20",
+    protein: "30g",
+    calories: "~350",
+    biomarkers: ["hba1c", "hscrp"],
+  },
+  {
+    id: "egg-muffin-cups",
+    name: "Egg Muffin Cups",
+    category: "breakfast",
+    description: "Batch-prep 12 on Sunday, grab 2-3 every morning. High protein, portable, and reheat perfectly. The ultimate meal prep breakfast.",
+    prepTime: "10 min prep",
+    cookTime: "18 min",
+    ingredients: [
+      "8 large eggs",
+      "100g cooked chicken sausage (or any protein), diced",
+      "1/2 bell pepper, diced",
+      "1/2 onion, diced",
+      "Handful spinach, chopped",
+      "30g shredded cheese (optional)",
+      "Salt, pepper, garlic powder",
+    ],
+    instructions: [
+      "Preheat oven to 180°C. Grease a 12-cup muffin tin.",
+      "Whisk eggs with salt, pepper, and garlic powder.",
+      "Divide vegetables, meat, and cheese evenly among muffin cups.",
+      "Pour egg mixture over fillings, filling each cup ~3/4 full.",
+      "Bake 16-18 min until set and slightly golden. Cool, store in fridge (5 days) or freezer (1 month).",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with your egg muffins (fat helps absorption). 💊 B-Complex alongside.",
+    variations: [
+      "🥓 Carnivore: use cooked bacon bits + cheddar, skip vegetables.",
+      "🥬 Vegetarian: use feta + sun-dried tomato + zucchini + basil.",
+      "🌶️ Mexican: add black beans + corn + cumin + cilantro + pepper jack cheese.",
+      "🍄 Mushroom & Swiss: sautéed mushrooms + Swiss cheese + thyme.",
+    ],
+    costPerServing: "SGD 1.20 (3 muffins)",
+    protein: "24g",
+    calories: "~280",
+    biomarkers: ["vitamin-d", "grip"],
+  },
+  {
+    id: "sardine-avocado-toast",
+    name: "Sardine Avocado Toast",
+    category: "breakfast",
+    description: "The ultimate budget longevity breakfast. Sardines are the highest omega-3 per dollar. Takes 5 minutes, no cooking.",
+    prepTime: "5 min",
+    cookTime: "0 min",
+    ingredients: [
+      "1 can sardines in olive oil",
+      "1/2 ripe avocado",
+      "2 slices whole-grain or sourdough bread",
+      "Lemon juice, salt, pepper",
+      "Optional: red pepper flakes, microgreens",
+    ],
+    instructions: [
+      "Toast bread until golden and crisp.",
+      "Mash avocado with a fork, spread on toast. Season with salt and pepper.",
+      "Drain sardines (reserve oil for drizzling). Break into chunks, arrange on avocado.",
+      "Drizzle with lemon juice and a bit of reserved sardine oil. Top with pepper flakes.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with this meal (sardine + avocado fat aids absorption).",
+    variations: [
+      "🥒 Cucumber: add sliced cucumber + dill + squeeze of lemon on top.",
+      "🍅 Tomato: add sliced cherry tomatoes + balsamic glaze drizzle.",
+      "🥗 Open-Faced Salad: top with rocket + shaved parmesan + balsamic.",
+      "🌶️ Spicy: add sriracha + pickled red onions + cilantro.",
+    ],
+    costPerServing: "SGD 2.50",
+    protein: "24g",
+    calories: "~420",
+    biomarkers: ["hscrp", "triglycerides", "vitamin-d", "homocysteine"],
+  },
+  {
+    id: "sweet-potato-hash",
+    name: "Sweet Potato & Egg Hash",
+    category: "breakfast",
+    description: "Savory, satiating, and packed with beta-carotene and fiber. One-pan meal that keeps you full for hours.",
+    prepTime: "5 min",
+    cookTime: "15 min",
+    ingredients: [
+      "1 medium sweet potato, cubed (1cm)",
+      "2-3 eggs",
+      "1 tbsp olive oil or ghee",
+      "1/2 onion, diced",
+      "1/2 bell pepper, diced",
+      "Salt, pepper, paprika, garlic powder",
+    ],
+    instructions: [
+      "Heat oil in a skillet over medium-high. Add sweet potato cubes, cook 8-10 min, stirring occasionally, until golden and tender.",
+      "Add onion and bell pepper, cook 3 more minutes. Season with paprika, garlic powder, salt, pepper.",
+      "Make 2-3 wells in the hash. Crack an egg into each well. Reduce heat to medium-low.",
+      "Cover and cook 3-5 min until whites are set but yolks are still runny. Serve immediately.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — eggs provide the fat for absorption.",
+    variations: [
+      "🥩 Add Protein: crumble in cooked sausage or diced ham with the onions.",
+      "🥑 Top with avocado + hot sauce + cilantro.",
+      "🧀 Cheesy: sprinkle feta or goat cheese over the finished hash.",
+      "🌿 Green: add a handful of kale or spinach just before adding eggs, let wilt.",
+    ],
+    costPerServing: "SGD 2.00",
+    protein: "18g",
+    calories: "~400",
+    biomarkers: ["hba1c", "fasting-glucose"],
+  },
+  {
+    id: "chia-pudding",
+    name: "Chia Pudding with Berries",
+    category: "breakfast",
+    description: "No-cook, prep-ahead, packed with omega-3s (from chia), fiber, and protein. Make 3-4 jars on Sunday for grab-and-go breakfasts.",
+    prepTime: "5 min prep",
+    cookTime: "0 min (set overnight)",
+    ingredients: [
+      "3 tbsp chia seeds",
+      "1 cup milk or unsweetened almond milk",
+      "1/2 scoop vanilla protein powder (optional)",
+      "1 tsp maple syrup or honey (optional)",
+      "1/2 cup mixed berries (for topping)",
+    ],
+    instructions: [
+      "Mix chia seeds, milk, protein powder, and sweetener in a jar. Stir vigorously, wait 2 min, stir again (prevents clumps).",
+      "Refrigerate overnight or minimum 4 hours. Chia seeds absorb liquid and form a pudding texture.",
+      "In the morning, stir, top with fresh or thawed frozen berries, and eat.",
+    ],
+    supplementPairing: "💊 Creatine Monohydrate — stir into the milk before mixing. Completely dissolves, no taste.",
+    variations: [
+      "🥥 Coconut: use coconut milk + top with mango + toasted coconut flakes.",
+      "🍫 Chocolate: add 1 tbsp cocoa powder to the milk + top with cacao nibs.",
+      "🍊 Orange Cream: add zest of 1 orange + 1/2 tsp vanilla extract + top with mandarin segments.",
+      "☕ Coffee: use cold brew coffee instead of half the milk + top with chopped almonds.",
+    ],
+    costPerServing: "SGD 1.50",
+    protein: "15g (25g with protein powder)",
+    calories: "~320",
+    biomarkers: ["hscrp", "apob"],
+  },
+  {
+    id: "protein-pancakes",
+    name: "High-Protein Pancakes",
+    category: "breakfast",
+    description: "Fluffy, satisfying, and packed with protein. Make a batch on weekends or prep and freeze for the week.",
+    prepTime: "5 min",
+    cookTime: "8 min",
+    ingredients: [
+      "2 eggs",
+      "1 scoop vanilla protein powder",
+      "1/2 banana, mashed",
+      "1/4 cup oats (blended into flour)",
+      "1/4 tsp baking powder",
+      "1 tbsp butter or coconut oil (for cooking)",
+    ],
+    instructions: [
+      "Mix all ingredients (except butter) in a bowl until smooth. Batter should be thick but pourable — add splash of milk if needed.",
+      "Heat butter in a non-stick pan over medium heat. Pour ~1/4 cup batter per pancake.",
+      "Cook 2-3 min until bubbles form on surface, flip, cook 1-2 more minutes.",
+      "Serve with Greek yogurt and berries instead of syrup.",
+    ],
+    supplementPairing: "💊 Creatine Monohydrate — mix 5g into the batter. Zero impact on taste or texture.",
+    variations: [
+      "🍫 Chocolate Chip: fold in 1 tbsp dark chocolate chips + 1 tsp cocoa powder.",
+      "🫐 Blueberry: fold fresh blueberries into batter before cooking.",
+      "🥜 Peanut Butter: add 1 tbsp PB2 powder + top with sliced banana.",
+      "🎃 Pumpkin: add 2 tbsp pumpkin purée + 1/2 tsp pumpkin spice + pinch nutmeg.",
+    ],
+    costPerServing: "SGD 2.00",
+    protein: "32g",
+    calories: "~380",
+    biomarkers: ["grip", "hba1c"],
+  },
+  {
+    id: "breakfast-burrito",
+    name: "Breakfast Burrito Bowl",
+    category: "breakfast",
+    description: "All the satisfaction of a burrito without the tortilla. High protein, high fat, zero carbs from wrap — perfect for stable blood sugar.",
+    prepTime: "5 min",
+    cookTime: "8 min",
+    ingredients: [
+      "2-3 eggs",
+      "100g cooked ground beef or turkey (or black beans for vegetarian)",
+      "1/2 avocado",
+      "Handful spinach",
+      "Salsa or pico de gallo",
+      "Salt, pepper, cumin, chili powder",
+    ],
+    instructions: [
+      "Scramble eggs in a pan. Set aside.",
+      "In the same pan, warm the cooked meat with cumin and chili powder.",
+      "Layer in a bowl: spinach, scrambled eggs, meat, diced avocado, salsa.",
+      "Optional: top with Greek yogurt (instead of sour cream) and hot sauce.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with this meal (eggs + avocado fat).",
+    variations: [
+      "🥑 Extra Avocado: double the avocado, skip the meat for lighter meal.",
+      "🌿 Herb: add fresh cilantro + lime juice + pickled jalapeños.",
+      "🧀 Cheesy: add shredded cheddar or cotija cheese on top.",
+      "🍚 Volume: add 1/2 cup cauliflower rice for more bulk without carbs.",
+    ],
+    costPerServing: "SGD 2.50",
+    protein: "30g",
+    calories: "~450",
+    biomarkers: ["hba1c", "fasting-glucose", "testosterone"],
+  },
+  {
+    id: "lemon-chicken-salad",
+    name: "Lemon Garlic Chicken Breast Salad",
+    category: "lunch",
+    description: "The workday staple. High protein, high volume, low calorie. Pre-make 3 days of salads in 20 minutes.",
+    prepTime: "15 min",
+    cookTime: "12 min",
+    ingredients: [
+      "150g chicken breast",
+      "4 cups mixed greens or romaine",
+      "1/2 cucumber, diced",
+      "1/2 bell pepper, sliced",
+      "1/4 red onion, thinly sliced",
+      "Handful cherry tomatoes, halved",
+      "2 tbsp extra virgin olive oil",
+      "Juice of 1/2 lemon",
+      "Salt, pepper, garlic powder",
+    ],
+    instructions: [
+      "Season chicken with salt, pepper, garlic powder. Air fry at 190°C for 10-12 min (flip at 6 min). Rest 5 min, then slice.",
+      "In a large bowl, combine greens, cucumber, bell pepper, onion, tomatoes.",
+      "Top with sliced chicken. Dress with olive oil + lemon juice + salt + pepper.",
+    ],
+    supplementPairing: "💊 Omega-3 (EPA/DHA) — take with lunch (olive oil and chicken fat aid absorption).",
+    variations: [
+      "🥑 Add 1/2 avocado + pumpkin seeds for healthy fats and crunch.",
+      "🧀 Add crumbled feta + Kalamata olives + oregano for Greek twist.",
+      "🥗 Swap chicken for canned salmon or sardines for zero-cook version.",
+      "🌿 Add fresh herbs: parsley + mint + dill for brightness.",
+    ],
+    costPerServing: "SGD 3.50",
+    protein: "35g",
+    calories: "~380",
+    biomarkers: ["hba1c", "grip", "alt"],
+  },
+  {
+    id: "tuna-lettuce-wraps",
+    name: "Tuna & Avocado Lettuce Wraps",
+    category: "lunch",
+    description: "No bread, no cooking, 5 minutes. High protein, healthy fats, and the tuna + avocado combo is surprisingly luxurious.",
+    prepTime: "5 min",
+    cookTime: "0 min",
+    ingredients: [
+      "1 can tuna (in water or olive oil)",
+      "1/2 ripe avocado",
+      "1 tbsp mayonnaise or Greek yogurt",
+      "Juice of 1/2 lemon",
+      "Salt, pepper",
+      "4-5 large lettuce leaves (butter, romaine, or iceberg)",
+    ],
+    instructions: [
+      "Drain tuna. In a bowl, mash avocado with a fork.",
+      "Mix in tuna, mayo/yogurt, lemon juice, salt, pepper.",
+      "Scoop mixture into lettuce leaves. Wrap and eat.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with this meal (avocado fat).",
+    variations: [
+      "🌶️ Add diced celery + red onion + dash of sriracha for crunch and heat.",
+      "🥗 Serve over mixed greens instead of lettuce wraps for a salad version.",
+      "🍎 Add diced apple + walnuts + tarragon for a Waldorf-style twist.",
+      "🥑 Double the avocado, skip the mayo — extra healthy fats.",
+    ],
+    costPerServing: "SGD 2.50",
+    protein: "28g",
+    calories: "~320",
+    biomarkers: ["hscrp", "triglycerides"],
+  },
+  {
+    id: "quinoa-buddha-bowl",
+    name: "Quinoa Buddha Bowl",
+    category: "lunch",
+    description: "Complete protein from quinoa + endless vegetable combinations. Make a big batch of quinoa on Sunday, assemble daily.",
+    prepTime: "10 min",
+    cookTime: "15 min (quinoa)",
+    ingredients: [
+      "1 cup cooked quinoa",
+      "100g protein (chicken, salmon, chickpeas, or tofu)",
+      "1 cup roasted vegetables (broccoli, sweet potato, bell pepper)",
+      "1/2 avocado",
+      "Handful leafy greens",
+      "2 tbsp tahini or vinaigrette dressing",
+    ],
+    instructions: [
+      "Cook quinoa: 2:1 water to quinoa, boil then simmer 15 min, fluff with fork.",
+      "Roast vegetables at 200°C for 15-20 min with olive oil, salt, pepper.",
+      "Cook protein (air fry chicken at 190°C for 12 min, or pan-sear salmon 4 min/side).",
+      "Assemble bowl: greens → quinoa → vegetables → protein → avocado → drizzle dressing.",
+    ],
+    supplementPairing: "💊 CoQ10 — take with lunch (fats from avocado + dressing aid absorption).",
+    variations: [
+      "🥔 Mediterranean: use chicken + roasted red pepper + olives + feta + tzatziki.",
+      "🍣 Salmon: use pan-seared salmon + edamame + pickled ginger + soy dressing.",
+      "🥬 Vegan: use chickpeas + roasted sweet potato + tahini + pumpkin seeds.",
+      "🌶️ Mexican: use ground beef + black beans + corn + salsa + lime.",
+    ],
+    costPerServing: "SGD 4.00",
+    protein: "30g",
+    calories: "~450",
+    biomarkers: ["hba1c", "fasting-glucose", "hscrp"],
+  },
+  {
+    id: "sardine-plate",
+    name: "Sardine Plate",
+    category: "lunch",
+    description: "Zero cooking, maximum nutrition. Sardines are the highest omega-3 per dollar on the planet. Keep canned sardines in your desk drawer.",
+    prepTime: "5 min",
+    cookTime: "0 min",
+    ingredients: [
+      "1 can sardines (in olive oil)",
+      "2-3 crackers or cucumber slices (for scooping)",
+      "Handful cherry tomatoes",
+      "Few olives",
+      "Lemon wedge",
+    ],
+    instructions: [
+      "Open can of sardines. Drain or keep the oil (drizzle over the plate).",
+      "Arrange on a plate with crackers/cucumber, tomatoes, olives, and lemon wedge.",
+      "Squeeze lemon over sardines. Eat with fork or scoop with crackers.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with this meal (sardine oil is pure fat).",
+    variations: [
+      "🥗 Sardine Salad: flake sardines over mixed greens + lemon + olive oil.",
+      "🥑 Avocado Boat: halve avocado, fill each half with sardine chunks + lemon.",
+      "🍝 Sardine Pasta: toss sardines with zucchini noodles + garlic + chili flakes.",
+      "🥪 Open Sandwich: mash sardines on sourdough + avocado + pickled onions.",
+    ],
+    costPerServing: "SGD 2.00",
+    protein: "22g",
+    calories: "~320",
+    biomarkers: ["hscrp", "triglycerides", "vitamin-d"],
+  },
+  {
+    id: "chicken-sweet-potato-bowl",
+    name: "Chicken & Sweet Potato Bowl",
+    category: "lunch",
+    description: "The macro-perfect lunch. Lean protein + complex carbs + healthy fats. Meal prep both components on Sunday.",
+    prepTime: "10 min",
+    cookTime: "20 min",
+    ingredients: [
+      "150g chicken thigh or breast",
+      "1 medium sweet potato, cubed",
+      "1 tbsp olive oil",
+      "1 cup steamed broccoli or green beans",
+      "Salt, pepper, paprika, garlic powder",
+    ],
+    instructions: [
+      "Toss sweet potato cubes with oil, paprika, garlic powder. Air fry at 200°C for 15-18 min.",
+      "Season chicken with salt, pepper, garlic powder. Air fry at 190°C for 12 min (flip halfway).",
+      "Steam broccoli 3-4 min (or add to air fryer for last 5 min).",
+      "Slice chicken. Assemble bowl: sweet potato → broccoli → chicken.",
+    ],
+    supplementPairing: "💊 Omega-3 — take with lunch (chicken has some fat for absorption). 💊 Zinc — take with dinner (not lunch, avoid zinc + coffee interaction).",
+    variations: [
+      "🍠 Swap sweet potato for roasted pumpkin or carrots.",
+      "🥑 Add 1/2 avocado + drizzle of tahini or yogurt dressing.",
+      "🌿 Add fresh herbs + lemon zest + pumpkin seeds for crunch.",
+      "🍚 Swap vegetables for cauliflower rice for lower carb option.",
+    ],
+    costPerServing: "SGD 3.50",
+    protein: "35g",
+    calories: "~450",
+    biomarkers: ["hba1c", "fasting-glucose", "grip"],
+  },
+  {
+    id: "salmon-poke-bowl",
+    name: "Salmon Poke Bowl",
+    category: "lunch",
+    description: "Omega-3 powerhouse lunch. Feel like you're eating out for a fraction of the cost. Prep rice and veggies on Sunday.",
+    prepTime: "10 min",
+    cookTime: "0 min (if using pre-cooked rice)",
+    ingredients: [
+      "150g sashimi-grade salmon (or smoked salmon as budget option)",
+      "1 cup cooked brown rice or cauliflower rice",
+      "1/2 avocado, diced",
+      "1/2 cucumber, diced",
+      "1/4 cup edamame",
+      "2 tbsp soy sauce + 1 tsp sesame oil + splash rice vinegar",
+    ],
+    instructions: [
+      "If using sashimi salmon: slice into cubes. If smoked salmon: shred into pieces.",
+      "Cook rice if not pre-made. Let cool slightly.",
+      "Assemble bowl: rice → salmon → avocado → cucumber → edamame.",
+      "Drizzle with soy-sesame dressing. Top with sesame seeds and optional furikake.",
+    ],
+    supplementPairing: "💊 CoQ10 — take with lunch (fat from salmon + avocado aids absorption).",
+    variations: [
+      "🍣 Budget: use canned salmon instead of fresh. Still high omega-3.",
+      "🥭 Tropical: add mango + coconut + lime juice + sambal oelek.",
+      "🌶️ Spicy: mix salmon with sriracha mayo + top with pickled ginger.",
+      "🥒 Low-Carb: use cauliflower rice + extra cucumber + seaweed salad.",
+    ],
+    costPerServing: "SGD 4.50",
+    protein: "32g",
+    calories: "~420",
+    biomarkers: ["hscrp", "triglycerides", "vitamin-d"],
+  },
+  {
+    id: "greek-salad-protein",
+    name: "Greek Salad with Grilled Chicken",
+    category: "lunch",
+    description: "Mediterranean classic with high-protein twist. No cooking required if you have pre-cooked chicken. High volume, low calorie.",
+    prepTime: "10 min",
+    cookTime: "0 min (with pre-cooked chicken)",
+    ingredients: [
+      "150g cooked chicken breast, diced",
+      "1 large cucumber, chopped",
+      "2 large tomatoes, chopped",
+      "1/2 red onion, thinly sliced",
+      "1/2 cup Kalamata olives",
+      "50g feta cheese, crumbled",
+      "3 tbsp extra virgin olive oil",
+      "1 tbsp red wine vinegar",
+      "Dried oregano, salt, pepper",
+    ],
+    instructions: [
+      "Combine cucumber, tomatoes, onion, olives in a large bowl.",
+      "Top with diced chicken and crumbled feta.",
+      "Dress with olive oil + vinegar + oregano + salt + pepper. Toss well.",
+    ],
+    supplementPairing: "💊 Omega-3 — take with lunch (olive oil aids absorption).",
+    variations: [
+      "🥔 Add 1/2 cup roasted potatoes or chickpeas for more carbs.",
+      "🐟 Swap chicken for canned sardines or grilled halloumi.",
+      "🥑 Add avocado + bell pepper + pepperoncini for extra vegetables.",
+      "🌿 Add fresh parsley + mint + dill for herbaceous twist.",
+    ],
+    costPerServing: "SGD 4.00",
+    protein: "32g",
+    calories: "~420",
+    biomarkers: ["hscrp", "hdl-c", "apob", "bp"],
+  },
+  {
+    id: "egg-salad-lettuce-cups",
+    name: "Egg Salad Lettuce Cups",
+    category: "lunch",
+    description: "Batch-boil 6 eggs on Sunday for grab-and-go lunches. High protein, healthy fats, zero cooking at lunchtime.",
+    prepTime: "5 min",
+    cookTime: "10 min (for eggs)",
+    ingredients: [
+      "3 hard-boiled eggs",
+      "1 tbsp mayonnaise or Greek yogurt",
+      "1 tsp Dijon mustard",
+      "Salt, pepper, paprika",
+      "4-5 large lettuce leaves",
+      "Optional: diced celery, chives, red onion",
+    ],
+    instructions: [
+      "Boil eggs: cover with cold water, bring to rolling boil, cover, remove from heat, let sit 10 min. Ice bath 5 min. Peel.",
+      "Chop eggs. Mix with mayo, mustard, diced vegetables, salt, pepper, paprika.",
+      "Scoop into lettuce leaves. Eat immediately or pack for lunch.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with this meal (egg yolks provide fat for absorption).",
+    variations: [
+      "🥑 Avocado Egg Salad: swap mayo for 1/2 mashed avocado + lime juice.",
+      "🌶️ Curry: add 1/2 tsp curry powder + raisins + chopped almonds.",
+      "🥗 Serve over mixed greens with cherry tomatoes + cucumber instead of lettuce cups.",
+      "🧀 Add crumbled bacon + shredded cheddar for chef's salad twist.",
+    ],
+    costPerServing: "SGD 1.50",
+    protein: "20g",
+    calories: "~300",
+    biomarkers: ["grip", "hdl-c"],
+  },
+  {
+    id: "turkey-roll-ups",
+    name: "Turkey Roll-Ups",
+    category: "lunch",
+    description: "Zero cooking, 5 minutes, high protein. The ultimate desk lunch. Roll, pack, eat.",
+    prepTime: "5 min",
+    cookTime: "0 min",
+    ingredients: [
+      "4-5 slices turkey breast (deli)",
+      "2 tbsp cream cheese or hummus",
+      "1/2 avocado, sliced",
+      "Handful spinach or rocket",
+      "1/2 bell pepper, sliced into strips",
+    ],
+    instructions: [
+      "Lay turkey slices flat. Spread a thin layer of cream cheese or hummus.",
+      "Layer avocado slices, spinach, and bell pepper strips on one end.",
+      "Roll tightly from the filled end. Slice in half if desired.",
+    ],
+    supplementPairing: "💊 Creatine — take with water anytime (morning is fine, timing doesn't matter).",
+    variations: [
+      "🥒 Add cucumber strips + shredded carrot + cream cheese for extra crunch.",
+      "🌶️ Spicy: use sriracha cream cheese + jalapeño + cilantro.",
+      "🐟 Swap turkey for smoked salmon + dill cream cheese + capers.",
+      "🥬 Vegetarian: use large collard green leaves instead of turkey, fill with hummus + vegetables.",
+    ],
+    costPerServing: "SGD 2.50",
+    protein: "25g",
+    calories: "~300",
+    biomarkers: ["grip"],
+  },
+  {
+    id: "chicken-breast-dinner",
+    name: "Chicken Breast (3 Ways)",
+    category: "dinner",
+    description: "The dinner you'll cook most often. Perfect every time. Change the method and marinade for endless variety. Never eat boring chicken again.",
+    prepTime: "5 min + 30 min marinate",
+    cookTime: "12 min",
+    ingredients: [
+      "150-200g chicken breast (FairPrice: SGD 2.50)",
+      "Marinade of choice",
+      "Salt and pepper",
+      "Olive oil",
+    ],
+    methods: [
+      {
+        name: "Air Fryer",
+        cookTime: "12 min",
+        costPerServing: "SGD 3.00",
+        instructions: [
+          "Pound chicken to even thickness (~2cm). Season and marinate 30+ min.",
+          "Preheat air fryer to 190°C. Place chicken in single layer.",
+          "Cook 10-12 min, flip at 6 min. Rest 5 min before slicing. Internal temp: 74°C.",
+        ],
+        supplementPairing: "💊 Omega-3 — take with dinner. 💊 Zinc — chicken + zinc = optimal absorption.",
+      },
+      {
+        name: "Pan-Seared",
+        cookTime: "10 min",
+        costPerServing: "SGD 3.00",
+        instructions: [
+          "Pound chicken to even thickness. Season and marinate.",
+          "Heat 1 tbsp oil in a pan over medium-high. Cook 4-5 min per side until golden and cooked through.",
+          "Let rest 5 min before slicing. Internal temp: 74°C.",
+        ],
+        supplementPairing: "💊 Omega-3 with dinner. 💊 Zinc Picolinate with dinner.",
+      },
+      {
+        name: "Baked",
+        cookTime: "22 min",
+        costPerServing: "SGD 3.00",
+        instructions: [
+          "Preheat oven to 200°C. Place seasoned chicken on a lined baking sheet.",
+          "Bake 18-22 min, flipping halfway through.",
+          "Rest 5 min. Internal temp: 74°C.",
+        ],
+        supplementPairing: "💊 Zinc Picolinate — take with dinner for testosterone + immune support.",
+      },
+    ],
+    variations: [
+      "🍋 Lemon Herb: olive oil + lemon + garlic + oregano + thyme. Classic.",
+      "🌶️ Spicy Asian: soy sauce + ginger + garlic + chili + sesame oil.",
+      "🍯 Honey Dijon: Dijon + honey + apple cider vinegar + garlic.",
+      "🥥 Turmeric Tandoori: yogurt + turmeric + cumin + coriander + garam masala.",
+    ],
+    costPerServing: "SGD 3.00",
+    protein: "35g",
+    calories: "~220",
     biomarkers: ["grip", "alt", "hba1c"],
-    howToCook: [
-      "Air fryer: 190°C for 10–12 min (flip halfway) — perfect every time",
-      "Marinate 30+ min in olive oil, lemon, garlic, salt, pepper, paprika",
-      "Pan-sear: 4 min each side on medium-high, rest 5 min before slicing",
-      "Bake: 200°C for 20–25 min (thicker breasts need more time)",
-      "Internal temp must reach 74°C — use a $10 meat thermometer",
-    ],
-    budgetTips: [
-      "Buy whole breasts in bulk (2–3kg) — save 30–40% vs pre-packed",
-      "Freeze individual portions in ziplock bags",
-      "Frozen chicken breast is just as nutritious as fresh",
-    ],
-    recipe: `Air Fryer Lemon Garlic Chicken Breast
-
-Marinade (for 500g):
-- 3 tbsp olive oil
-- Juice of 1 lemon
-- 4 cloves garlic, minced
-- 1 tsp paprika
-- 1 tsp dried oregano
-- Salt & pepper to taste
-
-Instructions:
-1. Mix all marinade ingredients in a bowl
-2. Add chicken breasts, coat well, marinate 30 min (or overnight)
-3. Preheat air fryer to 190°C for 3 min
-4. Place chicken in single layer in basket
-5. Cook 10–12 min, flip at 6 min
-6. Rest 5 min before slicing
-7. Internal temp should read 74°C
-
-Cost: ~$2.50 per serving`,
-    cookMethod: "Air Fryer / Pan-sear / Bake",
-    prepTime: "30 min marinade + 12 min cook",
-    servingSize: "150–200g per serving",
   },
   {
     id: "salmon",
-    name: "Wild Salmon",
-    category: "Protein",
-    description: "Omega-3 powerhouse — reduces inflammation, supports brain health, and improves lipid profile. The single best anti-inflammatory food.",
-    benefits: [
-      "Rich in EPA/DHA — 2–3g per serving reduces trigs by 20–30%",
-      "Astaxanthin — powerful antioxidant, protects skin and eyes",
-      "Vitamin D — 600 IU per serving",
-      "Selenium — 200% RDA per serving",
-      "High-quality protein — 22g per 100g",
+    name: "Salmon (3 Ways)",
+    category: "dinner",
+    description: "The single best anti-inflammatory dinner. Rich in omega-3s (EPA/DHA), astaxanthin, and vitamin D. Choose your cooking method.",
+    prepTime: "5 min",
+    cookTime: "10 min",
+    ingredients: [
+      "150g salmon fillet (FairPrice: SGD 5.00)",
+      "1 head broccoli, cut into florets (FairPrice: SGD 1.50)",
+      "2 tbsp olive oil",
+      "Salt, pepper, garlic powder",
+      "Lemon wedges for serving",
     ],
+    methods: [
+      {
+        name: "Pan-Seared",
+        cookTime: "10 min",
+        costPerServing: "SGD 7.00",
+        instructions: [
+          "Pat salmon dry. Season with salt, pepper, garlic powder.",
+          "Heat 1 tbsp oil in a non-stick pan over medium-high. Cook salmon skin-side down 4 min, flip, cook 3 min.",
+          "Toss broccoli with remaining oil, salt, pepper. Air fry at 180°C for 8 min or steam 4 min.",
+          "Serve salmon with lemon squeeze alongside broccoli.",
+        ],
+        supplementPairing: "💊 Omega-3 — still beneficial (therapeutic doses exceed food levels). 💊 CoQ10 — take with dinner (fat from salmon aids absorption).",
+      },
+      {
+        name: "Air Fryer",
+        cookTime: "10 min",
+        costPerServing: "SGD 7.00",
+        instructions: [
+          "Preheat air fryer to 180°C. Season salmon with oil, salt, pepper, garlic powder.",
+          "Cook skin-side up for 8-10 min (thicker fillets need more time).",
+          "Toss broccoli with oil, salt, pepper. After removing salmon, air fry broccoli at 180°C for 6 min.",
+          "Squeeze fresh lemon before serving.",
+        ],
+        supplementPairing: "💊 Omega-3 — top up your levels. 💊 CoQ10 — take with dinner.",
+      },
+      {
+        name: "Baked",
+        cookTime: "15 min",
+        costPerServing: "SGD 7.00",
+        instructions: [
+          "Preheat oven to 200°C. Line a baking sheet with parchment.",
+          "Place salmon skin-side down on one side. Toss broccoli with oil on the other side.",
+          "Season both. Bake 12-15 min until salmon flakes and broccoli is tender.",
+          "Serve with lemon and fresh herbs.",
+        ],
+        supplementPairing: "💊 Omega-3 — even on baked salmon day, supplementation ensures therapeutic dosing. 💊 CoQ10 with dinner.",
+      },
+    ],
+    variations: [
+      "🧈 Lemon Butter: add butter + lemon slices + capers, baste in last 2 min.",
+      "🌿 Herb Crust: press fresh dill + parsley + lemon zest onto salmon before cooking.",
+      "🥔 Add roasted sweet potato wedges alongside (toss with oil + paprika, same temp).",
+      "🌶️ Blackened: coat with paprika + cayenne + thyme + garlic powder.",
+    ],
+    costPerServing: "SGD 7.00",
+    protein: "32g",
+    calories: "~420",
     biomarkers: ["hscrp", "triglycerides", "apob", "vitamin-d"],
-    howToCook: [
-      "Air fryer: 180°C for 8–10 min (skin side up for crispy skin)",
-      "Pan-sear: 4 min skin side down, 3 min flip, medium heat",
-      "Bake: 180°C for 12–15 min with lemon and herbs",
-      "Never overcook — salmon should flake easily but stay moist",
-    ],
-    budgetTips: [
-      "Canned wild salmon (with bones) is 50% cheaper than fresh",
-      "Frozen wild salmon is cheaper and equally nutritious",
-      "Look for sales — stock up and freeze",
-      "Sockeye has more omega-3 per gram than Atlantic",
-    ],
-    recipe: `Simple Air Fryer Salmon
-
-Per serving:
-- 150g salmon fillet
-- 1 tbsp olive oil
-- Salt, pepper, garlic powder
-- Lemon wedges for serving
-
-Instructions:
-1. Pat salmon dry, rub with oil and seasonings
-2. Preheat air fryer to 180°C
-3. Cook skin-side up for 8 min (or 10 min for thicker fillets)
-4. Squeeze fresh lemon before serving
-
-Cost: ~$3.50 per serving (wild); ~$1.50 (canned)`,
-    cookMethod: "Air Fryer / Pan-sear / Bake",
-    prepTime: "5 min prep + 10 min cook",
-    servingSize: "150g per serving",
   },
   {
-    id: "sardines",
-    name: "Sardines",
-    category: "Protein",
-    description: "The ultimate budget longevity food — packed with omega-3s, calcium, vitamin D, and coenzyme Q10. Eat 2–3 cans weekly.",
-    benefits: [
-      "Highest omega-3 per dollar of any food",
-      "Calcium from soft bones — 350mg per can",
-      "Vitamin D — 400 IU per can",
-      "CoQ10 — supports mitochondrial health",
-      "Low mercury — small fish, short lifespan, minimal toxins",
+    id: "beef-stir-fry",
+    name: "Beef & Vegetable Stir-Fry",
+    category: "dinner",
+    description: "Quick, one-pan, high-iron dinner. Faster than takeout and a fraction of the cost. Any vegetables work.",
+    prepTime: "10 min",
+    cookTime: "8 min",
+    ingredients: [
+      "150g beef (sirloin, flank, or thinly sliced)", 
+      "2 cups mixed vegetables (broccoli, bell pepper, snap peas, carrot)",
+      "2 tbsp soy sauce",
+      "1 tbsp sesame oil",
+      "2 cloves garlic, minced",
+      "1 tsp ginger, grated",
     ],
-    biomarkers: ["hscrp", "triglycerides", "vitamin-d", "homocysteine"],
-    howToCook: [
-      "Eat straight from the can — no cooking needed",
-      "Mash with avocado on whole-grain toast",
-      "Add to salad with olive oil and lemon",
-      "For warm meal: pan-fry 2 min each side in olive oil",
+    instructions: [
+      "Slice beef thinly across the grain. Toss with 1 tbsp soy sauce.",
+      "Heat sesame oil in a wok or large pan over high heat until smoking.",
+      "Stir-fry beef 2 min, remove from pan.",
+      "Add vegetables + garlic + ginger. Stir-fry 3 min. Return beef to pan. Add remaining soy sauce. Toss 1 min. Serve immediately.",
     ],
-    budgetTips: [
-      "$2 per can — one of the cheapest protein + omega-3 sources",
-      "Buy canned in water or olive oil (not soy oil)",
-      "Store brands are just as good as premium brands",
+    supplementPairing: "💊 Zinc Picolinate — take with dinner (beef is high in zinc, supplements stack synergistically). 💊 Taurine — take with dinner (meat + taurine combo for heart health).",
+    variations: [
+      "🌶️ Spicy: add 1 tbsp sambal oelek or chili crisp with the garlic.",
+      "🥜 Peanut: add 1 tbsp peanut butter + splash of rice vinegar + lime juice.",
+      "🥬 Low-Carb: serve over cauliflower rice instead of regular rice.",
+      "🍜 Noodle: serve over soba noodles or zucchini noodles.",
     ],
-    recipe: `Sardine Avocado Toast
-
-Per serving:
-- 1 can sardines in olive oil
-- 1/2 avocado
-- 2 slices whole-grain bread
-- Lemon juice, salt, pepper
-- Optional: red pepper flakes
-
-Instructions:
-1. Toast bread
-2. Mash avocado on toast
-3. Top with sardines
-4. Drizzle lemon, season to taste
-
-Cost: ~$2.50 per serving`,
-    cookMethod: "No-cook / Quick pan-fry",
+    costPerServing: "SGD 4.00",
+    protein: "30g",
+    calories: "~380",
+    biomarkers: ["testosterone", "ferritin", "grip"],
+  },
+  {
+    id: "white-fish-dinner",
+    name: "White Fish (3 Ways)",
+    category: "dinner",
+    description: "The gentlest protein — low fat, high protein, quick cooking. Any white fish works: cod, barramundi, snapper, or tilapia.",
     prepTime: "5 min",
-    servingSize: "1 can per serving",
+    cookTime: "12 min",
+    ingredients: [
+      "150g white fish fillet (cod/barramundi, FairPrice: SGD 4.00)",
+      "1 tbsp butter or olive oil",
+      "2 cloves garlic, minced",
+      "Juice of 1/2 lemon",
+      "Salt, pepper, fresh herbs",
+    ],
+    methods: [
+      {
+        name: "Baked (en Papillote)",
+        cookTime: "12 min",
+        costPerServing: "SGD 4.50",
+        instructions: [
+          "Preheat oven to 180°C. Place fish on a piece of foil or parchment.",
+          "Drizzle with melted butter + garlic + lemon juice. Season. Fold into a packet.",
+          "Bake 10-12 min until fish flakes easily. Open carefully (steam is hot!).",
+        ],
+        supplementPairing: "💊 Vitamin D3+K2 — take with dinner (butter provides fat). 💊 Omega-3 with dinner.",
+      },
+      {
+        name: "Pan-Seared",
+        cookTime: "6 min",
+        costPerServing: "SGD 4.50",
+        instructions: [
+          "Pat fish dry. Season both sides.",
+          "Heat oil in a non-stick pan over medium-high.",
+          "Cook 3 min per side until golden and flakes easily. Squeeze lemon over before serving.",
+        ],
+        supplementPairing: "💊 Omega-3 — supplement covers EPA/DHA that white fish lacks. 💊 Vitamin D3+K2 with dinner.",
+      },
+      {
+        name: "Air Fryer",
+        cookTime: "8 min",
+        costPerServing: "SGD 4.50",
+        instructions: [
+          "Preheat air fryer to 180°C. Brush fish with oil, season.",
+          "Place in basket in single layer. Cook 7-9 min depending on thickness.",
+          "Fish should flake easily. Serve with lemon and fresh herbs.",
+        ],
+        supplementPairing: "💊 Omega-3 — supplements fill the EPA/DHA gap. 💊 CoQ10 with dinner.",
+      },
+    ],
+    variations: [
+      "🍅 Tomato Basil: add cherry tomatoes + basil + olive oil.",
+      "🌶️ Spicy: add sliced chili + ginger + soy sauce for Asian twist.",
+      "🧄 Extra Garlic: double the garlic + lemon rounds under the fish.",
+      "🥥 Coconut: add coconut milk + lime + ginger + cilantro for Thai-style.",
+    ],
+    costPerServing: "SGD 4.50",
+    protein: "28g",
+    calories: "~280",
+    biomarkers: ["hscrp", "triglycerides"],
   },
   {
-    id: "eggs",
-    name: "Eggs",
-    category: "Protein",
-    description: "The most bioavailable protein source — complete amino acid profile. Yolk contains choline, lutein, vitamin D, and B-vitamins.",
-    benefits: [
-      "Highest leucine content — triggers muscle protein synthesis best",
-      "Choline — critical for brain health and methylation",
-      "Lutein/zeaxanthin — eye health, reduces macular degeneration",
-      "Vitamin D — 40 IU per yolk",
-      "Affordable complete protein — can eat daily",
+    id: "chicken-thighs-dinner",
+    name: "Chicken Thighs (2 Ways)",
+    category: "dinner",
+    description: "Cheaper, juicier, and more flavourful than breast. Higher in iron and zinc too. The budget-friendly dinner MVP.",
+    prepTime: "5 min",
+    cookTime: "18 min",
+    ingredients: [
+      "2 boneless skinless chicken thighs (~200g) (FairPrice: SGD 2.00)",
+      "1 tbsp olive oil",
+      "Seasoning blend of choice",
+      "Salt and pepper",
     ],
-    biomarkers: ["grip", "homocysteine", "hdl-c"],
-    howToCook: [
-      "Boiled: 7 min for jammy, 10 min for hard — batch cook 6–12",
-      "Scrambled: low heat, constant stirring, finish off heat",
-      "Poached: simmer water + vinegar, swirl, drop egg 3 min",
-      "Air fryer boiled: 130°C for 13 min, ice bath",
+    methods: [
+      {
+        name: "Air Fryer",
+        cookTime: "18 min",
+        costPerServing: "SGD 2.50",
+        instructions: [
+          "Pat thighs dry. Rub with oil and seasoning. Let rest 10 min.",
+          "Preheat air fryer to 190°C. Place thighs in basket (don't overcrowd).",
+          "Air fry 16-18 min, flip at 10 min. Internal temp: 74°C. Rest 5 min.",
+        ],
+        supplementPairing: "💊 Zinc Picolinate — chicken thighs are zinc-rich. 💊 Taurine — dark meat contains natural taurine.",
+      },
+      {
+        name: "Pan-Seared",
+        cookTime: "14 min",
+        costPerServing: "SGD 2.50",
+        instructions: [
+          "Season thighs. Heat 1 tbsp oil in a pan over medium-high.",
+          "Cook skin-side down 5-6 min until golden and crispy. Flip.",
+          "Reduce heat to medium. Cook 5-6 more min until cooked through (74°C). Rest 5 min.",
+        ],
+        supplementPairing: "💊 Zinc Picolinate with dinner. 💊 Taurine with dinner.",
+      },
     ],
-    budgetTips: [
-      "Eggs are the cheapest complete protein — ~$0.25 per serving",
-      "Pasture-raised for better omega-3 content if budget allows",
-      "Buy in flats of 30 for best value",
+    variations: [
+      "🌿 Mediterranean: olive oil + lemon + garlic + oregano + rosemary.",
+      "🍯 Sticky: soy sauce + honey + ginger + garlic. Baste in last 5 min.",
+      "🌶️ Jerk: allspice + thyme + chili + ginger + cinnamon. Serve with mango salsa.",
+      "🧈 Butter Chicken: yogurt + garam masala + turmeric + cumin. Serve with cauliflower rice.",
     ],
-    recipe: `Perfect Hard-Boiled Eggs (Batch)
-
-Per batch:
-- 6–12 eggs
-
-Instructions:
-1. Place eggs in pot, cover with cold water by 1 inch
-2. Bring to rolling boil
-3. Cover, remove from heat, let sit 10 min
-4. Transfer to ice bath for 5 min
-5. Peel under running water
-
-Cost: ~$0.25 per egg`,
-    cookMethod: "Boiled / Scrambled / Poached",
+    costPerServing: "SGD 2.50",
+    protein: "32g",
+    calories: "~350",
+    biomarkers: ["testosterone", "ferritin", "grip"],
+  },
+  {
+    id: "steak-dinner",
+    name: "Steak (2 Ways)",
+    category: "dinner",
+    description: "Iron, zinc, creatine, and B-vitamins — nature's multivitamin in one cut. Cook it right and it's faster than waiting for delivery.",
+    prepTime: "5 min",
+    cookTime: "8 min",
+    ingredients: [
+      "150g beef steak (sirloin or rump, FairPrice: SGD 5.50)",
+      "1 bunch asparagus, woody ends snapped (FairPrice: SGD 3.00)",
+      "1 tbsp olive oil or butter",
+      "Salt and pepper (generous)",
+      "Optional: garlic, thyme",
+    ],
+    methods: [
+      {
+        name: "Pan-Seared",
+        cookTime: "8 min",
+        costPerServing: "SGD 9.00",
+        instructions: [
+          "Pat steak dry. Season generously. Let come to room temp (20 min if possible).",
+          "Heat a heavy pan over high heat until smoking. Add oil.",
+          "Sear steak 3-4 min per side (medium-rare). Add butter + herbs in last 2 min, baste.",
+          "Rest steak 5-8 min. Meanwhile, toss asparagus with oil + salt, air fry at 200°C for 6-8 min.",
+        ],
+        supplementPairing: "💊 Zinc Picolinate — beef + zinc = max testosterone support. 💊 CoQ10 — fat aids absorption.",
+      },
+      {
+        name: "Grilled",
+        cookTime: "8 min",
+        costPerServing: "SGD 9.00",
+        instructions: [
+          "Pat steak dry. Season generously. Let rest at room temp.",
+          "Heat grill or grill pan to high. Oil the grates.",
+          "Grill 3-4 min per side for medium-rare. Don't flip more than once.",
+          "Rest 5 min. Serve with grilled asparagus (add to grill last 4 min).",
+        ],
+        supplementPairing: "💊 Zinc — essential after a workout day. 💊 CoQ10 with dinner (fat).",
+      },
+    ],
+    variations: [
+      "🧈 Garlic Butter: after flipping, add butter + smashed garlic + thyme, baste.",
+      "🌶️ Peppercorn: coat in crushed black pepper. Serve with cream sauce.",
+      "🥗 Steak Salad: slice thin over rocket + parmesan + lemon vinaigrette.",
+      "🍄 Mushroom: sauté mushrooms in the pan after steak, deglaze with wine.",
+    ],
+    costPerServing: "SGD 9.00",
+    protein: "35g",
+    calories: "~400",
+    biomarkers: ["testosterone", "ferritin", "grip"],
+  },
+  {
+    id: "baked-salmon-sweet-potato",
+    name: "Baked Salmon with Sweet Potato Wedges",
+    category: "dinner",
+    description: "Sheet pan dinner — everything cooks together, minimal cleanup. Omega-3s + beta-carotene + fiber. The perfect longevity plate.",
+    prepTime: "10 min",
+    cookTime: "20 min",
+    ingredients: [
+      "150g salmon fillet",
+      "1 medium sweet potato, cut into wedges",
+      "1 tbsp olive oil",
+      "Salt, pepper, paprika, garlic powder",
+      "Lemon + fresh dill for serving",
+    ],
+    instructions: [
+      "Preheat oven to 200°C. Line a baking sheet with parchment.",
+      "Toss sweet potato wedges with oil, paprika, garlic powder, salt. Spread on one side of sheet.",
+      "Bake 10 min. Push potatoes to side. Place salmon skin-side down on sheet. Season.",
+      "Bake another 10-12 min until salmon flakes and potatoes are crispy. Serve with lemon and dill.",
+    ],
+    supplementPairing: "💊 Omega-3 — still beneficial as a top-up (food + supplement = therapeutic synergy). 💊 CoQ10 — take with dinner.",
+    variations: [
+      "🌿 Maple Dijon: brush salmon with Dijon + maple syrup + garlic before roasting.",
+      "🥔 Swap potato for roasted pumpkin or parsnips.",
+      "🥗 Add a side of steamed greens (kale, spinach, or green beans).",
+      "🌶️ Cajun: season salmon with cajun spice blend + serve with lemon aioli.",
+    ],
+    costPerServing: "SGD 4.50",
+    protein: "30g",
+    calories: "~450",
+    biomarkers: ["hscrp", "triglycerides", "hba1c", "vitamin-d"],
+  },
+  {
+    id: "stuffed-bell-peppers",
+    name: "Stuffed Bell Peppers",
+    category: "dinner",
+    description: "Batch-cook 4-6 on Sunday for easy reheat dinners. High protein, vegetables built in, freezer-friendly.",
     prepTime: "15 min",
-    servingSize: "2–3 eggs per serving",
+    cookTime: "25 min",
+    ingredients: [
+      "2 large bell peppers, halved and seeded",
+      "200g ground beef, turkey, or chicken",
+      "1/2 cup cooked rice or quinoa",
+      "1/2 onion, diced",
+      "1 can diced tomatoes (200g)",
+      "1 tsp cumin, 1 tsp paprika",
+      "Salt, pepper, optional cheese",
+    ],
+    instructions: [
+      "Preheat oven to 180°C.",
+      "Brown meat in a pan with onion and spices. Drain excess fat.",
+      "Mix in cooked rice and half the diced tomatoes. Season.",
+      "Stuff mixture into pepper halves. Top with remaining tomatoes (and cheese if using).",
+      "Bake 20-25 min until peppers are tender. Let rest 5 min before serving.",
+    ],
+    supplementPairing: "💊 Zinc Picolinate — take with dinner (meat + zinc combo). 💊 Taurine — take with dinner.",
+    variations: [
+      "🇲🇽 Mexican: use ground beef + black beans + corn + cumin + top with salsa.",
+      "🇬🇷 Greek: use ground lamb + feta + olives + oregano + lemon.",
+      "🥬 Low-Carb: use cauliflower rice instead of regular rice + extra vegetables.",
+      "🧀 Cheesy: top with mozzarella or cheddar in the last 5 min of baking.",
+    ],
+    costPerServing: "SGD 3.50",
+    protein: "28g",
+    calories: "~380",
+    biomarkers: ["testosterone", "grip", "hba1c"],
   },
   {
-    id: "greek-yogurt",
-    name: "Greek Yogurt",
-    category: "Protein",
-    description: "High-protein fermented dairy — probiotics for gut health, calcium for bones. Double the protein of regular yogurt.",
-    benefits: [
-      "15–20g protein per 150g serving",
-      "Probiotics — supports gut microbiome diversity",
-      "Calcium — 15% RDA per serving",
-      "B12 and riboflavin",
+    id: "tuna-white-bean-salad",
+    name: "Tuna & White Bean Salad",
+    category: "lunch",
+    description: "No-cook, high-protein, high-fiber lunch. Canned tuna + beans = perfect budget longevity meal. Make 3 portions in 10 minutes.",
+    prepTime: "10 min",
+    cookTime: "0 min",
+    ingredients: [
+      "1 can tuna (in olive oil)",
+      "1 can cannellini beans, drained and rinsed",
+      "1/2 red onion, thinly sliced",
+      "Handful cherry tomatoes, halved",
+      "2 tbsp extra virgin olive oil",
+      "1 tbsp lemon juice",
+      "Salt, pepper, fresh parsley",
     ],
-    biomarkers: ["hscrp", "hdl-c", "vitamin-d"],
-    howToCook: [
-      "No cooking — eat as is or use in smoothies",
-      "Top with berries, nuts, seeds for a complete meal",
-      "Use as sour cream substitute in recipes",
-      "Freeze into yogurt bark with fruit for healthy dessert",
+    instructions: [
+      "Drain tuna. In a bowl, combine beans, onion, tomatoes, and parsley.",
+      "Add tuna in chunks (don't over-mash).",
+      "Dress with olive oil + lemon juice + salt + pepper. Toss gently.",
+      "Serve at room temperature or refrigerate for up to 3 days.",
     ],
-    budgetTips: [
-      "Buy plain full-fat in large tubs (saves 50% vs individual cups)",
-      "Flavour yourself with frozen berries — cheaper than pre-flavoured",
-      "Store brand is identical to branded nutritionally",
+    supplementPairing: "💊 Vitamin D3+K2 — take with lunch (olive oil provides fat). 💊 Omega-3 — take with lunch (tuna + fish oil stack).",
+    variations: [
+      "🌿 Add cucumber + bell pepper + Kalamata olives for Greek twist.",
+      "🌶️ Spicy: add chili flakes + garlic + splash of red wine vinegar.",
+      "🥗 Serve over a bed of rocket or mixed greens for more volume.",
+      "🧀 Add crumbled feta + fresh mint for Mediterranean flavor.",
     ],
-    recipe: `Protein Yogurt Bowl
-
-Per serving:
-- 200g plain Greek yogurt
-- 1/2 cup frozen berries
-- 1 tbsp chia seeds
-- 1 tbsp almond butter
-- Optional: 1 scoop vanilla protein powder
-
-Instructions:
-1. Layer yogurt in bowl
-2. Top with berries, chia, almond butter
-3. Stir and enjoy
-
-Cost: ~$2.00 per serving`,
-    cookMethod: "No-cook",
-    prepTime: "3 min",
-    servingSize: "150–200g per serving",
+    costPerServing: "SGD 2.50",
+    protein: "28g",
+    calories: "~380",
+    biomarkers: ["hscrp", "triglycerides", "hdl-c"],
   },
   {
-    id: "broccoli",
-    name: "Broccoli",
-    category: "Vegetables",
-    description: "Cruciferous powerhouse — sulforaphane activates Nrf2, the master antioxidant pathway. Eat 3–5 servings of cruciferous vegetables weekly.",
-    benefits: [
-      "Sulforaphane — upregulates detox enzymes, reduces oxidative stress",
-      "Vitamin C — 135% RDA per 100g",
-      "Vitamin K — bone health and calcium regulation",
-      "Fiber — 2.6g per 100g, feeds beneficial gut bacteria",
-      "Glucosinolates — cancer-protective compounds",
-    ],
-    biomarkers: ["hscrp", "homocysteine", "alt", "uric-acid"],
-    howToCook: [
-      "Steam 4–5 min — preserves sulforaphane best",
-      "Air fry: 180°C for 8 min with oil and garlic — crispy edges",
-      "Roast: 200°C for 15 min with olive oil, salt, pepper",
-      "Add to stir-fry in the last 3 min of cooking",
-      "Avoid boiling — leaches nutrients and sulforaphane",
-    ],
-    budgetTips: [
-      "Frozen broccoli is cheaper and sometimes more nutritious (flash-frozen at peak)",
-      "Stems are just as nutritious as florets — chop and use both",
-    ],
-    recipe: `Air Fryer Garlic Broccoli
-
-Per serving:
-- 200g broccoli florets
-- 2 tbsp olive oil
-- 3 cloves garlic, minced
-- Salt & pepper
-
-Instructions:
-1. Toss broccoli with oil, garlic, seasonings
-2. Air fry at 180°C for 8 min
-3. Squeeze lemon juice before serving
-
-Cost: ~$0.80 per serving`,
-    cookMethod: "Steam / Air Fry / Roast",
-    prepTime: "5 min prep + 8 min cook",
-    servingSize: "150–200g per serving",
-  },
-  {
-    id: "spinach",
-    name: "Spinach & Kale",
-    category: "Vegetables",
-    description: "Leafy greens — highest nutrient-per-calorie foods on the planet. Magnesium, iron, vitamin K, and nitrates for vascular health.",
-    benefits: [
-      "Nitrates — convert to NO (nitric oxide), lower BP by 4–5 mmHg",
-      "Magnesium — 87mg per 100g (spinach), critical for 300+ enzymes",
-      "Vitamin K — 500% RDA, directs calcium to bones not arteries",
-      "Lutein — eye health, cognitive function",
-      "Kaempferol & quercetin — anti-inflammatory flavonoids",
-    ],
-    biomarkers: ["bp", "hscrp", "homocysteine", "ferritin"],
-    howToCook: [
-      "Wilt into eggs, soups, or stir-fries — shrinks dramatically",
-      "Sauté 2–3 min with garlic and olive oil",
-      "Massage kale with olive oil and lemon for raw salads",
-      "Add to smoothies — you won't taste it",
-    ],
-    budgetTips: [
-      "Frozen spinach is $1.50/bag and more concentrated than fresh",
-      "Buy fresh kale — it lasts 5–7 days in the fridge",
-    ],
-    recipe: `Garlic Wilted Spinach
-
-Per serving:
-- 200g fresh spinach (or 100g frozen)
-- 2 tbsp olive oil
-- 3 cloves garlic, sliced
-- Salt & pepper
-- Lemon juice
-
-Instructions:
-1. Heat oil in pan, add garlic 30 sec
-2. Add spinach in batches, toss until wilted (2–3 min)
-3. Season, squeeze lemon
-
-Cost: ~$1.00 per serving`,
-    cookMethod: "Sauté / Raw / Steamed",
-    prepTime: "5 min",
-    servingSize: "100–200g per serving",
-  },
-  {
-    id: "blueberries",
-    name: "Blueberries",
-    category: "Fruits",
-    description: "The longevity fruit — highest antioxidant capacity among common fruits. Anthocyanins protect against cognitive decline and oxidative stress.",
-    benefits: [
-      "Anthocyanins — cross the blood-brain barrier, protect neurons",
-      "Flavonoids — improve endothelial function, lower BP",
-      "Vitamin C & vitamin K",
-      "Low glycemic load — minimal impact on blood sugar",
-    ],
-    biomarkers: ["hscrp", "bp", "hba1c", "fasting-glucose"],
-    howToCook: [
-      "No cooking — eat fresh or frozen",
-      "Add to yogurt, oatmeal, smoothies",
-      "Bake into healthy muffins (use almond flour, minimal sweetener)",
-      "Frozen berries work perfectly in overnight oats",
-    ],
-    budgetTips: [
-      "Frozen wild blueberries are 50% cheaper and MORE nutritious than fresh",
-      "Buy in bulk bags from warehouse stores",
-      "Pick-your-own in season and freeze yourself",
-    ],
-    recipe: `3-Minute Berry Bowl
-
-Per serving:
-- 100g frozen wild blueberries
-- 1 tbsp chia seeds
-- 1 tbsp flax seeds
-- 200g Greek yogurt
-
-Instructions:
-1. Layer yogurt, berries, seeds
-2. Stir and eat
-
-Cost: ~$1.50 per serving`,
-    cookMethod: "No-cook",
-    prepTime: "3 min",
-    servingSize: "100–150g per serving",
-  },
-  {
-    id: "avocado",
-    name: "Avocado",
-    category: "Fruits",
-    description: "Monounsaturated fat powerhouse — supports hormone production, nutrient absorption, and cardiovascular health. Rich in potassium and fiber.",
-    benefits: [
-      "Monounsaturated fat — improves HDL, reduces LDL oxidation",
-      "Potassium — 485mg per half avocado (more than a banana)",
-      "Fiber — 7g per half, promotes satiety and gut health",
-      "Lutein + zeaxanthin — eye health",
-      "Improves absorption of fat-soluble vitamins from other foods",
-    ],
-    biomarkers: ["hdl-c", "bp", "hscrp", "testosterone"],
-    howToCook: [
-      "Sliced on toast, salads, or tacos",
-      "Guacamole: mash with lime, onion, cilantro, salt",
-      "Add to smoothies for creamy texture",
-      "Half with a splash of olive oil and salt = perfect snack",
-    ],
-    budgetTips: [
-      "Buy at local markets or discount grocery stores",
-      "Wait for sales and buy in bulk — ripen at home",
-      "Store ripe avocados in the fridge for 3–5 extra days",
-    ],
-    recipe: `Simple Guacamole
-
-Per serving:
-- 1 ripe avocado
-- 1 tbsp lime juice
-- 1/4 red onion, diced
-- Handful cilantro, chopped
-- Salt & pepper
-- Optional: 1/2 tomato, diced
-
-Instructions:
-1. Mash avocado to desired consistency
-2. Mix in all ingredients
-3. Adjust salt and lime to taste
-
-Cost: ~$1.50 per serving`,
-    cookMethod: "No-cook",
-    prepTime: "5 min",
-    servingSize: "1/2–1 avocado per serving",
-  },
-  {
-    id: "olive-oil",
-    name: "Extra Virgin Olive Oil",
-    category: "Healthy Fats",
-    description: "The cornerstone of the Mediterranean diet — polyphenols reduce inflammation, protect LDL from oxidation, and support brain health.",
-    benefits: [
-      "Oleic acid — monounsaturated fat, reduces inflammation",
-      "Polyphenols (oleocanthal) — natural anti-inflammatory, similar to ibuprofen",
-      "Hydroxytyrosol — protects LDL from oxidation",
-      "Vitamin E — fat-soluble antioxidant",
-      "Improves HDL function and endothelial health",
-    ],
-    biomarkers: ["hscrp", "hdl-c", "apob", "bp"],
-    howToCook: [
-      "Use raw for salads and finishing dishes",
-      "Medium-heat cooking OK — don't smoke it (keep below 180°C)",
-      "Drizzle on vegetables before roasting",
-      "Mix with lemon as simple salad dressing",
-    ],
-    budgetTips: [
-      "Buy in 3L tins — 50% cheaper than small bottles per ml",
-      "Store in cool, dark place to preserve polyphenols",
-      "Look for 'early harvest' olive oil — highest polyphenol content",
-      "Kalamata or Greek brands offer best value for quality",
-    ],
-    recipe: `Simple Vinaigrette
-
-Makes 1 cup:
-- 3/4 cup extra virgin olive oil
-- 1/4 cup red wine or balsamic vinegar
-- 1 tsp Dijon mustard
-- 1 clove garlic, minced
-- Salt & pepper
-- Optional: dried oregano
-
-Instructions:
-1. Whisk everything together
-2. Store in jar for up to 2 weeks
-
-Cost: ~$0.30 per serving`,
-    cookMethod: "Raw / Light cooking",
+    id: "omelette-dinner",
+    name: "Quick Omelette Dinner",
+    category: "dinner",
+    description: "The fastest dinner you'll ever make. Ready in 5 minutes, costs under SGD 2, and packs 25g protein. Perfect for nights when you have zero energy.",
     prepTime: "2 min",
-    servingSize: "1–2 tbsp per serving",
+    cookTime: "5 min",
+    ingredients: [
+      "3 large eggs (FairPrice: SGD 1.35)",
+      "1 tbsp butter or ghee",
+      "Handful of leftover vegetables or spinach",
+      "30g cheese (optional, FairPrice: SGD 0.50)",
+      "Salt, pepper, herbs",
+    ],
+    instructions: [
+      "Crack eggs into a bowl, whisk vigorously with salt and pepper until frothy.",
+      "Melt butter in a non-stick pan over medium heat. Add vegetables, cook 1 min.",
+      "Pour eggs over vegetables. Let set 30 sec. Gently push cooked edges toward centre, tilting pan to let raw egg flow to edges.",
+      "When mostly set but still slightly wet on top, add cheese and fold omelette in half. Cook 30 sec more. Slide onto plate.",
+    ],
+    supplementPairing: "💊 Vitamin D3+K2 — take with dinner (eggs + butter provide fat). 💊 Magnesium Glycinate — take 30 min before bed.",
+    variations: [
+      "🧀 Cheese: add cheddar + chives + ham for classic French omelette.",
+      "🌶️ Spicy: add chili + onion + bell pepper + cumin + cilantro.",
+      "🍄 Mushroom & Thyme: sauté mushrooms + garlic + thyme before adding eggs.",
+      "🥑 Top with avocado + salsa + Greek yogurt for loaded version.",
+    ],
+    costPerServing: "SGD 2.00",
+    protein: "20g",
+    calories: "~320",
+    biomarkers: ["vitamin-d", "hdl-c", "grip"],
   },
   {
-    id: "sweet-potato",
-    name: "Sweet Potatoes",
-    category: "Complex Carbs",
-    description: "Nutrient-dense carbohydrate source — rich in beta-carotene, fiber, and potassium. Lower glycemic impact than white potatoes.",
-    benefits: [
-      "Beta-carotene — converted to vitamin A, antioxidant",
-      "Fiber — 4g per medium potato with skin",
-      "Vitamin C — 35% RDA",
-      "Potassium — 540mg per medium potato",
-      "Slow-digesting carb — sustained energy without glucose spike",
+    id: "quick-chicken-veggie",
+    name: "Quick Chicken & Vegetable Skillet",
+    category: "dinner",
+    description: "The 15-minute, one-pan, no-excuses dinner. Whatever vegetables you have, this works. High protein, high volume, low effort.",
+    prepTime: "5 min",
+    cookTime: "10 min",
+    ingredients: [
+      "150g chicken breast or thigh, diced",
+      "2 cups mixed vegetables (broccoli, bell pepper, zucchini, snap peas)",
+      "2 tbsp olive oil",
+      "2 cloves garlic, minced",
+      "Salt, pepper, paprika, dried herbs",
     ],
-    biomarkers: ["hba1c", "fasting-glucose", "bp"],
-    howToCook: [
-      "Air fryer: 200°C for 15–20 min (cubed), flip halfway",
-      "Bake whole: 200°C for 45–60 min until soft",
-      "Boil: 15–20 min, then mash with olive oil and garlic",
-      "Cut into wedges, season, and roast for healthy 'fries'",
+    instructions: [
+      "Heat 1 tbsp oil in a large skillet over medium-high heat.",
+      "Season diced chicken with salt, pepper, paprika. Cook 4-5 min until golden and cooked through. Remove from pan.",
+      "Add remaining oil + vegetables + garlic to the pan. Cook 4-5 min until crisp-tender.",
+      "Return chicken to pan. Toss with herbs. Serve immediately.",
     ],
-    budgetTips: [
-      "Buy in bulk bags (3–5kg) — significantly cheaper",
-      "Store in cool, dark place — lasts 3–5 weeks",
-      "Skins are edible and contain extra fiber and nutrients",
+    supplementPairing: "💊 Zinc Picolinate — take with dinner. 💊 Taurine — take with dinner.",
+    variations: [
+      "🌶️ Asian: add soy sauce + ginger + sesame oil + chili flakes.",
+      "🌿 Italian: add diced tomatoes + basil + oregano + splash of balsamic.",
+      "🍋 Lemon: add lemon juice + zest + thyme + garlic at the end.",
+      "🥜 Peanut: add 1 tbsp peanut butter + soy sauce + lime juice + cilantro.",
     ],
-    recipe: `Air Fryer Sweet Potato Wedges
-
-Per serving:
-- 1 large sweet potato
-- 2 tbsp olive oil
-- 1 tsp paprika
-- 1 tsp garlic powder
-- Salt & pepper
-
-Instructions:
-1. Cut sweet potato into wedges
-2. Toss with oil and seasonings
-3. Air fry at 200°C for 15–18 min, flip at 8 min
-4. Sprinkle with salt while hot
-
-Cost: ~$0.50 per serving`,
-    cookMethod: "Air Fry / Bake / Boil",
-    prepTime: "10 min prep + 15–20 min cook",
-    servingSize: "1 medium potato per serving",
-  },
-  {
-    id: "oats",
-    name: "Rolled Oats",
-    category: "Complex Carbs",
-    description: "Whole grain with beta-glucan — soluble fiber that lowers cholesterol and feeds gut bacteria. The perfect breakfast base.",
-    benefits: [
-      "Beta-glucan — reduces LDL-C by 5–10% with 3g daily",
-      "Fiber — 4g per 40g serving",
-      "Magnesium, zinc, and B-vitamins",
-      "Slow-release energy — keeps blood sugar stable",
-    ],
-    biomarkers: ["apob", "ldl-c", "hba1c", "fasting-glucose"],
-    howToCook: [
-      "Overnight oats: 1:1 oats to milk/yogurt, refrigerate overnight",
-      "Stovetop: 5 min with water or milk, stir occasionally",
-      "Microwave: 2 min with liquid, stir halfway",
-      "Add protein powder, berries, nuts, seeds for complete meal",
-    ],
-    budgetTips: [
-      "Buy in large canisters — cheapest form ($0.10/serving)",
-      "Store brand = exactly the same as name brand (it's all oats)",
-      "Flavour with cinnamon and frozen berries instead of buying packets",
-    ],
-    recipe: `High-Protein Overnight Oats
-
-Per serving:
-- 40g rolled oats
-- 1 scoop vanilla protein powder (or collagen)
-- 200ml milk (or unsweetened almond milk)
-- 1 tbsp chia seeds
-- 50g frozen berries
-- 1 tbsp almond butter
-
-Instructions:
-1. Mix oats, protein, chia, milk in jar
-2. Top with berries
-3. Refrigerate overnight
-4. Top with almond butter before eating
-
-Cost: ~$1.50 per serving`,
-    cookMethod: "No-cook (overnight) / Stovetop / Microwave",
-    prepTime: "5 min prep (overnight) or 5 min cook",
-    servingSize: "40–60g dry oats per serving",
-  },
-  {
-    id: "quinoa",
-    name: "Quinoa",
-    category: "Complex Carbs",
-    description: "Complete plant protein with all 9 essential amino acids. High in fiber, magnesium, and iron — a perfect rice alternative.",
-    benefits: [
-      "Complete protein — 8g per cup cooked",
-      "Fiber — 5g per cup",
-      "Magnesium — 30% RDA per cup",
-      "Quercetin + kaempferol — anti-inflammatory flavonoids",
-      "Low glycemic index — doesn't spike blood sugar",
-    ],
-    biomarkers: ["hba1c", "fasting-glucose", "hscrp"],
-    howToCook: [
-      "Rinse before cooking to remove bitter saponins",
-      "2:1 water to quinoa ratio, boil then simmer 15 min",
-      "Fluff with fork and let sit 5 min",
-      "Use as base for bowls, salads, or side dish",
-    ],
-    budgetTips: [
-      "Buy in bulk bins — 50% cheaper than pre-packaged",
-      "Millet is a cheaper alternative with similar nutrition profile",
-      "Cooking in large batches saves time",
-    ],
-    recipe: `Simple Lemon Herb Quinoa
-
-Per serving:
-- 1 cup quinoa
-- 2 cups water or bone broth
-- 2 tbsp olive oil
-- Juice of 1 lemon
-- 2 tbsp fresh herbs (parsley, mint)
-- Salt & pepper
-
-Instructions:
-1. Rinse quinoa
-2. Bring water to boil, add quinoa, reduce to simmer 15 min
-3. Fluff, add oil, lemon, herbs
-4. Season to taste
-
-Cost: ~$0.60 per serving`,
-    cookMethod: "Boil / Simmer",
-    prepTime: "5 min prep + 15 min cook",
-    servingSize: "1/2 cup dry per serving",
+    costPerServing: "SGD 3.00",
+    protein: "32g",
+    calories: "~320",
+    biomarkers: ["grip", "alt", "hba1c"],
   },
 ];
+
+const MARINADES = [
+  {
+    id: "lemon-garlic-herb",
+    name: "Lemon Garlic Herb",
+    ingredients: ["3 tbsp olive oil", "juice of 1 lemon", "4 cloves garlic, minced", "1 tsp dried oregano", "1 tsp dried thyme", "salt and pepper"],
+    instructions: "Whisk all ingredients together. Marinate chicken, fish, or vegetables 30 min to 4 hours.",
+    pairsWith: "Chicken, white fish, shrimp, vegetables, tofu",
+    prepTime: "3 min",
+    storageTip: "Lasts 1 week in fridge. Shake before using.",
+  },
+  {
+    id: "spicy-ginger-soy",
+    name: "Spicy Ginger Soy",
+    ingredients: ["3 tbsp soy sauce", "1 tbsp sesame oil", "1 tbsp rice vinegar", "1 tsp ginger, grated", "2 cloves garlic, minced", "1 tsp chili flakes or sambal"],
+    instructions: "Whisk all ingredients. Marinate beef, chicken, or tofu 30 min. Great for stir-fries.",
+    pairsWith: "Beef, chicken, tofu, vegetables, noodles",
+    prepTime: "3 min",
+    storageTip: "Lasts 2 weeks in fridge.",
+  },
+  {
+    id: "mediterranean",
+    name: "Mediterranean",
+    ingredients: ["3 tbsp olive oil", "juice of 1/2 lemon", "2 cloves garlic, minced", "1 tsp dried oregano", "1 tsp dried basil", "salt and pepper"],
+    instructions: "Combine all ingredients. Marinate chicken, lamb, or vegetables 1-4 hours. Also works as salad dressing.",
+    pairsWith: "Chicken, lamb, fish, vegetables, halloumi",
+    prepTime: "3 min",
+    storageTip: "Lasts 1 week in fridge.",
+  },
+  {
+    id: "honey-dijon",
+    name: "Honey Dijon",
+    ingredients: ["2 tbsp Dijon mustard", "1 tbsp honey", "2 tbsp olive oil", "1 tbsp apple cider vinegar", "salt and pepper"],
+    instructions: "Whisk until emulsified. Marinate chicken or salmon 30 min. Also excellent as a salad dressing.",
+    pairsWith: "Chicken breast, salmon, pork, roasted vegetables",
+    prepTime: "2 min",
+    storageTip: "Lasts 2 weeks in fridge. If it separates, whisk again.",
+  },
+  {
+    id: "teriyaki",
+    name: "Teriyaki",
+    ingredients: ["3 tbsp soy sauce", "1 tbsp honey or brown sugar", "1 tbsp mirin or rice wine", "1 tsp ginger, grated", "2 cloves garlic, minced"],
+    instructions: "Combine in a small saucepan. Simmer 2 min until slightly thickened. Cool before using as marinade. Reserve some for glazing.",
+    pairsWith: "Chicken thighs, salmon, beef, tofu, vegetables",
+    prepTime: "5 min",
+    storageTip: "Lasts 2 weeks in fridge. Brush on protein during last 2 min of cooking.",
+  },
+  {
+    id: "chimichurri",
+    name: "Chimichurri",
+    ingredients: ["1 cup fresh parsley, finely chopped", "3 cloves garlic, minced", "2 tbsp red wine vinegar", "1/2 cup olive oil", "1 tsp dried oregano", "1/2 tsp red pepper flakes", "salt and pepper"],
+    instructions: "Mix all ingredients. Let sit 15 min before serving. Use as marinade or finishing sauce for grilled meat.",
+    pairsWith: "Steak, chicken, lamb, grilled vegetables",
+    prepTime: "5 min",
+    storageTip: "Best fresh but lasts 3-4 days in fridge. Bring to room temp before using.",
+  },
+  {
+    id: "tandoori-yogurt",
+    name: "Tandoori Yogurt",
+    ingredients: ["1/2 cup plain yogurt", "1 tbsp lemon juice", "1 tsp turmeric", "1 tsp cumin", "1 tsp paprika", "1 tsp garam masala", "2 cloves garlic, minced", "salt"],
+    instructions: "Mix everything into a thick paste. Coat chicken or fish generously. Marinate 2-24 hours. Air fry or bake as usual.",
+    pairsWith: "Chicken thighs, chicken breast, fish, paneer",
+    prepTime: "5 min",
+    storageTip: "Make fresh. Don't store after marinating (raw meat contact).",
+  },
+  {
+    id: "balsamic-vinaigrette",
+    name: "Simple Balsamic Vinaigrette",
+    ingredients: ["3 tbsp olive oil", "1 tbsp balsamic vinegar", "1 tsp Dijon mustard", "1 clove garlic, minced", "salt and pepper"],
+    instructions: "Whisk or shake in a jar. Use as marinade for vegetables and chicken, or as salad dressing.",
+    pairsWith: "Salads, roasted vegetables, chicken, strawberries",
+    prepTime: "2 min",
+    storageTip: "Lasts 2 weeks in fridge. Shake before using.",
+  },
+];
+
+const PANTRY = [
+  {
+    id: "chia-seeds",
+    name: "Chia Seeds",
+    description: "Packed with omega-3s (ALA), fiber, and protein. Absorbs 10× their weight in liquid — great for puddings, smoothies, and overnight oats.",
+    usedIn: ["overnight-oats", "chia-pudding", "greek-yogurt-bowl"],
+    benefit: "17g fiber per 30g serving. ALA omega-3s for inflammation. Magnesium for sleep and recovery.",
+    fairPrice: "SGD 8.50 (250g)",
+    servingTip: "1-2 tbsp daily. Soak before eating (absorbs liquid and becomes gel-like).",
+  },
+  {
+    id: "psyllium-husk",
+    name: "Psyllium Husk",
+    description: "Pure soluble fiber. Lowers LDL cholesterol, feeds gut bacteria, improves regularity. The cheapest fiber supplement per gram.",
+    usedIn: [],
+    benefit: "7g soluble fiber per 5g serving. Lowers LDL-C by 5-10%. Improves glycemic control.",
+    fairPrice: "SGD 6.00 (200g)",
+    servingTip: "1 tbsp mixed into water or food daily. Drink plenty of water. Start with 1 tsp to assess tolerance.",
+  },
+  {
+    id: "flax-seeds",
+    name: "Flax Seeds (Ground)",
+    description: "Rich in ALA omega-3s, lignans (antioxidants), and fiber. Must be ground for absorption — whole flax passes through undigested.",
+    usedIn: ["greek-yogurt-bowl", "overnight-oats"],
+    benefit: "ALA omega-3s + lignans = dual anti-inflammatory. 3g fiber per tbsp. Supports hormone balance via lignans.",
+    fairPrice: "SGD 4.50 (200g)",
+    servingTip: "1-2 tbsp ground daily. Keep refrigerated after grinding (fats oxidise quickly). Add to yogurt, oats, smoothies.",
+  },
+  {
+    id: "protein-powder",
+    name: "Protein Powder (Whey or Plant)",
+    description: "Convenient protein boost for muscle protein synthesis. Whey is fastest-absorbing; plant blends are complete and vegan-friendly.",
+    usedIn: ["overnight-oats", "green-protein-smoothie", "protein-pancakes", "greek-yogurt-bowl"],
+    benefit: "25-30g protein per scoop. Leucine triggers muscle protein synthesis. Keeps you full for hours.",
+    fairPrice: "SGD 45-60 (2kg whey concentrate)",
+    servingTip: "1 scoop daily post-workout or with breakfast. Scoop = ~30g. Mix into oats, smoothies, pancakes, or yogurt.",
+  },
+  {
+    id: "collagen",
+    name: "Collagen Peptides",
+    description: "Hydrolysed collagen for skin, joints, bones, and glycine intake. Dissolves in hot or cold liquids without affecting taste.",
+    usedIn: [],
+    benefit: "High glycine — supports sleep, glutathione production, and connective tissue health. 10g per serving.",
+    fairPrice: "SGD 35 (500g)",
+    servingTip: "1 scoop (10g) in coffee, tea, or smoothies daily. Tasteless — add to anything. Not a complete protein (lacks tryptophan).",
+  },
+  {
+    id: "olive-oil-pantry",
+    name: "Extra Virgin Olive Oil",
+    description: "The cornerstone of the Mediterranean diet. Polyphenols reduce inflammation, protect LDL from oxidation, and improve HDL function.",
+    usedIn: ["lemon-chicken-salad", "greek-salad-protein", "tuna-white-bean-salad", "salmon", "sardine-plate"],
+    benefit: "Oleocanthal = natural anti-inflammatory (similar to ibuprofen). Hydroxytyrosol protects LDL from oxidation. Monounsaturated fat improves HDL.",
+    fairPrice: "SGD 16-22 (750ml)",
+    servingTip: "2 tbsp per day. Use raw for salads and finishing. Don't cook above 180°C. Buy in 3L tins for best value.",
+  },
+  {
+    id: "apple-cider-vinegar",
+    name: "Apple Cider Vinegar",
+    description: "Fermented vinegar that improves glycemic control when taken before meals. Reduces post-meal glucose spikes by 15-20%.",
+    usedIn: [],
+    benefit: "Lowers post-meal glucose and insulin spikes. May modestly reduce HbA1c over time. Improves insulin sensitivity.",
+    fairPrice: "SGD 5.00 (500ml)",
+    servingTip: "1 tbsp in water 15 min before high-carb meals. Always dilute (don't drink straight — damages enamel). Rinse mouth after.",
+  },
+  {
+    id: "cinnamon",
+    name: "Cinnamon (Ceylon)",
+    description: "Spice that modestly improves fasting glucose, HbA1c, and triglycerides. Ceylon cinnamon is safer for daily use (less coumarin than Cassia).",
+    usedIn: [],
+    benefit: "Modest reductions in fasting glucose (3-5%) and HbA1c. Antioxidant polyphenols. Warming flavour reduces need for sugar.",
+    fairPrice: "SGD 6.00 (50g Ceylon)",
+    servingTip: "1 tsp daily. Add to oatmeal, coffee, smoothies, yogurt. Ceylon is preferred over Cassia for daily use.",
+  },
+  {
+    id: "turmeric",
+    name: "Turmeric + Black Pepper",
+    description: "Curcumin is a potent anti-inflammatory but poorly absorbed on its own. Black pepper (piperine) boosts absorption 2000%.",
+    usedIn: [],
+    benefit: "Curcumin inhibits NF-κB (master inflammation switch). Reduces hs-CRP, IL-6. Antioxidant and neuroprotective.",
+    fairPrice: "SGD 5.00 (100g turmeric)",
+    servingTip: "1/2-1 tsp turmeric + pinch of black pepper + fat (oil, coconut milk) for absorption. Add to eggs, rice, soups, smoothies.",
+  },
+];
+
+const FOOD_LISTS = [
+  {
+    id: "anti-inflammatory",
+    name: "🛡️ Anti-Inflammatory Foods",
+    description: "These foods reduce hs-CRP, IL-6, and TNF-α without negatively impacting other biomarkers. They lower inflammation without raising triglycerides, glucose, or blood pressure.",
+    foods: [
+      { name: "Fatty Fish (Salmon, Sardines, Mackerel)", why: "EPA/DHA directly lower hs-CRP and triglycerides. The most potent anti-inflammatory food.", biomarkers: ["hscrp", "triglycerides"] },
+      { name: "Extra Virgin Olive Oil", why: "Oleocanthal inhibits COX-1/COX-2 (similar to ibuprofen). Lowers CRP without affecting glucose.", biomarkers: ["hscrp", "hdl-c", "apob"] },
+      { name: "Leafy Greens (Spinach, Kale, Rocket)", why: "High in vitamin E, flavonoids, and carotenoids. Lower IL-6 and CRP. No negative metabolic impact.", biomarkers: ["hscrp", "bp"] },
+      { name: "Berries (Blueberries, Strawberries)", why: "Anthocyanins reduce NF-κB activation. Low glycemic — doesn't spike glucose.", biomarkers: ["hscrp", "hba1c"] },
+      { name: "Turmeric (+ Black Pepper)", why: "Curcumin inhibits multiple inflammatory pathways. No negative effects on any biomarker.", biomarkers: ["hscrp", "alt"] },
+      { name: "Green Tea", why: "EGCG reduces CRP and IL-6. Also benefits lipid profile and glucose metabolism.", biomarkers: ["hscrp", "apob", "hba1c"] },
+      { name: "Broccoli & Cruciferous Vegetables", why: "Sulforaphane activates Nrf2 — the master antioxidant pathway. Reduces inflammation without trade-offs.", biomarkers: ["hscrp", "alt", "uric-acid"] },
+      { name: "Ginger", why: "Gingerols reduce inflammation similarly to NSAIDs. Also improves glycemic control.", biomarkers: ["hscrp", "hba1c"] },
+      { name: "Tomatoes", why: "Lycopene reduces inflammatory markers. Cooked tomatoes have higher bioavailability.", biomarkers: ["hscrp", "apob"] },
+      { name: "Dark Chocolate (85%+ Cocoa)", why: "Flavonols lower CRP and improve endothelial function. Low sugar versions don't spike glucose.", biomarkers: ["hscrp", "bp"] },
+    ],
+  },
+  {
+    id: "fiber-rich",
+    name: "🌾 Fiber-Rich Foods",
+    description: "These foods provide soluble and insoluble fiber that lower LDL-C, improve glycemic control, and feed beneficial gut bacteria — without spiking triglycerides or glucose.",
+    foods: [
+      { name: "Rolled Oats", why: "Beta-glucan lowers LDL-C by 5-10%. Low glycemic — steady energy release.", biomarkers: ["apob", "ldl-c", "hba1c"] },
+      { name: "Psyllium Husk", why: "7g soluble fiber per 5g serving. Directly binds bile acids — lowers LDL. Zero glycemic impact.", biomarkers: ["apob", "ldl-c", "fasting-glucose"] },
+      { name: "Chia Seeds", why: "17g fiber per 30g. ALA omega-3s add anti-inflammatory benefit. Gel forms in stomach — increases satiety.", biomarkers: ["hscrp", "apob", "hba1c"] },
+      { name: "Flax Seeds (Ground)", why: "3g fiber per tbsp + lignans. Dual benefit for cholesterol and inflammation.", biomarkers: ["apob", "ldl-c", "hscrp"] },
+      { name: "Legumes (Lentils, Chickpeas, Beans)", why: "15g fiber per cup. Low glycemic, high satiety. Also rich in potassium and magnesium.", biomarkers: ["apob", "hba1c", "bp"] },
+      { name: "Broccoli", why: "5g fiber per cup + sulforaphane. Anti-inflammatory AND high fiber.", biomarkers: ["hscrp", "apob", "alt"] },
+      { name: "Avocado", why: "7g fiber per half. Monounsaturated fat improves HDL. Potassium lowers BP.", biomarkers: ["hdl-c", "bp", "hscrp"] },
+      { name: "Almonds & Walnuts", why: "3-4g fiber per serving. Healthy fats improve lipid profile. Walnuts add ALA omega-3s.", biomarkers: ["apob", "hdl-c", "hscrp"] },
+      { name: "Sweet Potatoes (with skin)", why: "4g fiber per medium potato. Beta-carotene + potassium. Lower glycemic than white potatoes.", biomarkers: ["hba1c", "bp", "fasting-glucose"] },
+      { name: "Brussels Sprouts", why: "4g fiber per cup. Glucosinolates detoxify. Roasted with olive oil = fiber + anti-inflammatory combo.", biomarkers: ["hscrp", "alt", "homocysteine"] },
+    ],
+  },
+  {
+    id: "potassium-rich",
+    name: "🥔 Potassium-Rich Foods",
+    description: "Potassium lowers blood pressure by counteracting sodium, reducing vascular resistance, and improving kidney function. These foods are also low in sodium and don't spike glucose or triglycerides.",
+    foods: [
+      { name: "Sweet Potatoes", why: "540mg potassium per medium potato + beta-carotene + fiber. Low glycemic.", biomarkers: ["bp", "hba1c"] },
+      { name: "Spinach (Cooked)", why: "840mg potassium per cup cooked. Also rich in magnesium, vitamin K, and nitrates for BP.", biomarkers: ["bp", "hscrp", "homocysteine"] },
+      { name: "Avocado", why: "485mg potassium per half + heart-healthy monounsaturated fat + fiber.", biomarkers: ["bp", "hdl-c", "hscrp"] },
+      { name: "Bananas", why: "422mg potassium per medium banana. Convenient pre-workout fuel. Modest glycemic impact — fine for most.", biomarkers: ["bp"] },
+      { name: "Salmon", why: "450mg potassium per 150g serving + omega-3s + vitamin D. Dual benefit for BP and inflammation.", biomarkers: ["bp", "hscrp", "triglycerides"] },
+      { name: "Beetroot", why: "Nitrates → NO (nitric oxide). Lowers BP by 5-10 mmHg. Also high in potassium.", biomarkers: ["bp", "hscrp"] },
+      { name: "White Beans (Cannellini)", why: "600mg potassium per cup + fiber + plant protein. Very low glycemic.", biomarkers: ["bp", "apob", "hba1c"] },
+      { name: "Tomatoes", why: "430mg potassium per cup. Lycopene reduces inflammation. Also supports prostate health.", biomarkers: ["bp", "hscrp"] },
+      { name: "Greek Yogurt (Plain)", why: "280mg potassium per 200g + probiotics + protein. No added sugar if plain.", biomarkers: ["bp", "hdl-c", "hscrp"] },
+      { name: "Mushrooms", why: "350mg potassium per cup. Also rich in selenium. Zero fat, zero sugar, low calorie.", biomarkers: ["bp", "tsh"] },
+    ],
+  },
+];
+
+const PRICE_DISCLAIMER = "Prices in SGD as of June 2026, sourced from iHerb. Actual prices may vary.";
 
 const SUPPLEMENTS = [
   {
     id: "vitamin-d3-k2",
     name: "Vitamin D3 + K2 (MK-7)",
-    description: "The foundational longevity supplement. D3 regulates immune function, bone health, mood, and gene expression. K2 directs calcium to bones and away from arteries.",
+    description: "D3 regulates 900+ genes — immune, bone, mood. K2 directs calcium to bones instead of arteries.",
+    tier: "minimal",
+    timing: "am",
+    timingLabel: "☀️ AM — with breakfast",
+    diets: ["carnivore", "omnivore", "vegetarian"],
     dosage: "3000–5000 IU D3 + 100–200 mcg K2 (MK-7) daily",
-    timing: "With largest meal containing fat (lunch or dinner)",
+    timingDetail: "Take 1 softgel of each with breakfast (fat helps absorption). Eggs, bacon, or full-fat yogurt = perfect.",
+    whyGeneral: "Vitamin D deficiency affects ~40% of the population. Optimal D levels (50–80 ng/mL) are linked to lower all-cause mortality, better immune function, and reduced autoimmunity. K2 prevents the calcium you eat from calcifying arteries, instead directing it to bones and teeth. Together, they're the single most cost-effective longevity intervention.",
+    whyDiet: {
+      carnivore: "Carnivore diets are naturally low in calcium and high in fat — D3+K2 absorption is excellent. K2 is especially important since high meat intake may increase calcium load.",
+      omnivore: "Standard diet provides moderate D and minimal K2. Supplementation is the only reliable way to reach optimal levels.",
+      vegetarian: "Crucial — plant foods provide almost no vitamin D or K2. Seek D3 from lichen (vegan source) like Doctor's Best Vegan D3.",
+    },
     benefits: [
-      "Supports immune function and reduces autoimmunity risk",
-      "Improves bone mineral density",
-      "Reduces cardiovascular calcification (with K2)",
-      "Enhances mood and cognitive function",
-      "Supports testosterone production",
+      "Regulates 900+ genes — immune, metabolic, anti-cancer",
+      "Improves bone mineral density and reduces fracture risk",
+      "Prevents arterial calcification (with K2)",
+      "Enhances mood, cognition, and testosterone",
+      "Reduces severity of autoimmune conditions",
     ],
     biomarkers: ["vitamin-d", "testosterone", "hscrp"],
-    budgetOptions: [
-      "Sports Research D3+K2 ($15/3 months) — best value with coconut oil",
-      "NOW Foods D3 5000 IU ($6/6 months) + NOW K2 MK-7 ($12/3 months)",
-      "Kirkland Signature D3 ($8/year for 2000 IU)",
-    ],
-    notes: "Test your levels first! Dose based on baseline. Take with fat for absorption. K2 MK-7 (from natto) is superior to MK-4.",
+    costPerMonth: "SGD 13",
+    product: "NOW D3 5000 IU (120 sgels, SGD 10.55) + NOW K2 MK-7 (60 caps, SGD 20.70)",
+    costPerServing: "SGD 0.44/day — D3 SGD 0.09 + K2 SGD 0.35",
+    conflicts: "None. Best taken with fat for absorption.",
   },
   {
     id: "omega-3",
     name: "Omega-3 (EPA/DHA)",
-    description: "Long-chain marine omega-3s. EPA is anti-inflammatory; DHA is structural for brain and eyes. Most people are deficient due to low fish intake.",
-    dosage: "2–4g total (EPA+DHA) daily. Look for at least 60% EPA+DHA concentration",
-    timing: "With meals containing fat for absorption. Split dose AM/PM if high dose.",
+    description: "The most important anti-inflammatory supplement. EPA reduces inflammation; DHA is structural for brain and eyes. Most people are deficient.",
+    tier: "critical",
+    timing: "pm",
+    timingLabel: "🌙 PM — with dinner",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "2–4g total EPA+DHA daily. Look for ≥60% concentration per gel.",
+    timingDetail: "Take with dinner (fat improves absorption). Store bottle in fridge after opening to prevent rancidity.",
+    whyGeneral: "The modern diet has an omega-6:omega-3 ratio of 15:1 (should be 3:1). This excess drives systemic inflammation. EPA directly lowers hs-CRP and triglycerides; DHA is concentrated in brain grey matter and retinal tissue. Every cell membrane needs omega-3s for proper function. Low levels are linked to depression, cognitive decline, and cardiovascular disease.",
+    whyDiet: {
+      carnivore: "Grass-fed meat has better omega-3 ratios than grain-fed, but still far below fish levels. Supplementation ensures therapeutic dosing.",
+      omnivore: "Even if you eat fish 1–2×/week, you're unlikely to reach 2–4g EPA+DHA. Supplementation is the only reliable method.",
+      vegetarian: "Algae-based DHA (Nordic Naturals Algae Omega, SGD 38/2mo) provides the same benefits without fish. DHA is critical since conversion from ALA (flax/chia) is only 5–10%.",
+    },
     benefits: [
-      "Reduces triglycerides by 20–30%",
-      "Lowers inflammation (CRP, IL-6)",
-      "Supports brain health and cognitive function",
-      "Improves HDL function",
-      "Reduces platelet aggregation (blood thinning)",
+      "Reduces triglycerides by 20–30% — top biomarker mover",
+      "Lowers inflammation (hs-CRP, IL-6) — critical for longevity",
+      "Supports brain health, mood, and cognition",
+      "Improves HDL function and endothelial health",
+      "Reduces platelet aggregation (mild blood thinning)",
     ],
     biomarkers: ["hscrp", "triglycerides", "hdl-c", "apob"],
-    budgetOptions: [
-      "NOW Foods Ultra Omega-3 ($18/2 months) — 500mg EPA + 250mg DHA per softgel",
-      "Viva Naturals Omega-3 ($25/3 months) — high concentration",
-      "Costco Kirkland Fish Oil ($12/6 months) — solid base option",
-      "Look for 'IFOS' or 'Nordic Naturals' quality seal",
-    ],
-    notes: "Algae oil for vegans. Triglyceride form is better absorbed than ethyl ester. Store in fridge after opening. Avoid if on blood thinners without MD consult.",
+    costPerMonth: "SGD 27",
+    product: "NOW Ultra Omega-3 (90 sgels, SGD 26.63) — 500mg EPA + 250mg DHA per gel",
+    costPerServing: "SGD 0.89/day (3 gels = 2.25g EPA+DHA)",
+    conflicts: "Mild blood thinning — stop 1 week before surgery. Don't exceed 5g daily without MD supervision.",
   },
   {
     id: "magnesium",
     name: "Magnesium Glycinate",
-    description: "The most absorbable form of magnesium — chelated to glycine for dual benefit. Involved in 300+ enzymatic reactions including ATP production, muscle function, and sleep.",
-    dosage: "200–400 mg elemental magnesium daily (as glycinate)",
-    timing: "30–60 min before bed — improves sleep quality and relaxation",
+    description: "Involved in 300+ enzymatic reactions. The glycinate form is gentle on the stomach and doubles as a sleep aid.",
+    tier: "minimal",
+    timing: "pm",
+    timingLabel: "🌙 PM — before bed",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "200–400 mg elemental magnesium (as glycinate)",
+    timingDetail: "Take 30–60 min before bed. Promotes relaxation and deep sleep (glycine is an inhibitory neurotransmitter).",
+    whyGeneral: "Magnesium is a cofactor for 300+ enzymes including ATP production, DNA synthesis, and muscle relaxation. ~50% of the population doesn't meet RDA. Deficiency accelerates aging via increased inflammation, poor sleep, and insulin resistance. Magnesium glycinate provides both magnesium and glycine — a dual benefit for sleep and stress reduction.",
+    whyDiet: {
+      carnivore: "Red meat is a decent magnesium source, but soil depletion means levels are lower than historical norms. Supplementation ensures optimal levels.",
+      omnivore: "Standard diet is magnesium-poor (processed foods, low leafy greens). Supplementation bridges the gap.",
+      vegetarian: "Plant foods provide magnesium, but phytates reduce absorption. Supplementation is recommended even with a good diet.",
+    },
     benefits: [
       "Improves sleep quality and reduces time to fall asleep",
-      "Supports muscle recovery and reduces cramps",
-      "Lowers blood pressure modestly",
+      "Lowers blood pressure (5–8 mmHg systolic)",
       "Reduces anxiety and stress response",
-      "Essential for vitamin D activation",
+      "Essential for vitamin D activation and ATP production",
+      "Reduces muscle cramps and supports recovery",
     ],
     biomarkers: ["bp", "testosterone", "hscrp", "hba1c"],
-    budgetOptions: [
-      "Doctor's Best High Absorption Magnesium ($12/2 months)",
-      "NOW Foods Magnesium Glycinate ($10/2 months)",
-      "KAL Magnesium Glycinate ($8/month)",
-      "AVOID magnesium oxide — poor absorption (~4%)",
-    ],
-    notes: "Glycinate is best for sleep and relaxation. Threonate for brain/cognition. Citrate for constipation. Start at 200mg to assess tolerance, then increase.",
+    costPerMonth: "SGD 15",
+    product: "NOW Foods Magnesium Glycinate (180 tabs, SGD 30.56) — 3 tabs = 300mg elemental",
+    costPerServing: "SGD 0.51/day (3 tabs)",
+    conflicts: "Avoid within 2 hours of thyroid medication. Glycinate is gentle — oxide causes loose stools.",
   },
   {
     id: "creatine",
     name: "Creatine Monohydrate",
-    description: "The most researched supplement in the world. Enhances ATP regeneration, muscle strength, brain function, and may reduce homocysteine.",
-    dosage: "5g daily (no cycling needed). Loading optional: 20g/day for 5–7 days.",
-    timing: "Consistent daily timing doesn't matter. In practice: post-workout or with meals.",
+    description: "The most researched supplement. Enhances ATP regeneration, strength, brain function, and homocysteine reduction.",
+    tier: "essential",
+    dietTier: {
+      vegetarian: "critical",
+    },
+    timing: "am",
+    timingLabel: "☀️ AM — with breakfast",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "5g daily. No loading or cycling needed.",
+    timingDetail: "Mix powder in coffee, water, or smoothie with breakfast. Consistent daily dose matters more than timing.",
+    whyGeneral: "Creatine is the body's rapid ATP regeneration system. Supplementation increases muscle creatine by 20–40%, improving strength, power, and lean mass. It also crosses the blood-brain barrier to support cognition, especially under sleep deprivation. Additionally, creatine reduces homocysteine by methyl group buffering — a direct longevity benefit.",
+    whyDiet: {
+      carnivore: "You get ~1–2g creatine from meat daily. Supplementation still boosts levels 20–40% above dietary baseline — worth it for strength, cognition, and homocysteine reduction.",
+      omnivore: "You get ~0.5–1g from diet. Supplementation provides the 4–4.5g gap to reach the therapeutic 5g dose.",
+      vegetarian: "CRITICAL — you get ZERO creatine from plants. Your muscle stores are 30–50% lower than meat-eaters. 5g daily closes this gap completely. This should be your highest priority supplement after D3 and magnesium.",
+    },
     benefits: [
       "Increases strength and lean mass by 15–20% over training alone",
-      "Improves high-intensity exercise performance",
-      "Enhances cognitive function, especially under sleep deprivation",
-      "Reduces homocysteine levels",
-      "Neuroprotective — potential benefits in neurodegenerative diseases",
+      "Enhances cognitive function under stress and sleep deprivation",
+      "Reduces homocysteine levels (lowers cardiovascular risk)",
+      "Improves glucose tolerance and insulin sensitivity",
+      "Neuroprotective — potential benefits in brain aging",
     ],
     biomarkers: ["grip", "homocysteine", "hdl-c"],
-    budgetOptions: [
-      "Creapure brand is the gold standard (sourced from Germany)",
-      "NOW Sports Creatine Mono ($15/6 months) — Creapure",
-      "Kaged Muscle Creatine ($18/4 months) — Creapure",
-      "BulkSupplements ($12/8 months) — micronized, works just as well",
-    ],
-    notes: "No loading required for benefits. Micronized dissolves better in water. Safe for long-term use (studies up to 5+ years). No 'loading' phase needed — 5g daily reaches saturation in 3–4 weeks.",
-  },
-  {
-    id: "nac",
-    name: "N-Acetylcysteine (NAC)",
-    description: "Precursor to glutathione — the body's master antioxidant. Replenishes cellular antioxidant capacity and supports liver detoxification.",
-    dosage: "600–1200 mg daily",
-    timing: "On empty stomach (food reduces absorption). Split dose if 1200mg.",
-    benefits: [
-      "Replenishes glutathione — critical for antioxidant defence",
-      "Reduces oxidative stress and inflammation",
-      "Supports liver detoxification pathways",
-      "Mucolytic — thins mucus, supports respiratory health",
-      "May reduce oxidative damage to LDL particles",
-    ],
-    biomarkers: ["alt", "hscrp", "homocysteine"],
-    budgetOptions: [
-      "NOW Foods NAC ($10/3 months at 600mg)",
-      "Doctor's Best NAC ($12/3 months)",
-      "Jarrow Formulas NAC ($10/2 months)",
-    ],
-    notes: "Take with glycine for synergistic glutathione synthesis. Liposomal glutathione is an alternative but more expensive. Some people get anhedonia at high doses — start low.",
-  },
-  {
-    id: "glycine",
-    name: "Glycine",
-    description: "The simplest amino acid with powerful longevity effects. Essential for collagen synthesis, glutathione production, and sleep quality.",
-    dosage: "3–5g before bed",
-    timing: "30–60 min before bedtime — improves sleep quality via NMDA receptor modulation",
-    benefits: [
-      "Improves sleep quality — reduces time to fall asleep, less daytime fatigue",
-      "Collagen synthesis — precursors for skin, joint, and bone health",
-      "Glutathione production — combines with NAC for maximal effect",
-      "Reduces oxidative stress and inflammation",
-      "Lowers blood sugar via improved insulin sensitivity",
-    ],
-    biomarkers: ["hba1c", "fasting-glucose", "hscrp", "hdl-c"],
-    budgetOptions: [
-      "NOW Foods Glycine ($12/6 months) — cheapest per gram",
-      "BulkSupplements Glycine ($10/8 months) — great value",
-      "Doctor's Best Glycine ($10/4 months)",
-    ],
-    notes: "The glycine + NAC combo is a potent glutathione-boosting stack. Can also be taken as collagen powder (but collagen is ~15% glycine, so you need more). Tastes mildly sweet — can be mixed in tea.",
+    costPerMonth: "SGD 10",
+    product: "NOW Sports Creatine Monohydrate (1 kg powder, SGD 64.58) — Creapure®",
+    costPerServing: "SGD 0.32/day (5g = 200 days)",
+    conflicts: "None. Caffeine does not negate creatine (common myth).",
   },
   {
     id: "zinc",
     name: "Zinc Picolinate",
-    description: "The best-absorbed form of zinc — critical for immune function, testosterone synthesis, DNA repair, and antioxidant defence.",
-    dosage: "15–30 mg elemental zinc daily (as picolinate)",
-    timing: "With food to avoid nausea. Avoid taking with calcium or iron.",
+    description: "The best-absorbed form. Essential for testosterone, immune function, and 300+ enzymes.",
+    tier: "essential",
+    timing: "pm",
+    timingLabel: "🌙 PM — with dinner",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "15–30 mg elemental zinc (as picolinate)",
+    timingDetail: "Take with dinner to avoid nausea. Don't take simultaneously with calcium or iron supplements (compete for absorption).",
+    whyGeneral: "Zinc is a cofactor for 300+ enzymes including superoxide dismutase (antioxidant), DNA repair enzymes, and testosterone synthesis. Even mild deficiency suppresses immunity, reduces T levels, and impairs wound healing. Zinc picolinate has the highest absorption rate (~60%) vs zinc oxide (~4%). Absorption declines with age, making supplementation increasingly important after 40.",
+    whyDiet: {
+      carnivore: "Red meat is rich in highly bioavailable zinc. However, high calcium intake (if consuming dairy) can block zinc absorption. Space zinc and dairy by 2+ hours.",
+      omnivore: "Mixed diet provides adequate zinc, but absorption is variable. Supplementation ensures optimal levels, especially with age.",
+      vegetarian: "Phytates in plant foods block zinc absorption by 40–50%. Supplementation is essential — consider 30mg instead of 15mg. Plant sources alone rarely meet RDA.",
+    },
     benefits: [
-      "Essential for testosterone synthesis — deficiency drops T levels",
-      "Supports immune function and reduces infection severity",
-      "Cofactor for superoxide dismutase (antioxidant enzyme)",
-      "Wound healing and skin health",
-      "Supports thyroid hormone metabolism",
+      "Essential for testosterone synthesis — deficiency drops T significantly",
+      "Critical for immune function — reduces infection severity and duration",
+      "Cofactor for superoxide dismutase — antioxidant defence",
+      "Supports thyroid function and skin health",
+      "Improves hair, nail, and wound healing",
     ],
     biomarkers: ["testosterone", "tsh", "hscrp"],
-    budgetOptions: [
-      "NOW Foods Zinc Picolinate ($8/4 months)",
-      "Solgar Zinc Picolinate ($10/3 months)",
-      "Thorne Zinc Picolinate ($10/2 months)",
-      "Other forms: gluconate (cheapest), citrate (good), oxide (avoid)",
-    ],
-    notes: "Take with copper if supplementing 30mg+ daily long-term (15:1 zinc:copper ratio). Zinc lozenges for acute cold symptoms. Picolinate has best absorption profile.",
+    costPerMonth: "SGD 5",
+    product: "NOW Foods Zinc Picolinate 50mg (60 caps, SGD 9.50) — 1 cap = 50mg zinc",
+    costPerServing: "SGD 0.16/day (1 cap = 2 months)",
+    conflicts: "Don't take with calcium or iron supplements (2hr separation). Add copper 2mg if taking 30mg+ zinc long-term.",
   },
   {
-    id: "coq10",
-    name: "CoQ10 (Ubiquinone)",
-    description: "Essential electron carrier in the mitochondrial electron transport chain. Critical for cellular energy production and antioxidant protection.",
-    dosage: "100–200 mg daily (ubiquinone) or 100 mg (ubiquinol — for age 50+)",
-    timing: "With a meal containing fat for absorption",
+    id: "b-complex",
+    name: "Methylated B-Complex",
+    description: "All eight B vitamins in active forms. Critical for energy metabolism, homocysteine regulation, and methylation.",
+    tier: "essential",
+    dietTier: {
+      carnivore: "optimized",
+      vegetarian: "critical",
+    },
+    timing: "am",
+    timingLabel: "☀️ AM — with breakfast",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "1 capsule daily (methylfolate, methylcobalamin, P5P forms)",
+    timingDetail: "With breakfast — B-vitamins are energizing. Avoid taking after 2pm (may disrupt sleep).",
+    whyGeneral: "B-vitamins are cofactors for energy production (Krebs cycle), methylation (DNA repair, gene expression), and neurotransmitter synthesis (dopamine, serotonin). Elevated homocysteine — a direct consequence of B-vitamin insufficiency — doubles cardiovascular risk and accelerates brain aging. Methylated forms (methylfolate NOT folic acid, methylcobalamin NOT cyanocobalamin, P5P NOT pyridoxine) are critical for ~40% of people with MTHFR mutations who can't convert synthetic B-vitamins.",
+    whyDiet: {
+      carnivore: "You get abundant B12 from meat. Methylfolate and B6 are still valuable for homocysteine control and methylation. This supplement is helpful but not urgent — moved to Optimized tier.",
+      omnivore: "Standard diet covers B12 but may lack optimal folate and B6. A methylated B-complex ensures all bases are covered.",
+      vegetarian: "CRITICAL — B12 is found ONLY in animal foods. Deficiency takes 3–5 years to develop but causes irreversible nerve damage and cognitive decline. Methylated forms are especially important since plant-based B12 analogues in seaweed/fermented foods are inactive in humans.",
+    },
     benefits: [
-      "Mitochondrial health — supports cellular energy production",
-      "Antioxidant — protects cell membranes from lipid peroxidation",
-      "Cardiovascular health — improves endothelial function",
-      "Statin-induced depletion — statins reduce CoQ10 by 40%",
-      "May improve sperm quality and heart function",
+      "Reduces homocysteine — directly lowers cardiovascular and cognitive risk",
+      "Supports methylation cycle — DNA repair, gene expression, detox",
+      "Converts food into energy — Krebs cycle cofactors",
+      "Neurotransmitter synthesis — mood, focus, cognitive function",
+      "Red blood cell production and nerve health",
     ],
-    biomarkers: ["ldl-c", "apob", "bp"],
-    budgetOptions: [
-      "Doctor's Best CoQ10 ($18/3 months)",
-      "NOW Foods CoQ10 ($16/3 months)",
-      "Costco Kirkland CoQ10 ($15/4 months) — excellent value",
-      "Ubiquinol is 3–5× more expensive — only needed for 50+ or statin users",
-    ],
-    notes: "Statin users ABSOLUTELY need CoQ10. Ubiquinol is the reduced, more bioavailable form but expensive. Ubiquinone works fine for most under 50. Take with a fatty meal.",
+    biomarkers: ["homocysteine", "alt", "tsh"],
+    costPerMonth: "SGD 12",
+    product: "Jarrow Formulas B-Right (100 caps, SGD 38.48) — fully methylated",
+    costPerServing: "SGD 0.38/day (1 cap = 3.3 months)",
+    conflicts: "None significant. Some people feel overstimulated — stop by early afternoon.",
   },
   {
-    id: "berberine",
-    name: "Berberine",
-    description: "Plant alkaloid that activates AMPK — the 'master metabolic regulator'. Mimics the effects of metformin and exercise at the cellular level.",
-    dosage: "500 mg, 2–3× daily before meals",
-    timing: "15–30 min before meals (especially before highest-carb meal)",
+    id: "nac",
+    name: "N-Acetylcysteine (NAC)",
+    description: "Precursor to glutathione — the body's master antioxidant. Replenishes cellular defences and supports liver detox.",
+    tier: "optimized",
+    timing: "am",
+    timingLabel: "☀️ AM — before breakfast",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "1000 mg daily (1 tab)",
+    timingDetail: "On empty stomach 30 min before breakfast (food reduces absorption by ~50%). 1000mg as a single daily dose works well.",
+    whyGeneral: "Glutathione is your body's most important antioxidant — it neutralises free radicals, regenerates vitamins C and E, and supports liver detoxification. Glutathione levels decline by 10–15% per decade after 30, contributing to the oxidative stress that drives aging. NAC directly replenishes glutathione and also has its own anti-inflammatory effects by inhibiting NF-κB.",
+    whyDiet: {
+      carnivore: "No specific dietary concern. NAC benefits all equally — glutathione decline is universal with age.",
+      omnivore: "Standard recommendation. Good for everyone over 30.",
+      vegetarian: "Vegetarian diets are often lower in sulphur-containing amino acids (methionine, cysteine) that are precursors to glutathione. NAC supplementation may be even more beneficial.",
+    },
     benefits: [
-      "Improves insulin sensitivity — comparable to metformin",
-      "Lowers fasting glucose and HbA1c",
-      "Reduces LDL-C and triglycerides",
-      "Activates AMPK — promotes mitochondrial biogenesis",
-      "Anti-inflammatory and antimicrobial effects",
+      "Replenishes glutathione — your body's master antioxidant",
+      "Reduces oxidative stress and systemic inflammation",
+      "Supports liver detoxification pathways (Phase II)",
+      "Mucolytic — thins mucus, supports respiratory and sinus health",
+      "May reduce oxidative damage to LDL particles",
     ],
-    biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "ldl-c", "triglycerides"],
-    budgetOptions: [
-      "NOW Foods Berberine Glucose Support ($15/2 months)",
-      "Thorne Berberine ($24/2 months) — premium quality",
-      "Doctor's Best Berberine ($18/2 months)",
-      "Look for 500mg capsules, avoid time-release (worse absorption)",
-    ],
-    notes: "Cycling: 8 weeks on, 4 weeks off to maintain effectiveness. Can cause GI upset — start with 500mg once daily and increase. Do NOT take with cyclosporine. May enhance metformin effects — monitor glucose.",
+    biomarkers: ["alt", "hscrp", "homocysteine"],
+    costPerMonth: "SGD 10",
+    product: "NOW Foods NAC 1000mg (60 tabs, SGD 18.99) — 1 tab daily",
+    costPerServing: "SGD 0.32/day (1 tab = 2 months)",
+    conflicts: "May thicken mucus temporarily if you have respiratory infection — pause until resolved. Don't take with nitroglycerin.",
   },
   {
-    id: "ashwagandha",
-    name: "Ashwagandha (KSM-66)",
-    description: "Adaptogenic herb that reduces cortisol, improves stress resilience, and supports testosterone production. KSM-66 is the most researched extract.",
-    dosage: "300–600 mg KSM-66 extract daily",
-    timing: "With meals. Can be taken AM (energy/performance) or PM (relaxation).",
+    id: "glycine",
+    name: "Glycine",
+    description: "The simplest amino acid with powerful effects on sleep, collagen, and glutathione — often overlooked.",
+    tier: "optimized",
+    timing: "pm",
+    timingLabel: "🌙 PM — before bed",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "3–5g before bed (powder form)",
+    timingDetail: "Mix powder in warm tea or water 30–60 min before bed. Tastes mildly sweet — pleasant enough to be a nightly ritual.",
+    whyGeneral: "Glycine is a conditionally essential amino acid that acts as an inhibitory neurotransmitter (NMDA receptor co-agonist), promoting sleep onset — studies show 50% reduction in time to fall asleep. It's also the rate-limiting amino acid for collagen synthesis (30% of collagen is glycine) and glutathione production. Most people consume only 1.5–3g daily from diet, far below the 10–15g needed for optimal collagen synthesis.",
+    whyDiet: {
+      carnivore: "Bone broth and connective tissue are rich in glycine, but most modern carnivores eat muscle meat (low glycine). Supplementation is still beneficial for sleep and collagen.",
+      omnivore: "Standard diet provides 1.5–3g/day — well below optimal. Supplementation benefits sleep quality, skin, joints, and antioxidant status.",
+      vegetarian: "Glycine is lower in plant foods. Supplementation has a bigger impact on collagen synthesis and glutathione production compared to omnivores.",
+    },
     benefits: [
-      "Reduces cortisol by 15–30% — stress resilience",
-      "Increases testosterone modestly in men (+10–20%)",
-      "Improves sleep quality and reduces anxiety",
-      "Increases muscle strength and VO₂ max",
-      "Anti-inflammatory — reduces CRP",
+      "Cuts time to fall asleep by 50% and reduces daytime fatigue",
+      "Collagen synthesis — critical for skin, joints, and bone health",
+      "Glutathione production — combines with NAC for maximum effect",
+      "Lowers blood sugar via improved insulin sensitivity",
+      "Reduces inflammation and oxidative stress",
     ],
-    biomarkers: ["testosterone", "hscrp", "tsh"],
-    budgetOptions: [
-      "NOW Foods Ashwagandha KSM-66 ($12/2 months)",
-      "Doctor's Best Ashwagandha ($10/2 months)",
-      "Jarrow Formulas Ashwagandha ($14/2 months)",
-      "KSM-66 is the gold-standard extract — stick to it",
-    ],
-    notes: "KSM-66 standardized to 5% withanolides. Cycled: 3 months on, 1 month off. Not recommended for hyperthyroidism or bipolar disorder. Start with 300mg for 2 weeks then increase if needed.",
+    biomarkers: ["hba1c", "fasting-glucose", "hscrp", "hdl-c"],
+    costPerMonth: "SGD 6",
+    product: "NOW Foods Glycine Powder (1 lb / 454g, SGD 29.33) — 1 tsp ≈ 3g",
+    costPerServing: "SGD 0.19/day (3g = 5 months)",
+    conflicts: "None. Works synergistically with NAC, creatine, and magnesium.",
   },
   {
     id: "taurine",
     name: "Taurine",
-    description: "Conditionally essential amino acid with diverse longevity benefits — supports heart function, insulin sensitivity, and mitochondrial health.",
-    dosage: "2–6g daily",
-    timing: "Can be taken any time. 30 min before workout for performance benefits.",
+    description: "Conditionally essential amino acid for heart, metabolism, and mitochondria. Depletes naturally with age.",
+    tier: "optimized",
+    dietTier: {
+      vegetarian: "essential",
+    },
+    timing: "pm",
+    timingLabel: "🌙 PM — with dinner",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "2–6g daily (powder form)",
+    timingDetail: "Mix in water or juice with dinner. Can also take pre-workout for performance. Tastes slightly sour.",
+    whyGeneral: "Taurine is the most abundant amino acid in the heart and plays critical roles in calcium signalling, mitochondrial function, and bile salt formation. Unlike other amino acids, taurine is not incorporated into proteins — it functions as a regulatory molecule. Levels decline 50–80% with age. Supplementation in animal models extends lifespan by 10–12%. In humans, it improves insulin sensitivity, lowers blood pressure, and reduces inflammation.",
+    whyDiet: {
+      carnivore: "Meat (especially dark meat and shellfish) is rich in taurine. Supplementation is less critical but still beneficial as levels naturally decline with age.",
+      omnivore: "Mixed diet provides some taurine but levels are still suboptimal after 40. Supplementation becomes increasingly important with age.",
+      vegetarian: "Taurine is <10% of omnivore intake on plant diets. Moved to Essential tier for vegetarians. This is one of the most impactful supplements for plant-based longevity.",
+    },
     benefits: [
       "Improves insulin sensitivity — reduces metabolic syndrome risk",
-      "Cardioprotective — reduces blood pressure, improves heart contractility",
-      "Mitochondrial health — supports electron transport chain",
-      "Anti-inflammatory and antioxidant",
-      "May improve exercise performance and recovery",
+      "Lowers blood pressure (cardioprotective)",
+      "Supports mitochondrial health and energy production",
+      "Anti-inflammatory and antioxidant — reduces hs-CRP",
+      "Improves exercise performance and recovery",
     ],
     biomarkers: ["hba1c", "bp", "hscrp", "fasting-glucose"],
-    budgetOptions: [
-      "NOW Foods Taurine ($10/6 months at 2g daily) — cheapest option",
-      "BulkSupplements Taurine ($8/8 months) — excellent value",
-      "Doctor's Best Taurine ($8/4 months)",
-    ],
-    notes: "Powder form is cheapest. Tastes slightly sour — mix in water or juice. Works synergistically with magnesium. Taurine depletion occurs with age — supplementation becomes more important after 40.",
+    costPerMonth: "SGD 5",
+    product: "NOW Foods Taurine Powder (8 oz / 227g, SGD 17.49) — 1/4 tsp ≈ 2g",
+    costPerServing: "SGD 0.15/day (2g = 3.8 months)",
+    conflicts: "None. Safe up to 6g/day. Stack with magnesium for synergy.",
   },
   {
-    id: "b-complex",
-    name: "B-Complex (Methylated)",
-    description: "All eight B vitamins in their active (methylated/co-enzymated) forms. Critical for energy metabolism, homocysteine regulation, and methylation.",
-    dosage: "1 capsule daily (look for methylfolate, methylcobalamin, P5P)",
-    timing: "With breakfast or lunch (can be energizing — avoid PM)",
+    id: "coq10",
+    name: "CoQ10 (Ubiquinone)",
+    description: "Essential electron carrier in mitochondria. Critical for cellular energy, heart function, and antioxidant protection.",
+    tier: "optimized",
+    timing: "pm",
+    timingLabel: "🌙 PM — with dinner",
+    diets: ["carnivore", "omnivore", "vegetarian"],
+    dosage: "100–200 mg daily (ubiquinone). 100 mg ubiquinol if age 50+.",
+    timingDetail: "Take with dinner (fat-containing meal for absorption). Avoid taking simultaneously with vitamin K2 (both fat-soluble, space by 2 hours).",
+    whyGeneral: "CoQ10 is the electron carrier in the mitochondrial electron transport chain — without it, your cells can't produce ATP. CoQ10 levels decline naturally with age and are further depleted by statin drugs (which block the same synthesis pathway). Low CoQ10 is linked to heart failure, mitochondrial dysfunction, and increased oxidative stress. Supplementation improves endothelial function and energy production.",
+    whyDiet: {
+      carnivore: "Meat (especially organ meats) contains CoQ10, but levels in muscle meat are modest. Supplementation is beneficial with age or statin use.",
+      omnivore: "Mixed diet provides 3–5mg/day — far below therapeutic levels. Supplementation is recommended for anyone on statins or over 50.",
+      vegetarian: "Plant foods contain very little CoQ10. Supplementation is more impactful for vegetarians, especially with age.",
+    },
     benefits: [
-      "Reduces homocysteine — directly lowers cardiovascular risk",
-      "Supports methylation cycle — DNA repair and gene expression",
-      "Energy production — B-vitamins are cofactors in the Krebs cycle",
-      "Neurotransmitter synthesis — mood and cognitive function",
-      "Red blood cell production",
+      "Mitochondrial health — cellular energy production",
+      "Antioxidant — protects cell membranes from lipid peroxidation",
+      "Cardiovascular — improves endothelial function and heart contractility",
+      "Statin users: CoQ10 is mandatory (statins deplete 40%)",
+      "May improve sperm quality and fertility",
     ],
-    biomarkers: ["homocysteine", "alt", "tsh"],
-    budgetOptions: [
-      "Pure Encapsulations B-Complex ($20/2 months) — premium methylated",
-      "NOW Foods B-50 ($10/3 months) — solid, partially methylated",
-      "Jarrow Formulas B-Right ($16/3 months) — fully methylated",
-      "Life Extension BioActive B ($18/2 months)",
-    ],
-    notes: "Methylated forms (methylfolate NOT folic acid, methylcobalamin NOT cyanocobalamin, P5P NOT pyridoxine HCl) are important for people with MTHFR mutations (~40% of population).",
+    biomarkers: ["ldl-c", "apob", "bp"],
+    costPerMonth: "SGD 12",
+    product: "NOW Foods CoQ10 100mg (50 sgels, SGD 20.70) — 1 gel daily",
+    costPerServing: "SGD 0.41/day (1 gel = 1.7 months)",
+    conflicts: "None major. Take with food for absorption. Ubiquinol is 3× cost — only needed for 50+.",
   },
 ];
 
-const FOOD_CATEGORIES = ["Protein", "Vegetables", "Fruits", "Healthy Fats", "Complex Carbs"];
+const TIER_ORDER = ["minimal", "critical", "essential", "optimized"];
+const TIER_LABELS = {
+  minimal: "Minimal Stack",
+  critical: "Critical Stack",
+  essential: "Essential Stack",
+  optimized: "Optimized Stack",
+};
+const TIER_DESCRIPTIONS = {
+  minimal: "The absolute survival kit. Pick this if budget is tight or you want to start slow.",
+  critical: "Non-negotiable foundations. Every longevity-focused person should be on these.",
+  essential: "Critical + robust coverage for metabolic health, strength, and methylation.",
+  optimized: "Everything. Level up with antioxidants, mitochondrial support, and sleep optimisation.",
+};
+const DIET_LABELS = {
+  carnivore: "🥩 Carnivore",
+  omnivore: "🍽️ Omnivore",
+  vegetarian: "🥬 Vegetarian/Vegan",
+};
+const DIET_LABELS_PLAIN = {
+  carnivore: "Carnivore",
+  omnivore: "Omnivore",
+  vegetarian: "Vegetarian/Vegan",
+};

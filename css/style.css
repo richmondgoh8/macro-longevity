@@ -427,7 +427,22 @@ img {
 .biomarker-grid {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 40px;
+}
+
+.biomarker-group-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+}
+
+.biomarker-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .biomarker-card {
@@ -722,102 +737,768 @@ img {
     color: var(--text-secondary);
 }
 
-/* --- Supplement Cards --- */
-.supplement-grid {
+/* --- Supplement App --- */
+
+/* Controls bar */
+.supp-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.supp-selector-group {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 8px;
 }
 
-.supplement-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    padding: 32px;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.2s;
-}
-
-.supplement-card:hover {
-    box-shadow: var(--shadow-md);
-}
-
-.supplement-header {
-    margin-bottom: 16px;
-}
-
-.supplement-name {
-    font-size: 24px;
+.supp-label {
+    font-size: 12px;
     font-weight: 700;
-    color: var(--text);
-    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
 }
 
-.supplement-desc {
+.supp-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+}
+
+.supp-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.supp-btn:hover {
+    color: var(--text);
+}
+
+.supp-btn.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Summary / Cost card */
+.supp-stack-summary {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    align-items: flex-start;
+}
+
+.supp-tier-info {
+    flex: 1;
+}
+
+.supp-tier-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.supp-tier-desc {
     font-size: 15px;
     line-height: 1.7;
     color: var(--text-secondary);
 }
 
-.supplement-detail-grid {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
+.supp-cost-card {
+    flex-shrink: 0;
+    min-width: 180px;
+    text-align: center;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: var(--radius-md);
+    color: #fff;
 }
 
-.supplement-detail {
-    flex: 1;
-    padding: 16px 20px;
-    background: var(--bg);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-light);
-}
-
-.detail-label {
+.supp-cost-label {
     display: block;
     font-size: 12px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.supp-cost-value {
+    display: block;
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.supp-cost-note {
+    display: block;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+/* Count */
+.supp-count {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Timing blocks */
+.supp-timing-block {
+    margin-bottom: 36px;
+}
+
+.supp-timing-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.supp-timing-label {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.supp-timing-count {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.supp-timing-advice {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+}
+
+.supp-timing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Supplement item card */
+.supp-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+}
+
+.supp-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.supp-item-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.supp-item-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-right: auto;
+}
+
+.supp-item-tier {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.supp-tier-critical {
+    background: var(--accent-light);
+    color: #b43a1a;
+}
+
+.supp-tier-essential {
+    background: var(--secondary-light);
+    color: #a06820;
+}
+
+.supp-tier-optimized {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.supp-tier-minimal {
+    background: #e8f5e9;
+    color: #2a7d3a;
+}
+
+.supp-item-cost {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.supp-item-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.supp-item-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    line-height: 1.6;
+}
+
+.supp-item-section {
+    margin-top: 14px;
+}
+
+.supp-item-section h5 {
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
     margin-bottom: 4px;
 }
 
-.detail-value {
-    font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.5;
+.supp-budget-text,
+.supp-notes-text,
+.supp-conflicts-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
 }
 
-.supplement-benefits,
-.supplement-budget,
-.supplement-targets,
-.supplement-notes {
+.supp-conflicts-text {
+    padding: 8px 12px;
+    background: var(--accent-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(214, 90, 58, 0.15);
+    color: #8a3a22;
+}
+
+.supp-notes-text {
+    padding: 8px 12px;
+    background: var(--secondary-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(232, 153, 58, 0.15);
+}
+
+.supp-diet-note {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(10, 126, 111, 0.15);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--primary-dark);
+}
+
+.supp-price-disclaimer {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.supp-product-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+}
+
+.supp-cost-serving {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 4px;
+}
+
+.supp-why-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.supp-diet-why-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(10, 126, 111, 0.12);
+}
+
+/* --- Meal Planner --- */
+.meal-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.meal-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.meal-tab {
+    padding: 10px 18px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    border: 1px solid var(--border-light);
+}
+
+.meal-tab:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.meal-tab.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.meal-tab-marinade.active {
+    background: var(--secondary);
+    color: #fff;
+    border-color: var(--secondary);
+}
+
+.meal-surprise {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid rgba(214, 90, 58, 0.2);
+    transition: all 0.2s;
+}
+
+.meal-surprise:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.meal-count {
+    font-size: 14px;
+    color: var(--text-muted);
     margin-bottom: 20px;
 }
 
-.supplement-card h4 {
+.meal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.meal-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+}
+
+.meal-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.meal-card-top {
+    margin-bottom: 8px;
+}
+
+.meal-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.meal-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.meal-desc {
     font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.meal-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.meal-meta span {
+    padding: 3px 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+}
+
+.meal-details {
+    margin-bottom: 10px;
+}
+
+.meal-details summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 4px 0;
+}
+
+.meal-details summary:hover {
+    opacity: 0.8;
+}
+
+.meal-section {
+    margin: 10px 0;
+}
+
+.meal-section h5 {
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.meal-steps {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.meal-steps li {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.meal-supplement {
+    margin: 12px 0;
+    padding: 10px 12px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(10, 126, 111, 0.12);
+}
+
+.meal-supplement h5 {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--primary);
+}
+
+.meal-supplement p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--primary-dark);
+}
+
+.meal-targets {
+    margin-top: 10px;
+}
+
+.meal-targets h5 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+/* --- Marinades --- */
+.marinade-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.marinade-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+}
+
+.marinade-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.marinade-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.marinade-pairs {
+    font-size: 13px;
+    color: var(--text-secondary);
     margin-bottom: 8px;
 }
 
-.supplement-notes p {
+.marinade-instruct {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.marinade-storage {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: var(--bg);
+    border-radius: 4px;
+}
+
+.marinade-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* --- Pantry --- */
+.pantry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.pantry-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+}
+
+.pantry-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.pantry-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.pantry-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.pantry-detail {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+/* --- Food Lists --- */
+.foodlist-header {
+    margin-bottom: 20px;
+}
+
+.foodlist-header h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.foodlist-desc {
     font-size: 14px;
     line-height: 1.7;
     color: var(--text-secondary);
-    padding: 12px 16px;
-    background: var(--secondary-light);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(232, 153, 58, 0.2);
+    max-width: 700px;
 }
 
-/* --- Footer --- */
+.foodlist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.foodlist-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--bg);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+}
+
+.foodlist-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    vertical-align: top;
+}
+
+.foodlist-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    width: 28%;
+}
+
+.foodlist-table td:last-child {
+    width: 18%;
+}
+
+.foodlist-divider {
+    border: none;
+    border-top: 3px solid var(--border);
+    margin: 40px 0;
+}
+
+@media (max-width: 768px) {
+    .pantry-grid {
+        grid-template-columns: 1fr;
+    }
+    .foodlist-table {
+        font-size: 13px;
+    }
+    .foodlist-table td:first-child {
+        white-space: normal;
+    }
+}
+
+/* --- Method Selector --- */
+.method-selector {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.method-btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    transition: all 0.2s;
+}
+
+.method-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.method-btn.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.hidden { display: none; }
+
+@keyframes highlight-flash {
+    0% { box-shadow: 0 0 0 0 rgba(10, 126, 111, 0); transform: scale(1); }
+    30% { box-shadow: 0 0 0 4px rgba(10, 126, 111, 0.3); transform: scale(1.02); }
+    100% { box-shadow: 0 0 0 0 rgba(10, 126, 111, 0); transform: scale(1); }
+}
+
+.highlight-flash {
+    animation: highlight-flash 0.6s ease-in-out 3;
+    border-color: var(--primary) !important;
+}
 .footer {
     background: var(--text);
     color: rgba(255, 255, 255, 0.7);
@@ -920,6 +1601,10 @@ img {
         padding: 24px;
     }
 
+    .biomarker-group-title {
+        font-size: 20px;
+    }
+
     .nav-links {
         gap: 2px;
     }
@@ -953,6 +1638,10 @@ img {
     }
 
     .biomarker-name {
+        font-size: 18px;
+    }
+
+    .biomarker-group-title {
         font-size: 18px;
     }
 
