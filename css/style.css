@@ -1613,6 +1613,39 @@ img {
         padding: 6px 10px;
         font-size: 13px;
     }
+
+    .meal-grid,
+    .marinade-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .supp-timing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .supp-toggle {
+        flex-direction: column;
+    }
+
+    .supp-stack-summary {
+        flex-direction: column;
+    }
+
+    .supp-cost-card {
+        width: 100%;
+    }
+
+    .method-selector {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .method-btn {
+        font-size: 11px;
+        padding: 5px 10px;
+        white-space: nowrap;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1625,16 +1658,30 @@ img {
     }
 
     .nav-inner {
-        padding: 0 16px;
+        padding: 0 12px;
+        height: 56px;
     }
 
     .nav-links {
         gap: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
+    .nav-links::-webkit-scrollbar { display: none; }
 
     .nav-link {
-        padding: 6px 8px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .nav-logo-text {
+        display: none;
+    }
+
+    .nav-logo-icon {
+        font-size: 22px;
     }
 
     .biomarker-name {
@@ -1651,5 +1698,51 @@ img {
 
     .supplement-name {
         font-size: 20px;
+    }
+
+    .meal-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        width: 100%;
+    }
+
+    .meal-tab {
+        font-size: 12px;
+        padding: 8px 12px;
+        white-space: nowrap;
+    }
+
+    .foodlist-table,
+    .foodlist-table thead,
+    .foodlist-table tbody,
+    .foodlist-table tr,
+    .foodlist-table th,
+    .foodlist-table td {
+        display: block;
+    }
+    .foodlist-table thead { display: none; }
+    .foodlist-table td {
+        padding: 8px 12px;
+        border: none;
+        width: 100% !important;
+    }
+    .foodlist-table td:first-child {
+        padding-top: 14px;
+        font-size: 15px;
+    }
+    .foodlist-table td:last-child {
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    .foodlist-table tr {
+        background: var(--bg-card);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        margin-bottom: 8px;
+    }
+    .foodlist-divider {
+        margin: 24px 0;
     }
 }
