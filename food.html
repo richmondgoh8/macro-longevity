@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food — Macro Longevity</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <span class="nav-logo-icon">⟁</span>
+                <span class="nav-logo-text">MacroLongevity</span>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/food.html" class="nav-link active">Food</a>
+                <a href="/supplements.html" class="nav-link">Supplements</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="section-inner">
+                <h1 class="page-title">Food as Medicine</h1>
+                <p class="page-desc">
+                    What to eat, how to cook it, and how much it costs. Every food item is
+                    chosen to move specific biomarkers in the right direction.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-inner" id="food-container"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="footer-logo">⟁</span>
+                <span>MacroLongevity</span>
+            </div>
+            <p class="footer-text">
+                Evidence-informed guidance for biomarker optimization and longevity.
+                Not medical advice. Consult your physician before starting any supplement
+                or dietary regimen.
+            </p>
+            <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
+        </div>
+    </footer>
+
+    <script src="/js/data.js"></script>
+    <script src="/js/render.js"></script>
+    <script>renderFoods()</script>
+</body>
+</html>

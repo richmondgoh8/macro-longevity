@@ -1,12 +1,4 @@
-.PHONY: run build clean
+.PHONY: serve
 
-run:
-	go run ./cmd/web
-
-build:
-	go build -o server ./cmd/web
-
-clean:
-	rm -f server
-	rm -f coverage.*
-	rm -f *.test
+serve:
+	python3 -m http.server 8080
