@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Singapore FIRE calculator with 4% rule, CPF LIFE estimates, HDB loan integration, and portfolio projection chart. Plan your financial independence.">
+    <title>FIRE Calculator — Macro Longevity</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        .fire-calc { max-width: 1000px; margin: 0 auto; }
+        .fire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        .fire-field { display: flex; flex-direction: column; gap: 4px; }
+        .fire-field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+        .fire-field input { padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-sans); font-size: 16px; font-weight: 600; color: var(--text); background: var(--bg-card); }
+        .fire-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,126,111,0.1); }
+        .fire-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+        .fire-result-card { padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-card); text-align: center; }
+        .fire-result-card .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+        .fire-result-card .value { font-size: 28px; font-weight: 900; color: var(--primary); font-family: var(--font-mono); }
+        .fire-result-card .sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        .fire-result-card.primary { background: var(--primary); border-color: var(--primary); }
+        .fire-result-card.primary .label, .fire-result-card.primary .value, .fire-result-card.primary .sub { color: #fff; }
+        .fire-result-card.warn { border-color: var(--secondary); }
+        .fire-result-card.warn .value { color: var(--secondary); }
+        .fire-result-card.danger { border-color: var(--accent); }
+        .fire-result-card.danger .value { color: var(--accent); }
+        .fire-assumptions { font-size: 13px; color: var(--text-muted); background: var(--bg); padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); margin-bottom: 28px; line-height: 1.6; }
+        .fire-chart-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; margin-bottom: 28px; overflow-x: auto; }
+        .fire-chart-container h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+        .fire-chart { width: 100%; }
+        .fire-note { background: var(--secondary-light); border: 1px solid rgba(232,153,58,0.2); border-radius: var(--radius-sm); padding: 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+        @media (max-width: 768px) {
+            .fire-grid { grid-template-columns: 1fr; }
+            .fire-results { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <span class="nav-logo-icon">⟁</span>
+                <span class="nav-logo-text">MacroLongevity</span>
+            </a>
+            <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/pages/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/pages/food.html" class="nav-link">Food</a>
+                <a href="/pages/fasting.html" class="nav-link">Fasting</a>
+                <a href="/pages/vaccinations.html" class="nav-link">Vaccinations</a>
+                <a href="/pages/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/fire-calculator.html" class="nav-link active">FIRE Calc</a>
+                <a href="/pages/investments.html" class="nav-link">Investments</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="section-inner">
+                <h1 class="page-title">Singapore FIRE Calculator</h1>
+                <p class="page-desc">How much do you need to retire early? This calculator uses the 4% rule, CPF LIFE estimates, and Singapore-specific assumptions. Adjust the numbers and see your path to Financial Independence.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-inner fire-calc">
+                <div class="fire-grid">
+                    <div class="fire-field">
+                        <label>Your Current Age</label>
+                        <input type="number" id="age" value="30" min="18" max="70" oninput="calcFire()">
+                    </div>
+                    <div class="fire-field">
+                        <label>Target Retirement Age</label>
+                        <input type="number" id="retireAge" value="55" min="30" max="70" oninput="calcFire()">
+                    </div>
+                    <div class="fire-field" style="grid-column:1/-1;background:var(--bg);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border-light)">
+                        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:12px">💳 Your Monthly Expenses</div>
+                        <div class="fire-field">
+                            <label>Monthly Living Expenses (food, transport, bills, insurance)</label>
+                            <input type="number" id="livingExpenses" value="1600" min="0" step="100" oninput="calcFire()">
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+                            <div class="fire-field">
+                                <label>HDB Loan Balance (SGD)</label>
+                                <input type="number" id="hdbBalance" value="250000" min="0" step="10000" oninput="calcFire()">
+                            </div>
+                            <div class="fire-field">
+                                <label>Monthly HDB Payment (SGD)</label>
+                                <input type="number" id="hdbMonthly" value="1000" min="0" step="50" oninput="calcFire()">
+                            </div>
+                            <div class="fire-field">
+                                <label>Years Left on Loan</label>
+                                <input type="number" id="hdbYears" value="25" min="0" max="30" step="1" oninput="calcFire()">
+                            </div>
+                        </div>
+                        <div class="fire-field" style="margin-top:12px">
+                            <label>Other Loans (car, study, personal) — Monthly Payment</label>
+                            <input type="number" id="otherLoans" value="0" min="0" step="50" oninput="calcFire()">
+                        </div>
+                    </div>
+                    <div class="fire-field">
+                        <label>💰 Current Savings & Investments (SGD)</label>
+                        <div style="font-size:12px;color:var(--text-muted)">Cash, stocks, ETFs, robos, Endowus etc.</div>
+                        <input type="number" id="portfolio" value="20000" min="0" step="5000" oninput="calcFire()">
+                    </div>
+                    <div class="fire-field">
+                        <label>📅 Monthly Savings You Can Set Aside</label>
+                        <div style="font-size:12px;color:var(--text-muted)">How much you put into investments each month</div>
+                        <input type="number" id="monthly" value="1000" min="0" step="100" oninput="calcFire()">
+                    </div>
+                    <div class="fire-field">
+                        <label>📈 Expected Annual Return on Investments (%)</label>
+                        <div style="font-size:12px;color:var(--text-muted)">6-8% is realistic for global stocks (VWRA/CSPX)</div>
+                        <input type="number" id="return" value="6" min="0" max="15" step="0.5" oninput="calcFire()">
+                    </div>
+                    <div class="fire-field">
+                        <label>🏦 CPF OA Balance (SGD)</label>
+                        <input type="number" id="cpfOa" value="35000" min="0" step="5000" oninput="calcFire()">
+                    </div>
+                    <div class="fire-field">
+                        <label>🏦 CPF SA Balance (SGD)</label>
+                        <input type="number" id="cpfSa" value="20000" min="0" step="5000" oninput="calcFire()">
+                    </div>
+                </div>
+
+                <div class="fire-results" id="fireResults"></div>
+
+                <div class="fire-assumptions" id="fireAssumptions"></div>
+
+                <div class="fire-chart-container">
+                    <h3>📈 Portfolio Growth Projection</h3>
+                    <div class="fire-chart">
+                        <svg id="fireChart" width="100%" viewBox="0 0 600 240"></svg>
+                    </div>
+                </div>
+
+                <div class="fire-note">
+                    <strong>⚠️ Important:</strong> This calculator uses simplified assumptions. The 4% rule (FIRE Number = 25x annual expenses) is based on US historical data. Singapore's higher healthcare costs and CPF LIFE payouts mean your actual number may differ. CPF LIFE payouts from age 65 onwards can significantly reduce the portfolio you need — aim for your investments to last from retirement age to 65, then CPF LIFE takes over. The CPF LIFE estimate is a rough heuristic — actual payouts depend on your retirement sum, chosen plan (Standard/Escalating/Basic), and payout start age. Use the CPF payout estimator at cpf.gov.sg for accurate figures. This is not financial advice. Consult a licensed adviser.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="footer-logo">⟁</span>
+                <span>MacroLongevity</span>
+            </div>
+            <p class="footer-text">
+                Not financial advice. This calculator is for educational purposes only.
+                Consult a licensed financial adviser before making investment decisions.
+            </p>
+            <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
+        </div>
+    </footer>
+
+    <script>
+    function fmt(n) {
+        if (n >= 1000000) return 'SGD ' + (n/1000000).toFixed(1) + 'M';
+        return 'SGD ' + Math.round(n).toLocaleString();
+    }
+    function fmtMonth(n) {
+        return 'SGD ' + Math.round(n).toLocaleString() + '/month';
+    }
+
+    function calcFire() {
+        const age = parseFloat(document.getElementById('age').value) || 30;
+        const retireAge = parseFloat(document.getElementById('retireAge').value) || 55;
+        const livingExp = parseFloat(document.getElementById('livingExpenses').value) || 0;
+        const hdbBal = parseFloat(document.getElementById('hdbBalance').value) || 0;
+        const hdbPay = parseFloat(document.getElementById('hdbMonthly').value) || 0;
+        const hdbYearsLeft = parseFloat(document.getElementById('hdbYears').value) || 0;
+        const otherLoans = parseFloat(document.getElementById('otherLoans').value) || 0;
+        const portfolio = parseFloat(document.getElementById('portfolio').value) || 0;
+        const monthly = parseFloat(document.getElementById('monthly').value) || 0;
+        const annReturn = (parseFloat(document.getElementById('return').value) || 6) / 100;
+        const cpfOa = parseFloat(document.getElementById('cpfOa').value) || 0;
+        const cpfSa = parseFloat(document.getElementById('cpfSa').value) || 0;
+
+        const years = retireAge - age;
+        if (years <= 0) { document.getElementById('fireResults').innerHTML = ''; document.getElementById('fireAssumptions').innerHTML = ''; return; }
+        const months = years * 12;
+        const monthlyReturn = annReturn / 12;
+
+        // Current total monthly expenses (with loans)
+        const totalMonthlyExp = livingExp + hdbPay + otherLoans;
+        const totalAnnualExp = totalMonthlyExp * 12;
+
+        // Estimate how much of the loan will be paid off by retirement
+        const loanPaidByRetire = Math.min(1, hdbYearsLeft > 0 ? years / hdbYearsLeft : 1);
+        const hdbRemainingAtRetire = hdbBal * (1 - Math.min(1, loanPaidByRetire));
+        const loanPaidOffCompletely = years >= hdbYearsLeft;
+
+        // Expenses at retirement (assuming loan is paid off, living expenses stay similar)
+        const monthlyExpAtRetire = loanPaidOffCompletely ? livingExp + otherLoans : livingExp + hdbPay * Math.max(0, 1 - years/hdbYearsLeft) + otherLoans;
+        const annualExpAtRetire = monthlyExpAtRetire * 12;
+
+        // FIRE Number (25x annual expenses at retirement)
+        const fireNumber = annualExpAtRetire * 25;
+
+        // Future portfolio value
+        const totalPortfolio = portfolio;
+        let fvPortfolio = portfolio * Math.pow(1 + monthlyReturn, months);
+        if (monthly > 0) {
+            fvPortfolio += monthly * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+        }
+        const fvOa = cpfOa * Math.pow(1 + 0.025/12, months);
+        const fvSa = cpfSa * Math.pow(1 + 0.04/12, months);
+        const projectedTotal = fvPortfolio + fvOa + fvSa;
+
+        // Monthly income from portfolio at retirement (4% rule)
+        const monthlyFromPortfolio = (projectedTotal * 0.04) / 12;
+
+        // CPF LIFE estimate (~SGD 800-2000/month)
+        const cpfLifeMonthly = Math.min(2000, Math.max(300, (fvOa + fvSa) * 0.003));
+        const totalMonthlyIncome = monthlyFromPortfolio + cpfLifeMonthly;
+
+        const monthlyShortfall = monthlyExpAtRetire - totalMonthlyIncome;
+        const onTrack = monthlyShortfall <= 0;
+
+        // Monthly savings needed
+        let neededMonthly = 0;
+        if (!onTrack && months > 0) {
+            const neededFV = fireNumber - (fvOa + fvSa);
+            const pvPart = portfolio * Math.pow(1 + monthlyReturn, months);
+            const remainingFV = neededFV - pvPart;
+            if (remainingFV > 0 && monthlyReturn > 0) {
+                neededMonthly = remainingFV * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
+            }
+        }
+
+        // Simple projection chart data
+        let data = [];
+        let val = totalPortfolio + cpfOa + cpfSa;
+        for (let y = 0; y <= Math.max(years, 30); y++) {
+            if (y <= years) {
+                val = portfolio * Math.pow(1 + annReturn, y);
+                if (monthly > 0) val += monthly * 12 * ((Math.pow(1 + annReturn, y) - 1) / (annReturn));
+                const cpv = (cpfOa + cpfSa) * Math.pow(1 + 0.03, y);
+                data.push(Math.round(val + cpv));
+            } else {
+                val = val * (1 + annReturn) - annualExpAtRetire;
+                if (val < 0) val = 0;
+                data.push(Math.round(val));
+            }
+        }
+
+        // Render results
+        document.getElementById('fireResults').innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;margin-bottom:4px">
+                <h3 style="font-size:22px;font-weight:800;color:var(--text)">Your Retirement Picture at Age ${retireAge}</h3>
+            </div>
+
+            <div class="fire-result-card ${onTrack ? 'primary' : 'warn'}">
+                <div class="label">Monthly Income in Retirement</div>
+                <div class="value" style="font-size:22px">${fmtMonth(totalMonthlyIncome)}</div>
+                <div class="sub">${cpfLifeMonthly > 0 ? 'SGD ' + Math.round(cpfLifeMonthly) + '/mo from CPF LIFE + ' : ''}portfolio withdrawals</div>
+            </div>
+            <div class="fire-result-card ${onTrack ? 'primary' : 'danger'}">
+                <div class="label">Monthly Expenses at ${retireAge}</div>
+                <div class="value" style="font-size:22px">${fmtMonth(monthlyExpAtRetire)}</div>
+                <div class="sub">${loanPaidOffCompletely ? '✅ HDB loan fully paid off!' : hdbRemainingAtRetire > 0 ? 'HDB loan balance: ' + fmt(hdbRemainingAtRetire) : ''}</div>
+            </div>
+            <div class="fire-result-card ${onTrack ? 'primary' : 'danger'}">
+                <div class="label">Monthly ${onTrack ? 'Surplus' : 'Shortfall'}</div>
+                <div class="value" style="font-size:22px">${onTrack ? '✅' : '❌'} ${fmtMonth(Math.abs(monthlyShortfall))}</div>
+                <div class="sub">${onTrack ? 'You\'ll have extra cash each month' : 'Gap you need to close'}</div>
+            </div>
+
+            <div class="fire-result-card" style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px">
+                <div><div class="label">Total Savings Needed</div><div class="value" style="font-size:20px">${fmt(fireNumber)}</div></div>
+                <div><div class="label">Projected Portfolio</div><div class="value" style="font-size:20px">${fmt(projectedTotal)}</div></div>
+                <div><div class="label">Monthly from Portfolio</div><div class="value" style="font-size:20px">${fmtMonth(monthlyFromPortfolio)}</div></div>
+                <div><div class="label">CPF LIFE Estimate</div><div class="value" style="font-size:20px">${fmtMonth(cpfLifeMonthly)}</div></div>
+                <div><div class="label">HDB Loan at Retirement</div><div class="value" style="font-size:20px">${loanPaidOffCompletely ? '✅ Paid' : fmt(hdbRemainingAtRetire)}</div></div>
+            </div>
+
+            ${!onTrack ? `
+            <div class="fire-result-card warn" style="grid-column:1/-1">
+                <div class="label">To Close the Gap, Save This Much Per Month Instead</div>
+                <div class="value" style="font-size:24px">${fmtMonth(neededMonthly > 0 ? neededMonthly : monthly)}</div>
+                <div class="sub">Currently saving ${fmtMonth(monthly)} · ${neededMonthly > monthly ? 'Need to increase by ' + fmtMonth(neededMonthly - monthly) : 'You\'re already saving enough, but portfolio needs time to grow.'}</div>
+            </div>` : ''}
+
+            <div class="fire-result-card" style="grid-column:1/-1;padding:16px;text-align:left">
+                <div style="font-size:14px;line-height:1.7;color:var(--text-secondary)">
+                    <strong>🏠 HDB Loan Summary:</strong> You have ${fmt(hdbBal)} remaining over ${hdbYearsLeft} years (${fmtMonth(hdbPay)}/mo).
+                    ${years >= hdbYearsLeft ? '✅ Your loan will be fully paid off by retirement!' : 'At retirement, ~' + Math.round((1 - years/hdbYearsLeft)*100) + '% of the loan will remain (' + fmt(hdbRemainingAtRetire) + ').'}
+                    ${!loanPaidOffCompletely ? ' Consider paying down the loan faster or refinancing to reduce retirement expenses.' : ''}
+                </div>
+            </div>
+        `;
+
+        document.getElementById('fireAssumptions').innerHTML = '';
+
+        // Draw chart
+        drawFireChart(data, fireNumber);
+    }
+
+    function drawFireChart(data, fireLine) {
+        const svg = document.getElementById('fireChart');
+        const rect = svg.parentElement.getBoundingClientRect();
+        const w = Math.max(300, Math.min(800, rect.width - 4));
+        const aspect = 2.2;
+        const h = Math.round(w / aspect);
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        svg.setAttribute('height', h);
+        const pad = { top: 20, right: 24, bottom: 30, left: 72 };
+        const cw = w - pad.left - pad.right;
+        const ch = h - pad.top - pad.bottom;
+
+        const maxVal = Math.max(...data) * 1.15;
+        const minVal = 0;
+        const years = data.length - 1;
+
+        let paths = '';
+        let firePath = '';
+        const fireY = pad.top + ch - ((fireLine - minVal) / (maxVal - minVal)) * ch;
+
+        data.forEach((v, i) => {
+            const x = pad.left + (i / years) * cw;
+            const y = pad.top + ch - ((v - minVal) / (maxVal - minVal)) * ch;
+            paths += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+        });
+
+        // Grid lines
+        let gridHtml = '';
+        const yLabelSize = Math.max(9, Math.min(11, w / 60));
+        for (let i = 0; i <= 4; i++) {
+            const y1 = pad.top + (i / 4) * ch;
+            const val = maxVal - (i / 4) * (maxVal - minVal);
+            gridHtml += `<line x1="${pad.left}" y1="${y1}" x2="${w - pad.right}" y2="${y1}" stroke="#e5e2dd" stroke-width="1"/>`;
+            gridHtml += `<text x="${pad.left - 6}" y="${y1 + 4}" text-anchor="end" fill="#8a95a3" font-size="${yLabelSize}" font-family="Inter,sans-serif">${fmt(val)}</text>`;
+        }
+
+        // X-axis labels (every 5 years)
+        const xLabelSize = Math.max(9, Math.min(11, w / 60));
+        const xStep = Math.max(1, Math.ceil(5 / (w / 300)));
+        for (let i = 0; i <= years; i += xStep) {
+            const x = pad.left + (i / years) * cw;
+            const label = i + 'y';
+            gridHtml += `<text x="${x}" y="${h - 8}" text-anchor="middle" fill="#8a95a3" font-size="${xLabelSize}" font-family="Inter,sans-serif">${label}</text>`;
+        }
+
+        // FIRE line
+        if (fireLine > 0) {
+            firePath = `<line x1="${pad.left}" y1="${fireY}" x2="${w - pad.right}" y2="${fireY}" stroke="#e8993a" stroke-width="2" stroke-dasharray="6,4"/>`;
+            firePath += `<text x="${w - pad.right - 4}" y="${fireY - 6}" text-anchor="end" fill="#e8993a" font-size="11" font-weight="600" font-family="Inter,sans-serif">FIRE Line</text>`;
+        }
+
+        const fillId = 'fillGrad_' + w;
+        const defs = `<defs><linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(10,126,111,0.2)"/><stop offset="100%" stop-color="rgba(10,126,111,0)"/></linearGradient></defs>`;
+
+        svg.innerHTML = defs +
+            gridHtml +
+            `<path d="${paths}" fill="none" stroke="#0a7e6f" stroke-width="2.5" stroke-linejoin="round"/>` +
+            `<path d="${paths}L${pad.left + (data.length-1)/years*cw},${pad.top+ch}L${pad.left},${pad.top+ch}Z" fill="url(#${fillId})" opacity="0.5"/>` +
+            firePath +
+            `<text x="${pad.left}" y="${pad.top - 4}" fill="#1a232e" font-size="12" font-weight="600" font-family="Inter,sans-serif">Portfolio Value</text>` +
+            `<text x="${w/2}" y="${h - 8}" text-anchor="middle" fill="#1a232e" font-size="12" font-weight="600" font-family="Inter,sans-serif">Years from Now</text>`;
+    }
+
+    calcFire();
+    </script>
+    <script>
+        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); document.body.classList.toggle('nav-open'); }
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
+                document.querySelector('.nav').classList.remove('nav-open');
+                document.body.classList.remove('nav-open');
+            }
+        });
+    </script>
+</body>
+</html>

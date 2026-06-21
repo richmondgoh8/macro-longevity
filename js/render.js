@@ -69,6 +69,278 @@ function renderBiomarkers() {
   }).join("");
 }
 
+function renderFasting() {
+  return `<div class="fasting-intro">
+    <h3>Choose Your Fasting Protocol</h3>
+    <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
+  </div>
+  <div class="fasting-grid">
+    ${FASTING_PROTOCOLS.map(p => `
+      <article class="fasting-card" id="fast-${p.id}">
+        <div class="fasting-header">
+          <span class="fasting-icon">${p.icon}</span>
+          <div>
+            <h3 class="fasting-name">${p.name}</h3>
+            <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
+          </div>
+        </div>
+        <p class="fasting-desc">${p.description}</p>
+        <details class="meal-details"><summary>🔬 What Happens in the Body</summary>
+          <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>🚪 How to Enter the Fast</summary>
+          <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>💧 What to Do During the Fast</summary>
+          <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>🍽️ How to Break the Fast</summary>
+          <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>💡 Tips</summary>
+          <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+        </details>
+        ${p.biomarkers && p.biomarkers.length ? `
+        <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
+          <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
+        </div>` : ""}
+      </article>
+    `).join("")}
+  </div>`;
+}
+
+function renderVaccines() {
+  const groups = [
+    { key: "one-time", label: "🛡️ One-Time", desc: "Take once (usually a short series), then protected for years or life." },
+    { key: "periodic", label: "🔄 Periodic", desc: "Requires a booster every few years to maintain protection." },
+    { key: "annual", label: "📆 Annual", desc: "Needed every year — strains change or immunity wanes." },
+  ];
+
+  function scheduleLabel(s) {
+    if (s.includes("every 10")) return s + " (meaning: one dose now, next dose 10 years later)";
+    if (s.includes("every year")) return s;
+    if (s.includes("Annually")) return s;
+    if (s.includes("3 doses:")) return s + " — first dose today, second in 2 months, third in 6 months";
+    if (s.includes("2 doses:")) return s + " — first dose today, second 2–6 months later";
+    if (s.includes("Single dose")) return s + " (one dose only, no follow-up needed)";
+    return s;
+  }
+
+  const vaccineCard = (v) => `
+    <article class="vaccine-card" id="vac-${v.id}">
+      <div class="vaccine-header">
+        <h2 class="vaccine-name">${v.name}</h2>
+        <span class="tag tag-schedule tag-schedule-${v.scheduleType}">${v.scheduleType}</span>
+      </div>
+      <p class="vaccine-desc">${v.description}</p>
+      <div class="vaccine-detail"><strong>👤 Who needs it:</strong> ${v.whoNeedsIt}</div>
+      <div class="vaccine-detail"><strong>📅 Schedule:</strong> ${scheduleLabel(v.schedule)}</div>
+      <div class="vaccine-detail"><strong>✅ Efficacy:</strong> ${v.efficacy}</div>
+      <div class="vaccine-detail vaccine-cost"><strong>💰 Cost in Singapore:</strong> ${v.costSGD}</div>
+      <details class="meal-details">
+        <summary>🎯 Why It Matters for Longevity</summary>
+        <p class="vaccine-body-text">${v.longevityBenefit}</p>
+      </details>
+      <details class="meal-details">
+        <summary>⚠️ Side Effects</summary>
+        <p class="vaccine-body-text">${v.sideEffects}</p>
+      </details>
+    </article>`;
+
+  const intro = `<div class="page-header">
+    <div class="section-inner">
+      <h1 class="page-title">Essential Vaccinations for Longevity</h1>
+      <p class="page-desc">Vaccinations prevent infectious diseases that accelerate biological aging, trigger chronic inflammation, and reduce quality of life. These are the most important vaccines for adults in Singapore.</p>
+    </div>
+  </div>`;
+
+  const body = groups.map(g => {
+    const items = VACCINES.filter(v => v.scheduleType === g.key);
+    if (!items.length) return "";
+    return `<div class="vaccine-group">
+      <h2 class="vaccine-group-title">${g.label}</h2>
+      <p class="vaccine-group-desc">${g.desc}</p>
+      <div class="vaccine-grid" style="margin-top:12px">${items.map(vaccineCard).join("")}</div>
+    </div>`;
+  }).join("");
+
+  return intro + `<div class="section"><div class="section-inner">${body}</div></div>`;
+}
+
+let budgetInvestments = 0;
+
+function renderInvestments() {
+  return `<div class="page-header">
+    <div class="section-inner">
+      <h1 class="page-title">Investment Combos (Singapore Edition)</h1>
+      <p class="page-desc">Pre-built portfolio combos based on r/singaporefi wisdom. Each combo shows how different instruments work together, why they synergize, and exactly how to execute. Pick the one that matches your goal and risk tolerance.</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-inner invest-combo-grid">
+      <p class="invest-disclaimer">Not financial advice. Information sourced from MAS, CPF Board, r/singaporefi, and HardwareZone for educational purposes. Consult a licensed adviser.</p>
+
+      <div class="budget-tool" id="budgetTool">
+        <h3 class="budget-title">💵 Your Budget at a Glance</h3>
+        <p class="budget-desc">Enter your monthly take-home salary. The 50/30/20 rule splits it into Expenses, Investments, and Savings. Drag the sliders to adjust.</p>
+        <div class="budget-input-row">
+          <div class="budget-field">
+            <label>Monthly Take-Home Salary</label>
+            <input type="number" id="budgetSalary" value="" min="0" step="500" placeholder="e.g. 5000" oninput="updateBudget()">
+          </div>
+        </div>
+        <div id="budgetResults"></div>
+        <div class="budget-sliders" id="budgetSliders" style="display:none">
+          <div class="budget-slider-row">
+            <div class="budget-slider-label">
+              <span class="budget-slider-name" style="color:#2563eb;font-weight:700">Expenses</span>
+              <span class="budget-slider-name" style="color:#2563eb;font-weight:700">Investments</span>
+              <span class="budget-slider-name" style="color:var(--text-muted)">Savings</span>
+            </div>
+          </div>
+          <div class="budget-slider-row">
+            <label>Expenses <span id="budgetPctExpenses">50</span>%</label>
+            <input type="range" id="sliderExpenses" min="0" max="100" value="50" oninput="updateBudget()">
+            <span class="budget-slider-val" id="budgetValExpenses">SGD 0</span>
+          </div>
+          <div class="budget-slider-row">
+            <label>Investments <span id="budgetPctInvestments">30</span>%</label>
+            <input type="range" id="sliderInvestments" min="0" max="100" value="30" oninput="updateBudget()">
+            <span class="budget-slider-val" id="budgetValInvestments">SGD 0</span>
+          </div>
+          <p class="budget-slider-hint">Savings auto-calculates as the remainder. Total always sums to 100%.</p>
+        </div>
+      </div>
+
+      ${INVESTMENTS.map(c => `
+        <article class="invest-card" id="inv-${c.id}">
+          <div class="invest-card-top">
+            <span class="invest-icon">${c.icon}</span>
+            <div>
+              <h2 class="invest-name">${c.name}</h2>
+              <span class="invest-goal">${c.goal}</span>
+            </div>
+          </div>
+          <div class="invest-meta-bar">
+            <span>📈 ${c.totalReturn}</span>
+            <span>⚠️ ${c.riskLevel}</span>
+          </div>
+          <div class="invest-table ${budgetInvestments > 0 ? '' : 'invest-table-hide-mo'}">
+            <div class="invest-table-header"><span>Asset</span><span>Allocation</span><span>Monthly</span><span>Why</span></div>
+            ${c.portfolio.map(a => {
+              const pct = parseFloat(a.pct);
+              const monthly = budgetInvestments > 0 && pct ? 'SGD ' + Math.round(budgetInvestments * pct / 100).toLocaleString() + '/mo' : '';
+              return `
+              <div class="invest-table-row">
+                <span class="invest-asset">${a.asset}</span>
+                <span class="invest-pct">${a.pct}</span>
+                <span class="invest-monthly">${monthly}</span>
+                <span class="invest-why">${a.why}</span>
+              </div>`;
+            }).join("")}
+          </div>
+          <details class="meal-details">
+            <summary>🧩 Why These Work Together</summary>
+            <p class="invest-body-text">${c.synergy}</p>
+          </details>
+          <details class="meal-details">
+            <summary>📋 Step-by-Step Execution</summary>
+            <p class="invest-body-text">${c.howToExecute}</p>
+          </details>
+          <details class="meal-details">
+            <summary>💡 Tips from r/singaporefi</summary>
+            <ul class="checklist">
+              ${c.tips.map(t => `<li>${t}</li>`).join("")}
+            </ul>
+          </details>
+        </article>
+      `).join("")}
+    </div>
+  </div>`;
+}
+
+function updateBudget() {
+  const salary = parseFloat(document.getElementById('budgetSalary').value) || 0;
+  const results = document.getElementById('budgetResults');
+  const sliders = document.getElementById('budgetSliders');
+
+  if (salary <= 0) {
+    results.innerHTML = '';
+    sliders.style.display = 'none';
+    if (budgetInvestments > 0) {
+      budgetInvestments = 0;
+      document.querySelectorAll('.invest-table').forEach(t => t.classList.add('invest-table-hide-mo'));
+    }
+    return;
+  }
+  sliders.style.display = 'block';
+
+  let vE = parseFloat(document.getElementById('sliderExpenses').value);
+  let vI = parseFloat(document.getElementById('sliderInvestments').value);
+  let vS = Math.max(0, 100 - vE - vI);
+
+  if (vE + vI > 100) {
+    const active = document.activeElement;
+    if (active && active.id === 'sliderExpenses') {
+      vE = 100 - vI;
+    } else {
+      vI = 100 - vE;
+    }
+    vS = 0;
+    document.getElementById('sliderExpenses').value = vE;
+    document.getElementById('sliderInvestments').value = vI;
+  }
+
+  const prevInvestments = budgetInvestments;
+  budgetInvestments = Math.round(salary * vI / 100);
+
+  document.getElementById('budgetPctExpenses').textContent = vE;
+  document.getElementById('budgetPctInvestments').textContent = vI;
+
+  document.getElementById('budgetValExpenses').textContent = 'SGD ' + Math.round(salary * vE / 100).toLocaleString();
+  document.getElementById('budgetValInvestments').textContent = 'SGD ' + budgetInvestments.toLocaleString();
+
+  results.innerHTML = `
+    <div class="budget-breakdown">
+      <div class="budget-card" style="background:#f0f6ff">
+        <div class="budget-card-label" style="color:#2563eb">Expenses</div>
+        <div class="budget-card-amt" style="color:#2563eb">SGD ${Math.round(salary * vE / 100).toLocaleString()}</div>
+        <div class="budget-card-pct" style="color:#2563eb">${vE}%</div>
+        <div class="budget-card-desc" style="color:var(--text-muted)">Housing, food, transport, bills, insurance</div>
+      </div>
+      <div class="budget-card" style="background:#e8f5e9">
+        <div class="budget-card-label" style="color:#2e7d32">Investments</div>
+        <div class="budget-card-amt" style="color:#2e7d32">SGD ${budgetInvestments.toLocaleString()}</div>
+        <div class="budget-card-pct" style="color:#2e7d32">${vI}%</div>
+        <div class="budget-card-desc" style="color:var(--text-muted)">Stocks, ETFs, CPF top-ups, robos</div>
+      </div>
+      <div class="budget-card" style="background:#fef3e7">
+        <div class="budget-card-label" style="color:#e8993a">Savings</div>
+        <div class="budget-card-amt" style="color:#e8993a">SGD ${Math.round(salary * vS / 100).toLocaleString()}</div>
+        <div class="budget-card-pct" style="color:#e8993a">${vS}%</div>
+        <div class="budget-card-desc" style="color:var(--text-muted)">High-yield savings account (UOB One / OCBC 360)</div>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.invest-table').forEach(t => {
+    if (budgetInvestments > 0) {
+      t.classList.remove('invest-table-hide-mo');
+    } else if (prevInvestments > 0) {
+      t.classList.add('invest-table-hide-mo');
+    }
+  });
+
+  document.querySelectorAll('.invest-table-row').forEach(row => {
+    const cells = row.querySelectorAll('span');
+    if (cells.length >= 3) {
+      const pctText = cells[1].textContent;
+      const pct = parseFloat(pctText);
+      cells[2].textContent = budgetInvestments > 0 && pct ? 'SGD ' + Math.round(budgetInvestments * pct / 100).toLocaleString() + '/mo' : '';
+    }
+  });
+}
+
 let foodTab = "breakfast";
 
 function renderFoods() {
@@ -89,6 +361,64 @@ function renderFoods() {
     </div>`;
   }
 
+  function fastingHTML() {
+    return `<div class="fasting-intro">
+      <h3>Choose Your Fasting Protocol</h3>
+      <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
+    </div>
+    <div class="fasting-grid">
+      ${FASTING_PROTOCOLS.map(p => `
+        <article class="fasting-card" id="fast-${p.id}">
+          <div class="fasting-header">
+            <span class="fasting-icon">${p.icon}</span>
+            <div>
+              <h3 class="fasting-name">${p.name}</h3>
+              <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
+            </div>
+          </div>
+          <p class="fasting-desc">${p.description}</p>
+          <details class="meal-details">
+            <summary>🔬 What Happens in the Body</summary>
+            <ul class="checklist">
+              ${p.whatHappens.map(h => `<li>${h}</li>`).join("")}
+            </ul>
+          </details>
+          <details class="meal-details">
+            <summary>🚪 How to Enter the Fast</summary>
+            <ul class="checklist">
+              ${p.howToEnter.map(h => `<li>${h}</li>`).join("")}
+            </ul>
+          </details>
+          <details class="meal-details">
+            <summary>💧 What to Do During the Fast</summary>
+            <ul class="checklist">
+              ${p.duringFast.map(d => `<li>${d}</li>`).join("")}
+            </ul>
+          </details>
+          <details class="meal-details">
+            <summary>🍽️ How to Break the Fast</summary>
+            <ul class="checklist">
+              ${p.howToBreak.map(h => `<li>${h}</li>`).join("")}
+            </ul>
+          </details>
+          <details class="meal-details">
+            <summary>💡 Tips</summary>
+            <ul class="checklist">
+              ${p.tips.map(t => `<li>${t}</li>`).join("")}
+            </ul>
+          </details>
+          ${p.biomarkers && p.biomarkers.length ? `
+          <div class="meal-targets" style="margin-top:12px">
+            <h5>Biomarkers Improved</h5>
+            <div class="tag-group">
+              ${p.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+            </div>
+          </div>` : ""}
+        </article>
+      `).join("")}
+    </div>`;
+  }
+
   function foodListHTML(list) {
     return `
       <div class="foodlist-header">
@@ -104,7 +434,7 @@ function renderFoods() {
             <tr>
               <td><strong>${f.name}</strong></td>
               <td>${f.why}</td>
-              <td>${f.biomarkers.map(b => `<a href="/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}</td>
+              <td>${f.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -165,23 +495,26 @@ function renderFoods() {
         </div>` : ""}
         ${hasMethods ? m.methods.map((mt, i) => `
         <div class="method-content${i === 0 ? "" : " hidden"}" data-method="${m.id}-${i}">
-          <div class="meal-section">
-            <h5>Ingredients</h5>
-            <ul class="checklist">
-              ${m.ingredients.map(i => `<li>${i}</li>`).join("")}
-            </ul>
-          </div>
-          <div class="meal-section">
-            <h5>Instructions</h5>
-            <ol class="meal-steps">
-              ${mt.instructions.map(s => `<li>${s}</li>`).join("")}
-            </ol>
-          </div>
-          ${mt.supplementPairing ? `
-          <div class="meal-supplement">
-            <h5>💊 Supplement Pairing</h5>
-            <p>${mt.supplementPairing}</p>
-          </div>` : ""}
+          <details class="meal-details">
+            <summary>Ingredients & Instructions</summary>
+            <div class="meal-section">
+              <h5>Ingredients</h5>
+              <ul class="checklist">
+                ${m.ingredients.map(i => `<li>${i}</li>`).join("")}
+              </ul>
+            </div>
+            <div class="meal-section">
+              <h5>Instructions</h5>
+              <ol class="meal-steps">
+                ${mt.instructions.map(s => `<li>${s}</li>`).join("")}
+              </ol>
+            </div>
+            ${mt.supplementPairing ? `
+            <div class="meal-supplement">
+              <h5>💊 Supplement Pairing</h5>
+              <p>${mt.supplementPairing}</p>
+            </div>` : ""}
+          </details>
         </div>`).join("") : `
         <details class="meal-details">
           <summary>Ingredients & Instructions</summary>
@@ -214,7 +547,7 @@ function renderFoods() {
         <div class="meal-targets">
           <h5>Targets</h5>
           <div class="tag-group">
-            ${m.biomarkers.map(b => `<a href="/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+            ${m.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
           </div>
         </div>` : ""}
       </article>`;
@@ -231,6 +564,14 @@ function renderFoods() {
         <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
         <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
       </div>
+      <select class="meal-tab-select" onchange="selectMealTab(this.value)">
+        ${MEAL_CATEGORIES.map(c =>
+          `<option value="${c}" ${foodTab === c ? "selected" : ""}>${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</option>`
+        ).join("")}
+        <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
+        <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
+        <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
+      </select>
       ${["breakfast", "lunch", "dinner", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
     </div>
 
@@ -283,9 +624,7 @@ function selectMethod(mealId, idx) {
 
   const firstContent = contents[idx];
   if (firstContent) {
-    const supp = firstContent.querySelector(".meal-supplement p");
-    const time = firstContent.closest(".meal-card")?.querySelector(".meal-time");
-    const cost = firstContent.closest(".meal-card")?.querySelector(".meal-meta span:first-child");
+    // method switch handled by class toggles above
   }
 }
 
@@ -432,7 +771,7 @@ function renderSupplements() {
               <div class="supp-item-section">
                 <h5>Targets</h5>
                 <div class="tag-group">
-                  ${s.biomarkers.map(b => `<a href="/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+                  ${s.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
                 </div>
               </div>` : ""}
             </div>

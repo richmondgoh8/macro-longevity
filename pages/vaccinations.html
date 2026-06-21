@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food — Macro Longevity</title>
+    <meta name="description" content="10 essential vaccinations for longevity in Singapore — HPV, Hep B, MMR, Shingles, RSV, Tdap, influenza, COVID-19 and more with costs and schedules.">
+    <title>Vaccinations — Macro Longevity</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,28 +23,18 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/biomarkers.html" class="nav-link">Biomarkers</a>
-                <a href="/food.html" class="nav-link active">Food</a>
-                <a href="/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/pages/food.html" class="nav-link">Food</a>
+                <a href="/pages/fasting.html" class="nav-link">Fasting</a>
+                <a href="/pages/vaccinations.html" class="nav-link active">Vaccinations</a>
+                <a href="/pages/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/fire-calculator.html" class="nav-link">FIRE Calc</a>
+                <a href="/pages/investments.html" class="nav-link">Investments</a>
             </div>
         </div>
     </nav>
 
-    <main>
-        <section class="page-header">
-            <div class="section-inner">
-                <h1 class="page-title">Meal Planner</h1>
-                <p class="page-desc">
-                    30+ meals across breakfast, lunch, and dinner with supplement pairings,
-                    marinades, and enough variations for a full month without repetition.
-                </p>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-inner" id="food-app"></div>
-        </section>
-    </main>
+    <main id="vaccines-app"></main>
 
     <footer class="footer">
         <div class="footer-inner">
@@ -53,8 +44,8 @@
             </div>
             <p class="footer-text">
                 Evidence-informed guidance for biomarker optimization and longevity.
-                Not medical advice. Consult your physician before starting any supplement
-                or dietary regimen.
+                Not medical advice. Consult your physician before starting any supplement,
+                dietary, or fasting regimen.
             </p>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
@@ -62,13 +53,13 @@
 
     <script src="/js/data.js"></script>
     <script src="/js/render.js"></script>
-    <script>renderFoods()</script>
-
+    <script>document.getElementById('vaccines-app').innerHTML = renderVaccines()</script>
     <script>
-        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); }
+        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); document.body.classList.toggle('nav-open'); }
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
                 document.querySelector('.nav').classList.remove('nav-open');
+                document.body.classList.remove('nav-open');
             }
         });
     </script>

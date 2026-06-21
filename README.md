@@ -1,87 +1,68 @@
 # macro-longevity
 
-An open-source Go web application that guides users toward optimal biomarker levels
-for longevity through evidence-based nutrition, cooking protocols, and supplement
-stacking — with a budget-first philosophy.
-
-**Live site:** planned for Render.com
+Static HTML/CSS/JS site guiding users toward optimal biomarker levels for longevity
+through evidence-based nutrition, cooking protocols, and supplement stacking — with
+a budget-first philosophy. Deploys to Cloudflare Pages.
 
 ---
 
 ## Quick start
 
 ```sh
-make run     # or: go run ./cmd/web
+make serve   # or: python3 -m http.server 8080
 ```
 
 Open http://localhost:8080
-
-## Build binary
-
-```sh
-make build   # produces ./server
-./server
-```
 
 ## Stack
 
 | Layer          | Technology                        |
 |----------------|-----------------------------------|
-| Language       | Go 1.22+                          |
-| Templates      | `html/template` (embedded via `//go:embed`) |
-| CSS            | Plain CSS (no framework)          |
-| Assets         | Fully embedded — single binary    |
+| Language       | Pure HTML, CSS, JavaScript        |
+| Frameworks     | None                              |
+| Build step     | None — served directly from root  |
+| Hosting        | Cloudflare Pages (planned)        |
 
 ## Architecture
 
 ```
-cmd/web/main.go              Entry point, router, static file serving
-internal/
-  handlers/pages.go          HTTP handlers (index, biomarkers, food, supplements)
-  models/data.go             All content: 20 biomarkers, 14 foods, 12 supplements
-  web/
-    embed.go                 Go embed declarations
-    templates/               5 .html files (base + 4 pages)
-    static/css/style.css     Full responsive design system (~400 lines)
+index.html              Landing page with hero, stats, feature cards
+biomarkers.html         20 biomarker cards rendered client-side
+food.html               30 meals (breakfast/lunch/dinner) + marinades + pantry + food lists
+supplements.html        Supplement stack builder with diet/tier filtering
+css/style.css           Single stylesheet, ~1850 lines, responsive (768px, 480px)
+js/data.js              All content: biomarkers, meals, supplements, pantry, food lists
+js/render.js            Client-side rendering for every page
 ```
 
-No database, no dependencies beyond stdlib. All content is compiled into the binary.
-To add or edit biomarkers/foods/supplements, edit `internal/models/data.go`.
+All data is hardcoded in `js/data.js` — no API, no database, no backend.
+Each `.html` page loads `data.js` + `render.js` and calls its render function.
 
 ## Pages
 
-| Route          | Content                                                   |
-|----------------|-----------------------------------------------------------|
-| `/`            | Landing page with hero, preview cards, stats, features    |
-| `/biomarkers`  | 20 biomarkers with ranges, importance, improvement plans, budget tips |
-| `/food`        | 14 foods across 5 categories with recipes, cooking instructions, cost breakdowns |
-| `/supplements` | 12 supplements with dosing, timing, budget brand recommendations |
+| File                | Content                                                              |
+|---------------------|----------------------------------------------------------------------|
+| `index.html`        | Landing page with hero, preview cards, stats, features               |
+| `biomarkers.html`   | 20 biomarkers grouped by category, with ranges and improvement plans |
+| `food.html`         | 30 meals across 3 meal types + marinades, pantry staples, food lists |
+| `supplements.html`  | Stack builder — select diet + tier to see filtered supplements       |
 
-## Anatomy of a Biomarker entry
+## Content editing
 
-Every biomarker in `internal/models/data.go` contains:
+Edit `js/data.js` to add or change biomarkers, meals, supplements, pantry items,
+or food lists. Each page reads the global arrays and renders them client-side.
+After editing, verify counts stay consistent with brace-matching.
 
-- **Name, description, category** — what it is
-- **Optimal range & optimal level** — clinical + aspirational targets
-- **Importance** — why it matters for longevity (with citations/statistics)
-- **How to improve** — actionable checklist (diet, exercise, lifestyle)
-- **Budget tips** — cheap/free alternatives that work
-- **Risk level** — `low` / `moderate` / `high` (visual badge)
+### Pricing
 
-## Deploy to Render
+- Ingredient costs in **SGD** reference NTUC FairPrice.
+- Supplement costs sourced from **iHerb SG** — update `PRICE_DISCLAIMER` date if refreshing.
+- Supplement costs use `"SGD XX"` format for `costPerMonth`.
 
-No config file required. Via the Render dashboard:
+## Deploy to Cloudflare Pages
 
-1. **Build command:** `go build -o server ./cmd/web`
-2. **Start command:** `./server`
-3. **Environment:** PORT is auto-injected by Render (defaults to `8080` locally)
-
-The binary is self-contained — no static files to copy.
-
-## Contributing
-
-PRs that add biomarkers, foods, supplements, or improve accuracy are welcome.
-Keep entries concise, evidence-grounded, and budget-conscious.
+Push to GitHub. No build command needed — serve files from root.
+All assets are static, no server-side processing.
 
 ## License
 

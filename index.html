@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Evidence-based longevity optimization for Singapore — biomarkers, nutrition, supplements, fasting, vaccines, and FIRE investing.">
     <title>Macro Longevity — Your Biomarker Optimization Guide</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,9 +23,13 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link active">Home</a>
-                <a href="/biomarkers.html" class="nav-link">Biomarkers</a>
-                <a href="/food.html" class="nav-link">Food</a>
-                <a href="/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/pages/food.html" class="nav-link">Food</a>
+                <a href="/pages/fasting.html" class="nav-link">Fasting</a>
+                <a href="/pages/vaccinations.html" class="nav-link">Vaccinations</a>
+                <a href="/pages/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/fire-calculator.html" class="nav-link">FIRE Calc</a>
+                <a href="/pages/investments.html" class="nav-link">Investments</a>
             </div>
         </div>
     </nav>
@@ -39,8 +44,8 @@
                     and the supplements that get you there — without burning a hole in your pocket.
                 </p>
                 <div class="hero-actions">
-                    <a href="/biomarkers.html" class="btn btn-primary">Explore Biomarkers</a>
-                    <a href="/food.html" class="btn btn-secondary">Start Eating Better</a>
+                    <a href="/pages/biomarkers.html" class="btn btn-primary">Explore Biomarkers</a>
+                    <a href="/pages/food.html" class="btn btn-secondary">Start Eating Better</a>
                 </div>
             </div>
         </section>
@@ -48,7 +53,7 @@
         <section class="section preview-cards">
             <div class="section-inner">
                 <div class="preview-grid">
-                    <a href="/biomarkers.html" class="preview-card">
+                    <a href="/pages/biomarkers.html" class="preview-card">
                         <div class="preview-icon">🩸</div>
                         <h3 class="preview-title">20 Key Biomarkers</h3>
                         <p class="preview-desc">
@@ -57,7 +62,7 @@
                         </p>
                         <span class="preview-cta">View biomarkers →</span>
                     </a>
-                    <a href="/food.html" class="preview-card">
+                    <a href="/pages/food.html" class="preview-card">
                         <div class="preview-icon">🥗</div>
                         <h3 class="preview-title">Food That Heals</h3>
                         <p class="preview-desc">
@@ -66,7 +71,7 @@
                         </p>
                         <span class="preview-cta">Explore food →</span>
                     </a>
-                    <a href="/supplements.html" class="preview-card">
+                    <a href="/pages/supplements.html" class="preview-card">
                         <div class="preview-icon">💊</div>
                         <h3 class="preview-title">Supplement Stack</h3>
                         <p class="preview-desc">
@@ -154,7 +159,7 @@
     </footer>
 
     <script>
-        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); }
+        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); document.body.classList.toggle('nav-open'); }
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
                 document.querySelector('.nav').classList.remove('nav-open');

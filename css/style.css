@@ -119,6 +119,7 @@ img {
     font-weight: 500;
     color: var(--text-secondary);
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -129,7 +130,8 @@ img {
 .nav-link.active {
     color: var(--primary);
     background: var(--primary-light);
-    font-weight: 600;
+    font-weight: 500;
+    box-shadow: 0 0 0 1px rgba(10,126,111,0.15);
 }
 
 /* --- Nav Toggle (Hamburger) --- */
@@ -172,6 +174,9 @@ img {
     }
     .nav-toggle {
         display: flex;
+    }
+    body.nav-open {
+        overflow-x: hidden;
     }
     .nav-links {
         position: absolute;
@@ -1370,6 +1375,397 @@ img {
     margin-bottom: 4px;
 }
 
+/* --- Fasting --- */
+.fasting-intro {
+    margin-bottom: 28px;
+}
+.fasting-intro h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+.fasting-intro p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 650px;
+}
+.fasting-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+.fasting-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+}
+.fasting-card:hover {
+    box-shadow: var(--shadow-md);
+}
+.fasting-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.fasting-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+.fasting-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+.fasting-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.fasting-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+.meal-tab-fasting.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.meal-tab-select {
+    display: none;
+    padding: 12px 16px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text);
+    width: 100%;
+    cursor: pointer;
+}
+
+@media (max-width: 767px) {
+    .meal-tabs { display: none; }
+    .meal-tab-select { display: block; }
+    .meal-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .meal-surprise { width: 100%; text-align: center; }
+}
+
+/* --- Vaccines --- */
+.vaccine-group {
+    margin-bottom: 40px;
+}
+
+.vaccine-group-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+}
+
+.vaccine-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.vaccine-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+}
+
+.vaccine-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.vaccine-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.vaccine-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.tag-schedule {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tag-schedule-one-time {
+    background: #e8f5e9;
+    color: #2a7d3a;
+}
+
+.tag-schedule-periodic {
+    background: var(--secondary-light);
+    color: #a06820;
+}
+
+.tag-schedule-annual {
+    background: var(--accent-light);
+    color: #b43a1a;
+}
+
+.vaccine-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.vaccine-detail {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    padding: 6px 10px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+}
+
+.vaccine-cost {
+    background: var(--primary-light);
+    border-color: rgba(10, 126, 111, 0.15);
+}
+
+.vaccine-group-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: -8px;
+    margin-bottom: 16px;
+}
+
+.vaccine-body-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding: 8px 0;
+}
+
+/* --- Investments (Portfolio Combos) --- */
+.invest-combo-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.invest-disclaimer {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.invest-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+}
+
+.invest-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.invest-card-top {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.invest-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.invest-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.invest-goal {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.invest-meta-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.invest-meta-bar span {
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.invest-table {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.invest-table-header {
+    display: grid;
+    grid-template-columns: 26% 10% 14% 1fr;
+    gap: 0;
+    background: var(--bg);
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+
+.invest-table-row {
+    display: grid;
+    grid-template-columns: 26% 10% 14% 1fr;
+    gap: 0;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px;
+    line-height: 1.5;
+    align-items: start;
+}
+
+.invest-table-row:last-child {
+    border-bottom: none;
+}
+
+.invest-asset {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.invest-pct {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 15px;
+}
+
+.invest-why {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.invest-monthly {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: #2e7d32;
+    font-size: 14px;
+}
+
+.invest-table-hide-mo .invest-monthly,
+.invest-table-hide-mo .invest-table-header span:nth-child(3) {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .invest-table-hide-mo .invest-monthly,
+    .invest-table-hide-mo .invest-table-header span:nth-child(3) {
+        display: none;
+    }
+}
+
+.invest-body-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding: 8px 0;
+}
+
+@media (max-width: 768px) {
+    .invest-card {
+        padding: 20px;
+    }
+    .invest-name {
+        font-size: 20px;
+    }
+    .invest-table-header,
+    .invest-table-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+    .invest-table-header {
+        display: none;
+    }
+    .invest-table-row {
+        padding: 14px;
+    }
+    .invest-asset {
+        font-size: 15px;
+    }
+    .invest-pct {
+        font-size: 14px;
+    }
+    .invest-monthly {
+        font-size: 14px;
+    }
+    .invest-meta-bar {
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+
+/* --- Vaccine mobile --- */
+@media (max-width: 768px) {
+    .vaccine-card {
+        padding: 20px;
+    }
+    .vaccine-name {
+        font-size: 20px;
+    }
+}
+
 /* --- Marinades --- */
 .marinade-grid {
     display: grid;
@@ -1735,7 +2131,8 @@ img {
     }
 
     .meal-grid,
-    .marinade-grid {
+    .marinade-grid,
+    .fasting-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1851,4 +2248,36 @@ img {
     .foodlist-divider {
         margin: 24px 0;
     }
+}
+
+.budget-tool {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin-bottom: 12px;
+}
+.budget-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.budget-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+.budget-input-row { max-width: 360px; }
+.budget-field { display: flex; flex-direction: column; gap: 4px; }
+.budget-field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.budget-field input { padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-sans); font-size: 16px; font-weight: 600; color: var(--text); background: var(--bg-card); }
+.budget-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,126,111,0.1); }
+.budget-breakdown { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+.budget-card { padding: 14px; border-radius: var(--radius-sm); }
+.budget-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.budget-card-amt { font-size: 22px; font-weight: 900; }
+.budget-card-pct { font-size: 13px; margin-top: 2px; }
+.budget-card-desc { font-size: 12px; margin-top: 4px; }
+.budget-sliders { margin-top: 16px; padding: 16px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border-light); }
+.budget-slider-row { display: grid; grid-template-columns: 180px 1fr 100px; gap: 12px; align-items: center; margin-bottom: 10px; }
+.budget-slider-row label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.budget-slider-row input[type=range] { width: 100%; accent-color: var(--primary); }
+.budget-slider-val { font-size: 14px; font-weight: 700; color: var(--text); font-family: var(--font-mono); text-align: right; }
+.budget-slider-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+@media (max-width: 768px) {
+    .budget-breakdown { grid-template-columns: 1fr; }
+    .budget-slider-row { grid-template-columns: 1fr; gap: 4px; }
+    .budget-slider-val { text-align: left; }
 }

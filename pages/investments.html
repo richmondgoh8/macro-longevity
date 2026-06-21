@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biomarkers — Macro Longevity</title>
+    <meta name="description" content="5 Singapore-focused investment combos — Safe Starter, Boglehead, Income Machine, FIRE Accelerator, HDB Downpayment. With budget planner tool.">
+    <title>Investing — Macro Longevity</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,30 +23,18 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/biomarkers.html" class="nav-link active">Biomarkers</a>
-                <a href="/food.html" class="nav-link">Food</a>
-                <a href="/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/pages/food.html" class="nav-link">Food</a>
+                <a href="/pages/fasting.html" class="nav-link">Fasting</a>
+                <a href="/pages/vaccinations.html" class="nav-link">Vaccinations</a>
+                <a href="/pages/supplements.html" class="nav-link">Supplements</a>
+                <a href="/pages/fire-calculator.html" class="nav-link">FIRE Calc</a>
+                <a href="/pages/investments.html" class="nav-link active">Investments</a>
             </div>
         </div>
     </nav>
 
-    <main>
-        <section class="page-header">
-            <div class="section-inner">
-                <h1 class="page-title">Essential Longevity Biomarkers</h1>
-                <p class="page-desc">
-                    Know your numbers. Each biomarker includes the optimal range, why it matters
-                    for longevity, and how to improve it on any budget.
-                </p>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-inner">
-                <div id="biomarker-grid" class="biomarker-grid"></div>
-            </div>
-        </section>
-    </main>
+    <main id="investments-app"></main>
 
     <footer class="footer">
         <div class="footer-inner">
@@ -54,9 +43,8 @@
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
-                Evidence-informed guidance for biomarker optimization and longevity.
-                Not medical advice. Consult your physician before starting any supplement
-                or dietary regimen.
+                Not financial advice. This information is for educational purposes only.
+                Consult a licensed financial adviser before making investment decisions.
             </p>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
@@ -64,13 +52,13 @@
 
     <script src="/js/data.js"></script>
     <script src="/js/render.js"></script>
-    <script>renderBiomarkers()</script>
-
+    <script>document.getElementById('investments-app').innerHTML = renderInvestments()</script>
     <script>
-        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); }
+        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); document.body.classList.toggle('nav-open'); }
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
                 document.querySelector('.nav').classList.remove('nav-open');
+                document.body.classList.remove('nav-open');
             }
         });
     </script>
