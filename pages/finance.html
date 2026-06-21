@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Singapore FIRE calculator with 4% rule, CPF LIFE estimates, HDB loan integration, and portfolio projection chart. Plan your financial independence.">
-    <title>FIRE Calculator — Macro Longevity</title>
+    <meta name="description" content="Singapore FIRE calculator with 4% rule, CPF LIFE estimates, investment combos, and passive income tracker.">
+    <title>Finance — Macro Longevity</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,9 +33,32 @@
         .fire-chart-container h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
         .fire-chart { width: 100%; }
         .fire-note { background: var(--secondary-light); border: 1px solid rgba(232,153,58,0.2); border-radius: var(--radius-sm); padding: 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+        .pi-section { margin-top: 32px; padding: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); }
+        .pi-section h2 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+        .pi-section .pi-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+        .pi-table { width: 100%; border-collapse: collapse; }
+        .pi-table th { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--border); }
+        .pi-table td { padding: 6px 10px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+        .pi-table input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: var(--font-mono); background: var(--bg); color: var(--text); box-sizing: border-box; }
+        .pi-table input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(10,126,111,0.1); }
+        .pi-table .pi-monthly { font-weight: 700; font-family: var(--font-mono); color: var(--primary); }
+        .pi-table .pi-total-row td { font-weight: 700; border-top: 2px solid var(--border); font-size: 15px; background: var(--bg); }
+        .pi-table .pi-total-row .pi-monthly { font-size: 16px; }
+        .pi-btn { padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; background: var(--bg); color: var(--text); }
+        .pi-btn:hover { background: var(--border-light); }
+        .pi-btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .pi-btn-primary:hover { opacity: 0.9; }
+        .pi-btn-danger { color: var(--accent); border-color: transparent; background: transparent; padding: 6px 8px; font-size: 16px; line-height: 1; }
+        .pi-btn-danger:hover { background: rgba(224,82,74,0.08); }
+        .pi-total-bar { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 16px; padding: 16px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border-light); }
+        .pi-total-bar .pi-stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+        .pi-total-bar .pi-stat-value { font-size: 24px; font-weight: 900; color: var(--primary); font-family: var(--font-mono); }
+        .pi-empty { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 14px; }
         @media (max-width: 768px) {
             .fire-grid { grid-template-columns: 1fr; }
             .fire-results { grid-template-columns: 1fr; }
+            .pi-table th:nth-child(2), .pi-table td:nth-child(2) { display: none; }
+            .pi-total-bar { flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
@@ -51,13 +74,9 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/pages/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/pages/health.html" class="nav-link">Health</a>
                 <a href="/pages/food.html" class="nav-link">Food</a>
-                <a href="/pages/fasting.html" class="nav-link">Fasting</a>
-                <a href="/pages/vaccinations.html" class="nav-link">Vaccinations</a>
-                <a href="/pages/supplements.html" class="nav-link">Supplements</a>
-                <a href="/pages/fire-calculator.html" class="nav-link active">FIRE Calc</a>
-                <a href="/pages/investments.html" class="nav-link">Investments</a>
+                <a href="/pages/finance.html" class="nav-link active">Finance</a>
             </div>
         </div>
     </nav>
@@ -65,13 +84,34 @@
     <main>
         <section class="page-header">
             <div class="section-inner">
-                <h1 class="page-title">Singapore FIRE Calculator</h1>
-                <p class="page-desc">How much do you need to retire early? This calculator uses the 4% rule, CPF LIFE estimates, and Singapore-specific assumptions. Adjust the numbers and see your path to Financial Independence.</p>
+                <h1 class="page-title">Finance & FIRE</h1>
+                <p class="page-desc">Investment combos for Singapore, FIRE calculator with 4% rule and CPF LIFE estimates, plus a passive income tracker.</p>
             </div>
         </section>
 
         <section class="section">
+            <div class="section-inner">
+                <div class="meal-tabs" id="financeTabs">
+                    <button class="meal-tab active" onclick="selectFinanceTab('investments')">📈 Investment Combos</button>
+                    <button class="meal-tab" onclick="selectFinanceTab('fire')">🧮 FIRE Calculator</button>
+                </div>
+                <select class="meal-tab-select" onchange="selectFinanceTab(this.value)">
+                    <option value="investments" selected>📈 Investment Combos</option>
+                    <option value="fire">🧮 FIRE Calculator</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="section" id="financeInvestments">
+            <div class="section-inner" id="investments-app"></div>
+        </section>
+
+        <section class="section" id="financeFire" style="display:none">
             <div class="section-inner fire-calc">
+                <div class="page-header" style="background: none; padding: 0; margin-bottom: 24px">
+                    <h1 class="page-title" style="font-size: 22px">Singapore FIRE Calculator</h1>
+                    <p class="page-desc">How much do you need to retire early? Uses the 4% rule, CPF LIFE estimates, and Singapore-specific assumptions.</p>
+                </div>
                 <div class="fire-grid">
                     <div class="fire-field">
                         <label>Your Current Age</label>
@@ -132,8 +172,13 @@
                 </div>
 
                 <div class="fire-results" id="fireResults"></div>
-
                 <div class="fire-assumptions" id="fireAssumptions"></div>
+
+                <div class="pi-section" id="piSection">
+                    <h2>📊 Passive Income Tracker</h2>
+                    <p class="pi-desc">Track your dividend and interest income across all holdings. Add your assets, enter the amount and annual rate — monthly income calculates automatically.</p>
+                    <div id="piContent"></div>
+                </div>
 
                 <div class="fire-chart-container">
                     <h3>📈 Portfolio Growth Projection</h3>
@@ -156,13 +201,16 @@
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
-                Not financial advice. This calculator is for educational purposes only.
+                Not financial advice. This information is for educational purposes only.
                 Consult a licensed financial adviser before making investment decisions.
             </p>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
+    <script src="/js/data.js"></script>
+    <script src="/js/render.js"></script>
+    <script>document.getElementById('investments-app').innerHTML = renderInvestments()</script>
     <script>
     function fmt(n) {
         if (n >= 1000000) return 'SGD ' + (n/1000000).toFixed(1) + 'M';
@@ -191,23 +239,18 @@
         const months = years * 12;
         const monthlyReturn = annReturn / 12;
 
-        // Current total monthly expenses (with loans)
         const totalMonthlyExp = livingExp + hdbPay + otherLoans;
         const totalAnnualExp = totalMonthlyExp * 12;
 
-        // Estimate how much of the loan will be paid off by retirement
         const loanPaidByRetire = Math.min(1, hdbYearsLeft > 0 ? years / hdbYearsLeft : 1);
         const hdbRemainingAtRetire = hdbBal * (1 - Math.min(1, loanPaidByRetire));
         const loanPaidOffCompletely = years >= hdbYearsLeft;
 
-        // Expenses at retirement (assuming loan is paid off, living expenses stay similar)
         const monthlyExpAtRetire = loanPaidOffCompletely ? livingExp + otherLoans : livingExp + hdbPay * Math.max(0, 1 - years/hdbYearsLeft) + otherLoans;
         const annualExpAtRetire = monthlyExpAtRetire * 12;
 
-        // FIRE Number (25x annual expenses at retirement)
         const fireNumber = annualExpAtRetire * 25;
 
-        // Future portfolio value
         const totalPortfolio = portfolio;
         let fvPortfolio = portfolio * Math.pow(1 + monthlyReturn, months);
         if (monthly > 0) {
@@ -217,17 +260,14 @@
         const fvSa = cpfSa * Math.pow(1 + 0.04/12, months);
         const projectedTotal = fvPortfolio + fvOa + fvSa;
 
-        // Monthly income from portfolio at retirement (4% rule)
         const monthlyFromPortfolio = (projectedTotal * 0.04) / 12;
 
-        // CPF LIFE estimate (~SGD 800-2000/month)
         const cpfLifeMonthly = Math.min(2000, Math.max(300, (fvOa + fvSa) * 0.003));
         const totalMonthlyIncome = monthlyFromPortfolio + cpfLifeMonthly;
 
         const monthlyShortfall = monthlyExpAtRetire - totalMonthlyIncome;
         const onTrack = monthlyShortfall <= 0;
 
-        // Monthly savings needed
         let neededMonthly = 0;
         if (!onTrack && months > 0) {
             const neededFV = fireNumber - (fvOa + fvSa);
@@ -238,7 +278,6 @@
             }
         }
 
-        // Simple projection chart data
         let data = [];
         let val = totalPortfolio + cpfOa + cpfSa;
         for (let y = 0; y <= Math.max(years, 30); y++) {
@@ -254,7 +293,6 @@
             }
         }
 
-        // Render results
         document.getElementById('fireResults').innerHTML = `
             <div style="grid-column:1/-1;text-align:center;margin-bottom:4px">
                 <h3 style="font-size:22px;font-weight:800;color:var(--text)">Your Retirement Picture at Age ${retireAge}</h3>
@@ -302,7 +340,6 @@
 
         document.getElementById('fireAssumptions').innerHTML = '';
 
-        // Draw chart
         drawFireChart(data, fireNumber);
     }
 
@@ -332,7 +369,6 @@
             paths += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
         });
 
-        // Grid lines
         let gridHtml = '';
         const yLabelSize = Math.max(9, Math.min(11, w / 60));
         for (let i = 0; i <= 4; i++) {
@@ -342,7 +378,6 @@
             gridHtml += `<text x="${pad.left - 6}" y="${y1 + 4}" text-anchor="end" fill="#8a95a3" font-size="${yLabelSize}" font-family="Inter,sans-serif">${fmt(val)}</text>`;
         }
 
-        // X-axis labels (every 5 years)
         const xLabelSize = Math.max(9, Math.min(11, w / 60));
         const xStep = Math.max(1, Math.ceil(5 / (w / 300)));
         for (let i = 0; i <= years; i += xStep) {
@@ -351,7 +386,6 @@
             gridHtml += `<text x="${x}" y="${h - 8}" text-anchor="middle" fill="#8a95a3" font-size="${xLabelSize}" font-family="Inter,sans-serif">${label}</text>`;
         }
 
-        // FIRE line
         if (fireLine > 0) {
             firePath = `<line x1="${pad.left}" y1="${fireY}" x2="${w - pad.right}" y2="${fireY}" stroke="#e8993a" stroke-width="2" stroke-dasharray="6,4"/>`;
             firePath += `<text x="${w - pad.right - 4}" y="${fireY - 6}" text-anchor="end" fill="#e8993a" font-size="11" font-weight="600" font-family="Inter,sans-serif">FIRE Line</text>`;
@@ -369,6 +403,106 @@
             `<text x="${w/2}" y="${h - 8}" text-anchor="middle" fill="#1a232e" font-size="12" font-weight="600" font-family="Inter,sans-serif">Years from Now</text>`;
     }
 
+    // Passive Income Tracker
+    const PI_KEY = 'passiveIncome';
+
+    function loadPiData() {
+        try { return JSON.parse(localStorage.getItem(PI_KEY)) || []; } catch { return []; }
+    }
+
+    function savePiData(data) {
+        localStorage.setItem(PI_KEY, JSON.stringify(data));
+    }
+
+    function delPiRow(idx) {
+        const data = loadPiData();
+        data.splice(idx, 1);
+        savePiData(data);
+        renderPiTable();
+    }
+
+    function addPiRow() {
+        const data = loadPiData();
+        data.push({ name: '', principal: 0, rate: 0 });
+        savePiData(data);
+        renderPiTable();
+    }
+
+    function renderPiTable() {
+        const data = loadPiData();
+        const container = document.getElementById('piContent');
+        let totalPrincipal = 0, totalMonthly = 0;
+
+        if (data.length === 0) {
+            container.innerHTML = `<div class="pi-empty">No assets yet. Add your first dividend stock, bond, or CPF account to see your monthly passive income.</div>
+                <button class="pi-btn pi-btn-primary" onclick="addPiRow()">+ Add Asset</button>`;
+            return;
+        }
+
+        let rows = '';
+        data.forEach((r, i) => {
+            const principal = parseFloat(r.principal) || 0;
+            const rate = parseFloat(r.rate) || 0;
+            const monthly = principal * rate / 100 / 12;
+            totalPrincipal += principal;
+            totalMonthly += monthly;
+            rows += `<tr>
+                <td><input type="text" value="${r.name.replace(/"/g, '&quot;')}" placeholder="e.g. DBS Stock" onchange="updatePiField(${i},'name',this.value)"></td>
+                <td><input type="number" value="${principal || ''}" min="0" placeholder="0" onchange="updatePiField(${i},'principal',parseFloat(this.value)||0)"></td>
+                <td><input type="number" value="${rate || ''}" min="0" max="100" step="0.1" placeholder="0" onchange="updatePiField(${i},'rate',parseFloat(this.value)||0)"></td>
+                <td class="pi-monthly">SGD ${Math.round(monthly).toLocaleString()}/mo</td>
+                <td><button class="pi-btn pi-btn-danger" onclick="delPiRow(${i})">✕</button></td>
+            </tr>`;
+        });
+
+        const annualTotal = totalMonthly * 12;
+        container.innerHTML = `
+            <table class="pi-table">
+                <thead><tr>
+                    <th style="width:30%">Asset</th>
+                    <th style="width:22%">Principal (SGD)</th>
+                    <th style="width:18%">Rate (%)</th>
+                    <th style="width:20%">Monthly Income</th>
+                    <th style="width:10%"></th>
+                </tr></thead>
+                <tbody>${rows}
+                    <tr class="pi-total-row">
+                        <td><strong>Total</strong></td>
+                        <td><strong>SGD ${Math.round(totalPrincipal).toLocaleString()}</strong></td>
+                        <td><strong>${totalPrincipal > 0 ? (totalMonthly * 12 / totalPrincipal * 100).toFixed(1) : 0}%</strong></td>
+                        <td class="pi-monthly"><strong>SGD ${Math.round(totalMonthly).toLocaleString()}/mo</strong></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pi-total-bar">
+                <div class="pi-stat"><div class="pi-stat-label">Total Principal</div><div class="pi-stat-value">SGD ${Math.round(totalPrincipal).toLocaleString()}</div></div>
+                <div class="pi-stat"><div class="pi-stat-label">Monthly Passive Income</div><div class="pi-stat-value">SGD ${Math.round(totalMonthly).toLocaleString()}</div></div>
+                <div class="pi-stat"><div class="pi-stat-label">Annual Passive Income</div><div class="pi-stat-value">SGD ${Math.round(annualTotal).toLocaleString()}</div></div>
+                <div class="pi-stat"><div class="pi-stat-label">Blended Yield</div><div class="pi-stat-value">${totalPrincipal > 0 ? (annualTotal / totalPrincipal * 100).toFixed(1) : 0}%</div></div>
+            </div>
+            <div style="margin-top:12px"><button class="pi-btn pi-btn-primary" onclick="addPiRow()">+ Add Asset</button></div>`;
+    }
+
+    function updatePiField(idx, field, value) {
+        const data = loadPiData();
+        if (!data[idx]) return;
+        data[idx][field] = value;
+        savePiData(data);
+        renderPiTable();
+    }
+
+    function selectFinanceTab(tab) {
+        const tabs = document.querySelectorAll('#financeTabs .meal-tab');
+        const selects = document.querySelectorAll('.meal-tab-select');
+        tabs.forEach((t, i) => t.classList.toggle('active', (i === 0 && tab === 'investments') || (i === 1 && tab === 'fire')));
+        selects.forEach(s => s.value = tab);
+        document.getElementById('financeInvestments').style.display = tab === 'investments' ? '' : 'none';
+        document.getElementById('financeFire').style.display = tab === 'fire' ? '' : 'none';
+        if (tab === 'fire') { calcFire(); renderPiTable(); }
+    }
+
+    renderPiTable();
     calcFire();
     </script>
     <script>

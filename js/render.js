@@ -1,5 +1,44 @@
-function renderBiomarkers() {
-  const grid = document.getElementById("biomarker-grid");
+let healthTab = "biomarkers";
+
+function selectHealthTab(tab) {
+  healthTab = tab;
+  renderHealth();
+}
+
+function renderHealth() {
+  const container = document.getElementById("health-app");
+  if (!container) return;
+
+  const tabs = `
+    <div class="meal-tabs">
+      ${["biomarkers", "fasting", "vaccinations"].map(t =>
+        `<button class="meal-tab ${healthTab === t ? "active" : ""}" onclick="selectHealthTab('${t}')">
+          ${t === "biomarkers" ? "🔬 Biomarkers" : t === "fasting" ? "⏳ Fasting" : "💉 Vaccinations"}
+        </button>`
+      ).join("")}
+      <select class="meal-tab-select" onchange="selectHealthTab(this.value)">
+        ${["biomarkers", "fasting", "vaccinations"].map(t =>
+          `<option value="${t}" ${healthTab === t ? "selected" : ""}>${t === "biomarkers" ? "Biomarkers" : t === "fasting" ? "Fasting" : "Vaccinations"}</option>`
+        ).join("")}
+      </select>
+    </div>`;
+
+  if (healthTab === "biomarkers") {
+    const bioContainer = document.createElement("div");
+    bioContainer.id = "biomarker-grid";
+    container.innerHTML = tabs;
+    container.appendChild(bioContainer);
+    renderBiomarkers("biomarker-grid");
+    window.scrollTo(0, 0);
+  } else if (healthTab === "fasting") {
+    container.innerHTML = tabs + renderFasting();
+  } else {
+    container.innerHTML = tabs + renderVaccines();
+  }
+}
+
+function renderBiomarkers(targetId) {
+  const grid = document.getElementById(targetId || "biomarker-grid");
   if (!grid) return;
 
   const riskOrder = { high: 0, moderate: 1, low: 2 };
@@ -102,7 +141,7 @@ function renderFasting() {
         </details>
         ${p.biomarkers && p.biomarkers.length ? `
         <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
-          <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
+          <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
         </div>` : ""}
       </article>
     `).join("")}
@@ -411,7 +450,7 @@ function renderFoods() {
           <div class="meal-targets" style="margin-top:12px">
             <h5>Biomarkers Improved</h5>
             <div class="tag-group">
-              ${p.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+              ${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
             </div>
           </div>` : ""}
         </article>
@@ -434,7 +473,7 @@ function renderFoods() {
             <tr>
               <td><strong>${f.name}</strong></td>
               <td>${f.why}</td>
-              <td>${f.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}</td>
+              <td>${f.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -462,6 +501,7 @@ function renderFoods() {
           </div>
         `).join("")}
       </div>`;
+      case "supplements": return `<div id="supplement-app"></div>`;
       default: {
         const items = MEALS.filter(m => m.category === tab);
         return `
@@ -547,7 +587,7 @@ function renderFoods() {
         <div class="meal-targets">
           <h5>Targets</h5>
           <div class="tag-group">
-            ${m.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+            ${m.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
           </div>
         </div>` : ""}
       </article>`;
@@ -563,6 +603,7 @@ function renderFoods() {
         <button class="meal-tab meal-tab-marinade ${foodTab === "marinade" ? "active" : ""}" onclick="selectMealTab('marinade')">🧂 Marinades & Sauces (${MARINADES.length})</button>
         <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
         <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
+        <button class="meal-tab ${foodTab === "supplements" ? "active" : ""}" onclick="selectMealTab('supplements')">💊 Supplements</button>
       </div>
       <select class="meal-tab-select" onchange="selectMealTab(this.value)">
         ${MEAL_CATEGORIES.map(c =>
@@ -571,13 +612,19 @@ function renderFoods() {
         <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
         <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
         <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
+        <option value="supplements" ${foodTab === "supplements" ? "selected" : ""}>💊 Supplements</option>
       </select>
-      ${["breakfast", "lunch", "dinner", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
+      ${["breakfast", "lunch", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
     </div>
 
     ${renderFoodContent(foodTab)}`;
 
   container.innerHTML = html;
+
+  if (foodTab === "supplements") {
+    const suppEl = document.getElementById("supplement-app");
+    if (suppEl) renderSupplements("supplement-app");
+  }
 }
 
 function surpriseMe() {
@@ -643,8 +690,8 @@ function filteredSupplements(diet, tier) {
   );
 }
 
-function renderSupplements() {
-  const container = document.getElementById("supplement-app");
+function renderSupplements(targetId) {
+  const container = document.getElementById(targetId || "supplement-app");
   if (!container) return;
 
   const filtered = filteredSupplements(selectedDiet, selectedTier);
@@ -771,7 +818,7 @@ function renderSupplements() {
               <div class="supp-item-section">
                 <h5>Targets</h5>
                 <div class="tag-group">
-                  ${s.biomarkers.map(b => `<a href="/pages/biomarkers.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+                  ${s.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
                 </div>
               </div>` : ""}
             </div>

@@ -20,9 +20,9 @@ make serve       # kill old :8080, start python3 http.server
 
 | Page | Function |
 |------|----------|
-| `biomarkers.html` | `renderBiomarkers()` |
-| `food.html` | `renderFoods()` |
-| `supplements.html` | `renderSupplements()` |
+| `health.html` | `renderHealth()` — sub-tabs: Biomarkers, Fasting, Vaccinations |
+| `food.html` | `renderFoods()` — sub-tabs: meals, marinades, pantry, food lists, supplements |
+| `finance.html` | `renderInvestments()` + inline FIRE calc — sub-tabs: combos, calculator |
 
 ## Data editing (`js/data.js`)
 

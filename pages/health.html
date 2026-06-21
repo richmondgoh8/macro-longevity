@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="5 Singapore-focused investment combos — Safe Starter, Boglehead, Income Machine, FIRE Accelerator, HDB Downpayment. With budget planner tool.">
-    <title>Investing — Macro Longevity</title>
+    <meta name="description" content="20 longevity biomarkers with optimal ranges, 6 fasting protocols, and essential vaccinations for Singapore adults.">
+    <title>Health — Macro Longevity</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,18 +23,27 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/pages/biomarkers.html" class="nav-link">Biomarkers</a>
+                <a href="/pages/health.html" class="nav-link active">Health</a>
                 <a href="/pages/food.html" class="nav-link">Food</a>
-                <a href="/pages/fasting.html" class="nav-link">Fasting</a>
-                <a href="/pages/vaccinations.html" class="nav-link">Vaccinations</a>
-                <a href="/pages/supplements.html" class="nav-link">Supplements</a>
-                <a href="/pages/fire-calculator.html" class="nav-link">FIRE Calc</a>
-                <a href="/pages/investments.html" class="nav-link active">Investments</a>
+                <a href="/pages/finance.html" class="nav-link">Finance</a>
             </div>
         </div>
     </nav>
 
-    <main id="investments-app"></main>
+    <main>
+        <section class="page-header">
+            <div class="section-inner">
+                <h1 class="page-title">Health Optimisation</h1>
+                <p class="page-desc">Track your biomarkers, explore fasting protocols, and stay up-to-date on essential vaccinations — all in one place.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-inner">
+                <div id="health-app"></div>
+            </div>
+        </section>
+    </main>
 
     <footer class="footer">
         <div class="footer-inner">
@@ -43,8 +52,9 @@
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
-                Not financial advice. This information is for educational purposes only.
-                Consult a licensed financial adviser before making investment decisions.
+                Evidence-informed guidance for biomarker optimization and longevity.
+                Not medical advice. Consult your physician before starting any supplement,
+                dietary, or fasting regimen.
             </p>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
@@ -52,7 +62,7 @@
 
     <script src="/js/data.js"></script>
     <script src="/js/render.js"></script>
-    <script>document.getElementById('investments-app').innerHTML = renderInvestments()</script>
+    <script>renderHealth()</script>
     <script>
         function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); document.body.classList.toggle('nav-open'); }
         document.addEventListener('click', function(e) {
