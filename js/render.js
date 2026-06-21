@@ -9,16 +9,23 @@ function renderHealth() {
   const container = document.getElementById("health-app");
   if (!container) return;
 
+  const healthTabs = ["biomarkers", "fasting", "vaccinations", "supplements", "damage-control"];
+  const tabLabels = {
+    biomarkers: "🔬 Biomarkers",
+    fasting: "⏳ Fasting",
+    vaccinations: "💉 Vaccinations",
+    supplements: "💊 Supplements",
+    "damage-control": "⚡ Damage Control",
+  };
+
   const tabs = `
     <div class="meal-tabs">
-      ${["biomarkers", "fasting", "vaccinations"].map(t =>
-        `<button class="meal-tab ${healthTab === t ? "active" : ""}" onclick="selectHealthTab('${t}')">
-          ${t === "biomarkers" ? "🔬 Biomarkers" : t === "fasting" ? "⏳ Fasting" : "💉 Vaccinations"}
-        </button>`
+      ${healthTabs.map(t =>
+        `<button class="meal-tab ${healthTab === t ? "active" : ""}" onclick="selectHealthTab('${t}')">${tabLabels[t]}</button>`
       ).join("")}
       <select class="meal-tab-select" onchange="selectHealthTab(this.value)">
-        ${["biomarkers", "fasting", "vaccinations"].map(t =>
-          `<option value="${t}" ${healthTab === t ? "selected" : ""}>${t === "biomarkers" ? "Biomarkers" : t === "fasting" ? "Fasting" : "Vaccinations"}</option>`
+        ${healthTabs.map(t =>
+          `<option value="${t}" ${healthTab === t ? "selected" : ""}>${tabLabels[t].replace(/^[^\s]+\s/, "")}</option>`
         ).join("")}
       </select>
     </div>`;
@@ -29,12 +36,17 @@ function renderHealth() {
     container.innerHTML = tabs;
     container.appendChild(bioContainer);
     renderBiomarkers("biomarker-grid");
-    window.scrollTo(0, 0);
   } else if (healthTab === "fasting") {
     container.innerHTML = tabs + renderFasting();
-  } else {
+  } else if (healthTab === "vaccinations") {
     container.innerHTML = tabs + renderVaccines();
+  } else if (healthTab === "supplements") {
+    container.innerHTML = tabs + '<div id="supplement-app"></div>';
+    renderSupplements("supplement-app");
+  } else {
+    container.innerHTML = tabs + renderDamageControl();
   }
+  window.scrollTo(0, 0);
 }
 
 function renderBiomarkers(targetId) {
@@ -380,6 +392,22 @@ function updateBudget() {
   });
 }
 
+function renderDamageControl() {
+  return `<div class="dc-section">
+    <h3 class="dc-section-title">🍬 Too Much Sugar</h3>
+    <p class="dc-desc">Your body can handle an occasional glucose spike. These interventions help clear it faster and reduce metabolic damage. Pick what's available to you now:</p>
+    <div class="dc-tip-list">
+      ${SUGAR_OFFSET_TIPS.map(t => `
+        <div class="dc-tip-card">
+          <div class="dc-tip-action">${t.action}</div>
+          <div class="dc-tip-why">${t.why}</div>
+          <div class="dc-tip-timing">⏰ ${t.timing}</div>
+        </div>
+      `).join("")}
+    </div>
+  </div>`;
+}
+
 let foodTab = "breakfast";
 
 function renderFoods() {
@@ -459,19 +487,31 @@ function renderFoods() {
   }
 
   function foodListHTML(list) {
+    const hasFiber = list.id === "fiber-rich";
+    const hasPotassium = list.id === "potassium-rich";
+    const extraCol = hasFiber ? { label: "Fiber", val: f => f.fiberG + "g" }
+                  : hasPotassium ? { label: "Potassium", val: f => f.potassiumMg + " mg" }
+                  : null;
+
+    const dailyNote = hasFiber ? `<p class="foodlist-note">Daily target: <strong>25-30g</strong> (women) · <strong>30-38g</strong> (men)</p>`
+                   : hasPotassium ? `<p class="foodlist-note">Daily target: <strong>2,600mg</strong> (women) · <strong>3,400mg</strong> (men)</p>`
+                   : "";
+
     return `
       <div class="foodlist-header">
         <h3>${list.name}</h3>
         <p class="foodlist-desc">${list.description}</p>
+        ${dailyNote}
       </div>
       <table class="foodlist-table">
         <thead>
-          <tr><th>Food</th><th>Why It Helps</th><th>Targets</th></tr>
+          <tr><th>Food</th>${extraCol ? `<th class="foodlist-num">${extraCol.label}</th>` : ""}<th>Why It Helps</th><th>Targets</th></tr>
         </thead>
         <tbody>
           ${list.foods.map(f => `
             <tr>
               <td><strong>${f.name}</strong></td>
+              ${extraCol ? `<td class="foodlist-num">${extraCol.val(f)}</td>` : ""}
               <td>${f.why}</td>
               <td>${f.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}</td>
             </tr>
@@ -501,7 +541,6 @@ function renderFoods() {
           </div>
         `).join("")}
       </div>`;
-      case "supplements": return `<div id="supplement-app"></div>`;
       default: {
         const items = MEALS.filter(m => m.category === tab);
         return `
@@ -603,7 +642,6 @@ function renderFoods() {
         <button class="meal-tab meal-tab-marinade ${foodTab === "marinade" ? "active" : ""}" onclick="selectMealTab('marinade')">🧂 Marinades & Sauces (${MARINADES.length})</button>
         <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
         <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
-        <button class="meal-tab ${foodTab === "supplements" ? "active" : ""}" onclick="selectMealTab('supplements')">💊 Supplements</button>
       </div>
       <select class="meal-tab-select" onchange="selectMealTab(this.value)">
         ${MEAL_CATEGORIES.map(c =>
@@ -612,7 +650,6 @@ function renderFoods() {
         <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
         <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
         <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
-        <option value="supplements" ${foodTab === "supplements" ? "selected" : ""}>💊 Supplements</option>
       </select>
       ${["breakfast", "lunch", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
     </div>
@@ -620,11 +657,6 @@ function renderFoods() {
     ${renderFoodContent(foodTab)}`;
 
   container.innerHTML = html;
-
-  if (foodTab === "supplements") {
-    const suppEl = document.getElementById("supplement-app");
-    if (suppEl) renderSupplements("supplement-app");
-  }
 }
 
 function surpriseMe() {

@@ -1851,16 +1851,16 @@ const FOOD_LISTS = [
     name: "🌾 Fiber-Rich Foods",
     description: "These foods provide soluble and insoluble fiber that lower LDL-C, improve glycemic control, and feed beneficial gut bacteria — without spiking triglycerides or glucose.",
     foods: [
-      { name: "Rolled Oats", why: "Beta-glucan lowers LDL-C by 5-10%. Low glycemic — steady energy release.", biomarkers: ["apob", "ldl-c", "hba1c"] },
-      { name: "Psyllium Husk", why: "7g soluble fiber per 5g serving. Directly binds bile acids — lowers LDL. Zero glycemic impact.", biomarkers: ["apob", "ldl-c", "fasting-glucose"] },
-      { name: "Chia Seeds", why: "17g fiber per 30g. ALA omega-3s add anti-inflammatory benefit. Gel forms in stomach — increases satiety.", biomarkers: ["hscrp", "apob", "hba1c"] },
-      { name: "Flax Seeds (Ground)", why: "3g fiber per tbsp + lignans. Dual benefit for cholesterol and inflammation.", biomarkers: ["apob", "ldl-c", "hscrp"] },
-      { name: "Legumes (Lentils, Chickpeas, Beans)", why: "15g fiber per cup. Low glycemic, high satiety. Also rich in potassium and magnesium.", biomarkers: ["apob", "hba1c", "bp"] },
-      { name: "Broccoli", why: "5g fiber per cup + sulforaphane. Anti-inflammatory AND high fiber.", biomarkers: ["hscrp", "apob", "alt"] },
-      { name: "Avocado", why: "7g fiber per half. Monounsaturated fat improves HDL. Potassium lowers BP.", biomarkers: ["hdl-c", "bp", "hscrp"] },
-      { name: "Almonds & Walnuts", why: "3-4g fiber per serving. Healthy fats improve lipid profile. Walnuts add ALA omega-3s.", biomarkers: ["apob", "hdl-c", "hscrp"] },
-      { name: "Sweet Potatoes (with skin)", why: "4g fiber per medium potato. Beta-carotene + potassium. Lower glycemic than white potatoes.", biomarkers: ["hba1c", "bp", "fasting-glucose"] },
-      { name: "Brussels Sprouts", why: "4g fiber per cup. Glucosinolates detoxify. Roasted with olive oil = fiber + anti-inflammatory combo.", biomarkers: ["hscrp", "alt", "homocysteine"] },
+      { name: "Legumes (Lentils, Chickpeas, Beans)", fiberG: 15, why: "Low glycemic, high satiety. Also rich in potassium and magnesium.", biomarkers: ["apob", "hba1c", "bp"] },
+      { name: "Chia Seeds", fiberG: 10, why: "ALA omega-3s add anti-inflammatory benefit. Gel forms in stomach — increases satiety.", biomarkers: ["hscrp", "apob", "hba1c"] },
+      { name: "Psyllium Husk", fiberG: 7, why: "Soluble fiber binds bile acids — lowers LDL. Zero glycemic impact.", biomarkers: ["apob", "ldl-c", "fasting-glucose"] },
+      { name: "Avocado", fiberG: 7, why: "Monounsaturated fat improves HDL. Potassium lowers BP.", biomarkers: ["hdl-c", "bp", "hscrp"] },
+      { name: "Brussels Sprouts", fiberG: 6, why: "Glucosinolates detoxify. Roasted with olive oil = fiber + anti-inflammatory combo.", biomarkers: ["hscrp", "alt", "homocysteine"] },
+      { name: "Broccoli", fiberG: 5, why: "Sulforaphane makes it anti-inflammatory AND high fiber.", biomarkers: ["hscrp", "apob", "alt"] },
+      { name: "Rolled Oats", fiberG: 4, why: "Beta-glucan lowers LDL-C by 5-10%. Low glycemic — steady energy.", biomarkers: ["apob", "ldl-c", "hba1c"] },
+      { name: "Sweet Potatoes (with skin)", fiberG: 4, why: "Beta-carotene + potassium. Lower glycemic than white potatoes.", biomarkers: ["hba1c", "bp", "fasting-glucose"] },
+      { name: "Almonds & Walnuts", fiberG: 4, why: "Healthy fats improve lipid profile. Walnuts add ALA omega-3s.", biomarkers: ["apob", "hdl-c", "hscrp"] },
+      { name: "Flax Seeds (Ground)", fiberG: 3, why: "Lignans provide dual benefit for cholesterol and inflammation.", biomarkers: ["apob", "ldl-c", "hscrp"] },
     ],
   },
   {
@@ -1868,16 +1868,23 @@ const FOOD_LISTS = [
     name: "🥔 Potassium-Rich Foods",
     description: "Potassium lowers blood pressure by counteracting sodium, reducing vascular resistance, and improving kidney function. These foods are also low in sodium and don't spike glucose or triglycerides.",
     foods: [
-      { name: "Sweet Potatoes", why: "540mg potassium per medium potato + beta-carotene + fiber. Low glycemic.", biomarkers: ["bp", "hba1c"] },
-      { name: "Spinach (Cooked)", why: "840mg potassium per cup cooked. Also rich in magnesium, vitamin K, and nitrates for BP.", biomarkers: ["bp", "hscrp", "homocysteine"] },
-      { name: "Avocado", why: "485mg potassium per half + heart-healthy monounsaturated fat + fiber.", biomarkers: ["bp", "hdl-c", "hscrp"] },
-      { name: "Bananas", why: "422mg potassium per medium banana. Convenient pre-workout fuel. Modest glycemic impact — fine for most.", biomarkers: ["bp"] },
-      { name: "Salmon", why: "450mg potassium per 150g serving + omega-3s + vitamin D. Dual benefit for BP and inflammation.", biomarkers: ["bp", "hscrp", "triglycerides"] },
-      { name: "Beetroot", why: "Nitrates → NO (nitric oxide). Lowers BP by 5-10 mmHg. Also high in potassium.", biomarkers: ["bp", "hscrp"] },
-      { name: "White Beans (Cannellini)", why: "600mg potassium per cup + fiber + plant protein. Very low glycemic.", biomarkers: ["bp", "apob", "hba1c"] },
-      { name: "Tomatoes", why: "430mg potassium per cup. Lycopene reduces inflammation. Also supports prostate health.", biomarkers: ["bp", "hscrp"] },
-      { name: "Greek Yogurt (Plain)", why: "280mg potassium per 200g + probiotics + protein. No added sugar if plain.", biomarkers: ["bp", "hdl-c", "hscrp"] },
-      { name: "Mushrooms", why: "350mg potassium per cup. Also rich in selenium. Zero fat, zero sugar, low calorie.", biomarkers: ["bp", "tsh"] },
+      { name: "Potato (Baked with Skin)", potassiumMg: 926, why: "Highest potassium density per serving. Eat cooled for resistant starch. Avoid frying.", biomarkers: ["bp", "hba1c"] },
+      { name: "Spinach (Cooked)", potassiumMg: 840, why: "Also rich in magnesium, vitamin K, and nitrates for BP.", biomarkers: ["bp", "hscrp", "homocysteine"] },
+      { name: "Edamame", potassiumMg: 676, why: "Plant protein + fiber. Great as a snack or side.", biomarkers: ["bp", "apob"] },
+      { name: "White Beans (Cannellini)", potassiumMg: 600, why: "Fiber + plant protein. Very low glycemic.", biomarkers: ["bp", "apob", "hba1c"] },
+      { name: "Coconut Water", potassiumMg: 600, why: "Naturally low-sugar electrolyte. Good post-workout or after a high-sodium meal.", biomarkers: ["bp"] },
+      { name: "Sweet Potatoes", potassiumMg: 540, why: "Beta-carotene + fiber. Low glycemic.", biomarkers: ["bp", "hba1c"] },
+      { name: "Orange Juice", potassiumMg: 496, why: "Vitamin C + potassium. Limit to 1 cup if watching glycemic load.", biomarkers: ["bp", "hba1c"] },
+      { name: "Avocado", potassiumMg: 485, why: "Heart-healthy monounsaturated fat + fiber.", biomarkers: ["bp", "hdl-c", "hscrp"] },
+      { name: "Broccoli", potassiumMg: 457, why: "Sulforaphane for antioxidant + fiber.", biomarkers: ["bp", "hscrp"] },
+      { name: "Salmon", potassiumMg: 450, why: "Omega-3s + vitamin D. Dual benefit for BP and inflammation.", biomarkers: ["bp", "hscrp", "triglycerides"] },
+      { name: "Tomatoes", potassiumMg: 430, why: "Lycopene reduces inflammation. Supports prostate health.", biomarkers: ["bp", "hscrp"] },
+      { name: "Bananas", potassiumMg: 422, why: "Convenient pre-workout fuel. Modest glycemic impact.", biomarkers: ["bp"] },
+      { name: "Beetroot", potassiumMg: 400, why: "Nitrates → nitric oxide. Lowers BP by 5-10 mmHg.", biomarkers: ["bp", "hscrp"] },
+      { name: "Mushrooms", potassiumMg: 350, why: "Also rich in selenium. Zero fat, zero sugar, low calorie.", biomarkers: ["bp", "tsh"] },
+      { name: "Watermelon", potassiumMg: 320, why: "Lycopene + hydration. Low calorie, high water content.", biomarkers: ["bp", "hscrp"] },
+      { name: "Greek Yogurt (Plain)", potassiumMg: 280, why: "Probiotics + protein. No added sugar if plain.", biomarkers: ["bp", "hdl-c", "hscrp"] },
+      { name: "Pumpkin Seeds", potassiumMg: 230, why: "Magnesium + zinc + healthy fats. Easy to add to meals.", biomarkers: ["bp", "hdl-c"] },
     ],
   },
 ];
@@ -2397,6 +2404,35 @@ const INVESTMENTS = [
 ];
 
 const PRICE_DISCLAIMER = "Prices in SGD as of June 2026, sourced from iHerb. Actual prices may vary.";
+
+const SODIUM_OFFSET_FOODS = [
+  { name: "Potato (baked with skin, 1 med)", potassiumMg: 926 },
+  { name: "Avocado (1 whole)", potassiumMg: 975 },
+  { name: "Spinach (cooked, 1 cup)", potassiumMg: 839 },
+  { name: "Edamame (1 cup shelled)", potassiumMg: 676 },
+  { name: "Tomato Paste (1/4 cup)", potassiumMg: 664 },
+  { name: "Coconut Water (1 cup)", potassiumMg: 600 },
+  { name: "Sweet Potato (1 medium)", potassiumMg: 542 },
+  { name: "Salmon (150g)", potassiumMg: 534 },
+  { name: "Orange Juice (1 cup)", potassiumMg: 496 },
+  { name: "Broccoli (cooked, 1 cup)", potassiumMg: 457 },
+  { name: "Button Mushrooms (1 cup cooked)", potassiumMg: 428 },
+  { name: "Banana (1 medium)", potassiumMg: 422 },
+  { name: "Greek Yoghurt (1 cup)", potassiumMg: 380 },
+  { name: "Watermelon (2 slices)", potassiumMg: 320 },
+  { name: "Pumpkin Seeds (1/4 cup)", potassiumMg: 230 },
+];
+
+const SUGAR_OFFSET_TIPS = [
+  { action: "🚶 Walk 15 minutes", why: "Exercise within 30 min of eating makes muscles take up glucose without insulin, lowering blood sugar by 15-30 mg/dL.", timing: "Within 30 min of eating" },
+  { action: "🥤 Apple Cider Vinegar (1 tbsp in water)", why: "ACV improves insulin sensitivity by up to 34% and reduces postprandial glucose spike by ~20%. Sip before or with the meal.", timing: "Before or with the meal" },
+  { action: "🍗 Eat protein next", why: "Protein slows gastric emptying, blunting the glucose spike from carbs that are still digesting. Any protein works — eggs, chicken, tofu.", timing: "Next 1-2 hours" },
+  { action: "🌿 Cinnamon (1 tsp)", why: "Cinnamon may reduce postprandial glucose by up to 29% by slowing carb breakdown and improving insulin sensitivity.", timing: "With the meal" },
+  { action: "💧 Hydrate with water", why: "Water helps kidneys excrete excess glucose. Dehydration concentrates blood sugar, making the spike worse.", timing: "Immediately + throughout day" },
+  { action: "🫐 Berberine (if supplement)", why: "Berberine activates AMPK, improving glucose uptake and reducing liver glucose production. Similar potency to metformin.", timing: "With the meal" },
+  { action: "🍵 Green tea (unsweetened)", why: "EGCG in green tea increases glucose uptake in muscle tissue and reduces carb absorption in the gut.", timing: "With or after the meal" },
+  { action: "⏸️ No more carbs for 4-6 hours", why: "Your body needs time to clear the glucose load. Adding more carbs resets the spike window. Let insulin do its job.", timing: "Next 4-6 hours" },
+];
 
 const SUPPLEMENTS = [
   {
