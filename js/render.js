@@ -37,9 +37,17 @@ function renderHealth() {
     container.appendChild(bioContainer);
     renderBiomarkers("biomarker-grid");
   } else if (healthTab === "fasting") {
-    container.innerHTML = tabs + renderFasting();
+    const fastContainer = document.createElement("div");
+    fastContainer.id = "fasting-grid";
+    container.innerHTML = tabs;
+    container.appendChild(fastContainer);
+    renderFasting("fasting-grid");
   } else if (healthTab === "vaccinations") {
-    container.innerHTML = tabs + renderVaccines();
+    const vacContainer = document.createElement("div");
+    vacContainer.id = "vaccine-grid";
+    container.innerHTML = tabs;
+    container.appendChild(vacContainer);
+    renderVaccines("vaccine-grid");
   } else if (healthTab === "supplements") {
     container.innerHTML = tabs + '<div id="supplement-app"></div>';
     renderSupplements("supplement-app");
@@ -47,6 +55,52 @@ function renderHealth() {
     container.innerHTML = tabs + renderDamageControl();
   }
   window.scrollTo(0, 0);
+}
+
+function biomarkerCardFace(b) {
+  return `
+    <div class="biomarker-header">
+      <span class="biomarker-icon">${b.icon}</span>
+      <div class="biomarker-title-group">
+        <span style="font-size:11px;color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${b.category}</span>
+        <h3 class="biomarker-name">${b.name}</h3>
+      </div>
+      <span class="biomarker-risk biomarker-risk-${b.riskLevel}">${b.riskLevel}</span>
+    </div>
+    <p class="biomarker-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${b.description}</p>
+    <div class="biomarker-ranges" style="margin-bottom:0;">
+      <div class="range-item">
+        <span class="range-label">Optimal Range</span>
+        <span class="range-value">${b.optimalRange}</span>
+      </div>
+      <div class="range-item">
+        <span class="range-label">Optimal Level</span>
+        <span class="range-value range-optimal">${b.optimalLevel}</span>
+      </div>
+    </div>
+  `;
+}
+
+function biomarkerCardDetail(b) {
+  return `
+    <div class="biomarker-importance">
+      <h4>Why It Matters</h4>
+      <p>${b.importance}</p>
+    </div>
+    <div class="biomarker-how-to">
+      <h4>How to Improve</h4>
+      <ul class="checklist">
+        ${b.howToImprove.map(t => `<li>${t}</li>`).join("")}
+      </ul>
+    </div>
+    ${b.budgetTips && b.budgetTips.length ? `
+    <div class="biomarker-budget">
+      <h4>💡 Budget Tips</h4>
+      <ul class="checklist checklist-budget">
+        ${b.budgetTips.map(t => `<li>${t}</li>`).join("")}
+      </ul>
+    </div>` : ""}
+  `;
 }
 
 function renderBiomarkers(targetId) {
@@ -71,7 +125,8 @@ function renderBiomarkers(targetId) {
   const cats = [...new Set(BIOMARKERS.map(b => b.category))];
   cats.sort((a, b) => catOrder.indexOf(a) - catOrder.indexOf(b));
 
-  grid.innerHTML = cats.map(cat => {
+  // Desktop grid
+  const desktopHTML = cats.map(cat => {
     const items = BIOMARKERS.filter(b => b.category === cat);
     items.sort((a, b) => riskOrder[a.riskLevel] - riskOrder[b.riskLevel]);
     return `
@@ -118,49 +173,155 @@ function renderBiomarkers(targetId) {
         `).join("")}
       </div>`;
   }).join("");
+
+  // Mobile swipe: flatten all biomarkers into one swipe, sorted by category then risk
+  const allSorted = [];
+  cats.forEach(cat => {
+    const items = BIOMARKERS.filter(b => b.category === cat);
+    items.sort((a, b) => riskOrder[a.riskLevel] - riskOrder[b.riskLevel]);
+    allSorted.push(...items);
+  });
+
+  const swipeSlides = allSorted.map(b => `
+    <div class="card-face">${biomarkerCardFace(b)}</div>
+    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
+    <div class="card-detail">${biomarkerCardDetail(b)}</div>
+  `);
+
+  grid.innerHTML = `
+    <div class="biomarker-grid">${desktopHTML}</div>
+    <div id="biomarker-swipe-wrap"></div>
+  `;
+
+  if (typeof CardSwipe !== 'undefined') {
+    CardSwipe.init('biomarker-swipe-wrap', swipeSlides, {
+      onSlideChange: (idx) => {
+        // Optional: update URL hash for deep-linking
+        // history.replaceState(null, null, '#' + allSorted[idx].id);
+      }
+    });
+  }
 }
 
-function renderFasting() {
-  return `<div class="fasting-intro">
-    <h3>Choose Your Fasting Protocol</h3>
-    <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
-  </div>
-  <div class="fasting-grid">
-    ${FASTING_PROTOCOLS.map(p => `
-      <article class="fasting-card" id="fast-${p.id}">
-        <div class="fasting-header">
-          <span class="fasting-icon">${p.icon}</span>
-          <div>
-            <h3 class="fasting-name">${p.name}</h3>
-            <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
+function fastingCardFace(p) {
+  return `
+    <div class="fasting-header">
+      <span class="fasting-icon" style="font-size:32px;">${p.icon}</span>
+      <div>
+        <h3 class="fasting-name" style="font-size:20px;margin-bottom:2px;">${p.name}</h3>
+        <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
+      </div>
+    </div>
+    <p class="fasting-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${p.description}</p>
+    ${p.biomarkers && p.biomarkers.length ? `
+    <div style="margin-top:auto;">
+      <span style="font-size:12px;color:var(--color-text-muted);font-weight:600;">Improves ${p.biomarkers.length} biomarker${p.biomarkers.length > 1 ? 's' : ''}</span>
+      <div class="tag-group" style="margin-top:6px;">${p.biomarkers.slice(0, 4).map(b => `<span class="tag tag-biomarker">${b}</span>`).join(' ')}${p.biomarkers.length > 4 ? ' ...' : ''}</div>
+    </div>` : ""}
+  `;
+}
+
+function fastingCardDetail(p) {
+  return `
+    <div class="biomarker-importance">
+      <h4>🔬 What Happens in the Body</h4>
+      <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
+    </div>
+    <div class="biomarker-importance">
+      <h4>🚪 How to Enter the Fast</h4>
+      <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
+    </div>
+    <div class="biomarker-importance">
+      <h4>💧 What to Do During the Fast</h4>
+      <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
+    </div>
+    <div class="biomarker-importance">
+      <h4>🍽️ How to Break the Fast</h4>
+      <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
+    </div>
+    <div class="biomarker-importance">
+      <h4>💡 Tips</h4>
+      <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+    </div>
+    ${p.biomarkers && p.biomarkers.length ? `
+    <div class="meal-targets" style="margin-top:12px">
+      <h5>Biomarkers Improved</h5>
+      <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
+    </div>` : ""}
+  `;
+}
+
+function renderFasting(targetId) {
+  const grid = document.getElementById(targetId || "fasting-grid");
+  if (!grid) return;
+
+  const desktopHTML = `
+    <div class="fasting-intro">
+      <h3>Choose Your Fasting Protocol</h3>
+      <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
+    </div>
+    <div class="fasting-grid">
+      ${FASTING_PROTOCOLS.map(p => `
+        <article class="fasting-card" id="fast-${p.id}">
+          <div class="fasting-header">
+            <span class="fasting-icon">${p.icon}</span>
+            <div>
+              <h3 class="fasting-name">${p.name}</h3>
+              <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
+            </div>
           </div>
+          <p class="fasting-desc">${p.description}</p>
+          <details class="meal-details"><summary>🔬 What Happens in the Body</summary>
+            <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
+          </details>
+          <details class="meal-details"><summary>🚪 How to Enter the Fast</summary>
+            <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
+          </details>
+          <details class="meal-details"><summary>💧 What to Do During the Fast</summary>
+            <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
+          </details>
+          <details class="meal-details"><summary>🍽️ How to Break the Fast</summary>
+            <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
+          </details>
+          <details class="meal-details"><summary>💡 Tips</summary>
+            <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+          </details>
+          ${p.biomarkers && p.biomarkers.length ? `
+          <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
+            <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
+          </div>` : ""}
+        </article>
+      `).join("")}
+    </div>`;
+
+  const swipeSlides = FASTING_PROTOCOLS.map(p => `
+    <div class="card-face">${fastingCardFace(p)}</div>
+    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
+    <div class="card-detail">${fastingCardDetail(p)}</div>
+  `);
+
+  grid.innerHTML = `
+    <div class="fasting-desktop">${desktopHTML}</div>
+    <div class="fasting-mobile-intro" style="display:none;">
+      <div class="page-header" style="padding:32px 24px 24px;">
+        <div class="section-inner">
+          <h1 class="page-title" style="font-size:28px;">Fasting Protocols</h1>
+          <p class="page-desc" style="font-size:14px;">Trigger autophagy, improve insulin sensitivity, and activate cellular repair.</p>
         </div>
-        <p class="fasting-desc">${p.description}</p>
-        <details class="meal-details"><summary>🔬 What Happens in the Body</summary>
-          <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>🚪 How to Enter the Fast</summary>
-          <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>💧 What to Do During the Fast</summary>
-          <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>🍽️ How to Break the Fast</summary>
-          <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>💡 Tips</summary>
-          <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
-        </details>
-        ${p.biomarkers && p.biomarkers.length ? `
-        <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
-          <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
-        </div>` : ""}
-      </article>
-    `).join("")}
-  </div>`;
+      </div>
+    </div>
+    <div id="fasting-swipe-wrap"></div>
+  `;
+
+  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
+    CardSwipe.init('fasting-swipe-wrap', swipeSlides);
+  }
 }
 
-function renderVaccines() {
+function renderVaccines(targetId) {
+  const grid = document.getElementById(targetId || "vaccine-grid");
+  if (!grid) return;
+
   const groups = [
     { key: "one-time", label: "🛡️ One-Time", desc: "Take once (usually a short series), then protected for years or life." },
     { key: "periodic", label: "🔄 Periodic", desc: "Requires a booster every few years to maintain protection." },
@@ -198,6 +359,33 @@ function renderVaccines() {
       </details>
     </article>`;
 
+  function vaccineCardFace(v) {
+    return `
+      <div class="vaccine-header" style="margin-bottom:10px;">
+        <h2 class="vaccine-name" style="font-size:20px;">${v.name}</h2>
+        <span class="tag tag-schedule tag-schedule-${v.scheduleType}">${v.scheduleType}</span>
+      </div>
+      <p class="vaccine-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${v.description}</p>
+      <div class="vaccine-detail" style="font-size:13px;margin-bottom:6px;"><strong>👤</strong> ${v.whoNeedsIt}</div>
+      <div class="vaccine-detail" style="font-size:13px;margin-bottom:6px;"><strong>📅</strong> ${scheduleLabel(v.schedule)}</div>
+      <div class="vaccine-detail" style="font-size:13px;margin-bottom:6px;"><strong>✅</strong> ${v.efficacy}</div>
+      <div class="vaccine-detail vaccine-cost" style="font-size:13px;margin-bottom:0;"><strong>💰</strong> ${v.costSGD}</div>
+    `;
+  }
+
+  function vaccineCardDetail(v) {
+    return `
+      <div class="biomarker-importance">
+        <h4>🎯 Why It Matters for Longevity</h4>
+        <p class="vaccine-body-text">${v.longevityBenefit}</p>
+      </div>
+      <div class="biomarker-importance">
+        <h4>⚠️ Side Effects</h4>
+        <p class="vaccine-body-text">${v.sideEffects}</p>
+      </div>
+    `;
+  }
+
   const intro = `<div class="page-header">
     <div class="section-inner">
       <h1 class="page-title">Essential Vaccinations for Longevity</h1>
@@ -215,7 +403,32 @@ function renderVaccines() {
     </div>`;
   }).join("");
 
-  return intro + `<div class="section"><div class="section-inner">${body}</div></div>`;
+  const desktopHTML = intro + `<div class="section"><div class="section-inner">${body}</div></div>`;
+
+  // Mobile swipe: flatten all vaccines into one list
+  const allVaccines = groups.flatMap(g => VACCINES.filter(v => v.scheduleType === g.key));
+  const swipeSlides = allVaccines.map(v => `
+    <div class="card-face">${vaccineCardFace(v)}</div>
+    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
+    <div class="card-detail">${vaccineCardDetail(v)}</div>
+  `);
+
+  grid.innerHTML = `
+    <div class="vaccine-desktop">${desktopHTML}</div>
+    <div class="vaccine-mobile-intro" style="display:none;">
+      <div class="page-header" style="padding:32px 24px 24px;">
+        <div class="section-inner">
+          <h1 class="page-title" style="font-size:28px;">Essential Vaccinations</h1>
+          <p class="page-desc" style="font-size:14px;">Prevent infectious diseases that accelerate biological aging.</p>
+        </div>
+      </div>
+    </div>
+    <div id="vaccine-swipe-wrap"></div>
+  `;
+
+  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
+    CardSwipe.init('vaccine-swipe-wrap', swipeSlides);
+  }
 }
 
 let budgetInvestments = 0;
@@ -246,7 +459,7 @@ function renderInvestments() {
             <div class="budget-slider-label">
               <span class="budget-slider-name" style="color:#2563eb;font-weight:700">Expenses</span>
               <span class="budget-slider-name" style="color:#2563eb;font-weight:700">Investments</span>
-              <span class="budget-slider-name" style="color:var(--text-muted)">Savings</span>
+              <span class="budget-slider-name" style="color:var(--color-text-muted)">Savings</span>
             </div>
           </div>
           <div class="budget-slider-row">
@@ -357,19 +570,19 @@ function updateBudget() {
         <div class="budget-card-label" style="color:#2563eb">Expenses</div>
         <div class="budget-card-amt" style="color:#2563eb">SGD ${Math.round(salary * vE / 100).toLocaleString()}</div>
         <div class="budget-card-pct" style="color:#2563eb">${vE}%</div>
-        <div class="budget-card-desc" style="color:var(--text-muted)">Housing, food, transport, bills, insurance</div>
+        <div class="budget-card-desc" style="color:var(--color-text-muted)">Housing, food, transport, bills, insurance</div>
       </div>
       <div class="budget-card" style="background:#e8f5e9">
         <div class="budget-card-label" style="color:#2e7d32">Investments</div>
         <div class="budget-card-amt" style="color:#2e7d32">SGD ${budgetInvestments.toLocaleString()}</div>
         <div class="budget-card-pct" style="color:#2e7d32">${vI}%</div>
-        <div class="budget-card-desc" style="color:var(--text-muted)">Stocks, ETFs, CPF top-ups, robos</div>
+        <div class="budget-card-desc" style="color:var(--color-text-muted)">Stocks, ETFs, CPF top-ups, robos</div>
       </div>
       <div class="budget-card" style="background:#fef3e7">
         <div class="budget-card-label" style="color:#e8993a">Savings</div>
         <div class="budget-card-amt" style="color:#e8993a">SGD ${Math.round(salary * vS / 100).toLocaleString()}</div>
         <div class="budget-card-pct" style="color:#e8993a">${vS}%</div>
-        <div class="budget-card-desc" style="color:var(--text-muted)">High-yield savings account (UOB One / OCBC 360)</div>
+        <div class="budget-card-desc" style="color:var(--color-text-muted)">High-yield savings account (UOB One / OCBC 360)</div>
       </div>
     </div>
   `;
@@ -722,6 +935,57 @@ function filteredSupplements(diet, tier) {
   );
 }
 
+function supplementCardFace(s) {
+  const tier = effectiveTier(s, selectedDiet);
+  return `
+    <div class="supp-item-top" style="margin-bottom:8px;">
+      <h4 class="supp-item-name" style="font-size:18px;">${s.name}</h4>
+      <span class="supp-item-tier supp-tier-${tier}">${tier}</span>
+      <span class="supp-item-cost">${s.costPerMonth}/mo</span>
+    </div>
+    <p class="supp-item-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${s.description}</p>
+    <div class="supp-item-detail" style="font-size:13px;margin-bottom:4px;"><strong>Dosage:</strong> ${s.dosage}</div>
+    <div class="supp-item-detail" style="font-size:13px;margin-bottom:4px;"><strong>When:</strong> ${s.timingDetail}</div>
+    <div class="supp-item-detail" style="font-size:13px;color:var(--color-text-muted);"><strong>Timing:</strong> ${s.timing === 'am' ? '☀️ AM' : '🌙 PM'}</div>
+  `;
+}
+
+function supplementCardDetail(s) {
+  const dietEmoji = selectedDiet === "carnivore" ? "🥩" : selectedDiet === "vegetarian" ? "🥬" : "🍽️";
+  return `
+    <div class="supp-item-section">
+      <h5>💊 Product & Pricing</h5>
+      <p class="supp-product-text">${s.product}</p>
+      <p class="supp-cost-serving">${s.costPerServing}</p>
+    </div>
+    <div class="supp-item-section">
+      <h5>🎯 Why You Need It</h5>
+      <p class="supp-why-text">${s.whyGeneral}</p>
+    </div>
+    <div class="supp-item-section">
+      <h5>${dietEmoji} Why ${DIET_LABELS_PLAIN[selectedDiet]} Need It</h5>
+      <p class="supp-diet-why-text">${s.whyDiet[selectedDiet]}</p>
+    </div>
+    <div class="supp-item-section">
+      <h5>Benefits</h5>
+      <ul class="checklist">
+        ${s.benefits.map(b => `<li>${b}</li>`).join("")}
+      </ul>
+    </div>
+    <div class="supp-item-section">
+      <h5>⚠️ Conflict Check</h5>
+      <p class="supp-conflicts-text">${s.conflicts}</p>
+    </div>
+    ${s.biomarkers && s.biomarkers.length ? `
+    <div class="supp-item-section">
+      <h5>Targets</h5>
+      <div class="tag-group">
+        ${s.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}
+      </div>
+    </div>` : ""}
+  `;
+}
+
 function renderSupplements(targetId) {
   const container = document.getElementById(targetId || "supplement-app");
   if (!container) return;
@@ -758,50 +1022,13 @@ function renderSupplements(targetId) {
     return sum + 1;
   }, 0) : 0;
 
-  let html = `
-    <div class="supp-controls">
-      <div class="supp-selector-group">
-        <label class="supp-label">Diet</label>
-        <div class="supp-toggle">
-          ${["carnivore", "omnivore", "vegetarian"].map(d =>
-            `<button class="supp-btn ${selectedDiet === d ? "active" : ""}" onclick="selectDiet('${d}')">${DIET_LABELS[d]}</button>`
-          ).join("")}
-        </div>
-      </div>
-      <div class="supp-selector-group">
-        <label class="supp-label">Stack</label>
-        <div class="supp-toggle">
-          ${TIER_ORDER.map(t =>
-            `<button class="supp-btn ${selectedTier === t ? "active" : ""}" onclick="selectTier('${t}')">${TIER_LABELS[t]}</button>`
-          ).join("")}
-        </div>
-      </div>
-    </div>
-
-    <div class="supp-stack-summary">
-      <div class="supp-tier-info">
-        <h3 class="supp-tier-name">${TIER_LABELS[selectedTier]}</h3>
-        <p class="supp-tier-desc">${TIER_DESCRIPTIONS[selectedTier]}</p>
-      </div>
-      <div class="supp-cost-card">
-        <span class="supp-cost-label">Monthly Total</span>
-        <span class="supp-cost-value">SGD ${totalCost.toFixed(0)}</span>
-        <span class="supp-cost-note">Budget-friendly brands</span>
-      </div>
-    </div>
-
-    <div class="supp-count">
-      ${filtered.length} supplements · ${filtered.length > 0 ? `AM: ~${pillCountAm} pills${grouped.am ? "" : " —"} · PM: ~${pillCountPm} pills` : ""} · fits a 2-box system
-    </div>
-
-    <p class="supp-price-disclaimer">${PRICE_DISCLAIMER}</p>
-  `;
-
+  // Desktop timing blocks
+  let desktopHTML = "";
   for (const t of timingOrder) {
     const items = grouped[t];
     if (!items.length) continue;
 
-    html += `
+    desktopHTML += `
       <div class="supp-timing-block">
         <div class="supp-timing-header">
           <h3 class="supp-timing-label">${timingLabels[t]}</h3>
@@ -859,7 +1086,62 @@ function renderSupplements(targetId) {
       </div>`;
   }
 
-  container.innerHTML = html;
+  // Mobile swipe: flatten all filtered supplements
+  const swipeSlides = filtered.map(s => `
+    <div class="card-face">${supplementCardFace(s)}</div>
+    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
+    <div class="card-detail">${supplementCardDetail(s)}</div>
+  `);
+
+  container.innerHTML = `
+    <div class="supp-controls">
+      <div class="supp-selector-group">
+        <label class="supp-label">Diet</label>
+        <div class="supp-toggle">
+          ${["carnivore", "omnivore", "vegetarian"].map(d =>
+            `<button class="supp-btn ${selectedDiet === d ? "active" : ""}" onclick="selectDiet('${d}')">${DIET_LABELS[d]}</button>`
+          ).join("")}
+        </div>
+      </div>
+      <div class="supp-selector-group">
+        <label class="supp-label">Stack</label>
+        <div class="supp-toggle">
+          ${TIER_ORDER.map(t =>
+            `<button class="supp-btn ${selectedTier === t ? "active" : ""}" onclick="selectTier('${t}')">${TIER_LABELS[t]}</button>`
+          ).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="supp-stack-summary">
+      <div class="supp-tier-info">
+        <h3 class="supp-tier-name">${TIER_LABELS[selectedTier]}</h3>
+        <p class="supp-tier-desc">${TIER_DESCRIPTIONS[selectedTier]}</p>
+      </div>
+      <div class="supp-cost-card">
+        <span class="supp-cost-label">Monthly Total</span>
+        <span class="supp-cost-value">SGD ${totalCost.toFixed(0)}</span>
+        <span class="supp-cost-note">Budget-friendly brands</span>
+      </div>
+    </div>
+
+    <div class="supp-count">
+      ${filtered.length} supplements · ${filtered.length > 0 ? `AM: ~${pillCountAm} pills${grouped.am ? "" : " —"} · PM: ~${pillCountPm} pills` : ""} · fits a 2-box system
+    </div>
+
+    <p class="supp-price-disclaimer">${PRICE_DISCLAIMER}</p>
+
+    <div class="supplement-grid-desktop">${desktopHTML}</div>
+    <div id="supplement-swipe-wrap"></div>
+  `;
+
+  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
+    CardSwipe.init('supplement-swipe-wrap', swipeSlides, {
+      onSlideChange: (idx) => {
+        // history.replaceState(null, null, '#' + filtered[idx].id);
+      }
+    });
+  }
 }
 
 function selectDiet(diet) {

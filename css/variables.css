@@ -1,0 +1,118 @@
+/* ============================================
+   Macro Longevity — Design Token Variables
+   Follows DESIGN.md v1.0 exactly
+   ============================================ */
+
+:root {
+  /* ─── COLOR ─────────────────── */
+  --color-primary: #0a7e6f;
+  --color-primary-hover: #0a6b5e;
+  --color-primary-light: #e8f5f3;
+  --color-primary-dark: #065a4f;
+  --color-secondary: #e8993a;
+  --color-secondary-light: #fef3e2;
+  --color-secondary-hover: #d4882e;
+  --color-accent: #d65a3a;
+  --color-accent-light: #fde8e2;
+  --color-bg: #f8f7f4;
+  --color-bg-card: #ffffff;
+  --color-bg-alt: #f0eeea;
+  --color-text: #1a232e;
+  --color-text-secondary: #5a6573;
+  --color-text-muted: #8a95a3;
+  --color-success: #2a9d58;
+  --color-danger: #d9534f;
+  --color-warning: #e8993a;
+  --color-border: #e5e2dd;
+  --color-border-light: #f0eee8;
+
+  /* ─── TYPOGRAPHY ────────────── */
+  /* Display font (geometric sans — DESIGN.md Strategy B) */
+  --font-display: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Body font (neutral sans) */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Monospace for data */
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* 4-Size Scale — DESIGN.md §3.1 */
+  /* SM: captions, metadata, labels */
+  --text-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);   /* 13–15px */
+  /* MD: body text, UI default */
+  --text-md: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);           /* 16–20px */
+  /* LG: section headings, H2 */
+  --text-lg: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);          /* 22–32px */
+  /* XL: page headline, hero */
+  --text-xl: clamp(1.75rem, 1.2rem + 2.5vw, 3.5rem);         /* 28–56px */
+
+  /* Overline / micro-tag (5th size via letter-spacing) */
+  --text-overline: 0.75rem;
+
+  /* Weights */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semi: 600;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Line heights */
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-loose: 1.8;
+
+  /* ─── SPACING (8px grid) ────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ─── RADIUS ────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ─── SHADOWS ───────────────── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.14);
+
+  /* ─── TRANSITIONS ───────────── */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+
+  /* ─── Z-INDEX ────────────────── */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-bottom-nav: 400;
+
+  /* ─── DERIVED TINTS ─────────── */
+  --glass-nav: rgba(255, 255, 255, 0.92);
+  --tint-primary-6: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  --tint-primary-10: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --tint-primary-12: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --tint-primary-15: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  --tint-secondary-6: color-mix(in srgb, var(--color-secondary) 6%, transparent);
+  --tint-secondary-10: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+  --tint-secondary-15: color-mix(in srgb, var(--color-secondary) 15%, transparent);
+  --tint-secondary-25: color-mix(in srgb, var(--color-secondary) 25%, transparent);
+  --tint-accent-15: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  --tint-accent-20: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --footer-text: rgba(255, 255, 255, 0.7);
+  --footer-copy: rgba(255, 255, 255, 0.4);
+}
