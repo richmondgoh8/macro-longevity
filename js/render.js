@@ -54,7 +54,9 @@ function renderHealth() {
   } else {
     container.innerHTML = tabs + renderDamageControl();
   }
-  window.scrollTo(0, 0);
+  if (healthTab !== "supplements") {
+    window.scrollTo(0, 0);
+  }
 }
 
 function biomarkerCardFace(b) {
@@ -756,9 +758,26 @@ function renderFoods() {
       </div>`;
       default: {
         const items = MEALS.filter(m => m.category === tab);
+        const groups = {};
+        items.forEach(m => {
+          const g = m.group || "Other";
+          if (!groups[g]) groups[g] = [];
+          groups[g].push(m);
+        });
+        const groupOrder = ["Quick & Easy", "Prep Ahead", "Eggs", "Poultry", "Fish & Seafood", "Beef & Lamb", "Vegetarian", "Soups & Stews", "Sides", "Other"];
+        const sortedGroups = Object.keys(groups).sort((a, b) => {
+          const ai = groupOrder.indexOf(a);
+          const bi = groupOrder.indexOf(b);
+          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+        });
         return `
           <p class="meal-count">${items.length} meals · ${items.reduce((s, m) => s + (m.variations ? m.variations.length : 0), 0)}+ variations</p>
-          <div class="meal-grid">${mealHTML(items)}</div>`;
+          ${sortedGroups.map(g => `
+            <div class="meal-group">
+              <h3 class="meal-group-title">${g}</h3>
+              <div class="meal-grid">${mealHTML(groups[g])}</div>
+            </div>
+          `).join("")}`;
       }
     }
   }
@@ -1141,6 +1160,16 @@ function renderSupplements(targetId) {
         // history.replaceState(null, null, '#' + filtered[idx].id);
       }
     });
+    // Scroll swipe container into view on mobile
+    if (window.innerWidth < 768) {
+      setTimeout(() => {
+        const wrap = document.getElementById('supplement-swipe-wrap');
+        if (wrap) {
+          const top = wrap.getBoundingClientRect().top + window.scrollY - 60;
+          window.scrollTo({ left: 0, top, behavior: 'auto' });
+        }
+      }, 0);
+    }
   }
 }
 

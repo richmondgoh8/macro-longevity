@@ -101,6 +101,14 @@
   --z-modal: 300;
   --z-bottom-nav: 400;
 
+  /* ─── SEMANTIC STATE COLORS ─── */
+  --color-on-primary: #ffffff;
+  --color-success-light: #e8f5e9;
+  --color-success-dark: #2a7d3a;
+  --color-warning-dark: #a06820;
+  --color-danger-dark: #b43a1a;
+  --color-danger-darker: #8a3a22;
+
   /* ─── DERIVED TINTS ─────────── */
   --glass-nav: rgba(255, 255, 255, 0.92);
   --tint-primary-6: color-mix(in srgb, var(--color-primary) 6%, transparent);
