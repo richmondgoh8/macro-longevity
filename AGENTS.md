@@ -14,7 +14,7 @@ make serve       # kill old :8080, start python3 http.server
 index.html              Landing page
 pages/
   health.html           Biomarkers, Fasting, Vaccinations, Supplements, Damage Control
-  food.html             Meals (Breakfast, Lunch & Dinner), Marinades, Pantry, Food Lists, Supplements
+  food.html             Meals (Breakfast, Lunch & Dinner), Marinades, Pantry, Food Lists
   finance.html          Investment Combos, FIRE Calculator + Passive Income Tracker
 css/
   variables.css         Design tokens (colors, typography, spacing, radius, shadows)
@@ -22,6 +22,7 @@ css/
 js/
   data.js               All content arrays
   render.js             Client-side rendering for all pages
+  export.js             Markdown export for AI consumption
   components/
     card-swipe.js       Viewport-filling swipeable card stack (mobile)
 scripts/
@@ -33,17 +34,19 @@ scripts/
 | Page | Function | Sub-tabs |
 |------|----------|----------|
 | `health.html` | `renderHealth()` | Biomarkers, Fasting, Vaccinations, Supplements, Damage Control |
-| `food.html` | `renderFoods()` | Breakfast, Lunch & Dinner, Marinades, Pantry, Food Lists, Supplements |
+| `food.html` | `renderFoods()` | Breakfast, Lunch & Dinner, Marinades, Pantry, Food Lists |
 | `finance.html` | `renderInvestments()` + inline `calcFire()` | Investment Combos, FIRE Calculator |
 
 ## Data editing (`js/data.js`)
 
 - Meals use `category: "breakfast"` or `"lunch"` (lunch includes dinner)
+- Meals use `group` property for visual grouping (e.g., "Poultry", "Fish & Seafood", "Sides")
 - 7 meals use `methods[]` for clickable cooking method switching
 - Meals without methods use a flat `instructions[]` inside a `<details>` toggle
 - Biomarker IDs referenced in meals must match `BIOMARKERS[].id`
+- Air fryer instructions include: preheat time, temperature, flip/shake timing, visual doneness cues
 - Ingredient pricing format: `(FairPrice: SGD X.XX)`. Supplement pricing: `costPerMonth: "SGD XX"`.
-- Biomarker counts: 20. Meals: ~51. Marinades: 8. Pantry: 9. Supplements: 10. Food Lists: 4.
+- Biomarker counts: 20. Meals: 36. Marinades: 8. Pantry: 9. Supplements: 10. Food Lists: 4.
 
 ## Design tokens (`css/variables.css`)
 
@@ -68,6 +71,14 @@ Follows DESIGN.md v1.0 — 4-size fluid typography with `clamp()`, DM Sans displ
 - Desktop shows normal grids; mobile shows swipe cards via CSS media queries
 - Sub-tab controls (meal-tabs, health tabs) hide buttons and show `<select>` dropdown on mobile
 - Meal sub-tab bar is sticky (`top: 56px`) on mobile so tabs stay visible when scrolling
+- Food lists show numeric columns (fiber/potassium) with daily targets above tables
+
+## Export to AI
+
+- `js/export.js` provides `exportData()` function
+- Downloads `macro-longevity-data.md` — full knowledge base in Markdown format
+- Includes: Biomarkers, Meals, Marinades, Pantry, Food Lists, Fasting, Vaccines, Supplements, Investments, Sugar Tips
+- Button in footer of all pages
 
 ## After editing
 

@@ -633,7 +633,7 @@ function renderFoods() {
     return `<div class="pantry-grid">
       ${PANTRY.map(p => `
         <div class="pantry-card">
-          <h3 class="pantry-name">${p.name}</h3>
+          <h3 class="pantry-name">${p.name}${p.daily ? `<span class="daily-badge">Daily</span>` : ""}</h3>
           <p class="pantry-desc">${p.description}</p>
           <div class="pantry-detail"><strong>💰 FairPrice:</strong> ${p.fairPrice}</div>
           <div class="pantry-detail"><strong>🎯 Benefit:</strong> ${p.benefit}</div>
@@ -735,10 +735,30 @@ function renderFoods() {
       </table>`;
   }
 
+  function avoidHTML() {
+    return AVOID_LIST.map(cat => `
+      <div class="avoid-card">
+        <h3 class="avoid-name">${cat.name}</h3>
+        <p class="avoid-desc">${cat.description}</p>
+        ${cat.items.map(item => `
+          <div class="avoid-item">
+            <div class="avoid-item-header">
+              <strong class="avoid-item-name">${item.item}</strong>
+              <span class="avoid-watch">🕵️ ${item.watchFor}</span>
+            </div>
+            <p class="avoid-why">❌ ${item.why}</p>
+            <p class="avoid-instead">✅ Instead: ${item.instead}</p>
+          </div>
+        `).join("")}
+      </div>
+    `).join("");
+  }
+
   function renderFoodContent(tab) {
     switch (tab) {
       case "pantry": return pantryHTML();
       case "foodlists": return FOOD_LISTS.map(list => foodListHTML(list)).join("<hr class='foodlist-divider'>");
+      case "avoid": return avoidHTML();
       case "marinade": return `<div class="marinade-grid">
         ${MARINADES.map(m => `
           <div class="marinade-card" id="mar-${m.id}">
@@ -874,6 +894,7 @@ function renderFoods() {
         <button class="meal-tab meal-tab-marinade ${foodTab === "marinade" ? "active" : ""}" onclick="selectMealTab('marinade')">🧂 Marinades & Sauces (${MARINADES.length})</button>
         <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
         <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
+        <button class="meal-tab ${foodTab === "avoid" ? "active" : ""}" onclick="selectMealTab('avoid')">🚫 Avoid (${AVOID_LIST.length})</button>
       </div>
       <select class="meal-tab-select" onchange="selectMealTab(this.value)">
         ${MEAL_CATEGORIES.map(c =>
@@ -882,6 +903,7 @@ function renderFoods() {
         <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
         <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
         <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
+        <option value="avoid" ${foodTab === "avoid" ? "selected" : ""}>🚫 Avoid (${AVOID_LIST.length})</option>
       </select>
       ${["breakfast", "lunch", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
     </div>
@@ -1171,6 +1193,474 @@ function renderSupplements(targetId) {
       }, 0);
     }
   }
+}
+
+/* ============================
+   Sound Cues
+   ============================ */
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, startTime, gainVal) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, startTime || ctx.currentTime);
+    const g = gainVal || 0.25;
+    gain.gain.setValueAtTime(g, startTime || ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, (startTime || ctx.currentTime) + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(startTime || ctx.currentTime);
+    osc.stop((startTime || ctx.currentTime) + duration);
+  } catch(e) {}
+}
+
+function playWhistle(startFreq, endFreq, duration) {
+  try {
+    const ctx = getAudioCtx();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(startFreq, t);
+    osc.frequency.linearRampToValueAtTime(endFreq, t + duration);
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.setValueAtTime(0.15, t + duration * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + duration);
+  } catch(e) {}
+}
+
+function playChime(freq, duration) {
+  playTone(freq, duration, "sine", undefined, 0.15);
+}
+
+function duckMusic(duration) {
+  if (!musicGain) return;
+  musicGain.gain.value = 0.001;
+  clearTimeout(musicGain._restoreTimer);
+  musicGain._restoreTimer = setTimeout(() => { if (musicGain) musicGain.gain.value = 0.2; }, duration * 1000);
+}
+
+function playTick() {
+  duckMusic(0.15);
+  playTone(1500, 0.1, "sine", undefined, 0.9);
+}
+
+function playStartWhistle() {
+  duckMusic(0.35);
+  if (!playSound("start")) playWhistle(500, 1000, 0.25);
+}
+function playMidpoint() {
+  duckMusic(0.4);
+  const t = (getAudioCtx() || {}).currentTime || 0;
+  playTone(1200, 0.2, "triangle", t, 0.9);
+  playTone(1600, 0.2, "triangle", t + 0.12, 0.7);
+}
+function playCountdownTick() {
+  duckMusic(0.15);
+  if (!playSound("tick")) playTick();
+}
+function playWorkEnd() {
+  duckMusic(0.45);
+  if (!playSound("workend")) playWhistle(800, 400, 0.3);
+}
+function playRestOver() {
+  duckMusic(0.35);
+  if (!playSound("restover")) setTimeout(() => playWhistle(400, 660, 0.25), 50);
+}
+function playAllDone() {
+  duckMusic(0.7);
+  if (!playSound("alldone")) {
+    const t = (getAudioCtx() || {}).currentTime || 0;
+    playTone(440, 0.25, "sine", t, 0.3);
+    playTone(554, 0.25, "sine", t + 0.2, 0.3);
+    playTone(660, 0.35, "sine", t + 0.4, 0.3);
+  }
+}
+
+/* ============================
+   Background Music (CC0 Freesound)
+   ============================ */
+let musicBuffer = null;
+let musicSource = null;
+let musicGain = null;
+const MUSIC_URL = "https://cdn.freesound.org/previews/441/441521_5218363-lq.mp3";
+let musicLoading = null;
+
+function loadMusic() {
+  if (musicBuffer || musicLoading) return musicLoading;
+  musicLoading = (async () => {
+    try {
+      const ctx = getAudioCtx();
+      const resp = await fetch(MUSIC_URL);
+      const buf = await resp.arrayBuffer();
+      musicBuffer = await ctx.decodeAudioData(buf);
+    } catch(e) { musicBuffer = null; }
+  })();
+  return musicLoading;
+}
+
+async function startMusic() {
+  stopMusic();
+  if (!musicBuffer) await loadMusic();
+  const ctx = getAudioCtx();
+  if (!ctx || !musicBuffer) return;
+
+  musicSource = ctx.createBufferSource();
+  musicSource.buffer = musicBuffer;
+  musicSource.loop = true;
+  musicGain = ctx.createGain();
+  musicGain.gain.value = 0.2;
+  musicSource.connect(musicGain).connect(ctx.destination);
+  musicSource.start();
+}
+
+function stopMusic() {
+  if (musicSource) {
+    try { musicSource.stop(); } catch(e) {}
+    musicSource = null;
+  }
+  musicGain = null;
+}
+
+/* ============================
+   FreeSound CC0 Sound Loading
+   ============================ */
+const SOUND_URLS = {
+  start: "https://cdn.freesound.org/previews/538/538422_11966684-lq.mp3",
+  restover: "https://cdn.freesound.org/previews/582/582701_5965684-lq.mp3",
+  alldone: "https://cdn.freesound.org/previews/607/607207_7724198-lq.mp3",
+};
+
+const soundBuffers = {};
+
+async function loadSound(name, url) {
+  try {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const resp = await fetch(url);
+    const buf = await resp.arrayBuffer();
+    soundBuffers[name] = await ctx.decodeAudioData(buf);
+  } catch(e) {
+    soundBuffers[name] = null;
+  }
+}
+
+function playSound(name) {
+  const buf = soundBuffers[name];
+  if (!buf) return false;
+  try {
+    const ctx = getAudioCtx();
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.5;
+    src.connect(gain).connect(ctx.destination);
+    src.start();
+    return true;
+  } catch(e) { return false; }
+}
+
+function initExerciseSounds() {
+  for (const [name, url] of Object.entries(SOUND_URLS)) {
+    loadSound(name, url);
+  }
+  loadMusic();
+}
+
+/* ============================
+   Exercise Timer State
+   ============================ */
+const timerState = {};
+
+function timerTick(id, ex) {
+  const s = timerState[id];
+  if (!s || s.status === "idle" || s.status === "paused") return;
+
+  const now = Date.now();
+  const elapsed = (now - s.lastTick) / 1000;
+  s.timeRemaining = Math.max(0, s.timeRemaining - elapsed);
+  s.lastTick = now;
+
+  const total = s.currentSet > s.totalSets ? 0 : s.isWork ? s.v.workSeconds : s.v.restSeconds;
+  const pct = total > 0 ? (s.timeRemaining / total) * 100 : 0;
+
+  const timeEl = document.getElementById(`time-${id}`);
+  const barEl = document.getElementById(`bar-${id}`);
+  const labelEl = document.getElementById(`label-${id}`);
+  const setEl = document.getElementById(`sets-${id}`);
+
+  if (timeEl) {
+    const mins = Math.floor(s.timeRemaining / 60);
+    const secs = Math.floor(s.timeRemaining % 60);
+    timeEl.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  }
+  if (barEl) barEl.style.width = `${pct}%`;
+  if (labelEl) labelEl.textContent = s.isWork ? "⏱️ WORK" : "💤 REST";
+
+  // Sound milestones
+  const timeLeft = s.timeRemaining;
+  const totalTime = total;
+  if (totalTime > 0) {
+    if (s.isWork) {
+      const pctLeft = timeLeft / totalTime;
+      if (!s._midpoint && pctLeft <= 0.5 && pctLeft > 0.48) { s._midpoint = true; playMidpoint(); }
+    }
+    if (timeLeft <= 10 && timeLeft > 0) {
+      const sec = Math.ceil(timeLeft);
+      if (sec !== s._lastCountdownSec) {
+        s._lastCountdownSec = sec;
+        playCountdownTick();
+        if (!s._musicStoppedForCountdown) {
+          s._musicStoppedForCountdown = true;
+          stopMusic();
+        }
+      }
+    }
+  }
+
+  if (s.timeRemaining <= 0) {
+    if (s.isWork) {
+      playWorkEnd();
+      if (s.currentSet >= s.totalSets) {
+        s.status = "done";
+        if (labelEl) labelEl.textContent = "✅ DONE";
+        playAllDone();
+        updateTimerControls(id, "done");
+        if (barEl) barEl.style.width = "0%";
+        return;
+      }
+      s.isWork = false;
+      s.timeRemaining = s.v.restSeconds;
+      s._resetFlags();
+      startMusic();
+      if (labelEl) labelEl.textContent = "💤 REST";
+      if (setEl) setEl.textContent = `${s.currentSet}/${s.totalSets}`;
+    } else {
+      playRestOver();
+      s.currentSet++;
+      if (s.currentSet > s.totalSets) {
+        s.status = "done";
+        if (labelEl) labelEl.textContent = "✅ DONE";
+        playAllDone();
+        updateTimerControls(id, "done");
+        if (barEl) barEl.style.width = "0%";
+        return;
+      }
+      s.isWork = true;
+  s.timeRemaining = s.v.workSeconds;
+      s._resetFlags();
+      playStartWhistle();
+      startMusic();
+      if (labelEl) labelEl.textContent = "⏱️ WORK";
+      if (setEl) setEl.textContent = `${s.currentSet}/${s.totalSets}`;
+    }
+    updateSetIndicators(id, s.currentSet, s.totalSets);
+  }
+
+  s._raf = requestAnimationFrame(() => timerTick(id, ex));
+}
+
+function timerStateReset(id, ex) {
+  if (!timerState[id]) timerState[id] = {};
+  const s = timerState[id];
+  s.v = getVariation(ex).variation;
+  s.status = "idle";
+  s.currentSet = 1;
+  s.totalSets = s.v.sets;
+  s.isWork = true;
+      s.timeRemaining = s.v.workSeconds;
+  s.lastTick = Date.now();
+  s._raf = null;
+  s._resetFlags = function() { this._midpoint = false; this._lastCountdownSec = null; this._musicStoppedForCountdown = false; };
+  s._resetFlags();
+}
+
+function updateTimerControls(id, state) {
+  const start = document.querySelector(`.timer-start[data-exercise="${id}"]`);
+  const pause = document.querySelector(`.timer-pause[data-exercise="${id}"]`);
+  const stop = document.querySelector(`.timer-stop[data-exercise="${id}"]`);
+  if (!start) return;
+  if (state === "idle") { start.style.display = ""; start.textContent = "▶ Start"; pause.style.display = "none"; stop.style.display = "none"; }
+  else if (state === "running") { start.style.display = "none"; pause.style.display = ""; pause.textContent = "⏸ Pause"; stop.style.display = ""; }
+  else if (state === "paused") { start.style.display = ""; start.textContent = "▶ Resume"; pause.style.display = "none"; stop.style.display = ""; }
+  else if (state === "done") { start.style.display = ""; start.textContent = "↻ Restart"; pause.style.display = "none"; stop.style.display = "none"; }
+}
+
+function updateSetIndicators(id, current, total) {
+  const dots = document.querySelectorAll(`.set-dot[data-exercise="${id}"]`);
+  dots.forEach((d, i) => {
+    d.className = "set-dot" + (i < current - 1 ? " done" : i === current - 1 ? " active" : "");
+    d.dataset.exercise = id;
+  });
+}
+
+function handleTimerAction(id, action, ex) {
+  if (!timerState[id]) timerStateReset(id, ex);
+  let s = timerState[id];
+
+  if (action === "start") {
+    for (const [tid, ts] of Object.entries(timerState)) {
+      if (tid !== id && (ts.status === "running" || ts.status === "paused")) {
+        handleTimerAction(tid, "stop", EXERCISES.find(e => e.id === tid));
+      }
+    }
+    if (s.status === "done") { timerStateReset(id, ex); s = timerState[id]; }
+    s.status = "running";
+    s.lastTick = Date.now();
+    updateTimerControls(id, "running");
+    playStartWhistle();
+    startMusic();
+    timerTick(id, ex);
+  } else if (action === "pause") {
+    s.status = "paused";
+    if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
+    stopMusic();
+    updateTimerControls(id, "paused");
+  } else if (action === "stop") {
+    s.status = "idle";
+    if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
+    stopMusic();
+    timerStateReset(id, ex);
+    const sv = timerState[id].v;
+    updateTimerControls(id, "idle");
+    const timeEl = document.getElementById(`time-${id}`);
+    const barEl = document.getElementById(`bar-${id}`);
+    const labelEl = document.getElementById(`label-${id}`);
+    const setEl = document.getElementById(`sets-${id}`);
+    if (timeEl) { const m = Math.floor(sv.workSeconds / 60); const sec = sv.workSeconds % 60; timeEl.textContent = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`; }
+    if (barEl) barEl.style.width = "100%";
+    if (labelEl) labelEl.textContent = "Ready";
+    if (setEl) setEl.textContent = `1/${sv.sets}`;
+    updateSetIndicators(id, 1, sv.sets);
+  }
+}
+
+function getVariation(ex) {
+  return { variation: ex.variations[1] || ex.variations[0], index: 1 };
+}
+
+function initExerciseTimers() {
+  const container = document.querySelector("#movement-app");
+  if (!container) return;
+  container.addEventListener("click", (e) => {
+    const start = e.target.closest(".timer-start");
+    const pause = e.target.closest(".timer-pause");
+    const stop = e.target.closest(".timer-stop");
+    const exId = (start || pause || stop)?.dataset?.exercise;
+    if (!exId) return;
+    const ex = EXERCISES.find(e => e.id === exId);
+    if (!ex) return;
+    if (start) handleTimerAction(exId, "start", ex);
+    else if (pause) handleTimerAction(exId, "pause", ex);
+    else if (stop) handleTimerAction(exId, "stop", ex);
+  });
+
+}
+
+/* ============================
+   Exercise Card Render
+   ============================ */
+function exerciseCardFace(e) {
+  const def = e.variations[1] || e.variations[0];
+  return `
+    <div class="exercise-header">
+      <div class="exercise-name">${e.name}</div>
+    </div>
+    <div class="exercise-target" id="target-${e.id}">🎯 ${def.target}</div>
+    <p class="exercise-desc">${e.description}</p>
+    <div class="exercise-timer" id="timer-${e.id}">
+      <div class="timer-config">
+        <span id="config-${e.id}">${def.sets} × ${def.workSeconds}s work · ${def.restSeconds}s rest</span>
+        <span class="set-indicators">
+          ${Array.from({length: def.sets}, (_, i) => `<span class="set-dot${i === 0 ? " active" : ""}" data-exercise="${e.id}"></span>`).join("")}
+        </span>
+      </div>
+      <div class="timer-display">
+        <span class="timer-time" id="time-${e.id}">${String(Math.floor(def.workSeconds/60)).padStart(2,"0")}:${String(def.workSeconds%60).padStart(2,"0")}</span>
+        <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${e.id}" style="width:100%"></div></div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn timer-start" data-exercise="${e.id}">▶ Start</button>
+        <button class="timer-btn timer-pause" data-exercise="${e.id}" style="display:none">⏸ Pause</button>
+        <button class="timer-btn timer-stop" data-exercise="${e.id}" style="display:none">⏹ Stop</button>
+      </div>
+      <div class="timer-label" id="label-${e.id}">Ready</div>
+    </div>
+    <div class="exercise-set-counter">Set <span id="sets-${e.id}">1/${def.sets}</span></div>`;
+}
+
+function exerciseCardDetail(e) {
+  return `
+    <div class="exercise-detail-section">
+      <h5>🎯 Why This Exercise</h5>
+      <p class="exercise-detail-text">${e.whyLongevity}</p>
+    </div>
+    <div class="exercise-detail-section">
+      <h5>📋 Step-by-Step</h5>
+      <ol class="checklist">${e.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
+    </div>
+    ${e.biomarkers.length ? `
+    <div class="exercise-detail-section">
+      <h5>🎯 Targets</h5>
+      <div class="tag-group">${e.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
+    </div>` : ""}
+  `;
+}
+
+function renderExercises(targetId) {
+  const container = document.getElementById(targetId || "movement-app");
+  if (!container) return;
+
+  initExerciseSounds();
+
+  const intro = `
+    <div class="exercise-intro">
+      <h3>Your Daily Movement Practice</h3>
+      <p>No equipment. No gym. No excuses. Pick 3-5 exercises and do them anywhere — takes 5-10 minutes daily. Use the built-in timer with sound cues.</p>
+    </div>`;
+
+  const desktopHTML = intro + `
+    <div class="exercise-grid">
+      ${EXERCISES.map(e => `
+        <div class="exercise-card" id="ex-${e.id}">
+          ${exerciseCardFace(e)}
+          <details class="exercise-details">
+            <summary>📖 Show Guide</summary>
+            <div class="exercise-detail-content">${exerciseCardDetail(e)}</div>
+          </details>
+        </div>
+      `).join("")}
+    </div>`;
+
+  const swipeSlides = EXERCISES.map(e => `
+    <div class="card-face">${exerciseCardFace(e)}</div>
+    <button class="card-swipe-expand-btn" aria-expanded="false">Show Guide</button>
+    <div class="card-detail">${exerciseCardDetail(e)}</div>
+  `);
+
+  container.innerHTML = `
+    <div class="exercise-desktop">${desktopHTML}</div>
+    <div class="exercise-mobile">
+      <div class="exercise-mobile-intro">${intro}</div>
+      <div id="exercise-swipe-wrap"></div>
+    </div>
+  `;
+
+  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
+    CardSwipe.init('exercise-swipe-wrap', swipeSlides);
+  }
+
+  initExerciseTimers();
 }
 
 function selectDiet(diet) {

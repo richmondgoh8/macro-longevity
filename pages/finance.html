@@ -77,6 +77,7 @@
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
                 <a href="/pages/health.html" class="nav-link">Health</a>
+                <a href="/pages/movement.html" class="nav-link">Movement</a>
                 <a href="/pages/food.html" class="nav-link">Food</a>
                 <a href="/pages/finance.html" class="nav-link active">Finance</a>
             </div>
@@ -206,11 +207,14 @@
                 Not financial advice. This information is for educational purposes only.
                 Consult a licensed financial adviser before making investment decisions.
             </p>
+            <button class="export-btn" onclick="exportData()">📥 Export All Data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
     <script src="/js/data.js"></script>
+    <script src="/js/data.js"></script>
+    <script src="/js/export.js"></script>
     <script src="/js/render.js"></script>
     <script>document.getElementById('investments-app').innerHTML = renderInvestments()</script>
     <script>
@@ -516,6 +520,4 @@
             }
         });
     </script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/health.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩺</span><span class="bottom-nav-label">Health</span></a><a href="/pages/food.html" class="bottom-nav-item"><span class="bottom-nav-icon">🍽️</span><span class="bottom-nav-label">Food</span></a><a href="/pages/finance.html" class="bottom-nav-item active"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a></div></nav>
-</body>
-</html>
+<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/health.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩺</span><span class="bottom-nav-label">Health</span></a><a href="/pages/movement.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Movement</span></a><a href="/pages/food.html" class="bottom-nav-item"><span class="bottom-nav-icon">🍽️</span><span class="bottom-nav-label">Food</span></a><a href="/pages/finance.html" class="bottom-nav-item active"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a></div></nav>

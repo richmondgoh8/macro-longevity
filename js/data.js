@@ -2019,6 +2019,8 @@ const PANTRY = [
     benefit: "17g fiber per 30g serving. ALA omega-3s for inflammation. Magnesium for sleep and recovery.",
     fairPrice: "SGD 8.50 (250g)",
     servingTip: "1-2 tbsp daily. Soak before eating (absorbs liquid and becomes gel-like).",
+    daily: true,
+    dailyAmount: "1–2 tbsp",
   },
   {
     id: "psyllium-husk",
@@ -2028,6 +2030,8 @@ const PANTRY = [
     benefit: "7g soluble fiber per 5g serving. Lowers LDL-C by 5-10%. Improves glycemic control.",
     fairPrice: "SGD 6.00 (200g)",
     servingTip: "1 tbsp mixed into water or food daily. Drink plenty of water. Start with 1 tsp to assess tolerance.",
+    daily: true,
+    dailyAmount: "1 tbsp",
   },
   {
     id: "flax-seeds",
@@ -2037,6 +2041,8 @@ const PANTRY = [
     benefit: "ALA omega-3s + lignans = dual anti-inflammatory. 3g fiber per tbsp. Supports hormone balance via lignans.",
     fairPrice: "SGD 4.50 (200g)",
     servingTip: "1-2 tbsp ground daily. Keep refrigerated after grinding (fats oxidise quickly). Add to yogurt, oats, smoothies.",
+    daily: true,
+    dailyAmount: "1–2 tbsp",
   },
   {
     id: "protein-powder",
@@ -2046,6 +2052,8 @@ const PANTRY = [
     benefit: "25-30g protein per scoop. Leucine triggers muscle protein synthesis. Keeps you full for hours.",
     fairPrice: "SGD 45-60 (2kg whey concentrate)",
     servingTip: "1 scoop daily post-workout or with breakfast. Scoop = ~30g. Mix into oats, smoothies, pancakes, or yogurt.",
+    daily: true,
+    dailyAmount: "1 scoop",
   },
   {
     id: "collagen",
@@ -2055,6 +2063,8 @@ const PANTRY = [
     benefit: "High glycine — supports sleep, glutathione production, and connective tissue health. 10g per serving.",
     fairPrice: "SGD 35 (500g)",
     servingTip: "1 scoop (10g) in coffee, tea, or smoothies daily. Tasteless — add to anything. Not a complete protein (lacks tryptophan).",
+    daily: true,
+    dailyAmount: "1 scoop (10g)",
   },
   {
     id: "olive-oil-pantry",
@@ -2064,6 +2074,8 @@ const PANTRY = [
     benefit: "Oleocanthal = natural anti-inflammatory (similar to ibuprofen). Hydroxytyrosol protects LDL from oxidation. Monounsaturated fat improves HDL.",
     fairPrice: "SGD 16-22 (750ml)",
     servingTip: "2 tbsp per day. Use raw for salads and finishing. Don't cook above 180°C. Buy in 3L tins for best value.",
+    daily: true,
+    dailyAmount: "2 tbsp",
   },
   {
     id: "apple-cider-vinegar",
@@ -2073,6 +2085,8 @@ const PANTRY = [
     benefit: "Lowers post-meal glucose and insulin spikes. May modestly reduce HbA1c over time. Improves insulin sensitivity.",
     fairPrice: "SGD 5.00 (500ml)",
     servingTip: "1 tbsp in water 15 min before high-carb meals. Always dilute (don't drink straight — damages enamel). Rinse mouth after.",
+    daily: true,
+    dailyAmount: "1 tbsp (before high-carb meals)",
   },
   {
     id: "cinnamon",
@@ -2082,6 +2096,8 @@ const PANTRY = [
     benefit: "Modest reductions in fasting glucose (3-5%) and HbA1c. Antioxidant polyphenols. Warming flavour reduces need for sugar.",
     fairPrice: "SGD 6.00 (50g Ceylon)",
     servingTip: "1 tsp daily. Add to oatmeal, coffee, smoothies, yogurt. Ceylon is preferred over Cassia for daily use.",
+    daily: true,
+    dailyAmount: "1 tsp",
   },
   {
     id: "turmeric",
@@ -2091,6 +2107,28 @@ const PANTRY = [
     benefit: "Curcumin inhibits NF-κB (master inflammation switch). Reduces hs-CRP, IL-6. Antioxidant and neuroprotective.",
     fairPrice: "SGD 5.00 (100g turmeric)",
     servingTip: "1/2-1 tsp turmeric + pinch of black pepper + fat (oil, coconut milk) for absorption. Add to eggs, rice, soups, smoothies.",
+  },
+  {
+    id: "green-tea",
+    name: "Green Tea (Unsweetened)",
+    description: "Rich in catechins (EGCG) — the most potent antioxidant polyphenols. Supports cardiovascular health, insulin sensitivity, and may reduce all-cause mortality. Contains L-theanine for calm focus.",
+    usedIn: [],
+    benefit: "EGCG reduces hs-CRP, improves HDL function, modestly lowers LDL-C and triglycerides. L-theanine + caffeine provides steady focus without jitters. 2+ cups daily linked to reduced all-cause mortality.",
+    fairPrice: "SGD 4-6 (50 bags, FairPrice house brand)",
+    servingTip: "2-3 cups daily, unsweetened. Steep at 80°C for 2-3 min. Matcha powder is ~10× more EGCG per gram.",
+    daily: true,
+    dailyAmount: "2-3 cups",
+  },
+  {
+    id: "ginger-tea",
+    name: "Ginger Tea",
+    description: "Gingerols and shogaols are potent anti-inflammatory compounds comparable to mild NSAIDs. Effective for nausea, digestion, and reducing exercise-induced muscle soreness.",
+    usedIn: [],
+    benefit: "Reduces hs-CRP and IL-6. Improves gastric emptying and reduces bloating. May lower muscle soreness post-exercise by 25%. Synergises with turmeric for anti-inflammatory effect.",
+    fairPrice: "SGD 3-4 (100g fresh ginger) or SGD 5-6 (40 bags)",
+    servingTip: "1-2 cups daily. Simmer 1-2 inches fresh sliced ginger in 2 cups water for 10 min. Add lemon + Ceylon cinnamon for synergy.",
+    daily: true,
+    dailyAmount: "1-2 cups",
   },
 ];
 
@@ -3026,3 +3064,313 @@ const DIET_LABELS_PLAIN = {
   omnivore: "Omnivore",
   vegetarian: "Vegetarian/Vegan",
 };
+
+const AVOID_LIST = [
+  {
+    id: "seed-oils",
+    name: "Industrial Seed Oils",
+    description: "High in omega-6 (pro-inflammatory), unstable when heated (forms aldehydes), and ubiquitous in restaurants and packaged foods. The single biggest dietary change you can make.",
+    items: [
+      { item: "Soybean Oil", why: "Primary oil used in most restaurants and cheap cooking oils. High omega-6:3 ratio (~7:1). Drives hs-CRP up.", instead: "Extra virgin olive oil, avocado oil, coconut oil, ghee", watchFor: "Restaurant cooking, salad dressings, mayo, 'vegetable oil' blends" },
+      { item: "Corn Oil", why: "Similar inflammatory profile to soybean oil. Common in fried foods and baked goods.", instead: "Same as above", watchFor: "Fried foods, margarine, packaged baked goods" },
+      { item: "Canola / Rapeseed Oil", why: "Highly processed — refined, bleached, deodorised. Often contains trans fats from processing. Marketed as 'heart-healthy' despite inflammatory omega-6 content.", instead: "Same as above", watchFor: "Processed foods, 'light' salad dressings, mayonnaise" },
+      { item: "Sunflower / Grapeseed Oil", why: "Very high omega-6 (65-70%). Grapeseed oil is often extracted with hexane. Used in 'healthy' bistro cooking.", instead: "Same as above", watchFor: "Bistro & café cooking, vinaigrettes, 'healthy' packaged snacks" },
+    ]
+  },
+  {
+    id: "added-sugar",
+    name: "Added Sugar & Refined Carbs",
+    description: "Drives HbA1c, triglycerides, and inflammation. Hiding in 74% of packaged foods under 60+ names. The biggest threat to metabolic health.",
+    items: [
+      { item: "Sugary Drinks (Soda, Bubble Tea, Sweetened Iced Tea)", why: "Number one source of added sugar. Liquid sugar hits the liver immediately — drives de novo lipogenesis, fatty liver, and triglycerides.", instead: "Sparkling water with lemon, unsweetened tea, black coffee, infused water", watchFor: "Every restaurant, convenience store, bubble tea shop, vending machine" },
+      { item: "Sweetened Coffee Drinks", why: "A single Starbucks Frappuccino can have 50-60g sugar. Even 'regular' iced coffee at hawker centres is often sweetened.", instead: "Black coffee, Americano, long black, or coffee with a splash of unsweetened milk", watchFor: "Cafés, coffee chains, hawker centre coffee stalls" },
+      { item: "White Bread, Buns & Tortillas", why: "High glycemic index — spikes glucose and insulin. Most supermarket bread contains added sugar or high-fructose corn syrup.", instead: "Sourdough (traditional fermented), wholegrain wraps, lettuce wraps, rice cakes", watchFor: "Sandwich shops, burger buns, breakfast toast, Subway, hawker western food" },
+      { item: "Refined Pasta", why: "Refined flour with high glycemic load. Most restaurant pasta portions are 2-3× a serving. No fiber to blunt glucose spike.", instead: "Chickpea or lentil pasta, zucchini noodles, konjac noodles, spaghetti squash", watchFor: "Italian restaurants, cai fan pasta station, cafeteria pasta bar" },
+      { item: "Pastries, Cookies, Muffins", why: "Sugar + refined flour + seed oils = triple metabolic threat. Store-bought versions are ultra-processed with preservatives.", instead: "Dark chocolate (85%+ cocoa), Greek yogurt bowl with berries, homemade protein pancakes", watchFor: "Cafés, supermarket bakery section, office pantries, hotel breakfast buffets" },
+      { item: "Sweetened Yogurt & Oatmeal", why: "Fruit-on-the-bottom yogurt has 15-20g added sugar per cup. Flavoured instant oatmeal packets are similarly loaded.", instead: "Plain Greek yogurt + fresh or frozen berries, rolled oats + cinnamon + mashed banana", watchFor: "Breakfast buffets, hotel breakfast, yogurt aisle, instant oatmeal packets" },
+    ]
+  },
+  {
+    id: "sugary-beverages",
+    name: "Sugar-Sweetened Beverages",
+    description: "The fastest way to spike glucose and triglycerides. Liquid sugar bypasses normal satiety signals — you consume calories without feeling fuller.",
+    items: [
+      { item: "Bottled Fruit Juices", why: "Even 100% juice has ~25-30g sugar per cup — no fiber to slow absorption. Fruit sugar (fructose) still drives fatty liver.", instead: "Eat the whole fruit instead (fiber slows absorption). Dilute juice 1:3 with sparkling water if you must.", watchFor: "Supermarket cold drinks section, hotel breakfast juice dispensers" },
+      { item: "Sweetened Soy / Almond / Oat Milk", why: "Many plant milks add 5-10g sugar per serving. 'Original' or 'Vanilla' versions are usually sweetened.", instead: "Unsweetened versions only. Check label — should say 0g sugar.", watchFor: "Cafés (default oat milk is often sweetened), supermarket chilled dairy aisle" },
+    ]
+  },
+  {
+    id: "artificial-sweeteners",
+    name: "Artificial Sweeteners & Diet Products",
+    description: "Zero calories but still problematic: may trigger insulin in some people, disrupt gut microbiome, and maintain sugar cravings. Zero-calorie doesn't mean zero metabolic effect.",
+    items: [
+      { item: "Aspartame, Sucralose, Saccharin", why: "Some studies show altered gut microbiome, increased glucose intolerance, and maintained sweet preference. Diet soda drinkers show no weight loss advantage over regular soda drinkers in long-term studies.", instead: "Stevia, monk fruit, or — best — retrain your palate to enjoy unsweetened. After 2 weeks without sweeteners, fruit tastes sweeter.", watchFor: "'Diet', 'zero sugar', 'light' drinks. Protein bars (many use sugar alcohols), chewing gum, sugar-free sweets" },
+      { item: "Sugar Alcohols (Maltitol, Sorbitol)", why: "Maltitol has a glycemic index of 52 (only slightly less than table sugar). Causes gas, bloating, and diarrhoea for many people.", instead: "Erythritol (best tolerated, zero GI) or allulose. Small amounts of xylitol (toxic to dogs).", watchFor: "'Sugar-free' chocolate, protein bars, keto snacks, sugar-free candies" },
+    ]
+  },
+  {
+    id: "processed-meats",
+    name: "Processed & Cured Meats",
+    description: "Preservatives (nitrates/nitrites), high sodium, and advanced glycation end-products (AGEs) from processing. Linked to colorectal cancer and increased blood pressure.",
+    items: [
+      { item: "Sausages & Hot Dogs", why: "High sodium + nitrates + low-quality meat trimmings. Most contain fillers, sugar, and seed oils. Category 1 carcinogen (IARC).", instead: "Fresh chicken or pork sausage (check label — no nitrates, minimal ingredients). Or cook fresh ground meat at home.", watchFor: "Hawker centres, convenience store steamers, BBQ packs, kids' menus, cai fan stalls" },
+      { item: "Conventional Bacon", why: "Nitrates form nitrosamines (carcinogenic) when cooked at high heat. High sodium (~200mg per slice). Most bacon has added sugar.", instead: "Uncured bacon (no nitrates, celery powder instead). Cook at lower temp. Or cook fresh pork belly from scratch.", watchFor: "Breakfast menus, Cobb salads, BLTs, burger toppings, weekend brunch" },
+      { item: "Chicken Nuggets & Fish Fingers", why: "Ultra-processed: mechanically separated meat + fillers + seed oils + sugar + preservatives. Low protein content relative to calories.", instead: "Homemade baked chicken tenders (coat in almond flour + parmesan). Canned sardines or tuna.", watchFor: "Frozen food aisle, kids' menus, school canteens, fast food value menus" },
+    ]
+  },
+  {
+    id: "hidden-sodium",
+    name: "Hidden Sodium & High-Salt Foods",
+    description: "Singapore hawker and restaurant food is notoriously high in sodium. Chronic high intake drives blood pressure and stiffens arteries, even in people who are 'salt-resistant'.",
+    items: [
+      { item: "Canned Soups & Broths", why: "A single serving can have 800-1,200mg sodium (33-50% of daily limit). Restaurant 'soup of the day' is often similar.", instead: "Homemade bone broth or vegetable soup where you control the salt. Low-sodium canned options.", watchFor: "Grocery canned soup aisle, restaurant soup specials, hotel buffet soups" },
+      { item: "Restaurant Stir-Fry Sauces", why: "Soy sauce + oyster sauce + fish sauce + sugar = 1,000-1,500mg sodium per serving. You don't control the portions when eating out.", instead: "Ask for 'less sauce' or 'light sauce'. Make your own stir-fry at home with reduced-sodium soy sauce.", watchFor: "Chinese/Vietnamese/Thai restaurants, tze char, food court mixed rice stalls, cai fan" },
+      { item: "Instant Noodles", why: "A single packet has 1,200-1,800mg sodium PLUS refined carbs + seed oils. The worst combination for BP and metabolic health.", instead: "Rice vermicelli or soba noodles with homemade broth. Egg drop soup (takes 5 min).", watchFor: "Convenience stores, office pantry, budget meals, student dorms" },
+      { item: "Processed Cheese & Cheese Spreads", why: "Processed cheese slices have ~300mg sodium per slice plus emulsifiers. Not the same as real cheese.", instead: "Real cheese (cheddar, mozzarella, Swiss, goat cheese). Check label — should be 3-5 ingredients max.", watchFor: "Supermarket cheese aisle, burger toppings, sandwich shops, hotel breakfast" },
+    ]
+  },
+];
+
+const EXERCISES = [
+  {
+    id: "bodyweight-squats",
+    name: "Bodyweight Squats",
+    icon: "🦵",
+    description: "The fundamental lower-body movement — builds leg strength, hip mobility, and knee stability with zero equipment.",
+    whyLongevity: "Squats maintain functional independence — getting up from a chair unassisted predicts lifespan. Builds bone density in hips and spine.",
+    instructions: [
+      "Stand with feet shoulder-width apart, toes slightly turned out",
+      "Keep chest up, core braced, weight in heels",
+      "Push hips back and down as if sitting in a chair",
+      "Go as deep as you can — thighs parallel to ground is the target",
+      "Drive through heels to stand up. Squeeze glutes at the top",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Pistol Squats (hold doorframe)", workSeconds: 50, restSeconds: 45, sets: 3 },
+      { name: "Regular", target: "Deep Bodyweight Squats", workSeconds: 40, restSeconds: 60, sets: 3 },
+      { name: "Easy Start", target: "Chair Squats (tap and stand)", workSeconds: 30, restSeconds: 60, sets: 2 },
+    ],
+    biomarkers: ["grip-strength", "hscrp"],
+  },
+  {
+    id: "push-ups",
+    name: "Push-Ups",
+    icon: "💪",
+    description: "The best no-equipment upper body exercise. Targets chest, shoulders, triceps, and core simultaneously.",
+    whyLongevity: "Push-up capacity correlates with cardiovascular health. 40+ push-ups is associated with 96% lower cardiovascular event risk.",
+    instructions: [
+      "Start in plank position, hands slightly wider than shoulder-width",
+      "Keep body in a straight line from head to heels",
+      "Lower chest to just above ground, elbows at 45° to body",
+      "Push through palms to return. Exhale on the push",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Decline Push-Ups (feet elevated)", workSeconds: 45, restSeconds: 45, sets: 3 },
+      { name: "Regular", target: "Standard Push-Ups", workSeconds: 35, restSeconds: 60, sets: 3 },
+      { name: "Easy Start", target: "Knee Push-Ups", workSeconds: 25, restSeconds: 60, sets: 2 },
+    ],
+    biomarkers: ["hscrp", "bp"],
+  },
+  {
+    id: "plank",
+    name: "Plank",
+    icon: "🧱",
+    description: "Isometric core exercise that builds endurance in the entire midsection, including deep stabilising muscles.",
+    whyLongevity: "Strong core protects the spine. Plank endurance correlates with lower back pain risk. Improves balance and prevents falls.",
+    instructions: [
+      "Start in forearm plank — elbows under shoulders, forearms parallel",
+      "Body forms straight line from head to heels. Engage glutes and core",
+      "Breathe steadily. Do not hold your breath",
+      "Stop if you feel lower back sagging — that's form failure",
+    ],
+    type: "hold",
+    variations: [
+      { name: "Gold Standard", target: "Plank with Leg Lifts", workSeconds: 50, restSeconds: 30, sets: 3 },
+      { name: "Regular", target: "Forearm Plank", workSeconds: 35, restSeconds: 45, sets: 3 },
+      { name: "Easy Start", target: "Knee Plank", workSeconds: 20, restSeconds: 45, sets: 2 },
+    ],
+    biomarkers: ["hscrp"],
+  },
+  {
+    id: "walking-lunges",
+    name: "Walking Lunges",
+    icon: "🚶",
+    description: "Single-leg movement that builds balance, coordination, and leg strength while challenging your core.",
+    whyLongevity: "Lunges improve balance for fall prevention. Single-leg strength predicts functional fitness better than two-legged strength.",
+    instructions: [
+      "Stand tall, step forward with right leg, lower hips until both knees at 90°",
+      "Front knee above ankle, back knee hovering above ground",
+      "Push off with back foot into the next lunge",
+      "Keep torso upright throughout. Repeat walking forward",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Walking Lunges with Twist", workSeconds: 45, restSeconds: 45, sets: 3 },
+      { name: "Regular", target: "Walking Lunges", workSeconds: 35, restSeconds: 60, sets: 3 },
+      { name: "Easy Start", target: "Stationary Lunges (step back)", workSeconds: 25, restSeconds: 60, sets: 2 },
+    ],
+    biomarkers: ["grip-strength", "bp"],
+  },
+  {
+    id: "glute-bridges",
+    name: "Glute Bridges",
+    icon: "🔥",
+    description: "Activates and strengthens the glutes and hamstrings — the muscles most weakened by prolonged sitting.",
+    whyLongevity: "Strong glutes stabilise hips and lower back, reducing back pain. Hip extension strength links to walking speed and fall prevention.",
+    instructions: [
+      "Lie on back, knees bent at 90°, feet flat on ground hip-width apart",
+      "Arms by sides, palms down for stability",
+      "Drive through heels to lift hips toward ceiling, squeezing glutes at top",
+      "Hold top for 1-2s, lower slowly (2s descent)",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Single-Leg Glute Bridges", workSeconds: 50, restSeconds: 30, sets: 3 },
+      { name: "Regular", target: "Standard Glute Bridges", workSeconds: 40, restSeconds: 45, sets: 3 },
+      { name: "Easy Start", target: "Glute Bridges (short range)", workSeconds: 30, restSeconds: 45, sets: 2 },
+    ],
+    biomarkers: ["hscrp"],
+  },
+  {
+    id: "bird-dogs",
+    name: "Bird Dogs",
+    icon: "🐦",
+    description: "Core stability exercise coordinating opposing arm and leg movements. Builds balance and spinal protection.",
+    whyLongevity: "Bird dogs train the posterior oblique sling system — critical for walking gait and back health. Improves coordination that declines with age.",
+    instructions: [
+      "Start on hands and knees, hands under shoulders, knees under hips",
+      "Extend right arm forward and left leg back simultaneously, hips square",
+      "Hold 1-2s, return to start slowly",
+      "Switch to left arm and right leg. Move under control",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Bird Dogs with 5s Hold", workSeconds: 45, restSeconds: 30, sets: 3 },
+      { name: "Regular", target: "Bird Dogs", workSeconds: 30, restSeconds: 45, sets: 3 },
+      { name: "Easy Start", target: "Bird Dogs (legs only)", workSeconds: 25, restSeconds: 45, sets: 2 },
+    ],
+    biomarkers: ["hscrp"],
+  },
+  {
+    id: "dead-bugs",
+    name: "Dead Bugs",
+    icon: "🦟",
+    description: "Deep core exercise teaching spinal stabilisation while moving arms and legs independently.",
+    whyLongevity: "Dead bugs train anti-rotation core control — preventing lower back injury during everyday movements like lifting and twisting.",
+    instructions: [
+      "Lie on back, arms toward ceiling, knees at 90° (tabletop)",
+      "Press lower back into ground — maintain contact throughout",
+      "Extend right arm overhead and left leg straight out, hovering off ground",
+      "Return to start. Switch sides. Move slowly",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Dead Bugs with Weight (book bag)", workSeconds: 45, restSeconds: 30, sets: 3 },
+      { name: "Regular", target: "Dead Bugs", workSeconds: 30, restSeconds: 45, sets: 3 },
+      { name: "Easy Start", target: "Dead Bugs (legs only)", workSeconds: 25, restSeconds: 45, sets: 2 },
+    ],
+    biomarkers: ["hscrp"],
+  },
+  {
+    id: "calf-raises",
+    name: "Calf Raises",
+    icon: "🦶",
+    description: "Strengthens calf muscles — the body's second heart, pumping blood back up from the legs.",
+    whyLongevity: "Strong calves improve venous return, reducing varicose veins and DVT risk. Calf strength links to walking speed and balance.",
+    instructions: [
+      "Stand with feet hip-width apart, hold wall or chair for balance",
+      "Slowly rise up onto the balls of your feet as high as possible",
+      "Hold at top for 1s, squeezing calves",
+      "Lower slowly (3s descent) then repeat",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Single-Leg Calf Raises (deficit)", workSeconds: 50, restSeconds: 30, sets: 3 },
+      { name: "Regular", target: "Standard Calf Raises", workSeconds: 40, restSeconds: 45, sets: 3 },
+      { name: "Easy Start", target: "Calf Raises (both feet)", workSeconds: 30, restSeconds: 45, sets: 2 },
+    ],
+    biomarkers: ["bp"],
+  },
+  {
+    id: "mountain-climbers",
+    name: "Mountain Climbers",
+    icon: "⛰️",
+    description: "Dynamic full-body exercise combining plank stability with alternating knee drives. Gets heart rate up.",
+    whyLongevity: "Improves cardiovascular conditioning without impact. The alternating knee drive maintains hip flexor mobility that stiffens with age.",
+    instructions: [
+      "Start in plank, hands under shoulders, body in straight line",
+      "Drive right knee toward chest as far as possible, hips level",
+      "Return right leg and drive left knee forward",
+      "Alternate quickly maintaining plank form",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Cross-Body Mountain Climbers", workSeconds: 35, restSeconds: 45, sets: 3 },
+      { name: "Regular", target: "Mountain Climbers", workSeconds: 25, restSeconds: 60, sets: 3 },
+      { name: "Easy Start", target: "Walking Climbers (slow pace)", workSeconds: 15, restSeconds: 60, sets: 2 },
+    ],
+    biomarkers: ["hscrp", "hba1c"],
+  },
+  {
+    id: "cat-cow",
+    name: "Cat-Cow Stretch",
+    icon: "🐱",
+    description: "Gentle spinal mobility exercise warming up the entire spine through flexion and extension.",
+    whyLongevity: "Spinal mobility decreases with age — cat-cow maintains intervertebral disc health by pumping fluid in and out of discs.",
+    instructions: [
+      "Start on hands and knees, hands under shoulders, knees under hips",
+      "Inhale: drop belly, lift chest and tailbone (Cow). Look slightly up",
+      "Exhale: round spine toward ceiling, tuck chin and tailbone (Cat)",
+      "Move slowly with breath — one full cycle per breath",
+    ],
+    type: "hold",
+    variations: [
+      { name: "Gold Standard", target: "Cat-Cow with 3s Hold Each", workSeconds: 60, restSeconds: 20, sets: 2 },
+      { name: "Regular", target: "Cat-Cow with Breath", workSeconds: 40, restSeconds: 30, sets: 2 },
+      { name: "Easy Start", target: "Gentle Cat-Cow (small range)", workSeconds: 30, restSeconds: 30, sets: 2 },
+    ],
+    biomarkers: ["hscrp"],
+  },
+  {
+    id: "wall-sit",
+    name: "Wall Sit",
+    icon: "🧊",
+    description: "Isometric leg exercise — hold sitting position against a wall. Deceptively hard, builds leg endurance fast.",
+    whyLongevity: "Wall sits build isometric leg strength for getting up from chairs and cars. Knee stability protects against falls.",
+    instructions: [
+      "Stand with back against wall, feet shoulder-width, 2 feet forward",
+      "Slide down until thighs parallel to ground (90° at knees)",
+      "Press entire back against wall. Hold position",
+      "Breathe steadily. Stop if knees feel sharp pain",
+    ],
+    type: "hold",
+    variations: [
+      { name: "Gold Standard", target: "Wall Sit with Pulses", workSeconds: 45, restSeconds: 45, sets: 3 },
+      { name: "Regular", target: "Standard Wall Sit", workSeconds: 25, restSeconds: 60, sets: 3 },
+      { name: "Easy Start", target: "Wall Sit (higher position)", workSeconds: 15, restSeconds: 60, sets: 2 },
+    ],
+    biomarkers: ["grip-strength"],
+  },
+  {
+    id: "standing-hip-circles",
+    name: "Standing Hip Circles",
+    icon: "🔄",
+    description: "Mobility drill moving the hip joint through full range of motion, lubricating and activating stabilisers.",
+    whyLongevity: "Hip mobility declines first from prolonged sitting. Stiff hips cause back pain, knee pain, and altered gait. Maintaining range prevents compensation.",
+    instructions: [
+      "Stand on one leg, holding wall or chair for balance",
+      "Lift other leg, knee bent to 90°",
+      "Rotate bent leg in large circles from hip — 10 forward, 10 backward",
+      "Switch legs. Slow control, largest circles possible",
+    ],
+    type: "reps",
+    variations: [
+      { name: "Gold Standard", target: "Hip Circles (no support)", workSeconds: 45, restSeconds: 20, sets: 2 },
+      { name: "Regular", target: "Hip Circles (holding support)", workSeconds: 30, restSeconds: 30, sets: 2 },
+      { name: "Easy Start", target: "Small Circles (on back)", workSeconds: 20, restSeconds: 30, sets: 2 },
+    ],
+    biomarkers: [],
+  },
+];
