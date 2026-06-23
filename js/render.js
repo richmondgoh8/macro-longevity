@@ -1296,6 +1296,7 @@ let musicLoading = null;
 let restMusicBuffer = null;
 let restMusicLoading = null;
 const REST_MUSIC_URL = "https://cdn.freesound.org/previews/858/858311_462105-lq.mp3";
+const MUSIC_START_OFFSET = 5;
 
 function loadMusic() {
   if (musicBuffer || musicLoading) return musicLoading;
@@ -1335,9 +1336,9 @@ async function startMusic(isWork) {
   musicSource.buffer = activeBuf;
   musicSource.loop = true;
   musicGain = ctx.createGain();
-  musicGain.gain.value = 0.2;
+  musicGain.gain.value = isWork ? 0.2 : 0.4;
   musicSource.connect(musicGain).connect(ctx.destination);
-  musicSource.start();
+  musicSource.start(0, isWork ? MUSIC_START_OFFSET : 0);
 }
 
 function stopMusic() {
@@ -1416,18 +1417,13 @@ function timerTick(id, ex) {
   const total = s.currentSet > s.totalSets ? 0 : s.isWork ? s.v.workSeconds : s.v.restSeconds;
   const pct = total > 0 ? (s.timeRemaining / total) * 100 : 0;
 
-  const timeEl = document.getElementById(`time-${id}`);
-  const barEl = document.getElementById(`bar-${id}`);
-  const labelEl = document.getElementById(`label-${id}`);
-  const setEl = document.getElementById(`sets-${id}`);
-
-  if (timeEl) {
-    const mins = Math.floor(s.timeRemaining / 60);
-    const secs = Math.floor(s.timeRemaining % 60);
-    timeEl.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  }
-  if (barEl) barEl.style.width = `${pct}%`;
-  if (labelEl) labelEl.textContent = s.isWork ? "⏱️ WORK" : "💤 REST";
+  const mins = Math.floor(s.timeRemaining / 60);
+  const secs = Math.floor(s.timeRemaining % 60);
+  const timeText = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  const labelText = s.isWork ? "⏱️ WORK" : "💤 REST";
+  document.querySelectorAll(`#time-${id}`).forEach(el => { el.textContent = timeText; });
+  document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = `${pct}%`; });
+  document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = labelText; });
 
   // Sound milestones
   const timeLeft = s.timeRemaining;
@@ -1437,7 +1433,7 @@ function timerTick(id, ex) {
       const pctLeft = timeLeft / totalTime;
       if (!s._midpoint && pctLeft <= 0.5 && pctLeft > 0.48) { s._midpoint = true; playMidpoint(); }
     }
-    if (timeLeft <= 10 && timeLeft > 0) {
+    if (timeLeft <= 6 && timeLeft > 0) {
       const sec = Math.ceil(timeLeft);
       if (sec !== s._lastCountdownSec) {
         s._lastCountdownSec = sec;
@@ -1455,27 +1451,27 @@ function timerTick(id, ex) {
       playWorkEnd();
       if (s.currentSet >= s.totalSets) {
         s.status = "done";
-        if (labelEl) labelEl.textContent = "✅ DONE";
+        document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "✅ DONE"; });
         playAllDone();
         updateTimerControls(id, "done");
-        if (barEl) barEl.style.width = "0%";
+        document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = "0%"; });
         return;
       }
       s.isWork = false;
       s.timeRemaining = s.v.restSeconds;
       s._resetFlags();
       startMusic(false);
-      if (labelEl) labelEl.textContent = "💤 REST";
-      if (setEl) setEl.textContent = `${s.currentSet}/${s.totalSets}`;
+      document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "💤 REST"; });
+      document.querySelectorAll(`#sets-${id}`).forEach(el => { el.textContent = `${s.currentSet}/${s.totalSets}`; });
     } else {
       playRestOver();
       s.currentSet++;
       if (s.currentSet > s.totalSets) {
         s.status = "done";
-        if (labelEl) labelEl.textContent = "✅ DONE";
+        document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "✅ DONE"; });
         playAllDone();
         updateTimerControls(id, "done");
-        if (barEl) barEl.style.width = "0%";
+        document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = "0%"; });
         return;
       }
       s.isWork = true;
@@ -1483,8 +1479,8 @@ function timerTick(id, ex) {
       s._resetFlags();
       playStartWhistle();
       startMusic(true);
-      if (labelEl) labelEl.textContent = "⏱️ WORK";
-      if (setEl) setEl.textContent = `${s.currentSet}/${s.totalSets}`;
+      document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "⏱️ WORK"; });
+      document.querySelectorAll(`#sets-${id}`).forEach(el => { el.textContent = `${s.currentSet}/${s.totalSets}`; });
     }
     updateSetIndicators(id, s.currentSet, s.totalSets);
   }
@@ -1508,14 +1504,14 @@ function timerStateReset(id, ex) {
 }
 
 function updateTimerControls(id, state) {
-  const start = document.querySelector(`.timer-start[data-exercise="${id}"]`);
-  const pause = document.querySelector(`.timer-pause[data-exercise="${id}"]`);
-  const stop = document.querySelector(`.timer-stop[data-exercise="${id}"]`);
-  if (!start) return;
-  if (state === "idle") { start.style.display = ""; start.textContent = "▶ Start"; pause.style.display = "none"; stop.style.display = "none"; }
-  else if (state === "running") { start.style.display = "none"; pause.style.display = ""; pause.textContent = "⏸ Pause"; stop.style.display = ""; }
-  else if (state === "paused") { start.style.display = ""; start.textContent = "▶ Resume"; pause.style.display = "none"; stop.style.display = ""; }
-  else if (state === "done") { start.style.display = ""; start.textContent = "↻ Restart"; pause.style.display = "none"; stop.style.display = "none"; }
+  document.querySelectorAll(`.timer-start[data-exercise="${id}"]`).forEach(start => {
+    const pause = start.closest('.timer-controls').querySelector('.timer-pause');
+    const stop = start.closest('.timer-controls').querySelector('.timer-stop');
+    if (state === "idle") { start.style.display = ""; start.textContent = "▶ Start"; pause.style.display = "none"; stop.style.display = "none"; }
+    else if (state === "running") { start.style.display = "none"; pause.style.display = ""; pause.textContent = "⏸ Pause"; stop.style.display = ""; }
+    else if (state === "paused") { start.style.display = ""; start.textContent = "▶ Resume"; pause.style.display = "none"; stop.style.display = ""; }
+    else if (state === "done") { start.style.display = ""; start.textContent = "↻ Restart"; pause.style.display = "none"; stop.style.display = "none"; }
+  });
 }
 
 function updateSetIndicators(id, current, total) {
@@ -1555,14 +1551,13 @@ function handleTimerAction(id, action, ex) {
     timerStateReset(id, ex);
     const sv = timerState[id].v;
     updateTimerControls(id, "idle");
-    const timeEl = document.getElementById(`time-${id}`);
-    const barEl = document.getElementById(`bar-${id}`);
-    const labelEl = document.getElementById(`label-${id}`);
-    const setEl = document.getElementById(`sets-${id}`);
-    if (timeEl) { const m = Math.floor(sv.workSeconds / 60); const sec = sv.workSeconds % 60; timeEl.textContent = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`; }
-    if (barEl) barEl.style.width = "100%";
-    if (labelEl) labelEl.textContent = "Ready";
-    if (setEl) setEl.textContent = `1/${sv.sets}`;
+    const m = Math.floor(sv.workSeconds / 60);
+    const sec = sv.workSeconds % 60;
+    const resetTime = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+    document.querySelectorAll(`#time-${id}`).forEach(el => { el.textContent = resetTime; });
+    document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = "100%"; });
+    document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "Ready"; });
+    document.querySelectorAll(`#sets-${id}`).forEach(el => { el.textContent = `1/${sv.sets}`; });
     updateSetIndicators(id, 1, sv.sets);
   }
 }
