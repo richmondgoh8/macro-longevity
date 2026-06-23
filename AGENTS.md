@@ -14,19 +14,18 @@ make serve       # kill old :8080, start python3 http.server
 index.html              Landing page
 pages/
   health.html           Biomarkers, Fasting, Vaccinations, Supplements, Damage Control
+  workout.html           12 equipment-free exercises with timer, music, and sound cues
   food.html             Meals (Breakfast, Lunch & Dinner), Marinades, Pantry, Food Lists
   finance.html          Investment Combos, FIRE Calculator + Passive Income Tracker
 css/
   variables.css         Design tokens (colors, typography, spacing, radius, shadows)
   style.css             All component styles, responsive (768px, 480px breakpoints)
 js/
-  data.js               All content arrays
-  render.js             Client-side rendering for all pages
+  data.js               All content arrays (3376 lines)
+  render.js             Client-side rendering for all pages (1674 lines)
   export.js             Markdown export for AI consumption
   components/
     card-swipe.js       Viewport-filling swipeable card stack (mobile)
-scripts/
-  validate-tokens.js    Validates token structure and hardcoded color usage
 ```
 
 ## Key render function calls
@@ -34,6 +33,7 @@ scripts/
 | Page | Function | Sub-tabs |
 |------|----------|----------|
 | `health.html` | `renderHealth()` | Biomarkers, Fasting, Vaccinations, Supplements, Damage Control |
+| `workout.html` | `renderExercises("workout-app")` | None (single page, 12 exercise cards with built-in timers) |
 | `food.html` | `renderFoods()` | Breakfast, Lunch & Dinner, Marinades, Pantry, Food Lists |
 | `finance.html` | `renderInvestments()` + inline `calcFire()` | Investment Combos, FIRE Calculator |
 
@@ -46,7 +46,17 @@ scripts/
 - Biomarker IDs referenced in meals must match `BIOMARKERS[].id`
 - Air fryer instructions include: preheat time, temperature, flip/shake timing, visual doneness cues
 - Ingredient pricing format: `(FairPrice: SGD X.XX)`. Supplement pricing: `costPerMonth: "SGD XX"`.
-- Biomarker counts: 20. Meals: 36. Marinades: 8. Pantry: 9. Supplements: 10. Food Lists: 4.
+- **Data counts**: Biomarkers 20, Meals 37, Marinades 8, Pantry 11, Supplements 23, Food Lists 3, Exercises 12, Fasting Protocols 7, Vaccines 10, Investments 5
+- Exercise objects have: `variations[]` (Gold Standard / Regular / Easy Start), `instructions[]`, `biomarkers[]`
+
+## Workout page (`pages/workout.html`)
+
+- 12 exercises: Wall Push-Up, Bodyweight Squat, Reverse Lunge, Glute Bridge, Standing Calf Raise, Dead Bug, Plank, Bird Dog, Standing Knee Drive, Step-Up, Wall Sit, Inchworm
+- Each exercise has a built-in timer (Web Audio API, no external libraries)
+- Timer states: idle → running → paused → done. Only one timer active at a time (starting one stops any other)
+- Background music: CC0 Freesound track looped at low gain, auto-stops during countdown ticks
+- Sound cues: synthesized whistles + ticks (no external audio files)
+- `getVariation(ex)` always returns `ex.variations[1]` (Regular tier)
 
 ## Design tokens (`css/variables.css`)
 
@@ -65,7 +75,7 @@ Follows DESIGN.md v1.0 — 4-size fluid typography with `clamp()`, DM Sans displ
 
 ## Mobile UX
 
-- Bottom tab bar on mobile (<768px): Home | Health | Food | Finance
+- Bottom tab bar on mobile (<768px): Home | Health | Workout | Food | Finance
 - Swipeable card stacks for dense content (biomarkers, supplements, fasting, vaccines)
 - Card-expand pattern: face view + "Show Details" button → detail section
 - Desktop shows normal grids; mobile shows swipe cards via CSS media queries

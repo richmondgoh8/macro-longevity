@@ -1214,7 +1214,7 @@ img {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin-bottom: 0;
+    margin-bottom: 32px;
 }
 .meal-tabs::-webkit-scrollbar {
     display: none;
@@ -2734,6 +2734,10 @@ img {
     padding-top: 16px;
 }
 
+.section-compact {
+    padding-top: 32px;
+}
+
 .fire-field {
     display: flex;
     flex-direction: column;
@@ -3058,6 +3062,12 @@ img {
     }
     .card-swipe-inner .biomarker-name {
         font-size: var(--font-size-lg);
+    }
+    .card-swipe-slide .card-detail {
+        display: block !important;
+    }
+    .card-swipe-expand-btn {
+        display: none !important;
     }
 }
 

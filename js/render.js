@@ -197,10 +197,7 @@ function renderBiomarkers(targetId) {
 
   if (typeof CardSwipe !== 'undefined') {
     CardSwipe.init('biomarker-swipe-wrap', swipeSlides, {
-      onSlideChange: (idx) => {
-        // Optional: update URL hash for deep-linking
-        // history.replaceState(null, null, '#' + allSorted[idx].id);
-      }
+      onSlideChange: (idx) => {}
     });
   }
 }
@@ -1293,8 +1290,12 @@ function playAllDone() {
 let musicBuffer = null;
 let musicSource = null;
 let musicGain = null;
-const MUSIC_URL = "https://cdn.freesound.org/previews/441/441521_5218363-lq.mp3";
+const MUSIC_URL = "https://cdn.freesound.org/previews/569/569920_4819210-lq.mp3";
 let musicLoading = null;
+
+let restMusicBuffer = null;
+let restMusicLoading = null;
+const REST_MUSIC_URL = "https://cdn.freesound.org/previews/858/858311_462105-lq.mp3";
 
 function loadMusic() {
   if (musicBuffer || musicLoading) return musicLoading;
@@ -1309,14 +1310,29 @@ function loadMusic() {
   return musicLoading;
 }
 
-async function startMusic() {
+function loadRestMusic() {
+  if (restMusicBuffer || restMusicLoading) return restMusicLoading;
+  restMusicLoading = (async () => {
+    try {
+      const ctx = getAudioCtx();
+      const resp = await fetch(REST_MUSIC_URL);
+      const buf = await resp.arrayBuffer();
+      restMusicBuffer = await ctx.decodeAudioData(buf);
+    } catch(e) { restMusicBuffer = null; }
+  })();
+  return restMusicLoading;
+}
+
+async function startMusic(isWork) {
   stopMusic();
-  if (!musicBuffer) await loadMusic();
+  const buf = isWork ? musicBuffer : restMusicBuffer;
+  if (!buf) { isWork ? await loadMusic() : await loadRestMusic(); }
   const ctx = getAudioCtx();
-  if (!ctx || !musicBuffer) return;
+  const activeBuf = isWork ? musicBuffer : restMusicBuffer;
+  if (!ctx || !activeBuf) return;
 
   musicSource = ctx.createBufferSource();
-  musicSource.buffer = musicBuffer;
+  musicSource.buffer = activeBuf;
   musicSource.loop = true;
   musicGain = ctx.createGain();
   musicGain.gain.value = 0.2;
@@ -1327,9 +1343,14 @@ async function startMusic() {
 function stopMusic() {
   if (musicSource) {
     try { musicSource.stop(); } catch(e) {}
+    try { musicSource.disconnect(); } catch(e) {}
     musicSource = null;
   }
-  musicGain = null;
+  if (musicGain) {
+    clearTimeout(musicGain._restoreTimer);
+    try { musicGain.disconnect(); } catch(e) {}
+    musicGain = null;
+  }
 }
 
 /* ============================
@@ -1375,6 +1396,7 @@ function initExerciseSounds() {
     loadSound(name, url);
   }
   loadMusic();
+  loadRestMusic();
 }
 
 /* ============================
@@ -1442,7 +1464,7 @@ function timerTick(id, ex) {
       s.isWork = false;
       s.timeRemaining = s.v.restSeconds;
       s._resetFlags();
-      startMusic();
+      startMusic(false);
       if (labelEl) labelEl.textContent = "💤 REST";
       if (setEl) setEl.textContent = `${s.currentSet}/${s.totalSets}`;
     } else {
@@ -1460,7 +1482,7 @@ function timerTick(id, ex) {
   s.timeRemaining = s.v.workSeconds;
       s._resetFlags();
       playStartWhistle();
-      startMusic();
+      startMusic(true);
       if (labelEl) labelEl.textContent = "⏱️ WORK";
       if (setEl) setEl.textContent = `${s.currentSet}/${s.totalSets}`;
     }
@@ -1519,7 +1541,7 @@ function handleTimerAction(id, action, ex) {
     s.lastTick = Date.now();
     updateTimerControls(id, "running");
     playStartWhistle();
-    startMusic();
+    startMusic(true);
     timerTick(id, ex);
   } else if (action === "pause") {
     s.status = "paused";
@@ -1550,7 +1572,7 @@ function getVariation(ex) {
 }
 
 function initExerciseTimers() {
-  const container = document.querySelector("#movement-app");
+  const container = document.querySelector("#workout-app");
   if (!container) return;
   container.addEventListener("click", (e) => {
     const start = e.target.closest(".timer-start");
@@ -1618,7 +1640,7 @@ function exerciseCardDetail(e) {
 }
 
 function renderExercises(targetId) {
-  const container = document.getElementById(targetId || "movement-app");
+  const container = document.getElementById(targetId || "workout-app");
   if (!container) return;
 
   initExerciseSounds();
