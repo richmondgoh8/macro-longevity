@@ -1,9 +1,31 @@
+import { BIOMARKERS, VACCINES, SUPPLEMENTS } from './data/health.js';
+import { MEAL_CATEGORIES, MEAL_LABELS, FASTING_PROTOCOLS, TIER_ORDER, TIER_LABELS, TIER_DESCRIPTIONS, DIET_LABELS, DIET_LABELS_PLAIN, PRICE_DISCLAIMER, SUGAR_OFFSET_TIPS } from './data/common.js';
+import { MEALS, MARINADES, PANTRY, FOOD_LISTS, AVOID_LIST } from './data/food.js';
+import { EXERCISES } from './data/workout.js';
+import { INVESTMENTS } from './data/finance.js';
+import { CardSwipe } from './components/card-swipe.js';
+
+function safeRender(fn, container, fallback) {
+  try { fn(); }
+  catch (err) {
+    console.error('Render error:', err);
+    if (container) {
+      container.innerHTML = `<div style="padding:24px;text-align:center;color:var(--color-text-secondary)">
+        <p style="font-size:18px;margin-bottom:8px">Something went wrong.</p>
+        <p style="font-size:14px;color:var(--color-text-muted)">${fallback || 'Please refresh the page.'}</p>
+      </div>`;
+    }
+  }
+}
+
 let healthTab = "biomarkers";
 
 function selectHealthTab(tab) {
   healthTab = tab;
   renderHealth();
 }
+
+const healthTabCache = {};
 
 function renderHealth() {
   const container = document.getElementById("health-app");
@@ -30,30 +52,51 @@ function renderHealth() {
       </select>
     </div>`;
 
-  if (healthTab === "biomarkers") {
-    const bioContainer = document.createElement("div");
-    bioContainer.id = "biomarker-grid";
-    container.innerHTML = tabs;
-    container.appendChild(bioContainer);
-    renderBiomarkers("biomarker-grid");
-  } else if (healthTab === "fasting") {
-    const fastContainer = document.createElement("div");
-    fastContainer.id = "fasting-grid";
-    container.innerHTML = tabs;
-    container.appendChild(fastContainer);
-    renderFasting("fasting-grid");
-  } else if (healthTab === "vaccinations") {
-    const vacContainer = document.createElement("div");
-    vacContainer.id = "vaccine-grid";
-    container.innerHTML = tabs;
-    container.appendChild(vacContainer);
-    renderVaccines("vaccine-grid");
-  } else if (healthTab === "supplements") {
-    container.innerHTML = tabs + '<div id="supplement-app"></div>';
-    renderSupplements("supplement-app");
+  if (!container.querySelector('.meal-tabs')) {
+    container.innerHTML = tabs + '<div class="health-content"></div>';
   } else {
-    container.innerHTML = tabs + renderDamageControl();
+    container.querySelectorAll('.meal-tab').forEach((btn, i) => {
+      btn.classList.toggle('active', healthTabs[i] === healthTab);
+    });
+    container.querySelector('.meal-tab-select').value = healthTab;
   }
+
+  const contentEl = container.querySelector('.health-content');
+
+  if (!healthTabCache[healthTab]) {
+    if (healthTab === "biomarkers") {
+      const bioGrid = document.createElement("div");
+      bioGrid.id = "biomarker-grid";
+      contentEl.innerHTML = '';
+      contentEl.appendChild(bioGrid);
+      renderBiomarkers("biomarker-grid");
+      healthTabCache[healthTab] = contentEl.innerHTML;
+    } else if (healthTab === "fasting") {
+      const fastGrid = document.createElement("div");
+      fastGrid.id = "fasting-grid";
+      contentEl.innerHTML = '';
+      contentEl.appendChild(fastGrid);
+      renderFasting("fasting-grid");
+      healthTabCache[healthTab] = contentEl.innerHTML;
+    } else if (healthTab === "vaccinations") {
+      const vacGrid = document.createElement("div");
+      vacGrid.id = "vaccine-grid";
+      contentEl.innerHTML = '';
+      contentEl.appendChild(vacGrid);
+      renderVaccines("vaccine-grid");
+      healthTabCache[healthTab] = contentEl.innerHTML;
+    } else if (healthTab === "supplements") {
+      contentEl.innerHTML = '<div id="supplement-app"></div>';
+      renderSupplements("supplement-app");
+      healthTabCache[healthTab] = contentEl.innerHTML;
+    } else {
+      contentEl.innerHTML = renderDamageControl();
+      healthTabCache[healthTab] = contentEl.innerHTML;
+    }
+  } else {
+    contentEl.innerHTML = healthTabCache[healthTab];
+  }
+
   if (healthTab !== "supplements") {
     window.scrollTo(0, 0);
   }
@@ -449,7 +492,7 @@ function renderInvestments() {
         <div class="budget-input-row">
           <div class="budget-field">
             <label>Monthly Take-Home Salary</label>
-            <input type="number" id="budgetSalary" value="" min="0" step="500" placeholder="e.g. 5000" oninput="updateBudget()">
+            <input type="number" id="budgetSalary" value="" min="0" step="500" placeholder="e.g. 5000" data-budget-input>
           </div>
         </div>
         <div id="budgetResults"></div>
@@ -463,12 +506,12 @@ function renderInvestments() {
           </div>
           <div class="budget-slider-row">
             <label>Expenses <span id="budgetPctExpenses">50</span>%</label>
-            <input type="range" id="sliderExpenses" min="0" max="100" value="50" oninput="updateBudget()">
+            <input type="range" id="sliderExpenses" min="0" max="100" value="50" data-budget-input>
             <span class="budget-slider-val" id="budgetValExpenses">SGD 0</span>
           </div>
           <div class="budget-slider-row">
             <label>Investments <span id="budgetPctInvestments">30</span>%</label>
-            <input type="range" id="sliderInvestments" min="0" max="100" value="30" oninput="updateBudget()">
+            <input type="range" id="sliderInvestments" min="0" max="100" value="30" data-budget-input>
             <span class="budget-slider-val" id="budgetValInvestments">SGD 0</span>
           </div>
           <p class="budget-slider-hint">Savings auto-calculates as the remainder. Total always sums to 100%.</p>
@@ -521,6 +564,9 @@ function renderInvestments() {
     </div>
   </div>`;
 }
+document.addEventListener('input', function(e) {
+    if (e.target.closest('[data-budget-input]')) updateBudget();
+});
 
 function updateBudget() {
   const salary = parseFloat(document.getElementById('budgetSalary').value) || 0;
@@ -621,84 +667,67 @@ function renderDamageControl() {
 }
 
 let foodTab = "breakfast";
+const foodTabCache = {};
 
 function renderFoods() {
   const container = document.getElementById("food-app");
   if (!container) return;
 
-  function pantryHTML() {
-    return `<div class="pantry-grid">
-      ${PANTRY.map(p => `
-        <div class="pantry-card">
-          <h3 class="pantry-name">${p.name}${p.daily ? `<span class="daily-badge">Daily</span>` : ""}</h3>
-          <p class="pantry-desc">${p.description}</p>
-          <div class="pantry-detail"><strong>💰 FairPrice:</strong> ${p.fairPrice}</div>
-          <div class="pantry-detail"><strong>🎯 Benefit:</strong> ${p.benefit}</div>
-          <div class="pantry-detail"><strong>💡 Use:</strong> ${p.servingTip}</div>
-        </div>
-      `).join("")}
+  const foodTabsHTML = `
+    <div class="meal-controls">
+      <div class="meal-tabs">
+        ${MEAL_CATEGORIES.map(c =>
+          `<button class="meal-tab ${foodTab === c ? "active" : ""}" onclick="selectMealTab('${c}')">${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</button>`
+        ).join("")}
+        <button class="meal-tab meal-tab-marinade ${foodTab === "marinade" ? "active" : ""}" onclick="selectMealTab('marinade')">🧂 Marinades & Sauces (${MARINADES.length})</button>
+        <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
+        <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
+        <button class="meal-tab ${foodTab === "avoid" ? "active" : ""}" onclick="selectMealTab('avoid')">🚫 Avoid (${AVOID_LIST.length})</button>
+      </div>
+      <select class="meal-tab-select" onchange="selectMealTab(this.value)">
+        ${MEAL_CATEGORIES.map(c =>
+          `<option value="${c}" ${foodTab === c ? "selected" : ""}>${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</option>`
+        ).join("")}
+        <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
+        <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
+        <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
+        <option value="avoid" ${foodTab === "avoid" ? "selected" : ""}>🚫 Avoid (${AVOID_LIST.length})</option>
+      </select>
+      ${["breakfast", "lunch", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
     </div>`;
+
+  if (!container.querySelector('.meal-controls')) {
+    container.innerHTML = foodTabsHTML + '<div class="food-content"></div>';
+  } else {
+    container.querySelectorAll('.meal-tab').forEach(btn => {
+      const tabName = btn.getAttribute('onclick')?.match(/selectMealTab\('([^']+)'\)/)?.[1];
+      if (tabName) btn.classList.toggle('active', tabName === foodTab);
+    });
+    container.querySelector('.meal-tab-select').value = foodTab;
   }
 
-  function fastingHTML() {
-    return `<div class="fasting-intro">
-      <h3>Choose Your Fasting Protocol</h3>
-      <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
-    </div>
-    <div class="fasting-grid">
-      ${FASTING_PROTOCOLS.map(p => `
-        <article class="fasting-card" id="fast-${p.id}">
-          <div class="fasting-header">
-            <span class="fasting-icon">${p.icon}</span>
-            <div>
-              <h3 class="fasting-name">${p.name}</h3>
-              <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
-            </div>
-          </div>
-          <p class="fasting-desc">${p.description}</p>
-          <details class="meal-details">
-            <summary>🔬 What Happens in the Body</summary>
-            <ul class="checklist">
-              ${p.whatHappens.map(h => `<li>${h}</li>`).join("")}
-            </ul>
-          </details>
-          <details class="meal-details">
-            <summary>🚪 How to Enter the Fast</summary>
-            <ul class="checklist">
-              ${p.howToEnter.map(h => `<li>${h}</li>`).join("")}
-            </ul>
-          </details>
-          <details class="meal-details">
-            <summary>💧 What to Do During the Fast</summary>
-            <ul class="checklist">
-              ${p.duringFast.map(d => `<li>${d}</li>`).join("")}
-            </ul>
-          </details>
-          <details class="meal-details">
-            <summary>🍽️ How to Break the Fast</summary>
-            <ul class="checklist">
-              ${p.howToBreak.map(h => `<li>${h}</li>`).join("")}
-            </ul>
-          </details>
-          <details class="meal-details">
-            <summary>💡 Tips</summary>
-            <ul class="checklist">
-              ${p.tips.map(t => `<li>${t}</li>`).join("")}
-            </ul>
-          </details>
-          ${p.biomarkers && p.biomarkers.length ? `
-          <div class="meal-targets" style="margin-top:12px">
-            <h5>Biomarkers Improved</h5>
-            <div class="tag-group">
-              ${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
-            </div>
-          </div>` : ""}
-        </article>
-      `).join("")}
-    </div>`;
+  const contentEl = container.querySelector('.food-content');
+  if (!foodTabCache[foodTab]) {
+    foodTabCache[foodTab] = renderFoodContent(foodTab);
   }
+  contentEl.innerHTML = foodTabCache[foodTab];
+}
 
-  function foodListHTML(list) {
+function pantryHTML() {
+  return `<div class="pantry-grid">
+    ${PANTRY.map(p => `
+      <div class="pantry-card">
+        <h3 class="pantry-name">${p.name}${p.daily ? `<span class="daily-badge">Daily</span>` : ""}</h3>
+        <p class="pantry-desc">${p.description}</p>
+        <div class="pantry-detail"><strong>💰 FairPrice:</strong> ${p.fairPrice}</div>
+        <div class="pantry-detail"><strong>🎯 Benefit:</strong> ${p.benefit}</div>
+        <div class="pantry-detail"><strong>💡 Use:</strong> ${p.servingTip}</div>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+function foodListHTML(list) {
     const hasFiber = list.id === "fiber-rich";
     const hasPotassium = list.id === "potassium-rich";
     const extraCol = hasFiber ? { label: "Fiber", val: f => f.fiberG + "g" }
@@ -882,36 +911,8 @@ function renderFoods() {
     }).join("");
   }
 
-  let html = `
-    <div class="meal-controls">
-      <div class="meal-tabs">
-        ${MEAL_CATEGORIES.map(c =>
-          `<button class="meal-tab ${foodTab === c ? "active" : ""}" onclick="selectMealTab('${c}')">${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</button>`
-        ).join("")}
-        <button class="meal-tab meal-tab-marinade ${foodTab === "marinade" ? "active" : ""}" onclick="selectMealTab('marinade')">🧂 Marinades & Sauces (${MARINADES.length})</button>
-        <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
-        <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
-        <button class="meal-tab ${foodTab === "avoid" ? "active" : ""}" onclick="selectMealTab('avoid')">🚫 Avoid (${AVOID_LIST.length})</button>
-      </div>
-      <select class="meal-tab-select" onchange="selectMealTab(this.value)">
-        ${MEAL_CATEGORIES.map(c =>
-          `<option value="${c}" ${foodTab === c ? "selected" : ""}>${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</option>`
-        ).join("")}
-        <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
-        <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
-        <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
-        <option value="avoid" ${foodTab === "avoid" ? "selected" : ""}>🚫 Avoid (${AVOID_LIST.length})</option>
-      </select>
-      ${["breakfast", "lunch", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
-    </div>
-
-    ${renderFoodContent(foodTab)}`;
-
-  container.innerHTML = html;
-}
-
 function surpriseMe() {
-  const validTabs = ["breakfast", "lunch", "dinner", "marinade"];
+  const validTabs = ["breakfast", "lunch", "marinade"];
   if (!validTabs.includes(foodTab)) return;
 
   let pick;
@@ -1198,9 +1199,11 @@ function renderSupplements(targetId) {
 let audioCtx = null;
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") audioCtx.resume();
   return audioCtx;
 }
+document.addEventListener("click", () => {
+  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+}, { once: true });
 
 function playTone(freq, duration, type, startTime, gainVal) {
   try {
@@ -1421,9 +1424,10 @@ function timerTick(id, ex) {
   const secs = Math.floor(s.timeRemaining % 60);
   const timeText = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   const labelText = s.isWork ? "⏱️ WORK" : "💤 REST";
-  document.querySelectorAll(`#time-${id}`).forEach(el => { el.textContent = timeText; });
-  document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = `${pct}%`; });
-  document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = labelText; });
+  const el = s._el;
+  if (el.time) el.time.textContent = timeText;
+  if (el.bar) el.bar.style.transform = `scaleX(${pct / 100})`;
+  if (el.label) el.label.textContent = labelText;
 
   // Sound milestones
   const timeLeft = s.timeRemaining;
@@ -1451,27 +1455,27 @@ function timerTick(id, ex) {
       playWorkEnd();
       if (s.currentSet >= s.totalSets) {
         s.status = "done";
-        document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "✅ DONE"; });
+        if (el.label) el.label.textContent = "✅ DONE";
         playAllDone();
         updateTimerControls(id, "done");
-        document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = "0%"; });
+        if (el.bar) el.bar.style.transform = "scaleX(0)";
         return;
       }
       s.isWork = false;
       s.timeRemaining = s.v.restSeconds;
       s._resetFlags();
       startMusic(false);
-      document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "💤 REST"; });
-      document.querySelectorAll(`#sets-${id}`).forEach(el => { el.textContent = `${s.currentSet}/${s.totalSets}`; });
+      if (el.label) el.label.textContent = "💤 REST";
+      if (el.sets) el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
     } else {
       playRestOver();
       s.currentSet++;
       if (s.currentSet > s.totalSets) {
         s.status = "done";
-        document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "✅ DONE"; });
+        if (el.label) el.label.textContent = "✅ DONE";
         playAllDone();
         updateTimerControls(id, "done");
-        document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = "0%"; });
+        if (el.bar) el.bar.style.transform = "scaleX(0)";
         return;
       }
       s.isWork = true;
@@ -1479,8 +1483,8 @@ function timerTick(id, ex) {
       s._resetFlags();
       playStartWhistle();
       startMusic(true);
-      document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "⏱️ WORK"; });
-      document.querySelectorAll(`#sets-${id}`).forEach(el => { el.textContent = `${s.currentSet}/${s.totalSets}`; });
+      if (el.label) el.label.textContent = "⏱️ WORK";
+      if (el.sets) el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
     }
     updateSetIndicators(id, s.currentSet, s.totalSets);
   }
@@ -1499,6 +1503,12 @@ function timerStateReset(id, ex) {
       s.timeRemaining = s.v.workSeconds;
   s.lastTick = Date.now();
   s._raf = null;
+  s._el = {
+    time: document.getElementById("time-" + id),
+    bar: document.getElementById("bar-" + id),
+    label: document.getElementById("label-" + id),
+    sets: document.getElementById("sets-" + id),
+  };
   s._resetFlags = function() { this._midpoint = false; this._lastCountdownSec = null; this._musicStoppedForCountdown = false; };
   s._resetFlags();
 }
@@ -1550,14 +1560,15 @@ function handleTimerAction(id, action, ex) {
     stopMusic();
     timerStateReset(id, ex);
     const sv = timerState[id].v;
+    const el2 = timerState[id]._el;
     updateTimerControls(id, "idle");
     const m = Math.floor(sv.workSeconds / 60);
     const sec = sv.workSeconds % 60;
     const resetTime = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
-    document.querySelectorAll(`#time-${id}`).forEach(el => { el.textContent = resetTime; });
-    document.querySelectorAll(`#bar-${id}`).forEach(el => { el.style.width = "100%"; });
-    document.querySelectorAll(`#label-${id}`).forEach(el => { el.textContent = "Ready"; });
-    document.querySelectorAll(`#sets-${id}`).forEach(el => { el.textContent = `1/${sv.sets}`; });
+    if (el2.time) el2.time.textContent = resetTime;
+    if (el2.bar) el2.bar.style.transform = "scaleX(1)";
+    if (el2.label) el2.label.textContent = "Ready";
+    if (el2.sets) el2.sets.textContent = `1/${sv.sets}`;
     updateSetIndicators(id, 1, sv.sets);
   }
 }
@@ -1689,3 +1700,30 @@ function selectTier(tier) {
   selectedTier = tier;
   renderSupplements();
 }
+
+// Expose functions to global scope for inline onclick handlers
+Object.assign(window, {
+  selectHealthTab,
+  selectMealTab,
+  selectMethod,
+  surpriseMe,
+  selectDiet,
+  selectTier,
+  exportData: typeof exportData !== 'undefined' ? exportData : undefined,
+});
+
+// Auto-initialize based on which page we're on
+document.addEventListener('DOMContentLoaded', () => {
+  const healthApp = document.getElementById('health-app');
+  const foodApp = document.getElementById('food-app');
+  const workoutApp = document.getElementById('workout-app');
+  const investmentsApp = document.getElementById('investments-app');
+  if (healthApp) safeRender(renderHealth, healthApp);
+  if (foodApp) safeRender(renderFoods, foodApp);
+  if (workoutApp) safeRender(() => renderExercises('workout-app'), workoutApp);
+  if (investmentsApp) safeRender(() => {
+    investmentsApp.innerHTML = renderInvestments();
+    if (typeof calcFire === 'function') calcFire();
+    if (typeof renderPiTable === 'function') renderPiTable();
+  }, investmentsApp);
+});

@@ -1,21 +1,43 @@
-/**
- * Export Macro Longevity data as Markdown for AI consumption.
- * Usage: Call exportData() from any page that loads data.js.
- */
+import { BIOMARKERS, VACCINES, SUPPLEMENTS } from './data/health.js';
+import { FASTING_PROTOCOLS, SUGAR_OFFSET_TIPS } from './data/common.js';
+import { MEALS, MARINADES, PANTRY, FOOD_LISTS } from './data/food.js';
+import { INVESTMENTS } from './data/finance.js';
+
+// Nav toggle handler
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-nav-toggle]');
+    if (btn) {
+        document.querySelector('.nav').classList.toggle('nav-open');
+        document.body.classList.toggle('nav-open');
+        return;
+    }
+    if (!e.target.closest('.nav') && document.querySelector('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
+        document.querySelector('.nav').classList.remove('nav-open');
+        document.body.classList.remove('nav-open');
+    }
+});
+
+// Export button handler
+document.addEventListener('click', function(e) {
+    if (e.target.closest('[data-export]')) {
+        exportData();
+    }
+});
+
 function exportData() {
     const data = {
         exportedAt: new Date().toISOString(),
         source: "macro-longevity.com",
-        biomarkers: typeof BIOMARKERS !== 'undefined' ? BIOMARKERS : [],
-        meals: typeof MEALS !== 'undefined' ? MEALS : [],
-        marinades: typeof MARINADES !== 'undefined' ? MARINADES : [],
-        pantry: typeof PANTRY !== 'undefined' ? PANTRY : [],
-        foodLists: typeof FOOD_LISTS !== 'undefined' ? FOOD_LISTS : [],
-        fastingProtocols: typeof FASTING_PROTOCOLS !== 'undefined' ? FASTING_PROTOCOLS : [],
-        vaccines: typeof VACCINES !== 'undefined' ? VACCINES : [],
-        investments: typeof INVESTMENTS !== 'undefined' ? INVESTMENTS : [],
-        supplements: typeof SUPPLEMENTS !== 'undefined' ? SUPPLEMENTS : [],
-        sugarOffsetTips: typeof SUGAR_OFFSET_TIPS !== 'undefined' ? SUGAR_OFFSET_TIPS : [],
+        biomarkers: BIOMARKERS,
+        meals: MEALS,
+        marinades: MARINADES,
+        pantry: PANTRY,
+        foodLists: FOOD_LISTS,
+        fastingProtocols: FASTING_PROTOCOLS,
+        vaccines: VACCINES,
+        investments: INVESTMENTS,
+        supplements: SUPPLEMENTS,
+        sugarOffsetTips: SUGAR_OFFSET_TIPS,
     };
 
     let md = `# Macro Longevity Knowledge Base\n\n`;
@@ -176,3 +198,5 @@ function exportData() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+window.exportData = exportData;

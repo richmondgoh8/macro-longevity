@@ -18,14 +18,27 @@ pages/
   food.html             Meals (Breakfast, Lunch & Dinner), Marinades, Pantry, Food Lists
   finance.html          Investment Combos, FIRE Calculator + Passive Income Tracker
 css/
-  variables.css         Design tokens (colors, typography, spacing, radius, shadows)
+  variables.css         Design tokens + self-hosted @font-face (DM Sans, Inter, JetBrains Mono)
   style.css             All component styles, responsive (768px, 480px breakpoints)
 js/
-  data.js               All content arrays (3376 lines)
-  render.js             Client-side rendering for all pages (1674 lines)
-  export.js             Markdown export for AI consumption
+  render.js             Client-side rendering for all pages (ES module, auto-inits on DOMContentLoaded)
+  export.js             Markdown export + nav toggle (ES module)
   components/
-    card-swipe.js       Viewport-filling swipeable card stack (mobile)
+    card-swipe.js       Viewport-filling swipeable card stack (mobile, ES module)
+  data/
+    common.js           Shared constants (MEAL_CATEGORIES, TIER_*, DIET_*, FASTING_PROTOCOLS)
+    health.js           BIOMARKERS, VACCINES, SUPPLEMENTS, SUGAR_OFFSET_TIPS
+    food.js             MEALS, MARINADES, PANTRY, FOOD_LISTS, AVOID_LIST
+    workout.js          EXERCISES
+    finance.js          INVESTMENTS
+fonts/
+  dm-sans-latin.woff2   Self-hosted Latin subset (variable weight)
+  inter-latin.woff2     Self-hosted Latin subset (variable weight)
+  jetbrains-mono-latin.woff2  Self-hosted Latin subset
+sw.js                   Service worker (cache-first for static assets)
+manifest.json           PWA manifest
+offline.html            Offline fallback page
+favicon.svg             Site icon (used as PWA icon too)
 ```
 
 ## Key render function calls
@@ -37,7 +50,15 @@ js/
 | `food.html` | `renderFoods()` | Breakfast, Lunch & Dinner, Marinades, Pantry, Food Lists |
 | `finance.html` | `renderInvestments()` + inline `calcFire()` | Investment Combos, FIRE Calculator |
 
-## Data editing (`js/data.js`)
+## Data editing (`js/data/*.js`)
+
+Data is split into ES modules under `js/data/`:
+
+- `common.js` — Shared constants: `MEAL_CATEGORIES`, `MEAL_LABELS`, `FASTING_PROTOCOLS`, `TIER_*`, `DIET_*`, `PRICE_DISCLAIMER`, `SUGAR_OFFSET_TIPS`
+- `health.js` — `BIOMARKERS`, `VACCINES`, `SUPPLEMENTS`
+- `food.js` — `MEALS`, `MARINADES`, `PANTRY`, `FOOD_LISTS`, `AVOID_LIST`
+- `workout.js` — `EXERCISES`
+- `finance.js` — `INVESTMENTS`
 
 - Meals use `category: "breakfast"` or `"lunch"` (lunch includes dinner)
 - Meals use `group` property for visual grouping (e.g., "Poultry", "Fish & Seafood", "Sides")
@@ -54,7 +75,9 @@ js/
 - 12 exercises: Wall Push-Up, Bodyweight Squat, Reverse Lunge, Glute Bridge, Standing Calf Raise, Dead Bug, Plank, Bird Dog, Standing Knee Drive, Step-Up, Wall Sit, Inchworm
 - Each exercise has a built-in timer (Web Audio API, no external libraries)
 - Timer states: idle → running → paused → done. Only one timer active at a time (starting one stops any other)
-- Background music: CC0 Freesound track looped at low gain, auto-stops during countdown ticks
+- Countdown threshold: `timeLeft <= 6` — ticks from 6 to 1, then triggers end cue
+- Background music: two separate tracks — work (Atmospheric Ambient Pad, CC BY 4.0, gain 0.2) + rest (Loft House, CC BY-NC 4.0, gain 0.4)
+- Work music skips first 5s of intro (`MUSIC_START_OFFSET = 5`)
 - Sound cues: synthesized whistles + ticks (no external audio files)
 - `getVariation(ex)` always returns `ex.variations[1]` (Regular tier)
 
@@ -95,7 +118,12 @@ Follows DESIGN.md v1.0 — 4-size fluid typography with `clamp()`, DM Sans displ
 No build step — just refresh the browser. Validate with:
 
 ```sh
-node --check js/data.js
+node --check js/data/common.js
+node --check js/data/health.js
+node --check js/data/food.js
+node --check js/data/workout.js
+node --check js/data/finance.js
 node --check js/render.js
+node --check js/export.js
 node --check js/components/card-swipe.js
 ```

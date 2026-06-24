@@ -108,3 +108,4 @@ const CardSwipe = (function () {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = CardSwipe;
 }
+export { CardSwipe };

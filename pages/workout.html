@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="12 equipment-free daily exercises with built-in timer and sound cues for optimal longevity.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a7e6f">
     <title>Daily Workouts — Macro Longevity</title>
+    <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/style.css?v=1782115098">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -20,7 +20,7 @@
                 <span class="nav-logo-icon">⟁</span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
-            <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">
+            <button class="nav-toggle" data-nav-toggle aria-label="Menu">
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-links">
@@ -59,25 +59,15 @@
                 Not medical advice. Consult your physician before starting any supplement,
                 dietary, or exercise regimen.
             </p>
-            <button class="export-btn" onclick="exportData()">📥 Export All Data (Markdown)</button>
+            <button class="export-btn" data-export>📥 Export All Data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
-    <script src="/js/data.js"></script>
-    <script src="/js/components/card-swipe.js"></script>
-    <script src="/js/export.js"></script>
-    <script src="/js/render.js"></script>
-    <script>renderExercises("workout-app")</script>
-    <script>
-        function toggleNav() { document.querySelector('.nav').classList.toggle('nav-open'); document.body.classList.toggle('nav-open'); }
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
-                document.querySelector('.nav').classList.remove('nav-open');
-                document.body.classList.remove('nav-open');
-            }
-        });
-    </script>
+    <script type="module" src="/js/render.js"></script>
+    <script type="module" src="/js/export.js"></script>
 <nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/health.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩺</span><span class="bottom-nav-label">Health</span></a><a href="/pages/workout.html" class="bottom-nav-item active"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/food.html" class="bottom-nav-item"><span class="bottom-nav-icon">🍽️</span><span class="bottom-nav-label">Food</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a></div></nav>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}</script>
+</body>
 </body>
 </html>
