@@ -15,6 +15,7 @@ export const FASTING_PROTOCOLS = [
     duration: "16 hr fast / 8 hr eating window",
     difficulty: "beginner",
     icon: "⏰",
+    group: "daily-trf",
     whatHappens: [
       "Hours 0–4: Body digests and absorbs last meal. Insulin rises, then falls.",
       "Hours 4–12: Glycogen (stored carbs) becomes primary fuel. Insulin stays low.",
@@ -54,6 +55,7 @@ export const FASTING_PROTOCOLS = [
     duration: "18 hr fast / 6 hr eating window",
     difficulty: "intermediate",
     icon: "🔥",
+    group: "daily-trf",
     whatHappens: [
       "Hours 0–12: Same as 16:8 — digestion, glycogen use, insulin drop.",
       "Hours 12–16: Fat-burning ramps up. Autophagy begins clearing damaged proteins.",
@@ -67,7 +69,7 @@ export const FASTING_PROTOCOLS = [
     ],
     duringFast: [
       "Same as 16:8 — water, black coffee, tea, salt.",
-      "💊 Electrolytes matter more at 18h+: add 1/4 tsp salt + 1/4 tsp potassium chloride to 1L water.",
+      "💊 Electrolytes matter more at 18h+: add 1/4 tsp (1.25ml) salt + 1/4 tsp (1.25ml) potassium chloride to 1L water.",
       "🧘 Light activity (walking) enhances fat oxidation. Keep it low-intensity.",
     ],
     howToBreak: [
@@ -90,6 +92,7 @@ export const FASTING_PROTOCOLS = [
     duration: "20 hr fast / 4 hr eating window",
     difficulty: "advanced",
     icon: "⚔️",
+    group: "daily-trf",
     whatHappens: [
       "Hours 0–12: Standard glycogen depletion, insulin normalisation.",
       "Hours 12–16: Fat-burning primary. Autophagy active. Ketones rising.",
@@ -103,7 +106,7 @@ export const FASTING_PROTOCOLS = [
       "Last meal before entering fast: high in healthy fats (70%) + protein (25%) + minimal carbs (5%). E.g., salmon + avocado + olive oil drizzle.",
     ],
     duringFast: [
-      "💧 Electrolytes are essential: 1/2 tsp salt + 1/4 tsp potassium + 1/4 tsp magnesium in 2L water.",
+      "💧 Electrolytes are essential: 1/2 tsp (2.5ml) salt + 1/4 tsp (1.25ml) potassium + 1/4 tsp (1.25ml) magnesium in 2L water.",
       "☕ Black coffee is fine but limit to 2 cups (excess caffeine + empty stomach = cortisol spike).",
       "🚶 Light walks, reading, work. Avoid social eating situations.",
       "❌ No intense cardio — your body is already stressed. Walking, stretching, or yoga only.",
@@ -130,6 +133,7 @@ export const FASTING_PROTOCOLS = [
     duration: "23 hr fast / 1 hr eating",
     difficulty: "advanced",
     icon: "🎯",
+    group: "daily-trf",
     whatHappens: [
       "Hours 0–12: Standard glycogen depletion.",
       "Hours 12–18: Active fat-burning. Autophagy fully engaged.",
@@ -143,7 +147,7 @@ export const FASTING_PROTOCOLS = [
       "Pre-fast meal: emphasise protein + fat. Avoid high-carb meals — they cause intense hunger the next day as blood sugar crashes.",
     ],
     duringFast: [
-      "💧 Electrolytes are non-negotiable: 1/2 tsp salt + 1/4 tsp potassium + 1/4 tsp magnesium in 2L+ water.",
+      "💧 Electrolytes are non-negotiable: 1/2 tsp (2.5ml) salt + 1/4 tsp (1.25ml) potassium + 1/4 tsp (1.25ml) magnesium in 2L+ water.",
       "☕ Black coffee, tea — keep hydrated throughout the day.",
       "🛌 Prioritise sleep — OMAD + sleep deprivation is a recipe for cortisol dysregulation.",
       "❌ No exercise beyond walking. Save strength training for just before or after your meal.",
@@ -163,12 +167,105 @@ export const FASTING_PROTOCOLS = [
     biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "hscrp", "triglycerides", "apob"],
   },
   {
+    id: "extended",
+    name: "Extended Fasting (24–72h)",
+    description: "Multi-day fasts. The deepest level of autophagy, ketosis, and cellular repair. Rarely needed but potent when used strategically.",
+    duration: "24–72 hour water fast",
+    difficulty: "expert",
+    icon: "🧬",
+    group: "extended-weekly",
+    whatHappens: [
+      "24h: Glycogen depleted. Autophagy active. Ketones ~0.5–1.0 mM. Deep (N3) sleep may increase up to 30% but sleep latency rises — cortisol and norepinephrine are elevated.",
+      "24–48h: Deep autophagy. Ketones 1–2 mM. Immune regeneration. Cortisol rises ~1.7× — the 2–4 AM gluconeogenesis spike often causes waking. REM drops 15–20% as brain adapts to ketones.",
+      "48–72h: Peak autophagy. Ketones 2–3+ mM. GH up ~5×. Deep sleep enhancement often reported at hour 60–70. REM begins rebound after ~3 weeks of fat adaptation.",
+      "Beyond 48h: Cells recycle damaged components en masse. Old immune cells cleared and replaced. Sleep disruption attenuates with adaptation — worst in first 24–48h, improves by day 3.",
+    ],
+    howToEnter: [
+      "⚠️ DO NOT attempt without prior fasting experience (minimum 4–8 weeks of daily 16:8).",
+      "Prepare: 2–3 days before, eat whole foods (low carb, high fat). Avoid alcohol, processed food, and sugar.",
+      "Last meal: large, nutritious dinner with protein + fat + vegetables. Minimise carbs.",
+      "Have an exit plan before you start. Know when you'll break the fast.",
+      "Inform someone you're fasting (safety buddy).",
+    ],
+    duringFast: [
+      "💧 Water with electrolytes: 1/2 tsp (2.5ml) salt + 1/4 tsp (1.25ml) potassium + 1/4 tsp (1.25ml) magnesium per 2L water. Drink 3–4L daily = ~1 tsp (5ml) salt total (~2,400mg sodium). Sip throughout the day.",
+      "☕ Black coffee or tea (1–2 cups max). No caffeine after 2pm — half-life extends during fasting and compounds sleep disruption.",
+      "🛌 Rest as needed. Extended fasting lowers energy. Listen to your body. During 72h+ fasts, aim for 9–10h sleep + afternoon nap (1–4 PM aligns with natural cortisol dip).",
+      "🛏️ 60–90 min before bed: 200–400mg elemental magnesium glycinate (glycine component lowers core temp, promotes deep sleep). Start at 200mg, increase if needed.",
+      "🛏️ If 3 AM waking persists: add 3g glycine + 200mg L-theanine before bed. Optional: 1 tsp (5ml) MCT oil provides ketones for brain fuel without breaking the fast.",
+      "🌅 Morning: 15–30 min sunlight within 30 min of waking — 40% more effective for circadian resetting during fasted state.",
+      "🚶 Light walking only. No exercise beyond gentle movement.",
+      "❌ No: alcohol, any calories, intense exercise, sauna/hot baths (risk of electrolyte imbalance).",
+      "⚠️ Stop immediately if: severe dizziness, confusion, chest pain, heart palpitations, or inability to keep water down.",
+    ],
+    howToBreak: [
+      "Refeeding is more important than the fast itself. Break gently.",
+      "Start with: bone broth or 1–2 tbsp coconut oil. Wait 30 min.",
+      "Then: small portion of soft, easily digestible food (soup, steamed vegetables, or 1 boiled egg).",
+      "Wait 1–2 hours before a normal meal. No heavy meat, no large carb loads, no sugar.",
+      "Avoid: raw vegetables, nuts, seeds, fatty meat, and dairy in the first meal — they're hard on a dormant digestive system.",
+      "First 24h after: eat small, frequent, simple meals. Gradually reintroduce normal foods.",
+    ],
+    tips: [
+      "Extended fasting is a quarterly or monthly practice, not weekly. 1–2× per month max for 24h, or 1× per quarter for 72h.",
+      "Day 2 morning is the hardest — electrolytes + distraction get you through.",
+      "🛌 Primary sleep stack: 200–400mg elemental magnesium glycinate (60–90 min pre-bed). Stack with 3g glycine if needed. Add 200–400mg phosphatidylserine 1–2h before bed if 3 AM cortisol-driven waking persists — effects build over 2–4 weeks.",
+      "🧂 Sip sodium water 10am–6pm, stop by 7PM to prevent nocturia. Move magnesium closer to bed (post-7PM is fine and helps sleep).",
+      "💡 3 AM wake-up rescue: 1 tsp (5ml) MCT oil + pinch of salt — provides ketones for brain, stabilises glucose without breaking fast.",
+      "🌡️ Cool bedroom (18–20°C) — fasting lowers core temperature; align with it. Morning sunlight 15–30 min within 30 min of waking.",
+      "⚠️ ABSOLUTE contraindications: underweight (BMI <19), eating disorder history, Type 1 diabetes, pregnancy/breastfeeding, kidney disease, heart conditions, medications requiring food. Always consult a doctor before extended fasting.",
+    ],
+    biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "hscrp", "triglycerides", "apob", "bp", "alt"],
+  },
+  {
+    id: "alternate-day",
+    name: "Alternate Day Fasting",
+    description: "Alternate between normal eating days and full fast days. One of the most effective protocols for insulin sensitivity and fat loss.",
+    duration: "36 hr fast / 12 hr eating (alternating)",
+    difficulty: "advanced",
+    icon: "🔄",
+    group: "extended-weekly",
+    whatHappens: [
+      "Fast day (0–36h): Deeper autophagy than daily TRF. Ketones climb higher. Cell repair pathways (AMPK, sirtuins) strongly activated.",
+      "Feast day: Normal insulin, refeed, recovery. Body adapts over cycles.",
+      "Over weeks: Significant improvement in fasting insulin and HbA1c. Studies show 3–5% reduction in HbA1c over 8–12 weeks.",
+      "The extended fast period (24h+) produces more pronounced mitochondrial biogenesis than shorter daily fasts.",
+    ],
+    howToEnter: [
+      "ONLY after 4+ weeks of daily TRF (16:8 or 18:6). This is a serious protocol.",
+      "Pattern: Dinner at 7pm → Fast all next day → Breakfast (36h later) at 7am. Repeat.",
+      "Fast days: zero calories. Water, black coffee, and unsweetened tea only.",
+      "Feast days: eat normally but don't binge. Your body needs adequate nutrition on refeed days.",
+    ],
+    duringFast: [
+      "💧 Electrolytes are critical: 1/2 tsp (2.5ml) salt + 1/4 tsp (1.25ml) potassium in each litre of water.",
+      "💊 Magnesium glycinate at bedtime (helps sleep quality during fast).",
+      "🛌 Sleep quality may drop on fast days — magnesium and glycine help.",
+      "🚶 Walking is fine. No intense exercise on fast days — schedule workouts on feast days.",
+      "❌ No alcohol, no broth with calories, no gum (chewing triggers hunger signals), no diet sodas.",
+    ],
+    howToBreak: [
+      "After 36 hours, your digestive system has slowed down. Ease back in.",
+      "Start with bone broth or a small handful of almonds. Wait 20 min.",
+      "Next: a normal-sized meal with protein + vegetables. Avoid large carb loads.",
+      "Do NOT break a 36h fast with a feast. Refeeding syndrome is rare but real — start small.",
+    ],
+    tips: [
+      "Schedule fast days on your busiest days (workdays are easier than weekends).",
+      "Your body adapts after 2–3 cycles. The first fast day is hardest.",
+      "If you can't manage a full 36h, try 24h (dinner→dinner) every other day.",
+      "⚠️ Not for: underweight, pregnant, breastfeeding, Type 1 diabetes, eating disorder history, or anyone on medication that requires food timing.",
+    ],
+    biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "hscrp", "triglycerides", "apob", "bp"],
+  },
+  {
     id: "5-2",
     name: "5:2 Diet",
     description: "Eat normally 5 days, restrict calories (500–600) on 2 non-consecutive days. More flexible than daily time-restricted eating.",
     duration: "5 normal days / 2 low-calorie days",
     difficulty: "intermediate",
     icon: "📅",
+    group: "extended-weekly",
     whatHappens: [
       "Normal days: Regular metabolic function.",
       "Low-calorie days: After 12–14 hours on 500 calories, body shifts to fat-burning and autophagy, similar to a 24h fast.",
@@ -199,91 +296,14 @@ export const FASTING_PROTOCOLS = [
     ],
     biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "hscrp", "triglycerides"],
   },
-  {
-    id: "alternate-day",
-    name: "Alternate Day Fasting",
-    description: "Alternate between normal eating days and full fast days. One of the most effective protocols for insulin sensitivity and fat loss.",
-    duration: "36 hr fast / 12 hr eating (alternating)",
-    difficulty: "advanced",
-    icon: "🔄",
-    whatHappens: [
-      "Fast day (0–36h): Deeper autophagy than daily TRF. Ketones climb higher. Cell repair pathways (AMPK, sirtuins) strongly activated.",
-      "Feast day: Normal insulin, refeed, recovery. Body adapts over cycles.",
-      "Over weeks: Significant improvement in fasting insulin and HbA1c. Studies show 3–5% reduction in HbA1c over 8–12 weeks.",
-      "The extended fast period (24h+) produces more pronounced mitochondrial biogenesis than shorter daily fasts.",
-    ],
-    howToEnter: [
-      "ONLY after 4+ weeks of daily TRF (16:8 or 18:6). This is a serious protocol.",
-      "Pattern: Dinner at 7pm → Fast all next day → Breakfast (36h later) at 7am. Repeat.",
-      "Fast days: zero calories. Water, black coffee, and unsweetened tea only.",
-      "Feast days: eat normally but don't binge. Your body needs adequate nutrition on refeed days.",
-    ],
-    duringFast: [
-      "💧 Electrolytes are critical: 1/2 tsp salt + 1/4 tsp potassium in each litre of water.",
-      "💊 Magnesium glycinate at bedtime (helps sleep quality during fast).",
-      "🛌 Sleep quality may drop on fast days — magnesium and glycine help.",
-      "🚶 Walking is fine. No intense exercise on fast days — schedule workouts on feast days.",
-      "❌ No alcohol, no broth with calories, no gum (chewing triggers hunger signals), no diet sodas.",
-    ],
-    howToBreak: [
-      "After 36 hours, your digestive system has slowed down. Ease back in.",
-      "Start with bone broth or a small handful of almonds. Wait 20 min.",
-      "Next: a normal-sized meal with protein + vegetables. Avoid large carb loads.",
-      "Do NOT break a 36h fast with a feast. Refeeding syndrome is rare but real — start small.",
-    ],
-    tips: [
-      "Schedule fast days on your busiest days (workdays are easier than weekends).",
-      "Your body adapts after 2–3 cycles. The first fast day is hardest.",
-      "If you can't manage a full 36h, try 24h (dinner→dinner) every other day.",
-      "⚠️ Not for: underweight, pregnant, breastfeeding, Type 1 diabetes, eating disorder history, or anyone on medication that requires food timing.",
-    ],
-    biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "hscrp", "triglycerides", "apob", "bp"],
-  },
-  {
-    id: "extended",
-    name: "Extended Fasting (24–72h)",
-    description: "Multi-day fasts. The deepest level of autophagy, ketosis, and cellular repair. Rarely needed but potent when used strategically.",
-    duration: "24–72 hour water fast",
-    difficulty: "expert",
-    icon: "🧬",
-    whatHappens: [
-      "24h: Glycogen depleted. Autophagy active. Ketones ~0.5–1.0 mM.",
-      "24–48h: Deep autophagy. Ketones 1–2 mM. Immune system regenerates (stem cell activation). Inflammation markers (CRP) drop significantly.",
-      "48–72h: Peak autophagy. Ketones 2–3+ mM. Growth hormone up ~5×. Norepinephrine up. Mental clarity often reported as 'heightened'.",
-      "Beyond 48h: Cells recycle damaged components en masse. Old or dysfunctional immune cells are cleared and replaced (autophagy + stem cell activation).",
-    ],
-    howToEnter: [
-      "⚠️ DO NOT attempt without prior fasting experience (minimum 4–8 weeks of daily 16:8).",
-      "Prepare: 2–3 days before, eat whole foods (low carb, high fat). Avoid alcohol, processed food, and sugar.",
-      "Last meal: large, nutritious dinner with protein + fat + vegetables. Minimise carbs.",
-      "Have an exit plan before you start. Know when you'll break the fast.",
-      "Inform someone you're fasting (safety buddy).",
-    ],
-    duringFast: [
-      "💧 Water with electrolytes: 1/2 tsp salt + 1/4 tsp potassium + 1/4 tsp magnesium per 2L water. Sip throughout the day.",
-      "☕ Black coffee or tea (1–2 cups max). Excess caffeine depletes electrolytes.",
-      "🛌 Rest as needed. Extended fasting lowers energy. Listen to your body.",
-      "🚶 Light walking only. No exercise beyond gentle movement.",
-      "❌ No: alcohol, any calories, intense exercise, sauna/hot baths (risk of electrolyte imbalance).",
-      "⚠️ Stop immediately if: severe dizziness, confusion, chest pain, heart palpitations, or inability to keep water down.",
-    ],
-    howToBreak: [
-      "Refeeding is more important than the fast itself. Break gently.",
-      "Start with: bone broth or 1–2 tbsp coconut oil. Wait 30 min.",
-      "Then: small portion of soft, easily digestible food (soup, steamed vegetables, or 1 boiled egg).",
-      "Wait 1–2 hours before a normal meal. No heavy meat, no large carb loads, no sugar.",
-      "Avoid: raw vegetables, nuts, seeds, fatty meat, and dairy in the first meal — they're hard on a dormant digestive system.",
-      "First 24h after: eat small, frequent, simple meals. Gradually reintroduce normal foods.",
-    ],
-    tips: [
-      "Extended fasting is a quarterly or monthly practice, not weekly. 1–2× per month max for 24h, or 1× per quarter for 72h.",
-      "Day 2 morning is the hardest — electrolytes + distraction get you through.",
-      "If you can't sleep, 200mg magnesium glycinate + 3g glycine before bed helps.",
-      "⚠️ ABSOLUTE contraindications: underweight (BMI <19), eating disorder history, Type 1 diabetes, pregnancy/breastfeeding, kidney disease, heart conditions, medications requiring food. Always consult a doctor before extended fasting.",
-    ],
-    biomarkers: ["hba1c", "fasting-glucose", "fasting-insulin", "hscrp", "triglycerides", "apob", "bp", "alt"],
-  },
 ];
+
+export const FASTING_GROUPS = {
+  "daily-trf": "⏰ Daily Time-Restricted Feeding",
+  "extended-weekly": "🧬 Extended & Weekly Protocols",
+};
+
+export const FASTING_GROUP_ORDER = ["daily-trf", "extended-weekly"];
 
 export const TIER_ORDER = ["minimal", "critical", "essential", "optimized"];
 
@@ -315,13 +335,20 @@ export const DIET_LABELS_PLAIN = {
 
 export const PRICE_DISCLAIMER = "Prices in SGD as of June 2026, sourced from iHerb. Actual prices may vary.";
 
+export const RECIPE_CATEGORIES = ["breakfast", "dinner", "snack"];
+
+export const RECIPE_LABELS = {
+  breakfast: "🍳 Breakfast",
+  dinner: "🥘 Lunch & Dinner",
+  snack: "🍪 Snacks",
+};
+
 export const SUGAR_OFFSET_TIPS = [
-  { action: "🚶 Walk 15 minutes", why: "Exercise within 30 min of eating makes muscles take up glucose without insulin, lowering blood sugar by 15-30 mg/dL.", timing: "Within 30 min of eating" },
-  { action: "🥤 Apple Cider Vinegar (1 tbsp in water)", why: "ACV improves insulin sensitivity by up to 34% and reduces postprandial glucose spike by ~20%. Sip before or with the meal.", timing: "Before or with the meal" },
+  { action: "🚶 Walk 10–15 minutes", why: "Exercise immediately after eating makes muscles take up glucose without insulin, lowering blood sugar by up to 18 mg/dL. Even a 10-min walk significantly reduces peak glucose.", timing: "Within 30 min of eating" },
   { action: "🍗 Eat protein next", why: "Protein slows gastric emptying, blunting the glucose spike from carbs that are still digesting. Any protein works — eggs, chicken, tofu.", timing: "Next 1-2 hours" },
-  { action: "🌿 Cinnamon (1 tsp)", why: "Cinnamon may reduce postprandial glucose by up to 29% by slowing carb breakdown and improving insulin sensitivity.", timing: "With the meal" },
+  { action: "🌿 Cinnamon (1 tsp)", why: "Cinnamon modestly reduces postprandial glucose by ~11 mg/dL by slowing carb breakdown and improving insulin sensitivity.", timing: "With the meal" },
   { action: "💧 Hydrate with water", why: "Water helps kidneys excrete excess glucose. Dehydration concentrates blood sugar, making the spike worse.", timing: "Immediately + throughout day" },
-  { action: "🫐 Berberine (if supplement)", why: "Berberine activates AMPK, improving glucose uptake and reducing liver glucose production. Similar potency to metformin.", timing: "With the meal" },
+  { action: "🫐 Berberine (if supplement)", why: "Berberine activates AMPK, improving glucose uptake and reducing liver glucose production. Similar potency to metformin. ⚠️ Do NOT combine with statins or warfarin — inhibits CYP450 enzymes.", timing: "With the meal" },
   { action: "🍵 Green tea (unsweetened)", why: "EGCG in green tea increases glucose uptake in muscle tissue and reduces carb absorption in the gut.", timing: "With or after the meal" },
   { action: "⏸️ No more carbs for 4-6 hours", why: "Your body needs time to clear the glucose load. Adding more carbs resets the spike window. Let insulin do its job.", timing: "Next 4-6 hours" },
 ];

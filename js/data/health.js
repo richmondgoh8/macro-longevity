@@ -90,7 +90,7 @@ export const BIOMARKERS = [
       "Progressive overload — add weight or reps each week",
       "Eat 1.6–2.2 g protein per kg body weight daily",
       "Prioritize sleep — growth hormone release peaks during deep sleep",
-      "Creatine monohydrate — 5g daily increases strength gains by 15–20%",
+      "Creatine monohydrate — 5g daily increases strength gains by 5–10%",
       "Train grip specifically — dead hangs, grip crushers, fat bar work",
     ],
     budgetTips: [
@@ -113,7 +113,7 @@ export const BIOMARKERS = [
     importance: "Fasting glucose >100 mg/dL indicates impaired fasting glucose. Elevated glucose drives glycation (AGE formation), damaging proteins and accelerating aging. Levels in the 75–85 range are associated with optimal longevity.",
     howToImprove: [
       "Same strategies as HbA1c — they're closely related",
-      "Berberine 500 mg before meals mimics metformin effects",
+      "Berberine 500 mg before meals — mimics metformin effects (⚠️ inhibits CYP3A4 — do NOT combine with statins, metformin, or warfarin without doctor approval)",
       "Cinnamon (1 tsp/day) modestly reduces fasting glucose",
       "Evening protein + fat before bed prevents dawn phenomenon",
     ],
@@ -138,7 +138,7 @@ export const BIOMARKERS = [
       "Intermittent fasting — every hour fasted lowers insulin",
       "Exercise — insulin sensitivity improves for 24–48 hrs post-workout",
       "Sleep — even one night of poor sleep worsens insulin sensitivity by 25%",
-      "Berberine — activates AMPK, improves insulin sensitivity",
+      "Berberine — activates AMPK, improves insulin sensitivity (⚠️ inhibits CYP3A4 — do NOT combine with statins, metformin, or warfarin without doctor approval)",
     ],
     budgetTips: [
       "Fasting costs nothing — skip breakfast, eat in an 8-hr window",
@@ -182,8 +182,8 @@ export const BIOMARKERS = [
     howToImprove: [
       "Reduce saturated fat and trans fat intake",
       "Soluble fiber — psyllium, oats, beans, chia seeds",
-      "Policosanol 20 mg — plant compound that inhibits cholesterol synthesis",
-      "Red yeast rice — natural statin (consult doctor)",
+      "Policosanol 20 mg — plant compound that inhibits cholesterol synthesis (⚠️ mixed evidence: strong in Cuban studies, weak in Western replications. May lower LDL by 5–10% in some individuals.)",
+      "Red yeast rice — contains monacolin K (natural lovastatin). Same side effects as statins: muscle pain, liver risk. Requires doctor supervision and periodic liver enzyme monitoring.",
     ],
     budgetTips: [
       "Psyllium husk — bulk buy, extremely cheap per serving",
@@ -623,7 +623,7 @@ export const SUPPLEMENTS = [
     costPerMonth: "SGD 13",
     product: "NOW D3 5000 IU (120 sgels, SGD 10.55) + NOW K2 MK-7 (60 caps, SGD 20.70)",
     costPerServing: "SGD 0.44/day — D3 SGD 0.09 + K2 SGD 0.35",
-    conflicts: "None. Best taken with fat for absorption.",
+    conflicts: "K2 (MK-7) directly antagonizes warfarin — do NOT take if on warfarin without INR monitoring and doctor approval. Take with fat for absorption.",
   },
   {
     id: "omega-3",
@@ -652,7 +652,7 @@ export const SUPPLEMENTS = [
     costPerMonth: "SGD 27",
     product: "NOW Ultra Omega-3 (90 sgels, SGD 26.63) — 500mg EPA + 250mg DHA per gel",
     costPerServing: "SGD 0.89/day (3 gels = 2.25g EPA+DHA)",
-    conflicts: "Mild blood thinning — stop 1 week before surgery. Don't exceed 5g daily without MD supervision.",
+    conflicts: "Mild blood thinning — stop 1 week before surgery. Use caution with warfarin (may increase INR), aspirin, or other blood thinners. Monitor INR if on warfarin. Don't exceed 5g daily without MD supervision.",
   },
   {
     id: "magnesium",
@@ -703,7 +703,7 @@ export const SUPPLEMENTS = [
       vegetarian: "CRITICAL — you get ZERO creatine from plants. Your muscle stores are 30–50% lower than meat-eaters. 5g daily closes this gap completely. This should be your highest priority supplement after D3 and magnesium.",
     },
     benefits: [
-      "Increases strength and lean mass by 15–20% over training alone",
+      "Increases strength by 5–10% and lean mass by 1–2 kg over training alone",
       "Enhances cognitive function under stress and sleep deprivation",
       "Reduces homocysteine levels (lowers cardiovascular risk)",
       "Improves glucose tolerance and insulin sensitivity",
@@ -740,9 +740,9 @@ export const SUPPLEMENTS = [
     ],
     biomarkers: ["testosterone", "tsh", "hscrp"],
     costPerMonth: "SGD 5",
-    product: "NOW Foods Zinc Picolinate 50mg (60 caps, SGD 9.50) — 1 cap = 50mg zinc",
-    costPerServing: "SGD 0.16/day (1 cap = 2 months)",
-    conflicts: "Don't take with calcium or iron supplements (2hr separation). Add copper 2mg if taking 30mg+ zinc long-term.",
+    product: "NOW Foods Zinc Picolinate 50mg (60 caps, SGD 9.50) — take 1 cap every other day (25mg/day average). Do NOT take 1 cap daily (50mg exceeds 40mg UL).",
+    costPerServing: "SGD 0.08/day (1 cap every other day = 4 months)",
+    conflicts: "50mg zinc exceeds the Tolerable Upper Intake Level of 40mg/day. Take 1 cap every other day, or split contents. Copper 2mg is mandatory if taking 30mg+ zinc long-term — zinc depletes copper within weeks. Don't take with calcium or iron supplements (2hr separation).",
   },
   {
     id: "b-complex",
@@ -804,7 +804,7 @@ export const SUPPLEMENTS = [
     costPerMonth: "SGD 10",
     product: "NOW Foods NAC 1000mg (60 tabs, SGD 18.99) — 1 tab daily",
     costPerServing: "SGD 0.32/day (1 tab = 2 months)",
-    conflicts: "May thicken mucus temporarily if you have respiratory infection — pause until resolved. Don't take with nitroglycerin.",
+    conflicts: "May thicken mucus temporarily if you have respiratory infection — pause until resolved. Don't take with nitroglycerin. May redistribute stored heavy metals (mercury, lead, cadmium) — particularly concerning with amalgam dental fillings or high fish consumption. Get heavy metal levels tested before long-term use. Consider taking with selenium (200mcg) and zinc (15mg) to support excretion pathways.",
   },
   {
     id: "glycine",
@@ -894,7 +894,7 @@ export const SUPPLEMENTS = [
     costPerMonth: "SGD 12",
     product: "NOW Foods CoQ10 100mg (50 sgels, SGD 20.70) — 1 gel daily",
     costPerServing: "SGD 0.41/day (1 gel = 1.7 months)",
-    conflicts: "None major. Take with food for absorption. Ubiquinol is 3× cost — only needed for 50+.",
+    conflicts: "May reduce warfarin effectiveness — monitor INR. Additive blood pressure lowering with antihypertensives. May lower blood sugar — caution with diabetes medications. Take with food for absorption. Ubiquinol is 3× cost — only needed for 50+.",
   },
 ];
 

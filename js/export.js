@@ -1,7 +1,8 @@
 import { BIOMARKERS, VACCINES, SUPPLEMENTS } from './data/health.js';
-import { FASTING_PROTOCOLS, SUGAR_OFFSET_TIPS } from './data/common.js';
+import { FASTING_PROTOCOLS, FASTING_GROUPS, FASTING_GROUP_ORDER, SUGAR_OFFSET_TIPS } from './data/common.js';
 import { MEALS, MARINADES, PANTRY, FOOD_LISTS } from './data/food.js';
 import { INVESTMENTS } from './data/finance.js';
+import { RECIPES } from './data/recipes.js';
 
 // Nav toggle handler
 document.addEventListener('click', function(e) {
@@ -37,6 +38,7 @@ function exportData() {
         vaccines: VACCINES,
         investments: INVESTMENTS,
         supplements: SUPPLEMENTS,
+        recipes: RECIPES,
         sugarOffsetTips: SUGAR_OFFSET_TIPS,
     };
 
@@ -120,19 +122,25 @@ function exportData() {
     });
 
     md += `## Fasting Protocols (${data.fastingProtocols.length})\n\n`;
-    data.fastingProtocols.forEach(p => {
-        md += `### ${p.icon} ${p.name}\n`;
-        md += `- **Duration:** ${p.duration} | **Difficulty:** ${p.difficulty}\n`;
-        md += `- **Description:** ${p.description}\n`;
-        md += `- **What Happens:** ${p.whatHappens.join('; ')}\n`;
-        md += `- **How to Enter:** ${p.howToEnter.join('; ')}\n`;
-        md += `- **During Fast:** ${p.duringFast.join('; ')}\n`;
-        md += `- **How to Break:** ${p.howToBreak.join('; ')}\n`;
-        md += `- **Tips:** ${p.tips.join('; ')}\n`;
-        if (p.biomarkers && p.biomarkers.length) {
-            md += `- **Biomarkers:** ${p.biomarkers.join(', ')}\n`;
-        }
-        md += `\n`;
+    FASTING_GROUP_ORDER.forEach(groupKey => {
+        const label = FASTING_GROUPS[groupKey];
+        const protocols = data.fastingProtocols.filter(p => p.group === groupKey);
+        if (!protocols.length) return;
+        md += `### ${label}\n\n`;
+        protocols.forEach(p => {
+            md += `#### ${p.icon} ${p.name}\n`;
+            md += `- **Duration:** ${p.duration} | **Difficulty:** ${p.difficulty}\n`;
+            md += `- **Description:** ${p.description}\n`;
+            md += `- **What Happens:** ${p.whatHappens.join('; ')}\n`;
+            md += `- **How to Enter:** ${p.howToEnter.join('; ')}\n`;
+            md += `- **During Fast:** ${p.duringFast.join('; ')}\n`;
+            md += `- **How to Break:** ${p.howToBreak.join('; ')}\n`;
+            md += `- **Tips:** ${p.tips.join('; ')}\n`;
+            if (p.biomarkers && p.biomarkers.length) {
+                md += `- **Biomarkers:** ${p.biomarkers.join(', ')}\n`;
+            }
+            md += `\n`;
+        });
     });
 
     md += `## Vaccines (${data.vaccines.length})\n\n`;
@@ -177,6 +185,22 @@ function exportData() {
         if (inv.tips && inv.tips.length) {
             md += `- **Tips:**\n`;
             inv.tips.forEach(t => md += `  - ${t}\n`);
+        }
+        md += `\n`;
+    });
+
+    md += `## External Recipes (${data.recipes.length})\n\n`;
+    data.recipes.forEach(r => {
+        md += `### ${r.name}\n`;
+        md += `- **Source:** ${r.source}\n`;
+        md += `- **URL:** ${r.url}\n`;
+        md += `- **Category:** ${r.category}\n`;
+        md += `- **Description:** ${r.description}\n`;
+        md += `- **Tags:** ${r.tags.join(', ')}\n`;
+        md += `- **Prep:** ${r.prepTime} | **Cook:** ${r.cookTime}\n`;
+        md += `- **Protein:** ${r.protein} | **Calories:** ${r.calories} | **Fiber:** ${r.fiber}\n`;
+        if (r.biomarkers && r.biomarkers.length) {
+            md += `- **Biomarkers:** ${r.biomarkers.join(', ')}\n`;
         }
         md += `\n`;
     });

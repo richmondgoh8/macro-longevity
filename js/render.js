@@ -1,6 +1,7 @@
 import { BIOMARKERS, VACCINES, SUPPLEMENTS } from './data/health.js';
-import { MEAL_CATEGORIES, MEAL_LABELS, FASTING_PROTOCOLS, TIER_ORDER, TIER_LABELS, TIER_DESCRIPTIONS, DIET_LABELS, DIET_LABELS_PLAIN, PRICE_DISCLAIMER, SUGAR_OFFSET_TIPS } from './data/common.js';
+import { MEAL_CATEGORIES, MEAL_LABELS, FASTING_PROTOCOLS, FASTING_GROUPS, FASTING_GROUP_ORDER, TIER_ORDER, TIER_LABELS, TIER_DESCRIPTIONS, DIET_LABELS, DIET_LABELS_PLAIN, PRICE_DISCLAIMER, SUGAR_OFFSET_TIPS, RECIPE_CATEGORIES, RECIPE_LABELS } from './data/common.js';
 import { MEALS, MARINADES, PANTRY, FOOD_LISTS, AVOID_LIST } from './data/food.js';
+import { RECIPES } from './data/recipes.js';
 import { EXERCISES } from './data/workout.js';
 import { INVESTMENTS } from './data/finance.js';
 import { CardSwipe } from './components/card-swipe.js';
@@ -297,50 +298,70 @@ function renderFasting(targetId) {
   const grid = document.getElementById(targetId || "fasting-grid");
   if (!grid) return;
 
+  function renderProtocolCard(p) {
+    return `
+      <article class="fasting-card" id="fast-${p.id}">
+        <div class="fasting-header">
+          <span class="fasting-icon">${p.icon}</span>
+          <div>
+            <h3 class="fasting-name">${p.name}</h3>
+            <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
+          </div>
+        </div>
+        <p class="fasting-desc">${p.description}</p>
+        <details class="meal-details"><summary>🔬 What Happens in the Body</summary>
+          <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>🚪 How to Enter the Fast</summary>
+          <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>💧 What to Do During the Fast</summary>
+          <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>🍽️ How to Break the Fast</summary>
+          <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
+        </details>
+        <details class="meal-details"><summary>💡 Tips</summary>
+          <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+        </details>
+        ${p.biomarkers && p.biomarkers.length ? `
+        <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
+          <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
+        </div>` : ""}
+      </article>`;
+  }
+
+  function renderGroup(groupKey) {
+    const label = FASTING_GROUPS[groupKey];
+    const protocols = FASTING_PROTOCOLS.filter(p => p.group === groupKey);
+    if (!protocols.length) return "";
+    return `
+      <div class="fasting-group">
+        <h3 class="fasting-group-title">${label}</h3>
+        <div class="fasting-grid">
+          ${protocols.map(renderProtocolCard).join("")}
+        </div>
+      </div>`;
+  }
+
   const desktopHTML = `
     <div class="fasting-intro">
       <h3>Choose Your Fasting Protocol</h3>
       <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
     </div>
-    <div class="fasting-grid">
-      ${FASTING_PROTOCOLS.map(p => `
-        <article class="fasting-card" id="fast-${p.id}">
-          <div class="fasting-header">
-            <span class="fasting-icon">${p.icon}</span>
-            <div>
-              <h3 class="fasting-name">${p.name}</h3>
-              <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
-            </div>
-          </div>
-          <p class="fasting-desc">${p.description}</p>
-          <details class="meal-details"><summary>🔬 What Happens in the Body</summary>
-            <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
-          </details>
-          <details class="meal-details"><summary>🚪 How to Enter the Fast</summary>
-            <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
-          </details>
-          <details class="meal-details"><summary>💧 What to Do During the Fast</summary>
-            <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
-          </details>
-          <details class="meal-details"><summary>🍽️ How to Break the Fast</summary>
-            <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
-          </details>
-          <details class="meal-details"><summary>💡 Tips</summary>
-            <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
-          </details>
-          ${p.biomarkers && p.biomarkers.length ? `
-          <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
-            <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
-          </div>` : ""}
-        </article>
-      `).join("")}
-    </div>`;
+    ${FASTING_GROUP_ORDER.map(renderGroup).join("")}`;
 
-  const swipeSlides = FASTING_PROTOCOLS.map(p => `
-    <div class="card-face">${fastingCardFace(p)}</div>
-    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
-    <div class="card-detail">${fastingCardDetail(p)}</div>
-  `);
+  const swipeSlides = FASTING_GROUP_ORDER.flatMap(groupKey => {
+    const label = FASTING_GROUPS[groupKey];
+    const protocols = FASTING_PROTOCOLS.filter(p => p.group === groupKey);
+    const groupHeader = `<div class="fasting-swipe-group-header"><h3>${label}</h3></div>`;
+    const protocolSlides = protocols.map(p => `
+      <div class="card-face">${fastingCardFace(p)}</div>
+      <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
+      <div class="card-detail">${fastingCardDetail(p)}</div>
+    `);
+    return [groupHeader, ...protocolSlides];
+  });
 
   grid.innerHTML = `
     <div class="fasting-desktop">${desktopHTML}</div>
@@ -683,6 +704,7 @@ function renderFoods() {
         <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
         <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
         <button class="meal-tab ${foodTab === "avoid" ? "active" : ""}" onclick="selectMealTab('avoid')">🚫 Avoid (${AVOID_LIST.length})</button>
+        <button class="meal-tab ${foodTab === "recipes" ? "active" : ""}" onclick="selectMealTab('recipes')">🌐 Recipes (${RECIPES.length})</button>
       </div>
       <select class="meal-tab-select" onchange="selectMealTab(this.value)">
         ${MEAL_CATEGORIES.map(c =>
@@ -692,8 +714,9 @@ function renderFoods() {
         <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
         <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
         <option value="avoid" ${foodTab === "avoid" ? "selected" : ""}>🚫 Avoid (${AVOID_LIST.length})</option>
+        <option value="recipes" ${foodTab === "recipes" ? "selected" : ""}>🌐 Recipes (${RECIPES.length})</option>
       </select>
-      ${["breakfast", "lunch", "marinade"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
+      ${["breakfast", "lunch", "marinade", "recipes"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
     </div>`;
 
   if (!container.querySelector('.meal-controls')) {
@@ -780,6 +803,44 @@ function foodListHTML(list) {
     `).join("");
   }
 
+  function recipeTabHTML() {
+    const tagClass = tag => `recipe-tag recipe-tag--${tag}`;
+    return RECIPE_CATEGORIES.map(cat => {
+      const items = RECIPES.filter(r => r.category === cat);
+      if (!items.length) return "";
+      return `
+        <div class="meal-group">
+          <h3 class="meal-group-title">${RECIPE_LABELS[cat]} (${items.length})</h3>
+          <div class="meal-grid">
+            ${items.map(r => `
+              <article class="meal-card recipe-card">
+                <div class="meal-card-top">
+                  <h3 class="meal-name">${r.name}</h3>
+                  <span class="meal-time">${r.prepTime} · ${r.cookTime}</span>
+                </div>
+                <p class="meal-desc">${r.description}</p>
+                <div class="meal-meta">
+                  <span>🥩 ${r.protein}</span>
+                  <span>🔥 ${r.calories}</span>
+                  ${r.fiber ? `<span>🌾 ${r.fiber} fiber</span>` : ""}
+                </div>
+                <div class="recipe-tags">
+                  ${r.tags.map(t => `<span class="${tagClass(t)}">${t}</span>`).join("")}
+                </div>
+                ${r.biomarkers && r.biomarkers.length ? `
+                <div class="meal-targets">
+                  <div class="tag-group">
+                    ${r.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
+                  </div>
+                </div>` : ""}
+                <a href="${r.url}" target="_blank" rel="noopener" class="recipe-link">📖 View recipe on ${r.source}</a>
+              </article>
+            `).join("")}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
   function renderFoodContent(tab) {
     switch (tab) {
       case "pantry": return pantryHTML();
@@ -802,6 +863,7 @@ function foodListHTML(list) {
           </div>
         `).join("")}
       </div>`;
+      case "recipes": return recipeTabHTML();
       default: {
         const items = MEALS.filter(m => m.category === tab);
         const groups = {};
