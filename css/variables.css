@@ -151,4 +151,9 @@
   --tint-accent-20: color-mix(in srgb, var(--color-accent) 20%, transparent);
   --footer-text: rgba(255, 255, 255, 0.7);
   --footer-copy: rgba(255, 255, 255, 0.4);
+
+  /* ─── GENUI v2.0 — CARNIVORE SEMANTICS ─── */
+  --carnivore: #6b21a8;
+  --carnivore-bg: #f3eefb;
+  --carnivore-border: #ddd0f0;
 }

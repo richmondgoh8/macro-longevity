@@ -1,6 +1,8 @@
 # macro-longevity
 
-Static HTML/CSS/JS site — no build step, zero dependencies. Deploys to Cloudflare Pages from root.
+Static HTML/CSS/JS carnivore-first longevity site — daily stack, blood tests, workout, finance. Zero build step, zero dependencies. Deploys to Cloudflare Pages from root.
+
+Follows GENUI.md v2.0 (protocol-first design system; supersedes DESIGN.md for this app).
 
 ## Quick start
 
@@ -11,24 +13,26 @@ make serve       # kill old :8080, start python3 http.server
 ## Structure
 
 ```
-index.html              Landing page
+index.html              Home — carnivore note, daily protocol at a glance, page links
 pages/
-  health.html           Biomarkers, Fasting, Vaccinations, Supplements, Damage Control
-  workout.html           12 equipment-free exercises with timer, music, and sound cues
-  food.html             Meals (Breakfast, Lunch & Dinner), Marinades, Pantry, Food Lists
+  stack.html            Daily Stack: Food & Spices / Extras / Skip List (sub-tabs)
+  blood.html            Blood Tests: Annual core, One-time, Periodic, Low-value tests, ApoB module
+  workout.html          12 equipment-free exercises with timer, music, and sound cues
   finance.html          Investment Combos, FIRE Calculator + Passive Income Tracker
+  avoid.html            Ingredients to Avoid (full-page list, 3 items)
 css/
   variables.css         Design tokens + self-hosted @font-face (DM Sans, Inter, JetBrains Mono)
   style.css             All component styles, responsive (768px, 480px breakpoints)
 js/
-  render.js             Client-side rendering for all pages (ES module, auto-inits on DOMContentLoaded)
+  stack.js              Daily Stack rendering (ES module, auto-inits on DOMContentLoaded)
+  blood.js              Blood Tests rendering (ES module, auto-inits on DOMContentLoaded)
+  render.js             Workout + Finance rendering (ES module, auto-inits on DOMContentLoaded)
   export.js             Markdown export + nav toggle (ES module)
   components/
     card-swipe.js       Viewport-filling swipeable card stack (mobile, ES module)
   data/
-    common.js           Shared constants (MEAL_CATEGORIES, TIER_*, DIET_*, FASTING_PROTOCOLS)
-    health.js           BIOMARKERS, VACCINES, SUPPLEMENTS, SUGAR_OFFSET_TIPS
-    food.js             MEALS, MARINADES, PANTRY, FOOD_LISTS, AVOID_LIST
+    stack.js            FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, SKIP_LIST
+    blood.js            ANNUAL_PANEL (tiers), LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN + APOB_EFFECTS
     workout.js          EXERCISES
     finance.js          INVESTMENTS
 fonts/
@@ -39,51 +43,46 @@ sw.js                   Service worker (cache-first for static assets)
 manifest.json           PWA manifest
 offline.html            Offline fallback page
 favicon.svg             Site icon (used as PWA icon too)
+GENUI.md                Design spec v2.0 (protocol-first, evidence-graded, zero hype)
 ```
 
 ## Key render function calls
 
 | Page | Function | Sub-tabs |
 |------|----------|----------|
-| `health.html` | `renderHealth()` | Biomarkers, Fasting, Vaccinations, Supplements, Damage Control |
-| `workout.html` | `renderExercises("workout-app")` | None (single page, 12 exercise cards with built-in timers) |
-| `food.html` | `renderFoods()` | Breakfast, Lunch & Dinner, Marinades, Pantry, Food Lists |
+| `index.html` | `renderFoodProtocol()` | None (daily protocol table) |
+| `stack.html` | `renderStack()` | Supplements, Food & Spices, Extras, Conditional, Skip List |
+| `blood.html` | `renderBlood()` | None (tier sections + ApoB module) |
+| `workout.html` | `renderExercises("workout-app")` | None (4 Pillars: Zone 2, VO₂ Max, Strength, Mobility with built-in timers) |
 | `finance.html` | `renderInvestments()` + inline `calcFire()` | Investment Combos, FIRE Calculator |
+| `avoid.html` | `renderAvoidPage()` | None (full-page list) |
 
 ## Data editing (`js/data/*.js`)
 
-Data is split into ES modules under `js/data/`:
-
-- `common.js` — Shared constants: `MEAL_CATEGORIES`, `MEAL_LABELS`, `FASTING_PROTOCOLS`, `TIER_*`, `DIET_*`, `PRICE_DISCLAIMER`, `SUGAR_OFFSET_TIPS`
-- `health.js` — `BIOMARKERS`, `VACCINES`, `SUPPLEMENTS`
-- `food.js` — `MEALS`, `MARINADES`, `PANTRY`, `FOOD_LISTS`, `AVOID_LIST`
+- `stack.js` — `DAILY_SUPPLEMENTS` (dose, timing, pairing, synergy, why, carnivoreNote), `FOOD_SPICES` (serving, timing, why, risk), `EXTRAS` (drinks/habits, same schema), `AVOID_INGREDIENTS`, `SKIP_LIST`, `CONDITIONAL_LIST` (context-dependent supplements with who/dose/why/caution)
+- `blood.js` — `ANNUAL_PANEL` (tiers: annual / one-time / periodic; each: frequency, optimalRange, why, carnivoreNote), `LOW_VALUE_TESTS`, `BEYOND_PANEL` (non-lab high-ROI habits), `APOB_PLAN` + `APOB_EFFECTS` (ApoB-elevated next-steps module)
 - `workout.js` — `EXERCISES`
 - `finance.js` — `INVESTMENTS`
 
-- Meals use `category: "breakfast"` or `"lunch"` (lunch includes dinner)
-- Meals use `group` property for visual grouping (e.g., "Poultry", "Fish & Seafood", "Sides")
-- 7 meals use `methods[]` for clickable cooking method switching
-- Meals without methods use a flat `instructions[]` inside a `<details>` toggle
-- Biomarker IDs referenced in meals must match `BIOMARKERS[].id`
-- Air fryer instructions include: preheat time, temperature, flip/shake timing, visual doneness cues
-- Ingredient pricing format: `(FairPrice: SGD X.XX)`. Supplement pricing: `costPerMonth: "SGD XX"`.
-- **Data counts**: Biomarkers 20, Meals 37, Marinades 8, Pantry 11, Supplements 23, Food Lists 3, Exercises 12, Fasting Protocols 7, Vaccines 10, Investments 5
-- Exercise objects have: `variations[]` (Gold Standard / Regular / Easy Start), `instructions[]`, `biomarkers[]`
+- **Why-lines**: 1–2 sentences per item. No citation walls in the UI (research lives in the data, not the DOM).
+- **Data counts**: Supplements 8, Food & Spices 9, Extras 5, Avoid Ingredients 5, Skip List 15, Conditional 6, Blood Tests 26, Low-Value Tests 9, Beyond the Panel 8, ApoB Plan 7 + 8 Effects, Exercises 12, Investments 5
+- **Supplements: food-first hierarchy.** Only 8 supplements survive — each one covers a genuine carnivore gap or has strong evidence that food alone doesn't provide. 6 conditional supplements are Tier B evidence — worth tracking but not daily essentials.
 
 ## Workout page (`pages/workout.html`)
 
-- 12 exercises: Wall Push-Up, Bodyweight Squat, Reverse Lunge, Glute Bridge, Standing Calf Raise, Dead Bug, Plank, Bird Dog, Standing Knee Drive, Step-Up, Wall Sit, Inchworm
-- Each exercise has a built-in timer (Web Audio API, no external libraries)
+- 4 Pillars: Zone 2 (steady-state countdown), VO₂ Max (Norwegian 4×4 intervals), Strength & Posterior Chain (6 compound exercises), Mobility (4 drills)
+- Each pillar has a built-in timer (Web Audio API, no external libraries)
+- Timer types: countdown (Zone 2), intervals (VO₂ Max), reps (Strength/Mobility)
 - Timer states: idle → running → paused → done. Only one timer active at a time (starting one stops any other)
 - Countdown threshold: `timeLeft <= 6` — ticks from 6 to 1, then triggers end cue
 - Background music: two separate tracks — work (Atmospheric Ambient Pad, CC BY 4.0, gain 0.2) + rest (Loft House, CC BY-NC 4.0, gain 0.4)
 - Work music skips first 5s of intro (`MUSIC_START_OFFSET = 5`)
 - Sound cues: synthesized whistles + ticks (no external audio files)
-- `getVariation(ex)` always returns `ex.variations[1]` (Regular tier)
+- `PILLARS` export replaces flat `EXERCISES` array; legacy `EXERCISES` maintained for backward compat
 
 ## Design tokens (`css/variables.css`)
 
-Follows DESIGN.md v1.0 — 4-size fluid typography with `clamp()`, DM Sans display font, 8px spacing grid.
+Follows GENUI.md v2.0 — 4-size fluid typography with `clamp()`, DM Sans display font, 8px spacing grid.
 
 ```css
 --text-sm:  clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);  /* captions */
@@ -92,37 +91,44 @@ Follows DESIGN.md v1.0 — 4-size fluid typography with `clamp()`, DM Sans displ
 --text-xl:  clamp(1.75rem, 1.2rem + 2.5vw, 3.5rem);         /* hero */
 ```
 
+- Carnivore note tokens: `--carnivore`, `--carnivore-bg`, `--carnivore-border`
 - Radius: sm=4px, md=8px, lg=16px, xl=24px
 - Spacing: 8px grid (`--space-2` through `--space-20`)
 - Never hardcode colors in style.css — use token variables
 
 ## Mobile UX
 
-- Bottom tab bar on mobile (<768px): Home | Health | Workout | Food | Finance
-- Swipeable card stacks for dense content (biomarkers, supplements, fasting, vaccines)
-- Card-expand pattern: face view + "Show Details" button → detail section
-- Desktop shows normal grids; mobile shows swipe cards via CSS media queries
-- Sub-tab controls (meal-tabs, health tabs) hide buttons and show `<select>` dropdown on mobile
-- Meal sub-tab bar is sticky (`top: 56px`) on mobile so tabs stay visible when scrolling
-- Food lists show numeric columns (fiber/potassium) with daily targets above tables
+- Bottom tab bar on mobile (<768px): Home | Stack | Blood | Workout | Finance | Avoid
+- Swipeable card stacks for dense content (workout exercises)
+- Sub-tab controls (stack page) hide buttons and show `<select>` dropdown on mobile
+- Timing tables scroll horizontally on narrow screens
 
 ## Export to AI
 
 - `js/export.js` provides `exportData()` function
 - Downloads `macro-longevity-data.md` — full knowledge base in Markdown format
-- Includes: Biomarkers, Meals, Marinades, Pantry, Food Lists, Fasting, Vaccines, Supplements, Investments, Sugar Tips
+- Includes: Food & Spices, Extras, Avoid Ingredients, Skip List, Conditional List, Blood Panel, Low-Value Tests, Beyond the Panel, ApoB Plan, Investments, 4 Pillars of Training
 - Button in footer of all pages
+
+## Search & Retrieval Priority
+
+**TinyFish is always the first choice for any web search or content retrieval.** Exa is backup-only.
+
+1. **TinyFish first** — Use `tinyfish_search` and `tinyfish_fetch_content` for all web searches, URL reading, and external knowledge retrieval.
+2. **Exa backup only** — Only use Exa tools (`exa_web_search_exa`, `exa_crawling_exa`, `exa_get_code_context_exa`) if TinyFish returns insufficient or poor-quality results.
+3. **Never mix search providers** in the same task.
 
 ## After editing
 
 No build step — just refresh the browser. Validate with:
 
 ```sh
-node --check js/data/common.js
-node --check js/data/health.js
-node --check js/data/food.js
+node --check js/data/stack.js
+node --check js/data/blood.js
 node --check js/data/workout.js
 node --check js/data/finance.js
+node --check js/stack.js
+node --check js/blood.js
 node --check js/render.js
 node --check js/export.js
 node --check js/components/card-swipe.js

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="4 Pillars of Longevity Training: Zone 2 cardio, VO₂ max intervals, strength & posterior chain, and mobility. Built-in timers with sound cues.">
+    <meta name="description" content="The daily carnivore stack — supplements, food and spices, and strict ingredients to avoid. Evidence-graded, no hype.">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a7e6f">
-    <title>Daily Workouts — Macro Longevity</title>
+    <title>Daily Stack — Macro Longevity</title>
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -25,9 +25,9 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/pages/stack.html" class="nav-link">Daily Stack</a>
+                <a href="/pages/stack.html" class="nav-link active">Daily Stack</a>
                 <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
-                <a href="/pages/workout.html" class="nav-link active">Workout</a>
+                <a href="/pages/workout.html" class="nav-link">Workout</a>
                 <a href="/pages/finance.html" class="nav-link">Finance</a>
                 <a href="/pages/avoid.html" class="nav-link">Avoid</a>
             </div>
@@ -37,14 +37,17 @@
     <main>
         <section class="page-header">
             <div class="section-inner">
-                <h1 class="page-title">Daily Workouts</h1>
-                <p class="page-desc">4 Pillars of Longevity Training: Zone 2 cardio, VO₂ max intervals, strength & posterior chain, and mobility. Built-in timers with sound cues.</p>
+                <h1 class="page-title">Daily Stack</h1>
+                <p class="page-desc">
+                    Seven supplements, six foods, three extras. Everything earns its place —
+                    or it's on the skip list with a reason.
+                </p>
             </div>
         </section>
 
-        <section class="section">
+        <section class="section section-compact">
             <div class="section-inner">
-                <div id="workout-app"></div>
+                <div id="stack-app"></div>
             </div>
         </section>
     </main>
@@ -57,17 +60,17 @@
             </div>
             <p class="footer-text">
                 Evidence-informed guidance for a carnivore-first longevity protocol.
-                Not medical advice. Consult your physician before starting any exercise regimen.
+                Not medical advice. Consult your physician before starting any supplement
+                or dietary regimen, especially with existing conditions or medications.
             </p>
             <button class="export-btn" data-export>📥 Export All Data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
-    <script type="module" src="/js/render.js"></script>
+    <script type="module" src="/js/stack.js"></script>
     <script type="module" src="/js/export.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item active"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a></div></nav>
+<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item active"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a></div></nav>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}</script>
-</body>
 </body>
 </html>

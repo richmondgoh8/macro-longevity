@@ -1,10 +1,8 @@
-import { BIOMARKERS, VACCINES, SUPPLEMENTS } from './data/health.js';
-import { FASTING_PROTOCOLS, FASTING_GROUPS, FASTING_GROUP_ORDER, SUGAR_OFFSET_TIPS } from './data/common.js';
-import { MEALS, MARINADES, PANTRY, FOOD_LISTS } from './data/food.js';
+import { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, SKIP_LIST, CONDITIONAL_LIST } from './data/stack.js';
+import { ANNUAL_PANEL, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS } from './data/blood.js';
 import { INVESTMENTS } from './data/finance.js';
-import { RECIPES } from './data/recipes.js';
+import { PILLARS, EXERCISES } from './data/workout.js';
 
-// Nav toggle handler
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-nav-toggle]');
     if (btn) {
@@ -18,7 +16,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Export button handler
 document.addEventListener('click', function(e) {
     if (e.target.closest('[data-export]')) {
         exportData();
@@ -29,148 +26,115 @@ function exportData() {
     const data = {
         exportedAt: new Date().toISOString(),
         source: "macro-longevity.com",
-        biomarkers: BIOMARKERS,
-        meals: MEALS,
-        marinades: MARINADES,
-        pantry: PANTRY,
-        foodLists: FOOD_LISTS,
-        fastingProtocols: FASTING_PROTOCOLS,
-        vaccines: VACCINES,
+        supplements: DAILY_SUPPLEMENTS,
+        foodSpices: FOOD_SPICES,
+        extras: EXTRAS,
+        avoidIngredients: AVOID_INGREDIENTS,
+        conditionalList: CONDITIONAL_LIST,
+        skipList: SKIP_LIST,
+        bloodPanel: ANNUAL_PANEL,
+        lowValueTests: LOW_VALUE_TESTS,
+        beyondPanel: BEYOND_PANEL,
+        apobPlan: APOB_PLAN,
+        apobEffects: APOB_EFFECTS,
         investments: INVESTMENTS,
-        supplements: SUPPLEMENTS,
-        recipes: RECIPES,
-        sugarOffsetTips: SUGAR_OFFSET_TIPS,
+        pillars: PILLARS,
+        exercises: EXERCISES,
     };
 
     let md = `# Macro Longevity Knowledge Base\n\n`;
     md += `Exported: ${data.exportedAt}\nSource: ${data.source}\n\n`;
+    md += `> Carnivore-first, strong and moderate evidence only. Not medical advice.\n\n`;
     md += `---\n\n`;
-
-    md += `## Biomarkers (${data.biomarkers.length})\n\n`;
-    data.biomarkers.forEach(b => {
-        md += `### ${b.icon} ${b.name}\n`;
-        md += `- **Category:** ${b.category}\n`;
-        md += `- **Risk Level:** ${b.riskLevel}\n`;
-        md += `- **Optimal Range:** ${b.optimalRange}\n`;
-        md += `- **Optimal Level:** ${b.optimalLevel}\n`;
-        md += `- **Importance:** ${b.importance}\n`;
-        md += `- **How to Improve:**\n`;
-        b.howToImprove.forEach(t => md += `  - ${t}\n`);
-        if (b.budgetTips && b.budgetTips.length) {
-            md += `- **Budget Tips:**\n`;
-            b.budgetTips.forEach(t => md += `  - ${t}\n`);
-        }
-        md += `\n`;
-    });
-
-    md += `## Meals (${data.meals.length})\n\n`;
-    data.meals.forEach(m => {
-        md += `### ${m.name}\n`;
-        md += `- **Category:** ${m.category} | **Group:** ${m.group || 'Other'}\n`;
-        md += `- **Prep:** ${m.prepTime} | **Cook:** ${m.cookTime}\n`;
-        md += `- **Cost:** ${m.costPerServing} | **Protein:** ${m.protein} | **Calories:** ${m.calories}\n`;
-        md += `- **Description:** ${m.description}\n`;
-        md += `- **Ingredients:**\n`;
-        m.ingredients.forEach(i => md += `  - ${i}\n`);
-        if (m.methods && m.methods.length) {
-            md += `- **Methods:**\n`;
-            m.methods.forEach(mt => {
-                md += `  - **${mt.name}** (${mt.cookTime}):\n`;
-                mt.instructions.forEach(s => md += `    - ${s}\n`);
-            });
-        } else {
-            md += `- **Instructions:**\n`;
-            m.instructions.forEach(s => md += `  - ${s}\n`);
-        }
-        if (m.variations && m.variations.length) {
-            md += `- **Variations:**\n`;
-            m.variations.forEach(v => md += `  - ${v}\n`);
-        }
-        if (m.biomarkers && m.biomarkers.length) {
-            md += `- **Biomarkers:** ${m.biomarkers.join(', ')}\n`;
-        }
-        md += `\n`;
-    });
-
-    md += `## Marinades (${data.marinades.length})\n\n`;
-    data.marinades.forEach(m => {
-        md += `### ${m.name}\n`;
-        md += `- **Pairs with:** ${m.pairsWith}\n`;
-        md += `- **Ingredients:** ${m.ingredients.join(', ')}\n`;
-        md += `- **Instructions:** ${m.instructions}\n`;
-        md += `- **Storage:** ${m.storageTip}\n\n`;
-    });
-
-    md += `## Pantry Staples (${data.pantry.length})\n\n`;
-    data.pantry.forEach(p => {
-        md += `### ${p.name}\n`;
-        md += `- **FairPrice:** ${p.fairPrice}\n`;
-        md += `- **Benefit:** ${p.benefit}\n`;
-        md += `- **Use:** ${p.servingTip}\n\n`;
-    });
-
-    md += `## Food Lists\n\n`;
-    data.foodLists.forEach(fl => {
-        md += `### ${fl.name}\n`;
-        md += `- **Description:** ${fl.description}\n`;
-        md += `- **Daily Target:** ${fl.dailyTarget}\n`;
-        md += `- **Foods:**\n`;
-        fl.foods.forEach(f => {
-            md += `  - **${f.name}** — ${f.why} (targets: ${f.biomarkers.join(', ')})\n`;
-        });
-        md += `\n`;
-    });
-
-    md += `## Fasting Protocols (${data.fastingProtocols.length})\n\n`;
-    FASTING_GROUP_ORDER.forEach(groupKey => {
-        const label = FASTING_GROUPS[groupKey];
-        const protocols = data.fastingProtocols.filter(p => p.group === groupKey);
-        if (!protocols.length) return;
-        md += `### ${label}\n\n`;
-        protocols.forEach(p => {
-            md += `#### ${p.icon} ${p.name}\n`;
-            md += `- **Duration:** ${p.duration} | **Difficulty:** ${p.difficulty}\n`;
-            md += `- **Description:** ${p.description}\n`;
-            md += `- **What Happens:** ${p.whatHappens.join('; ')}\n`;
-            md += `- **How to Enter:** ${p.howToEnter.join('; ')}\n`;
-            md += `- **During Fast:** ${p.duringFast.join('; ')}\n`;
-            md += `- **How to Break:** ${p.howToBreak.join('; ')}\n`;
-            md += `- **Tips:** ${p.tips.join('; ')}\n`;
-            if (p.biomarkers && p.biomarkers.length) {
-                md += `- **Biomarkers:** ${p.biomarkers.join(', ')}\n`;
-            }
-            md += `\n`;
-        });
-    });
-
-    md += `## Vaccines (${data.vaccines.length})\n\n`;
-    data.vaccines.forEach(v => {
-        md += `### ${v.name}\n`;
-        md += `- **Schedule Type:** ${v.scheduleType}\n`;
-        md += `- **Description:** ${v.description}\n`;
-        md += `- **Who Needs It:** ${v.whoNeedsIt}\n`;
-        md += `- **Schedule:** ${v.schedule}\n`;
-        md += `- **Efficacy:** ${v.efficacy}\n`;
-        md += `- **Cost (SGD):** ${v.costSGD}\n`;
-        md += `- **Longevity Benefit:** ${v.longevityBenefit}\n`;
-        md += `- **Side Effects:** ${v.sideEffects}\n\n`;
-    });
 
     md += `## Supplements (${data.supplements.length})\n\n`;
     data.supplements.forEach(s => {
-        md += `### ${s.name}\n`;
-        md += `- **Tier:** ${s.tier} | **Timing:** ${s.timing}\n`;
-        md += `- **Dosage:** ${s.dosage}\n`;
-        md += `- **Cost:** ${s.costPerMonth} (${s.costPerServing})\n`;
-        md += `- **Description:** ${s.description}\n`;
-        md += `- **Why General:** ${s.whyGeneral}\n`;
-        md += `- **Benefits:** ${s.benefits.join('; ')}\n`;
-        md += `- **Conflicts:** ${s.conflicts}\n`;
-        if (s.biomarkers && s.biomarkers.length) {
-            md += `- **Biomarkers:** ${s.biomarkers.join(', ')}\n`;
-        }
+        md += `### ${s.icon} ${s.name}\n`;
+        md += `- **Dose:** ${s.dose}\n`;
+        md += `- **Timing:** ${s.timing}\n`;
+        md += `- **Pairing:** ${s.pairing}\n`;
+        if (s.synergy && s.synergy.length) md += `- **Synergy:** ${s.synergy.join(', ')}\n`;
+        md += `- **Why:** ${s.why}\n`;
+        if (s.carnivoreNote) md += `- **Carnivore note:** ${s.carnivoreNote}\n`;
         md += `\n`;
     });
+
+    md += `## Food & Spices (${data.foodSpices.length})\n\n`;
+    data.foodSpices.forEach(f => {
+        md += `### ${f.icon} ${f.name}\n`;
+        md += `- **Serving:** ${f.serving}\n`;
+        md += `- **When:** ${f.timing}\n`;
+        md += `- **Why:** ${f.why}\n`;
+        if (f.risk) md += `- **Risk:** ${f.risk}\n`;
+        md += `\n`;
+    });
+
+    md += `## Extras (${data.extras.length})\n\n`;
+    data.extras.forEach(f => {
+        md += `### ${f.icon} ${f.name}\n`;
+        md += `- **Serving:** ${f.serving}\n`;
+        md += `- **When:** ${f.timing}\n`;
+        md += `- **Why:** ${f.why}\n`;
+        if (f.risk) md += `- **Risk:** ${f.risk}\n`;
+        md += `\n`;
+    });
+
+    md += `## Ingredients to Avoid (${data.avoidIngredients.length})\n\n`;
+    data.avoidIngredients.forEach(a => {
+        md += `### ${a.name}\n`;
+        md += `- **Where it hides:** ${a.where}\n`;
+        md += `- **Why:** ${a.why}\n`;
+        md += `- **Replace with:** ${a.replace}\n\n`;
+    });
+
+    md += `## Skip List — Do Not Buy (${data.skipList.length})\n\n`;
+    data.skipList.forEach(s => {
+        md += `### ${s.icon} ${s.name}\n`;
+        md += `- **Why skip:** ${s.why}\n`;
+        md += `\n`;
+    });
+
+    md += `## Conditional — Context-Dependent (${data.conditionalList.length})\n\n`;
+    data.conditionalList.forEach(s => {
+        md += `### ${s.icon} ${s.name}\n`;
+        md += `- **Who:** ${s.who}\n`;
+        md += `- **Dose:** ${s.dose}\n`;
+        md += `- **Why:** ${s.why}\n`;
+        md += `- **Caution:** ${s.caution}\n`;
+        md += `\n`;
+    });
+
+    md += `## Annual Blood Panel (${data.bloodPanel.length})\n\n`;
+    data.bloodPanel.forEach(t => {
+        md += `### ${t.name}\n`;
+        md += `- **Frequency:** ${t.frequency}\n`;
+        md += `- **Target:** ${t.optimalRange}\n`;
+        md += `- **Why:** ${t.why}\n`;
+        if (t.carnivoreNote) md += `- **Carnivore note:** ${t.carnivoreNote}\n`;
+        md += `\n`;
+    });
+
+    md += `## Low-Value Tests — Skip (${data.lowValueTests.length})\n\n`;
+    data.lowValueTests.forEach(t => {
+        md += `### ${t.name}\n`;
+        md += `- **Why it's a trap:** ${t.why}\n\n`;
+    });
+
+    md += `## Beyond the Blood Panel (${data.beyondPanel.length})\n\n`;
+    data.beyondPanel.forEach(t => {
+        md += `### ${t.icon} ${t.name}\n`;
+        md += `- **Do:** ${t.action}\n`;
+        md += `- **Why:** ${t.why}\n\n`;
+    });
+
+    md += `## ApoB Elevated? Next Steps (${data.apobPlan.length})\n\n`;
+    data.apobPlan.forEach((s, i) => {
+        md += `${i + 1}. **${s.step}:** ${s.action}\n`;
+    });
+    md += `\n**What helps what:**\n\n`;
+    md += `| Intervention | Also helps | Lowers ApoB? |\n|---|---|---|\n`;
+    data.apobEffects.forEach(r => { md += `| ${r[0]} | ${r[1]} | ${r[2]} |\n`; });
+    md += `\n`;
 
     md += `## Investment Combos (${data.investments.length})\n\n`;
     data.investments.forEach(inv => {
@@ -189,27 +153,24 @@ function exportData() {
         md += `\n`;
     });
 
-    md += `## External Recipes (${data.recipes.length})\n\n`;
-    data.recipes.forEach(r => {
-        md += `### ${r.name}\n`;
-        md += `- **Source:** ${r.source}\n`;
-        md += `- **URL:** ${r.url}\n`;
-        md += `- **Category:** ${r.category}\n`;
-        md += `- **Description:** ${r.description}\n`;
-        md += `- **Tags:** ${r.tags.join(', ')}\n`;
-        md += `- **Prep:** ${r.prepTime} | **Cook:** ${r.cookTime}\n`;
-        md += `- **Protein:** ${r.protein} | **Calories:** ${r.calories} | **Fiber:** ${r.fiber}\n`;
-        if (r.biomarkers && r.biomarkers.length) {
-            md += `- **Biomarkers:** ${r.biomarkers.join(', ')}\n`;
+    md += `## 4 Pillars of Longevity Training\n\n`;
+    data.pillars.forEach(p => {
+        md += `### ${p.icon} ${p.name}\n`;
+        md += `- **Frequency:** ${p.frequency}\n`;
+        md += `- **Target:** ${p.target}\n`;
+        md += `- **Benefits:**\n`;
+        p.benefits.forEach(b => md += `  - ${b}\n`);
+        if (p.whyLongevity) md += `- **Why:** ${p.whyLongevity}\n`;
+        if (p.protocol) {
+            md += `- **Protocol:** ${p.protocol.name} — ${p.protocol.warmup}min warmup → ${p.protocol.rounds}×(${p.protocol.workMinutes}min work + ${p.protocol.recoveryMinutes}min recovery) → ${p.protocol.cooldown}min cooldown\n`;
+        }
+        if (p.exercises) {
+            md += `- **Exercises:**\n`;
+            p.exercises.forEach(ex => {
+                md += `  - ${ex.name}: ${ex.sets}×${ex.workSeconds}s work/${ex.restSeconds}s rest\n`;
+            });
         }
         md += `\n`;
-    });
-
-    md += `## Sugar Offset Tips (${data.sugarOffsetTips.length})\n\n`;
-    data.sugarOffsetTips.forEach(t => {
-        md += `### ${t.action}\n`;
-        md += `- **Why:** ${t.why}\n`;
-        md += `- **Timing:** ${t.timing}\n\n`;
     });
 
     const blob = new Blob([md], { type: 'text/markdown' });

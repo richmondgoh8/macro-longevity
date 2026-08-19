@@ -1,8 +1,4 @@
-import { BIOMARKERS, VACCINES, SUPPLEMENTS } from './data/health.js';
-import { MEAL_CATEGORIES, MEAL_LABELS, FASTING_PROTOCOLS, FASTING_GROUPS, FASTING_GROUP_ORDER, TIER_ORDER, TIER_LABELS, TIER_DESCRIPTIONS, DIET_LABELS, DIET_LABELS_PLAIN, PRICE_DISCLAIMER, SUGAR_OFFSET_TIPS, RECIPE_CATEGORIES, RECIPE_LABELS } from './data/common.js';
-import { MEALS, MARINADES, PANTRY, FOOD_LISTS, AVOID_LIST } from './data/food.js';
-import { RECIPES } from './data/recipes.js';
-import { EXERCISES } from './data/workout.js';
+import { PILLARS, EXERCISES } from './data/workout.js';
 import { INVESTMENTS } from './data/finance.js';
 import { CardSwipe } from './components/card-swipe.js';
 
@@ -18,482 +14,6 @@ function safeRender(fn, container, fallback) {
     }
   }
 }
-
-let healthTab = "biomarkers";
-
-function selectHealthTab(tab) {
-  healthTab = tab;
-  renderHealth();
-}
-
-const healthTabCache = {};
-
-function renderHealth() {
-  const container = document.getElementById("health-app");
-  if (!container) return;
-
-  const healthTabs = ["biomarkers", "fasting", "vaccinations", "supplements", "damage-control"];
-  const tabLabels = {
-    biomarkers: "🔬 Biomarkers",
-    fasting: "⏳ Fasting",
-    vaccinations: "💉 Vaccinations",
-    supplements: "💊 Supplements",
-    "damage-control": "⚡ Damage Control",
-  };
-
-  const tabs = `
-    <div class="meal-tabs">
-      ${healthTabs.map(t =>
-        `<button class="meal-tab ${healthTab === t ? "active" : ""}" onclick="selectHealthTab('${t}')">${tabLabels[t]}</button>`
-      ).join("")}
-      <select class="meal-tab-select" onchange="selectHealthTab(this.value)">
-        ${healthTabs.map(t =>
-          `<option value="${t}" ${healthTab === t ? "selected" : ""}>${tabLabels[t].replace(/^[^\s]+\s/, "")}</option>`
-        ).join("")}
-      </select>
-    </div>`;
-
-  if (!container.querySelector('.meal-tabs')) {
-    container.innerHTML = tabs + '<div class="health-content"></div>';
-  } else {
-    container.querySelectorAll('.meal-tab').forEach((btn, i) => {
-      btn.classList.toggle('active', healthTabs[i] === healthTab);
-    });
-    container.querySelector('.meal-tab-select').value = healthTab;
-  }
-
-  const contentEl = container.querySelector('.health-content');
-
-  if (!healthTabCache[healthTab]) {
-    if (healthTab === "biomarkers") {
-      const bioGrid = document.createElement("div");
-      bioGrid.id = "biomarker-grid";
-      contentEl.innerHTML = '';
-      contentEl.appendChild(bioGrid);
-      renderBiomarkers("biomarker-grid");
-      healthTabCache[healthTab] = contentEl.innerHTML;
-    } else if (healthTab === "fasting") {
-      const fastGrid = document.createElement("div");
-      fastGrid.id = "fasting-grid";
-      contentEl.innerHTML = '';
-      contentEl.appendChild(fastGrid);
-      renderFasting("fasting-grid");
-      healthTabCache[healthTab] = contentEl.innerHTML;
-    } else if (healthTab === "vaccinations") {
-      const vacGrid = document.createElement("div");
-      vacGrid.id = "vaccine-grid";
-      contentEl.innerHTML = '';
-      contentEl.appendChild(vacGrid);
-      renderVaccines("vaccine-grid");
-      healthTabCache[healthTab] = contentEl.innerHTML;
-    } else if (healthTab === "supplements") {
-      contentEl.innerHTML = '<div id="supplement-app"></div>';
-      renderSupplements("supplement-app");
-      healthTabCache[healthTab] = contentEl.innerHTML;
-    } else {
-      contentEl.innerHTML = renderDamageControl();
-      healthTabCache[healthTab] = contentEl.innerHTML;
-    }
-  } else {
-    contentEl.innerHTML = healthTabCache[healthTab];
-  }
-
-  if (healthTab !== "supplements") {
-    window.scrollTo(0, 0);
-  }
-}
-
-function biomarkerCardFace(b) {
-  return `
-    <div class="biomarker-header">
-      <span class="biomarker-icon">${b.icon}</span>
-      <div class="biomarker-title-group">
-        <span style="font-size:11px;color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${b.category}</span>
-        <h3 class="biomarker-name">${b.name}</h3>
-      </div>
-      <span class="biomarker-risk biomarker-risk-${b.riskLevel}">${b.riskLevel}</span>
-    </div>
-    <p class="biomarker-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${b.description}</p>
-    <div class="biomarker-ranges" style="margin-bottom:0;">
-      <div class="range-item">
-        <span class="range-label">Optimal Range</span>
-        <span class="range-value">${b.optimalRange}</span>
-      </div>
-      <div class="range-item">
-        <span class="range-label">Optimal Level</span>
-        <span class="range-value range-optimal">${b.optimalLevel}</span>
-      </div>
-    </div>
-  `;
-}
-
-function biomarkerCardDetail(b) {
-  return `
-    <div class="biomarker-importance">
-      <h4>Why It Matters</h4>
-      <p>${b.importance}</p>
-    </div>
-    <div class="biomarker-how-to">
-      <h4>How to Improve</h4>
-      <ul class="checklist">
-        ${b.howToImprove.map(t => `<li>${t}</li>`).join("")}
-      </ul>
-    </div>
-    ${b.budgetTips && b.budgetTips.length ? `
-    <div class="biomarker-budget">
-      <h4>💡 Budget Tips</h4>
-      <ul class="checklist checklist-budget">
-        ${b.budgetTips.map(t => `<li>${t}</li>`).join("")}
-      </ul>
-    </div>` : ""}
-  `;
-}
-
-function renderBiomarkers(targetId) {
-  const grid = document.getElementById(targetId || "biomarker-grid");
-  if (!grid) return;
-
-  const riskOrder = { high: 0, moderate: 1, low: 2 };
-  const catOrder = [
-    "Blood Sugar & Metabolic",
-    "Inflammation",
-    "Lipids & Cardiovascular",
-    "Cardiovascular Health",
-    "Hormones",
-    "Physical Function",
-    "Body Composition",
-    "Metabolic Health",
-    "Organ Health",
-    "Cardiovascular & Cognitive",
-    "Micronutrients",
-  ];
-
-  const cats = [...new Set(BIOMARKERS.map(b => b.category))];
-  cats.sort((a, b) => catOrder.indexOf(a) - catOrder.indexOf(b));
-
-  // Desktop grid
-  const desktopHTML = cats.map(cat => {
-    const items = BIOMARKERS.filter(b => b.category === cat);
-    items.sort((a, b) => riskOrder[a.riskLevel] - riskOrder[b.riskLevel]);
-    return `
-      <div class="biomarker-group">
-        <h2 class="biomarker-group-title">${items[0].icon} ${cat}</h2>
-        ${items.map(b => `
-          <article class="biomarker-card" id="${b.id}">
-            <div class="biomarker-header">
-              <span class="biomarker-icon">${b.icon}</span>
-              <div class="biomarker-title-group">
-                <h3 class="biomarker-name">${b.name}</h3>
-              </div>
-              <span class="biomarker-risk biomarker-risk-${b.riskLevel}">${b.riskLevel}</span>
-            </div>
-            <p class="biomarker-desc">${b.description}</p>
-            <div class="biomarker-ranges">
-              <div class="range-item">
-                <span class="range-label">Optimal Range</span>
-                <span class="range-value">${b.optimalRange}</span>
-              </div>
-              <div class="range-item">
-                <span class="range-label">Optimal Level</span>
-                <span class="range-value range-optimal">${b.optimalLevel}</span>
-              </div>
-            </div>
-            <div class="biomarker-importance">
-              <h4>Why It Matters</h4>
-              <p>${b.importance}</p>
-            </div>
-            <div class="biomarker-how-to">
-              <h4>How to Improve</h4>
-              <ul class="checklist">
-                ${b.howToImprove.map(t => `<li>${t}</li>`).join("")}
-              </ul>
-            </div>
-            ${b.budgetTips && b.budgetTips.length ? `
-            <div class="biomarker-budget">
-              <h4>💡 Budget Tips</h4>
-              <ul class="checklist checklist-budget">
-                ${b.budgetTips.map(t => `<li>${t}</li>`).join("")}
-              </ul>
-            </div>` : ""}
-          </article>
-        `).join("")}
-      </div>`;
-  }).join("");
-
-  // Mobile swipe: flatten all biomarkers into one swipe, sorted by category then risk
-  const allSorted = [];
-  cats.forEach(cat => {
-    const items = BIOMARKERS.filter(b => b.category === cat);
-    items.sort((a, b) => riskOrder[a.riskLevel] - riskOrder[b.riskLevel]);
-    allSorted.push(...items);
-  });
-
-  const swipeSlides = allSorted.map(b => `
-    <div class="card-face">${biomarkerCardFace(b)}</div>
-    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
-    <div class="card-detail">${biomarkerCardDetail(b)}</div>
-  `);
-
-  grid.innerHTML = `
-    <div class="biomarker-grid">${desktopHTML}</div>
-    <div id="biomarker-swipe-wrap"></div>
-  `;
-
-  if (typeof CardSwipe !== 'undefined') {
-    CardSwipe.init('biomarker-swipe-wrap', swipeSlides, {
-      onSlideChange: (idx) => {}
-    });
-  }
-}
-
-function fastingCardFace(p) {
-  return `
-    <div class="fasting-header">
-      <span class="fasting-icon" style="font-size:32px;">${p.icon}</span>
-      <div>
-        <h3 class="fasting-name" style="font-size:20px;margin-bottom:2px;">${p.name}</h3>
-        <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
-      </div>
-    </div>
-    <p class="fasting-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${p.description}</p>
-    ${p.biomarkers && p.biomarkers.length ? `
-    <div style="margin-top:auto;">
-      <span style="font-size:12px;color:var(--color-text-muted);font-weight:600;">Improves ${p.biomarkers.length} biomarker${p.biomarkers.length > 1 ? 's' : ''}</span>
-      <div class="tag-group" style="margin-top:6px;">${p.biomarkers.slice(0, 4).map(b => `<span class="tag tag-biomarker">${b}</span>`).join(' ')}${p.biomarkers.length > 4 ? ' ...' : ''}</div>
-    </div>` : ""}
-  `;
-}
-
-function fastingCardDetail(p) {
-  return `
-    <div class="biomarker-importance">
-      <h4>🔬 What Happens in the Body</h4>
-      <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
-    </div>
-    <div class="biomarker-importance">
-      <h4>🚪 How to Enter the Fast</h4>
-      <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
-    </div>
-    <div class="biomarker-importance">
-      <h4>💧 What to Do During the Fast</h4>
-      <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
-    </div>
-    <div class="biomarker-importance">
-      <h4>🍽️ How to Break the Fast</h4>
-      <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
-    </div>
-    <div class="biomarker-importance">
-      <h4>💡 Tips</h4>
-      <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
-    </div>
-    ${p.biomarkers && p.biomarkers.length ? `
-    <div class="meal-targets" style="margin-top:12px">
-      <h5>Biomarkers Improved</h5>
-      <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
-    </div>` : ""}
-  `;
-}
-
-function renderFasting(targetId) {
-  const grid = document.getElementById(targetId || "fasting-grid");
-  if (!grid) return;
-
-  function renderProtocolCard(p) {
-    return `
-      <article class="fasting-card" id="fast-${p.id}">
-        <div class="fasting-header">
-          <span class="fasting-icon">${p.icon}</span>
-          <div>
-            <h3 class="fasting-name">${p.name}</h3>
-            <span class="fasting-meta">${p.duration} · ${p.difficulty}</span>
-          </div>
-        </div>
-        <p class="fasting-desc">${p.description}</p>
-        <details class="meal-details"><summary>🔬 What Happens in the Body</summary>
-          <ul class="checklist">${p.whatHappens.map(h => `<li>${h}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>🚪 How to Enter the Fast</summary>
-          <ul class="checklist">${p.howToEnter.map(h => `<li>${h}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>💧 What to Do During the Fast</summary>
-          <ul class="checklist">${p.duringFast.map(d => `<li>${d}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>🍽️ How to Break the Fast</summary>
-          <ul class="checklist">${p.howToBreak.map(h => `<li>${h}</li>`).join("")}</ul>
-        </details>
-        <details class="meal-details"><summary>💡 Tips</summary>
-          <ul class="checklist">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul>
-        </details>
-        ${p.biomarkers && p.biomarkers.length ? `
-        <div class="meal-targets" style="margin-top:12px"><h5>Biomarkers Improved</h5>
-          <div class="tag-group">${p.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
-        </div>` : ""}
-      </article>`;
-  }
-
-  function renderGroup(groupKey) {
-    const label = FASTING_GROUPS[groupKey];
-    const protocols = FASTING_PROTOCOLS.filter(p => p.group === groupKey);
-    if (!protocols.length) return "";
-    return `
-      <div class="fasting-group">
-        <h3 class="fasting-group-title">${label}</h3>
-        <div class="fasting-grid">
-          ${protocols.map(renderProtocolCard).join("")}
-        </div>
-      </div>`;
-  }
-
-  const desktopHTML = `
-    <div class="fasting-intro">
-      <h3>Choose Your Fasting Protocol</h3>
-      <p>Fasting triggers autophagy, improves insulin sensitivity, reduces inflammation, and activates cellular repair pathways. Start where you're comfortable and progress slowly. Always listen to your body.</p>
-    </div>
-    ${FASTING_GROUP_ORDER.map(renderGroup).join("")}`;
-
-  const swipeSlides = FASTING_GROUP_ORDER.flatMap(groupKey => {
-    const label = FASTING_GROUPS[groupKey];
-    const protocols = FASTING_PROTOCOLS.filter(p => p.group === groupKey);
-    const groupHeader = `<div class="fasting-swipe-group-header"><h3>${label}</h3></div>`;
-    const protocolSlides = protocols.map(p => `
-      <div class="card-face">${fastingCardFace(p)}</div>
-      <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
-      <div class="card-detail">${fastingCardDetail(p)}</div>
-    `);
-    return [groupHeader, ...protocolSlides];
-  });
-
-  grid.innerHTML = `
-    <div class="fasting-desktop">${desktopHTML}</div>
-    <div class="fasting-mobile-intro" style="display:none;">
-      <div class="page-header" style="padding:32px 24px 24px;">
-        <div class="section-inner">
-          <h1 class="page-title" style="font-size:28px;">Fasting Protocols</h1>
-          <p class="page-desc" style="font-size:14px;">Trigger autophagy, improve insulin sensitivity, and activate cellular repair.</p>
-        </div>
-      </div>
-    </div>
-    <div id="fasting-swipe-wrap"></div>
-  `;
-
-  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
-    CardSwipe.init('fasting-swipe-wrap', swipeSlides);
-  }
-}
-
-function renderVaccines(targetId) {
-  const grid = document.getElementById(targetId || "vaccine-grid");
-  if (!grid) return;
-
-  const groups = [
-    { key: "one-time", label: "🛡️ One-Time", desc: "Take once (usually a short series), then protected for years or life." },
-    { key: "periodic", label: "🔄 Periodic", desc: "Requires a booster every few years to maintain protection." },
-    { key: "annual", label: "📆 Annual", desc: "Needed every year — strains change or immunity wanes." },
-  ];
-
-  function scheduleLabel(s) {
-    if (s.includes("every 10")) return s + " (meaning: one dose now, next dose 10 years later)";
-    if (s.includes("every year")) return s;
-    if (s.includes("Annually")) return s;
-    if (s.includes("3 doses:")) return s + " — first dose today, second in 2 months, third in 6 months";
-    if (s.includes("2 doses:")) return s + " — first dose today, second 2–6 months later";
-    if (s.includes("Single dose")) return s + " (one dose only, no follow-up needed)";
-    return s;
-  }
-
-  const vaccineCard = (v) => `
-    <article class="vaccine-card" id="vac-${v.id}">
-      <div class="vaccine-header">
-        <h2 class="vaccine-name">${v.name}</h2>
-        <span class="tag tag-schedule tag-schedule-${v.scheduleType}">${v.scheduleType}</span>
-      </div>
-      <p class="vaccine-desc">${v.description}</p>
-      <div class="vaccine-detail"><strong>👤 Who needs it:</strong> ${v.whoNeedsIt}</div>
-      <div class="vaccine-detail"><strong>📅 Schedule:</strong> ${scheduleLabel(v.schedule)}</div>
-      <div class="vaccine-detail"><strong>✅ Efficacy:</strong> ${v.efficacy}</div>
-      <div class="vaccine-detail vaccine-cost"><strong>💰 Cost in Singapore:</strong> ${v.costSGD}</div>
-      <details class="meal-details">
-        <summary>🎯 Why It Matters for Longevity</summary>
-        <p class="vaccine-body-text">${v.longevityBenefit}</p>
-      </details>
-      <details class="meal-details">
-        <summary>⚠️ Side Effects</summary>
-        <p class="vaccine-body-text">${v.sideEffects}</p>
-      </details>
-    </article>`;
-
-  function vaccineCardFace(v) {
-    return `
-      <div class="vaccine-header" style="margin-bottom:10px;">
-        <h2 class="vaccine-name" style="font-size:20px;">${v.name}</h2>
-        <span class="tag tag-schedule tag-schedule-${v.scheduleType}">${v.scheduleType}</span>
-      </div>
-      <p class="vaccine-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${v.description}</p>
-      <div class="vaccine-detail" style="font-size:13px;margin-bottom:6px;"><strong>👤</strong> ${v.whoNeedsIt}</div>
-      <div class="vaccine-detail" style="font-size:13px;margin-bottom:6px;"><strong>📅</strong> ${scheduleLabel(v.schedule)}</div>
-      <div class="vaccine-detail" style="font-size:13px;margin-bottom:6px;"><strong>✅</strong> ${v.efficacy}</div>
-      <div class="vaccine-detail vaccine-cost" style="font-size:13px;margin-bottom:0;"><strong>💰</strong> ${v.costSGD}</div>
-    `;
-  }
-
-  function vaccineCardDetail(v) {
-    return `
-      <div class="biomarker-importance">
-        <h4>🎯 Why It Matters for Longevity</h4>
-        <p class="vaccine-body-text">${v.longevityBenefit}</p>
-      </div>
-      <div class="biomarker-importance">
-        <h4>⚠️ Side Effects</h4>
-        <p class="vaccine-body-text">${v.sideEffects}</p>
-      </div>
-    `;
-  }
-
-  const intro = `<div class="page-header">
-    <div class="section-inner">
-      <h1 class="page-title">Essential Vaccinations for Longevity</h1>
-      <p class="page-desc">Vaccinations prevent infectious diseases that accelerate biological aging, trigger chronic inflammation, and reduce quality of life. These are the most important vaccines for adults in Singapore.</p>
-    </div>
-  </div>`;
-
-  const body = groups.map(g => {
-    const items = VACCINES.filter(v => v.scheduleType === g.key);
-    if (!items.length) return "";
-    return `<div class="vaccine-group">
-      <h2 class="vaccine-group-title">${g.label}</h2>
-      <p class="vaccine-group-desc">${g.desc}</p>
-      <div class="vaccine-grid" style="margin-top:12px">${items.map(vaccineCard).join("")}</div>
-    </div>`;
-  }).join("");
-
-  const desktopHTML = intro + `<div class="section"><div class="section-inner">${body}</div></div>`;
-
-  // Mobile swipe: flatten all vaccines into one list
-  const allVaccines = groups.flatMap(g => VACCINES.filter(v => v.scheduleType === g.key));
-  const swipeSlides = allVaccines.map(v => `
-    <div class="card-face">${vaccineCardFace(v)}</div>
-    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
-    <div class="card-detail">${vaccineCardDetail(v)}</div>
-  `);
-
-  grid.innerHTML = `
-    <div class="vaccine-desktop">${desktopHTML}</div>
-    <div class="vaccine-mobile-intro" style="display:none;">
-      <div class="page-header" style="padding:32px 24px 24px;">
-        <div class="section-inner">
-          <h1 class="page-title" style="font-size:28px;">Essential Vaccinations</h1>
-          <p class="page-desc" style="font-size:14px;">Prevent infectious diseases that accelerate biological aging.</p>
-        </div>
-      </div>
-    </div>
-    <div id="vaccine-swipe-wrap"></div>
-  `;
-
-  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
-    CardSwipe.init('vaccine-swipe-wrap', swipeSlides);
-  }
-}
-
 let budgetInvestments = 0;
 
 function renderInvestments() {
@@ -588,7 +108,6 @@ function renderInvestments() {
 document.addEventListener('input', function(e) {
     if (e.target.closest('[data-budget-input]')) updateBudget();
 });
-
 function updateBudget() {
   const salary = parseFloat(document.getElementById('budgetSalary').value) || 0;
   const results = document.getElementById('budgetResults');
@@ -671,593 +190,6 @@ function updateBudget() {
   });
 }
 
-function renderDamageControl() {
-  return `<div class="dc-section">
-    <h3 class="dc-section-title">🍬 Too Much Sugar</h3>
-    <p class="dc-desc">Your body can handle an occasional glucose spike. These interventions help clear it faster and reduce metabolic damage. Pick what's available to you now:</p>
-    <div class="dc-tip-list">
-      ${SUGAR_OFFSET_TIPS.map(t => `
-        <div class="dc-tip-card">
-          <div class="dc-tip-action">${t.action}</div>
-          <div class="dc-tip-why">${t.why}</div>
-          <div class="dc-tip-timing">⏰ ${t.timing}</div>
-        </div>
-      `).join("")}
-    </div>
-  </div>`;
-}
-
-let foodTab = "breakfast";
-const foodTabCache = {};
-
-function renderFoods() {
-  const container = document.getElementById("food-app");
-  if (!container) return;
-
-  const foodTabsHTML = `
-    <div class="meal-controls">
-      <div class="meal-tabs">
-        ${MEAL_CATEGORIES.map(c =>
-          `<button class="meal-tab ${foodTab === c ? "active" : ""}" onclick="selectMealTab('${c}')">${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</button>`
-        ).join("")}
-        <button class="meal-tab meal-tab-marinade ${foodTab === "marinade" ? "active" : ""}" onclick="selectMealTab('marinade')">🧂 Marinades & Sauces (${MARINADES.length})</button>
-        <button class="meal-tab ${foodTab === "pantry" ? "active" : ""}" onclick="selectMealTab('pantry')">📦 Pantry (${PANTRY.length})</button>
-        <button class="meal-tab ${foodTab === "foodlists" ? "active" : ""}" onclick="selectMealTab('foodlists')">📊 Food Lists (3)</button>
-        <button class="meal-tab ${foodTab === "avoid" ? "active" : ""}" onclick="selectMealTab('avoid')">🚫 Avoid (${AVOID_LIST.length})</button>
-        <button class="meal-tab ${foodTab === "recipes" ? "active" : ""}" onclick="selectMealTab('recipes')">🌐 Recipes (${RECIPES.length})</button>
-      </div>
-      <select class="meal-tab-select" onchange="selectMealTab(this.value)">
-        ${MEAL_CATEGORIES.map(c =>
-          `<option value="${c}" ${foodTab === c ? "selected" : ""}>${MEAL_LABELS[c]} (${MEALS.filter(m => m.category === c).length})</option>`
-        ).join("")}
-        <option value="marinade" ${foodTab === "marinade" ? "selected" : ""}>🧂 Marinades & Sauces (${MARINADES.length})</option>
-        <option value="pantry" ${foodTab === "pantry" ? "selected" : ""}>📦 Pantry (${PANTRY.length})</option>
-        <option value="foodlists" ${foodTab === "foodlists" ? "selected" : ""}>📊 Food Lists (3)</option>
-        <option value="avoid" ${foodTab === "avoid" ? "selected" : ""}>🚫 Avoid (${AVOID_LIST.length})</option>
-        <option value="recipes" ${foodTab === "recipes" ? "selected" : ""}>🌐 Recipes (${RECIPES.length})</option>
-      </select>
-      ${["breakfast", "lunch", "marinade", "recipes"].includes(foodTab) ? `<button class="meal-surprise" onclick="surpriseMe()">🎲 Surprise Me</button>` : ""}
-    </div>`;
-
-  if (!container.querySelector('.meal-controls')) {
-    container.innerHTML = foodTabsHTML + '<div class="food-content"></div>';
-  } else {
-    container.querySelectorAll('.meal-tab').forEach(btn => {
-      const tabName = btn.getAttribute('onclick')?.match(/selectMealTab\('([^']+)'\)/)?.[1];
-      if (tabName) btn.classList.toggle('active', tabName === foodTab);
-    });
-    container.querySelector('.meal-tab-select').value = foodTab;
-  }
-
-  const contentEl = container.querySelector('.food-content');
-  if (!foodTabCache[foodTab]) {
-    foodTabCache[foodTab] = renderFoodContent(foodTab);
-  }
-  contentEl.innerHTML = foodTabCache[foodTab];
-}
-
-function pantryHTML() {
-  return `<div class="pantry-grid">
-    ${PANTRY.map(p => `
-      <div class="pantry-card">
-        <h3 class="pantry-name">${p.name}${p.daily ? `<span class="daily-badge">Daily</span>` : ""}</h3>
-        <p class="pantry-desc">${p.description}</p>
-        <div class="pantry-detail"><strong>💰 FairPrice:</strong> ${p.fairPrice}</div>
-        <div class="pantry-detail"><strong>🎯 Benefit:</strong> ${p.benefit}</div>
-        <div class="pantry-detail"><strong>💡 Use:</strong> ${p.servingTip}</div>
-      </div>
-    `).join("")}
-  </div>`;
-}
-
-function foodListHTML(list) {
-    const hasFiber = list.id === "fiber-rich";
-    const hasPotassium = list.id === "potassium-rich";
-    const extraCol = hasFiber ? { label: "Fiber", val: f => f.fiberG + "g" }
-                  : hasPotassium ? { label: "Potassium", val: f => f.potassiumMg + " mg" }
-                  : null;
-
-    const dailyNote = hasFiber ? `<p class="foodlist-note">Daily target: <strong>25-30g</strong> (women) · <strong>30-38g</strong> (men)</p>`
-                   : hasPotassium ? `<p class="foodlist-note">Daily target: <strong>2,600mg</strong> (women) · <strong>3,400mg</strong> (men)</p>`
-                   : "";
-
-    return `
-      <div class="foodlist-header">
-        <h3>${list.name}</h3>
-        <p class="foodlist-desc">${list.description}</p>
-        ${dailyNote}
-      </div>
-      <table class="foodlist-table">
-        <thead>
-          <tr><th>Food</th>${extraCol ? `<th class="foodlist-num">${extraCol.label}</th>` : ""}<th>Why It Helps</th><th>Targets</th></tr>
-        </thead>
-        <tbody>
-          ${list.foods.map(f => `
-            <tr>
-              <td><strong>${f.name}</strong></td>
-              ${extraCol ? `<td class="foodlist-num">${extraCol.val(f)}</td>` : ""}
-              <td>${f.why}</td>
-              <td>${f.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>`;
-  }
-
-  function avoidHTML() {
-    return AVOID_LIST.map(cat => `
-      <div class="avoid-card">
-        <h3 class="avoid-name">${cat.name}</h3>
-        <p class="avoid-desc">${cat.description}</p>
-        ${cat.items.map(item => `
-          <div class="avoid-item">
-            <div class="avoid-item-header">
-              <strong class="avoid-item-name">${item.item}</strong>
-              <span class="avoid-watch">🕵️ ${item.watchFor}</span>
-            </div>
-            <p class="avoid-why">❌ ${item.why}</p>
-            <p class="avoid-instead">✅ Instead: ${item.instead}</p>
-          </div>
-        `).join("")}
-      </div>
-    `).join("");
-  }
-
-  function recipeTabHTML() {
-    const tagClass = tag => `recipe-tag recipe-tag--${tag}`;
-    return RECIPE_CATEGORIES.map(cat => {
-      const items = RECIPES.filter(r => r.category === cat);
-      if (!items.length) return "";
-      return `
-        <div class="meal-group">
-          <h3 class="meal-group-title">${RECIPE_LABELS[cat]} (${items.length})</h3>
-          <div class="meal-grid">
-            ${items.map(r => `
-              <article class="meal-card recipe-card">
-                <div class="meal-card-top">
-                  <h3 class="meal-name">${r.name}</h3>
-                  <span class="meal-time">${r.prepTime} · ${r.cookTime}</span>
-                </div>
-                <p class="meal-desc">${r.description}</p>
-                <div class="meal-meta">
-                  <span>🥩 ${r.protein}</span>
-                  <span>🔥 ${r.calories}</span>
-                  ${r.fiber ? `<span>🌾 ${r.fiber} fiber</span>` : ""}
-                </div>
-                <div class="recipe-tags">
-                  ${r.tags.map(t => `<span class="${tagClass(t)}">${t}</span>`).join("")}
-                </div>
-                ${r.biomarkers && r.biomarkers.length ? `
-                <div class="meal-targets">
-                  <div class="tag-group">
-                    ${r.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
-                  </div>
-                </div>` : ""}
-                <a href="${r.url}" target="_blank" rel="noopener" class="recipe-link">📖 View recipe on ${r.source}</a>
-              </article>
-            `).join("")}
-          </div>
-        </div>`;
-    }).join("");
-  }
-
-  function renderFoodContent(tab) {
-    switch (tab) {
-      case "pantry": return pantryHTML();
-      case "foodlists": return FOOD_LISTS.map(list => foodListHTML(list)).join("<hr class='foodlist-divider'>");
-      case "avoid": return avoidHTML();
-      case "marinade": return `<div class="marinade-grid">
-        ${MARINADES.map(m => `
-          <div class="marinade-card" id="mar-${m.id}">
-            <h3 class="marinade-name">${m.name}</h3>
-            <p class="marinade-pairs"><strong>Pairs with:</strong> ${m.pairsWith}</p>
-            <details class="meal-details">
-              <summary>Recipe</summary>
-              <ul class="checklist">
-                ${m.ingredients.map(i => `<li>${i}</li>`).join("")}
-              </ul>
-              <p class="marinade-instruct">${m.instructions}</p>
-              <p class="marinade-storage">📦 ${m.storageTip}</p>
-            </details>
-            <span class="marinade-time">${m.prepTime}</span>
-          </div>
-        `).join("")}
-      </div>`;
-      case "recipes": return recipeTabHTML();
-      default: {
-        const items = MEALS.filter(m => m.category === tab);
-        const groups = {};
-        items.forEach(m => {
-          const g = m.group || "Other";
-          if (!groups[g]) groups[g] = [];
-          groups[g].push(m);
-        });
-        const groupOrder = ["Quick & Easy", "Prep Ahead", "Eggs", "Poultry", "Fish & Seafood", "Beef & Lamb", "Vegetarian", "Soups & Stews", "Sides", "Other"];
-        const sortedGroups = Object.keys(groups).sort((a, b) => {
-          const ai = groupOrder.indexOf(a);
-          const bi = groupOrder.indexOf(b);
-          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-        });
-        return `
-          <p class="meal-count">${items.length} meals · ${items.reduce((s, m) => s + (m.variations ? m.variations.length : 0), 0)}+ variations</p>
-          ${sortedGroups.map(g => `
-            <div class="meal-group">
-              <h3 class="meal-group-title">${g}</h3>
-              <div class="meal-grid">${mealHTML(groups[g])}</div>
-            </div>
-          `).join("")}`;
-      }
-    }
-  }
-
-  function mealHTML(items) {
-    return items.map(m => {
-      const hasMethods = m.methods && m.methods.length > 1;
-      const method = hasMethods ? m.methods[0] : null;
-      return `
-      <article class="meal-card" id="${m.id}">
-        <div class="meal-card-top">
-          <h3 class="meal-name">${m.name}</h3>
-          <span class="meal-time">${m.prepTime} · ${method ? method.cookTime : m.cookTime}</span>
-        </div>
-        <p class="meal-desc">${m.description}</p>
-        <div class="meal-meta">
-          <span>💰 ${method ? method.costPerServing : m.costPerServing}</span>
-          <span>🥩 ${m.protein}</span>
-          <span>🔥 ${m.calories}</span>
-        </div>
-        ${hasMethods ? `
-        <div class="method-selector">
-          ${m.methods.map((mt, i) =>
-            `<button class="method-btn ${i === 0 ? "active" : ""}" onclick="selectMethod('${m.id}', ${i})">${mt.name}</button>`
-          ).join("")}
-        </div>` : ""}
-        ${hasMethods ? m.methods.map((mt, i) => `
-        <div class="method-content${i === 0 ? "" : " hidden"}" data-method="${m.id}-${i}">
-          <details class="meal-details">
-            <summary>Ingredients & Instructions</summary>
-            <div class="meal-section">
-              <h5>Ingredients</h5>
-              <ul class="checklist">
-                ${m.ingredients.map(i => `<li>${i}</li>`).join("")}
-              </ul>
-            </div>
-            <div class="meal-section">
-              <h5>Instructions</h5>
-              <ol class="meal-steps">
-                ${mt.instructions.map(s => `<li>${s}</li>`).join("")}
-              </ol>
-            </div>
-            ${mt.supplementPairing ? `
-            <div class="meal-supplement">
-              <h5>💊 Supplement Pairing</h5>
-              <p>${mt.supplementPairing}</p>
-            </div>` : ""}
-          </details>
-        </div>`).join("") : `
-        <details class="meal-details">
-          <summary>Ingredients & Instructions</summary>
-          <div class="meal-section">
-            <h5>Ingredients</h5>
-            <ul class="checklist">
-              ${m.ingredients.map(i => `<li>${i}</li>`).join("")}
-            </ul>
-          </div>
-          <div class="meal-section">
-            <h5>Instructions</h5>
-            <ol class="meal-steps">
-              ${m.instructions.map(s => `<li>${s}</li>`).join("")}
-            </ol>
-          </div>
-        </details>
-        ${m.supplementPairing ? `
-        <div class="meal-supplement">
-          <h5>💊 Supplement Pairing</h5>
-          <p>${m.supplementPairing}</p>
-        </div>` : ""}`}
-        ${m.variations && m.variations.length ? `
-        <details class="meal-details">
-          <summary>Variations (${m.variations.length})</summary>
-          <ul class="checklist">
-            ${m.variations.map(v => `<li>${v}</li>`).join("")}
-          </ul>
-        </details>` : ""}
-        ${m.biomarkers && m.biomarkers.length ? `
-        <div class="meal-targets">
-          <h5>Targets</h5>
-          <div class="tag-group">
-            ${m.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
-          </div>
-        </div>` : ""}
-      </article>`;
-    }).join("");
-  }
-
-function surpriseMe() {
-  const validTabs = ["breakfast", "lunch", "marinade"];
-  if (!validTabs.includes(foodTab)) return;
-
-  let pick;
-  if (foodTab === "marinade") {
-    pick = MARINADES[Math.floor(Math.random() * MARINADES.length)];
-    const el = document.getElementById("mar-" + pick.id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      el.classList.add("highlight-flash");
-      setTimeout(() => el.classList.remove("highlight-flash"), 2500);
-    }
-    return;
-  }
-
-  const all = MEALS.filter(m => m.category === foodTab);
-  if (!all.length) return;
-  pick = all[Math.floor(Math.random() * all.length)];
-  const el = document.getElementById(pick.id);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-    el.classList.add("highlight-flash");
-    setTimeout(() => el.classList.remove("highlight-flash"), 2500);
-  }
-}
-
-function selectMealTab(tab) {
-  foodTab = tab;
-  renderFoods();
-}
-
-function selectMethod(mealId, idx) {
-  const card = document.getElementById(mealId);
-  if (!card) return;
-
-  const btns = card.querySelectorAll(".method-btn");
-  btns.forEach((b, i) => b.classList.toggle("active", i === idx));
-
-  const contents = card.querySelectorAll(".method-content");
-  contents.forEach((c, i) => c.classList.toggle("hidden", i !== idx));
-
-  const firstContent = contents[idx];
-  if (firstContent) {
-    // method switch handled by class toggles above
-  }
-}
-
-let selectedDiet = "carnivore";
-let selectedTier = "critical";
-
-function effectiveTier(s, diet) {
-  return (s.dietTier && s.dietTier[diet]) || s.tier;
-}
-
-function filteredSupplements(diet, tier) {
-  const tierIndex = TIER_ORDER.indexOf(tier);
-  const includedTiers = TIER_ORDER.slice(0, tierIndex + 1);
-  return SUPPLEMENTS.filter(s =>
-    s.diets.includes(diet) && includedTiers.includes(effectiveTier(s, diet))
-  );
-}
-
-function supplementCardFace(s) {
-  const tier = effectiveTier(s, selectedDiet);
-  return `
-    <div class="supp-item-top" style="margin-bottom:8px;">
-      <h4 class="supp-item-name" style="font-size:18px;">${s.name}</h4>
-      <span class="supp-item-tier supp-tier-${tier}">${tier}</span>
-      <span class="supp-item-cost">${s.costPerMonth}/mo</span>
-    </div>
-    <p class="supp-item-desc" style="font-size:14px;line-height:1.6;margin-bottom:12px;">${s.description}</p>
-    <div class="supp-item-detail" style="font-size:13px;margin-bottom:4px;"><strong>Dosage:</strong> ${s.dosage}</div>
-    <div class="supp-item-detail" style="font-size:13px;margin-bottom:4px;"><strong>When:</strong> ${s.timingDetail}</div>
-    <div class="supp-item-detail" style="font-size:13px;color:var(--color-text-muted);"><strong>Timing:</strong> ${s.timing === 'am' ? '☀️ AM' : '🌙 PM'}</div>
-  `;
-}
-
-function supplementCardDetail(s) {
-  const dietEmoji = selectedDiet === "carnivore" ? "🥩" : selectedDiet === "vegetarian" ? "🥬" : "🍽️";
-  return `
-    <div class="supp-item-section">
-      <h5>💊 Product & Pricing</h5>
-      <p class="supp-product-text">${s.product}</p>
-      <p class="supp-cost-serving">${s.costPerServing}</p>
-    </div>
-    <div class="supp-item-section">
-      <h5>🎯 Why You Need It</h5>
-      <p class="supp-why-text">${s.whyGeneral}</p>
-    </div>
-    <div class="supp-item-section">
-      <h5>${dietEmoji} Why ${DIET_LABELS_PLAIN[selectedDiet]} Need It</h5>
-      <p class="supp-diet-why-text">${s.whyDiet[selectedDiet]}</p>
-    </div>
-    <div class="supp-item-section">
-      <h5>Benefits</h5>
-      <ul class="checklist">
-        ${s.benefits.map(b => `<li>${b}</li>`).join("")}
-      </ul>
-    </div>
-    <div class="supp-item-section">
-      <h5>⚠️ Conflict Check</h5>
-      <p class="supp-conflicts-text">${s.conflicts}</p>
-    </div>
-    ${s.biomarkers && s.biomarkers.length ? `
-    <div class="supp-item-section">
-      <h5>Targets</h5>
-      <div class="tag-group">
-        ${s.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join(" ")}
-      </div>
-    </div>` : ""}
-  `;
-}
-
-function renderSupplements(targetId) {
-  const container = document.getElementById(targetId || "supplement-app");
-  if (!container) return;
-
-  const filtered = filteredSupplements(selectedDiet, selectedTier);
-
-  const totalCost = filtered.reduce((sum, s) => {
-    return sum + parseFloat(s.costPerMonth.replace("SGD ", ""));
-  }, 0);
-
-  const timingOrder = ["am", "pm"];
-  const timingLabels = {
-    am: "☀️ AM — with breakfast",
-    pm: "🌙 PM — with dinner or before bed",
-  };
-  const timingAdvice = {
-    am: "Set aside your AM pill box after breakfast. Keep on the kitchen counter as a visual cue.",
-    pm: "Fill your PM pill box each morning alongside your AM box. Pair with toothbrushing as a trigger.",
-  };
-
-  const grouped = {};
-  for (const t of timingOrder) {
-    grouped[t] = filtered.filter(s => s.timing === t);
-  }
-
-  const pillCountAm = grouped.am ? grouped.am.reduce((sum, s) => {
-    if (s.id === "creatine") return sum;
-    if (s.id === "nac") return sum + 1;
-    return sum + 1;
-  }, 0) : 0;
-  const pillCountPm = grouped.pm ? grouped.pm.reduce((sum, s) => {
-    if (s.id === "omega-3") return sum + 3;
-    if (s.id === "magnesium") return sum + 3;
-    return sum + 1;
-  }, 0) : 0;
-
-  // Desktop timing blocks
-  let desktopHTML = "";
-  for (const t of timingOrder) {
-    const items = grouped[t];
-    if (!items.length) continue;
-
-    desktopHTML += `
-      <div class="supp-timing-block">
-        <div class="supp-timing-header">
-          <h3 class="supp-timing-label">${timingLabels[t]}</h3>
-          <span class="supp-timing-count">${items.length} supplement${items.length > 1 ? "s" : ""}</span>
-        </div>
-        <p class="supp-timing-advice">💡 ${timingAdvice[t]}</p>
-        <div class="supp-timing-grid">
-          ${items.map(s => `
-            <div class="supp-item" id="supp-${s.id}">
-              <div class="supp-item-top">
-                <h4 class="supp-item-name">${s.name}</h4>
-                <span class="supp-item-tier supp-tier-${effectiveTier(s, selectedDiet)}">${effectiveTier(s, selectedDiet)}</span>
-                <span class="supp-item-cost">${s.costPerMonth}/mo</span>
-              </div>
-              <p class="supp-item-desc">${s.description}</p>
-              <div class="supp-item-detail">
-                <strong>Dosage:</strong> ${s.dosage}
-              </div>
-              <div class="supp-item-detail">
-                <strong>When:</strong> ${s.timingDetail}
-              </div>
-              <div class="supp-item-section">
-                <h5>💊 Product & Pricing</h5>
-                <p class="supp-product-text">${s.product}</p>
-                <p class="supp-cost-serving">${s.costPerServing}</p>
-              </div>
-              <div class="supp-item-section">
-                <h5>🎯 Why You Need It</h5>
-                <p class="supp-why-text">${s.whyGeneral}</p>
-              </div>
-              <div class="supp-item-section">
-                <h5>${selectedDiet === "carnivore" ? "🥩" : selectedDiet === "vegetarian" ? "🥬" : "🍽️"} Why ${DIET_LABELS_PLAIN[selectedDiet]} Need It</h5>
-                <p class="supp-diet-why-text">${s.whyDiet[selectedDiet]}</p>
-              </div>
-              <div class="supp-item-section">
-                <h5>Benefits</h5>
-                <ul class="checklist">
-                  ${s.benefits.map(b => `<li>${b}</li>`).join("")}
-                </ul>
-              </div>
-              <div class="supp-item-section">
-                <h5>⚠️ Conflict Check</h5>
-                <p class="supp-conflicts-text">${s.conflicts}</p>
-              </div>
-              ${s.biomarkers && s.biomarkers.length ? `
-              <div class="supp-item-section">
-                <h5>Targets</h5>
-                <div class="tag-group">
-                  ${s.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}
-                </div>
-              </div>` : ""}
-            </div>
-          `).join("")}
-        </div>
-      </div>`;
-  }
-
-  // Mobile swipe: flatten all filtered supplements
-  const swipeSlides = filtered.map(s => `
-    <div class="card-face">${supplementCardFace(s)}</div>
-    <button class="card-swipe-expand-btn" aria-expanded="false">Show Details</button>
-    <div class="card-detail">${supplementCardDetail(s)}</div>
-  `);
-
-  container.innerHTML = `
-    <div class="supp-controls">
-      <div class="supp-selector-group">
-        <label class="supp-label">Diet</label>
-        <div class="supp-toggle">
-          ${["carnivore", "omnivore", "vegetarian"].map(d =>
-            `<button class="supp-btn ${selectedDiet === d ? "active" : ""}" onclick="selectDiet('${d}')">${DIET_LABELS[d]}</button>`
-          ).join("")}
-        </div>
-      </div>
-      <div class="supp-selector-group">
-        <label class="supp-label">Stack</label>
-        <div class="supp-toggle">
-          ${TIER_ORDER.map(t =>
-            `<button class="supp-btn ${selectedTier === t ? "active" : ""}" onclick="selectTier('${t}')">${TIER_LABELS[t]}</button>`
-          ).join("")}
-        </div>
-      </div>
-    </div>
-
-    <div class="supp-stack-summary">
-      <div class="supp-tier-info">
-        <h3 class="supp-tier-name">${TIER_LABELS[selectedTier]}</h3>
-        <p class="supp-tier-desc">${TIER_DESCRIPTIONS[selectedTier]}</p>
-      </div>
-      <div class="supp-cost-card">
-        <span class="supp-cost-label">Monthly Total</span>
-        <span class="supp-cost-value">SGD ${totalCost.toFixed(0)}</span>
-        <span class="supp-cost-note">Budget-friendly brands</span>
-      </div>
-    </div>
-
-    <div class="supp-count">
-      ${filtered.length} supplements · ${filtered.length > 0 ? `AM: ~${pillCountAm} pills${grouped.am ? "" : " —"} · PM: ~${pillCountPm} pills` : ""} · fits a 2-box system
-    </div>
-
-    <p class="supp-price-disclaimer">${PRICE_DISCLAIMER}</p>
-
-    <div class="supplement-grid-desktop">${desktopHTML}</div>
-    <div id="supplement-swipe-wrap"></div>
-  `;
-
-  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
-    CardSwipe.init('supplement-swipe-wrap', swipeSlides, {
-      onSlideChange: (idx) => {
-        // history.replaceState(null, null, '#' + filtered[idx].id);
-      }
-    });
-    // Scroll swipe container into view on mobile
-    if (window.innerWidth < 768) {
-      setTimeout(() => {
-        const wrap = document.getElementById('supplement-swipe-wrap');
-        if (wrap) {
-          const top = wrap.getBoundingClientRect().top + window.scrollY - 60;
-          window.scrollTo({ left: 0, top, behavior: 'auto' });
-        }
-      }, 0);
-    }
-  }
-}
-
-/* ============================
-   Sound Cues
-   ============================ */
 let audioCtx = null;
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1466,11 +398,11 @@ function initExerciseSounds() {
 }
 
 /* ============================
-   Exercise Timer State
+   Exercise Timer State — Unified
    ============================ */
 const timerState = {};
 
-function timerTick(id, ex) {
+function timerTick(id, config) {
   const s = timerState[id];
   if (!s || s.status === "idle" || s.status === "paused") return;
 
@@ -1479,100 +411,170 @@ function timerTick(id, ex) {
   s.timeRemaining = Math.max(0, s.timeRemaining - elapsed);
   s.lastTick = now;
 
-  const total = s.currentSet > s.totalSets ? 0 : s.isWork ? s.v.workSeconds : s.v.restSeconds;
+  const total = s.phaseTotal || 1;
   const pct = total > 0 ? (s.timeRemaining / total) * 100 : 0;
 
   const mins = Math.floor(s.timeRemaining / 60);
   const secs = Math.floor(s.timeRemaining % 60);
   const timeText = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  const labelText = s.isWork ? "⏱️ WORK" : "💤 REST";
-  const el = s._el;
+
+  let el = s._el;
+  if (el.time && el.time.offsetParent === null) { s._el = timerEls(id); el = s._el; }
   if (el.time) el.time.textContent = timeText;
   if (el.bar) el.bar.style.transform = `scaleX(${pct / 100})`;
-  if (el.label) el.label.textContent = labelText;
 
   // Sound milestones
   const timeLeft = s.timeRemaining;
-  const totalTime = total;
-  if (totalTime > 0) {
-    if (s.isWork) {
-      const pctLeft = timeLeft / totalTime;
-      if (!s._midpoint && pctLeft <= 0.5 && pctLeft > 0.48) { s._midpoint = true; playMidpoint(); }
-    }
-    if (timeLeft <= 6 && timeLeft > 0) {
-      const sec = Math.ceil(timeLeft);
-      if (sec !== s._lastCountdownSec) {
-        s._lastCountdownSec = sec;
-        playCountdownTick();
-        if (!s._musicStoppedForCountdown) {
-          s._musicStoppedForCountdown = true;
-          stopMusic();
-        }
+  if (timeLeft <= 6 && timeLeft > 0) {
+    const sec = Math.ceil(timeLeft);
+    if (sec !== s._lastCountdownSec) {
+      s._lastCountdownSec = sec;
+      playCountdownTick();
+      if (!s._musicStoppedForCountdown) {
+        s._musicStoppedForCountdown = true;
+        stopMusic();
       }
     }
   }
 
   if (s.timeRemaining <= 0) {
+    advanceTimerPhase(id);
+  }
+
+  s._raf = requestAnimationFrame(() => timerTick(id, config));
+}
+
+function advanceTimerPhase(id) {
+  const s = timerState[id];
+  if (!s) return;
+
+  if (s.type === "countdown") {
+    s.status = "done";
+    const el = s._el;
+    if (el.label) el.label.textContent = "✅ DONE";
+    playAllDone();
+    updateTimerControls(id, "done");
+    if (el.bar) el.bar.style.transform = "scaleX(0)";
+    return;
+  }
+
+  if (s.type === "intervals") {
+    if (s.phase === "warmup") {
+      s.phase = "work";
+      s.timeRemaining = s.config.work;
+      s.phaseTotal = s.config.work;
+      s._resetFlags();
+      playStartWhistle();
+      startMusic(true);
+      if (s._el.label) s._el.label.textContent = "⚡ WORK";
+      if (s._el.phase) s._el.phase.textContent = `Interval ${s.currentRound}/${s.config.rounds}`;
+    } else if (s.phase === "work") {
+      playWorkEnd();
+      s.phase = "recovery";
+      s.timeRemaining = s.config.recovery;
+      s.phaseTotal = s.config.recovery;
+      s._resetFlags();
+      startMusic(false);
+      if (s._el.label) s._el.label.textContent = "😮‍💨 RECOVER";
+    } else if (s.phase === "recovery") {
+      s.currentRound++;
+      if (s.currentRound > s.config.rounds) {
+        s.phase = "cooldown";
+        s.timeRemaining = s.config.cooldown;
+        s.phaseTotal = s.config.cooldown;
+        s._resetFlags();
+        startMusic(false);
+        if (s._el.label) s._el.label.textContent = "🧘 COOLDOWN";
+        if (s._el.phase) s._el.phase.textContent = "Final cooldown";
+      } else {
+        s.phase = "work";
+        s.timeRemaining = s.config.work;
+        s.phaseTotal = s.config.work;
+        s._resetFlags();
+        playRestOver();
+        startMusic(true);
+        if (s._el.label) s._el.label.textContent = "⚡ WORK";
+        if (s._el.phase) s._el.phase.textContent = `Interval ${s.currentRound}/${s.config.rounds}`;
+      }
+    } else if (s.phase === "cooldown") {
+      s.status = "done";
+      if (s._el.label) s._el.label.textContent = "✅ DONE";
+      playAllDone();
+      updateTimerControls(id, "done");
+      if (s._el.bar) s._el.bar.style.transform = "scaleX(0)";
+      return;
+    }
+    updateIntervalDisplay(id);
+  }
+
+  if (s.type === "reps") {
     if (s.isWork) {
       playWorkEnd();
       if (s.currentSet >= s.totalSets) {
         s.status = "done";
-        if (el.label) el.label.textContent = "✅ DONE";
+        if (s._el.label) s._el.label.textContent = "✅ DONE";
         playAllDone();
         updateTimerControls(id, "done");
-        if (el.bar) el.bar.style.transform = "scaleX(0)";
+        if (s._el.bar) s._el.bar.style.transform = "scaleX(0)";
         return;
       }
       s.isWork = false;
-      s.timeRemaining = s.v.restSeconds;
+      s.timeRemaining = s.restSeconds;
+      s.phaseTotal = s.restSeconds;
       s._resetFlags();
       startMusic(false);
-      if (el.label) el.label.textContent = "💤 REST";
-      if (el.sets) el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
+      if (s._el.label) s._el.label.textContent = "💤 REST";
+      if (s._el.sets) s._el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
     } else {
       playRestOver();
       s.currentSet++;
       if (s.currentSet > s.totalSets) {
         s.status = "done";
-        if (el.label) el.label.textContent = "✅ DONE";
+        if (s._el.label) s._el.label.textContent = "✅ DONE";
         playAllDone();
         updateTimerControls(id, "done");
-        if (el.bar) el.bar.style.transform = "scaleX(0)";
+        if (s._el.bar) s._el.bar.style.transform = "scaleX(0)";
         return;
       }
       s.isWork = true;
-  s.timeRemaining = s.v.workSeconds;
+      s.timeRemaining = s.workSeconds;
+      s.phaseTotal = s.workSeconds;
       s._resetFlags();
       playStartWhistle();
       startMusic(true);
-      if (el.label) el.label.textContent = "⏱️ WORK";
-      if (el.sets) el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
+      if (s._el.label) s._el.label.textContent = "⏱️ WORK";
+      if (s._el.sets) s._el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
     }
     updateSetIndicators(id, s.currentSet, s.totalSets);
   }
-
-  s._raf = requestAnimationFrame(() => timerTick(id, ex));
 }
 
-function timerStateReset(id, ex) {
+function timerStateReset(id) {
   if (!timerState[id]) timerState[id] = {};
   const s = timerState[id];
-  s.v = getVariation(ex).variation;
   s.status = "idle";
-  s.currentSet = 1;
-  s.totalSets = s.v.sets;
-  s.isWork = true;
-      s.timeRemaining = s.v.workSeconds;
   s.lastTick = Date.now();
   s._raf = null;
-  s._el = {
-    time: document.getElementById("time-" + id),
-    bar: document.getElementById("bar-" + id),
-    label: document.getElementById("label-" + id),
-    sets: document.getElementById("sets-" + id),
-  };
-  s._resetFlags = function() { this._midpoint = false; this._lastCountdownSec = null; this._musicStoppedForCountdown = false; };
+  s._el = timerEls(id);
+  s._resetFlags = function() { this._lastCountdownSec = null; this._musicStoppedForCountdown = false; };
   s._resetFlags();
+}
+
+function timerEls(id) {
+  const resolve = (name) => {
+    let visible = null;
+    document.querySelectorAll(`#${name}-${id}`).forEach(el => {
+      if (!visible && el.offsetParent !== null) visible = el;
+    });
+    return visible || document.getElementById(`${name}-${id}`) || null;
+  };
+  return {
+    time: resolve("time"),
+    bar: resolve("bar"),
+    label: resolve("label"),
+    sets: resolve("sets"),
+    phase: resolve("phase"),
+  };
 }
 
 function updateTimerControls(id, state) {
@@ -1590,27 +592,36 @@ function updateSetIndicators(id, current, total) {
   const dots = document.querySelectorAll(`.set-dot[data-exercise="${id}"]`);
   dots.forEach((d, i) => {
     d.className = "set-dot" + (i < current - 1 ? " done" : i === current - 1 ? " active" : "");
-    d.dataset.exercise = id;
   });
 }
 
-function handleTimerAction(id, action, ex) {
-  if (!timerState[id]) timerStateReset(id, ex);
+function updateIntervalDisplay(id) {
+  const s = timerState[id];
+  if (!s || !s._el) return;
+  const el = s._el;
+  if (el.phase) el.phase.textContent = s.phase === "warmup" ? "Warm-up" :
+    s.phase === "work" ? `Interval ${s.currentRound}/${s.config.rounds}` :
+    s.phase === "recovery" ? `Recovery ${s.currentRound}/${s.config.rounds}` :
+    "Cooldown";
+}
+
+function handleTimerAction(id, action) {
+  if (!timerState[id]) return;
   let s = timerState[id];
 
   if (action === "start") {
     for (const [tid, ts] of Object.entries(timerState)) {
       if (tid !== id && (ts.status === "running" || ts.status === "paused")) {
-        handleTimerAction(tid, "stop", EXERCISES.find(e => e.id === tid));
+        handleTimerAction(tid, "stop");
       }
     }
-    if (s.status === "done") { timerStateReset(id, ex); s = timerState[id]; }
+    if (s.status === "done") { initTimerState(id); s = timerState[id]; }
     s.status = "running";
     s.lastTick = Date.now();
     updateTimerControls(id, "running");
     playStartWhistle();
-    startMusic(true);
-    timerTick(id, ex);
+    if (s.type !== "countdown") startMusic(true);
+    timerTick(id);
   } else if (action === "pause") {
     s.status = "paused";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
@@ -1620,23 +631,55 @@ function handleTimerAction(id, action, ex) {
     s.status = "idle";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
     stopMusic();
-    timerStateReset(id, ex);
-    const sv = timerState[id].v;
+    initTimerState(id);
     const el2 = timerState[id]._el;
     updateTimerControls(id, "idle");
-    const m = Math.floor(sv.workSeconds / 60);
-    const sec = sv.workSeconds % 60;
-    const resetTime = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
-    if (el2.time) el2.time.textContent = resetTime;
-    if (el2.bar) el2.bar.style.transform = "scaleX(1)";
-    if (el2.label) el2.label.textContent = "Ready";
-    if (el2.sets) el2.sets.textContent = `1/${sv.sets}`;
-    updateSetIndicators(id, 1, sv.sets);
+    const st = timerState[id];
+    if (st.type === "countdown") {
+      const m = Math.floor(st.totalSeconds / 60);
+      const sec = st.totalSeconds % 60;
+      if (el2.time) el2.time.textContent = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+      if (el2.label) el2.label.textContent = "Ready";
+    } else if (st.type === "intervals") {
+      if (el2.time) el2.time.textContent = "00:00";
+      if (el2.label) el2.label.textContent = "Ready";
+      if (el2.phase) el2.phase.textContent = "Norwegian 4×4";
+      if (el2.bar) el2.bar.style.transform = "scaleX(1)";
+    } else {
+      const m = Math.floor(st.workSeconds / 60);
+      const sec = st.workSeconds % 60;
+      if (el2.time) el2.time.textContent = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+      if (el2.bar) el2.bar.style.transform = "scaleX(1)";
+      if (el2.label) el2.label.textContent = "Ready";
+      if (el2.sets) el2.sets.textContent = `1/${st.totalSets}`;
+      updateSetIndicators(id, 1, st.totalSets);
+    }
   }
 }
 
-function getVariation(ex) {
-  return { variation: ex.variations[1] || ex.variations[0], index: 1 };
+function initTimerState(id) {
+  const s = timerState[id];
+  if (!s) return;
+  if (s.type === "countdown") {
+    s.timeRemaining = s.totalSeconds;
+    s.phaseTotal = s.totalSeconds;
+  } else if (s.type === "intervals") {
+    s.phase = "warmup";
+    s.currentRound = 1;
+    s.timeRemaining = s.config.warmup;
+    s.phaseTotal = s.config.warmup;
+  } else {
+    s.currentSet = 1;
+    s.isWork = true;
+    s.timeRemaining = s.workSeconds;
+    s.phaseTotal = s.workSeconds;
+  }
+}
+
+function createTimerState(id, config) {
+  timerState[id] = { ...config, status: "idle", _raf: null, _el: timerEls(id) };
+  timerState[id]._resetFlags = function() { this._lastCountdownSec = null; this._musicStoppedForCountdown = false; };
+  initTimerState(id);
 }
 
 function initExerciseTimers() {
@@ -1648,17 +691,202 @@ function initExerciseTimers() {
     const stop = e.target.closest(".timer-stop");
     const exId = (start || pause || stop)?.dataset?.exercise;
     if (!exId) return;
-    const ex = EXERCISES.find(e => e.id === exId);
-    if (!ex) return;
-    if (start) handleTimerAction(exId, "start", ex);
-    else if (pause) handleTimerAction(exId, "pause", ex);
-    else if (stop) handleTimerAction(exId, "stop", ex);
+    if (start) handleTimerAction(exId, "start");
+    else if (pause) handleTimerAction(exId, "pause");
+    else if (stop) handleTimerAction(exId, "stop");
   });
-
 }
 
 /* ============================
-   Exercise Card Render
+   4-Pillar Exercise Rendering
+   ============================ */
+function pillarOverviewCard(p) {
+  const freq = p.id === "zone2" ? p.frequency :
+    p.id === "vo2max" ? `${p.protocol.name} · ${p.protocol.totalMinutes} min` :
+    p.id === "strength" ? p.frequency :
+    p.frequency;
+  return `
+    <article class="pillar-card" id="pillar-${p.id}">
+      <div class="pillar-card-head">
+        <span class="pillar-icon">${p.icon}</span>
+        <div>
+          <h2 class="pillar-name">${p.name}</h2>
+          <span class="pillar-freq">${freq}</span>
+        </div>
+      </div>
+      <p class="pillar-desc">${p.description}</p>
+      <div class="pillar-benefits">
+        ${p.benefits.map(b => `<span class="pillar-benefit">✓ ${b}</span>`).join("")}
+      </div>
+    </article>`;
+}
+
+function zone2TimerHTML(pillar) {
+  const id = "zone2";
+  const totalSec = pillar.timer.defaultMinutes * 60;
+  const m = pillar.timer.defaultMinutes;
+  return `
+    <div class="pillar-timer zone2-timer" id="timer-${id}">
+      <div class="timer-config">
+        <span class="timer-phase-label" id="phase-${id}">Zone 2 Steady State</span>
+      </div>
+      <div class="timer-display">
+        <span class="timer-time" id="time-${id}">${String(m).padStart(2,"0")}:00</span>
+        <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn timer-start" data-exercise="${id}">▶ Start</button>
+        <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
+        <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
+      </div>
+      <div class="timer-label" id="label-${id}">Ready — ${m} min at conversational pace</div>
+    </div>`;
+}
+
+function vo2TimerHTML(pillar) {
+  const id = "vo2max";
+  const t = pillar.timer;
+  return `
+    <div class="pillar-timer interval-timer" id="timer-${id}">
+      <div class="timer-config">
+        <span class="timer-phase-label" id="phase-${id}">${pillar.protocol.name}</span>
+      </div>
+      <div class="timer-display">
+        <span class="timer-time" id="time-${id}">00:00</span>
+        <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn timer-start" data-exercise="${id}">▶ Start</button>
+        <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
+        <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
+      </div>
+      <div class="timer-label" id="label-${id}">Ready — ${t.warmup/60}min warmup → ${t.rounds}×(${t.work/60}min work + ${t.recovery/60}min recovery) → ${t.cooldown/60}min cooldown</div>
+    </div>`;
+}
+
+function strengthExerciseCard(ex) {
+  const id = ex.id;
+  return `
+    <div class="pillar-exercise-card" id="ex-${id}">
+      <div class="exercise-header">
+        <div class="exercise-name">${ex.icon || "🏋️"} ${ex.name}</div>
+      </div>
+      <p class="exercise-desc">${ex.description}</p>
+      <div class="exercise-timer" id="timer-${id}">
+        <div class="timer-config">
+          <span id="config-${id}">${ex.sets} × ${ex.workSeconds}s work · ${ex.restSeconds}s rest</span>
+          <span class="set-indicators">
+            ${Array.from({length: ex.sets}, (_, i) => `<span class="set-dot${i === 0 ? " active" : ""}" data-exercise="${id}"></span>`).join("")}
+          </span>
+        </div>
+        <div class="timer-display">
+          <span class="timer-time" id="time-${id}">${String(Math.floor(ex.workSeconds/60)).padStart(2,"0")}:${String(ex.workSeconds%60).padStart(2,"0")}</span>
+          <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn timer-start" data-exercise="${id}">▶ Start</button>
+          <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
+          <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
+        </div>
+        <div class="timer-label" id="label-${id}">Ready</div>
+      </div>
+      <div class="exercise-set-counter">Set <span id="sets-${id}">1/${ex.sets}</span></div>
+      <details class="exercise-details">
+        <summary>📖 Guide</summary>
+        <div class="exercise-detail-content">
+          <div class="exercise-detail-section">
+            <h5>🎯 Why</h5>
+            <p class="exercise-detail-text">${ex.whyLongevity}</p>
+          </div>
+          <div class="exercise-detail-section">
+            <h5>📋 Steps</h5>
+            <ol class="checklist">${ex.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
+          </div>
+        </div>
+      </details>
+    </div>`;
+}
+
+function renderPillars(targetId) {
+  const container = document.getElementById(targetId || "workout-app");
+  if (!container) return;
+
+  initExerciseSounds();
+
+  const intro = `
+    <div class="exercise-intro">
+      <h3>4 Pillars of Longevity Training</h3>
+      <p>The four most impactful exercise domains for healthspan and lifespan. Each pillar addresses a distinct physiological system. Together, they cover cardiovascular fitness, mitochondrial health, muscular strength, and movement quality.</p>
+    </div>`;
+
+  const pillarHTML = PILLARS.map(p => {
+    let timerHTML = "";
+    let exercisesHTML = "";
+
+    if (p.id === "zone2") {
+      timerHTML = zone2TimerHTML(p);
+    } else if (p.id === "vo2max") {
+      timerHTML = vo2TimerHTML(p);
+    } else if (p.exercises) {
+      exercisesHTML = `<div class="pillar-exercises">${p.exercises.map(strengthExerciseCard).join("")}</div>`;
+    }
+
+    const whyHTML = p.whyLongevity ? `
+      <details class="exercise-details">
+        <summary>📖 Why This Matters</summary>
+        <div class="exercise-detail-content">
+          <div class="exercise-detail-section">
+            <p class="exercise-detail-text">${p.whyLongevity}</p>
+          </div>
+        </div>
+      </details>` : "";
+
+    return `
+      <section class="pillar-section" id="section-${p.id}">
+        ${pillarOverviewCard(p)}
+        ${timerHTML}
+        ${exercisesHTML}
+        ${whyHTML}
+      </section>`;
+  }).join("");
+
+  container.innerHTML = intro + `<div class="pillars-container">${pillarHTML}</div>`;
+
+  // Create timer states for each pillar
+  const zone2 = PILLARS.find(p => p.id === "zone2");
+  const vo2 = PILLARS.find(p => p.id === "vo2max");
+
+  createTimerState("zone2", {
+    type: "countdown",
+    totalSeconds: zone2.timer.defaultMinutes * 60,
+  });
+
+  createTimerState("vo2max", {
+    type: "intervals",
+    config: vo2.timer,
+  });
+
+  // Create timer states for strength/mobility exercises
+  PILLARS.forEach(p => {
+    if (p.exercises) {
+      p.exercises.forEach(ex => {
+        createTimerState(ex.id, {
+          type: "reps",
+          workSeconds: ex.workSeconds,
+          restSeconds: ex.restSeconds,
+          totalSets: ex.sets,
+          currentSet: 1,
+          isWork: true,
+        });
+      });
+    }
+  });
+
+  initExerciseTimers();
+}
+
+/* ============================
+   Legacy exercise rendering (backward compat)
    ============================ */
 function exerciseCardFace(e) {
   const def = e.variations[1] || e.variations[0];
@@ -1698,90 +926,17 @@ function exerciseCardDetail(e) {
     <div class="exercise-detail-section">
       <h5>📋 Step-by-Step</h5>
       <ol class="checklist">${e.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
-    </div>
-    ${e.biomarkers.length ? `
-    <div class="exercise-detail-section">
-      <h5>🎯 Targets</h5>
-      <div class="tag-group">${e.biomarkers.map(b => `<a href="/pages/health.html#${b}" class="tag tag-biomarker">${b}</a>`).join("")}</div>
-    </div>` : ""}
-  `;
+    </div>`;
 }
 
 function renderExercises(targetId) {
-  const container = document.getElementById(targetId || "workout-app");
-  if (!container) return;
-
-  initExerciseSounds();
-
-  const intro = `
-    <div class="exercise-intro">
-      <h3>Your Daily Movement Practice</h3>
-      <p>No equipment. No gym. No excuses. Pick 3-5 exercises and do them anywhere — takes 5-10 minutes daily. Use the built-in timer with sound cues.</p>
-    </div>`;
-
-  const desktopHTML = intro + `
-    <div class="exercise-grid">
-      ${EXERCISES.map(e => `
-        <div class="exercise-card" id="ex-${e.id}">
-          ${exerciseCardFace(e)}
-          <details class="exercise-details">
-            <summary>📖 Show Guide</summary>
-            <div class="exercise-detail-content">${exerciseCardDetail(e)}</div>
-          </details>
-        </div>
-      `).join("")}
-    </div>`;
-
-  const swipeSlides = EXERCISES.map(e => `
-    <div class="card-face">${exerciseCardFace(e)}</div>
-    <button class="card-swipe-expand-btn" aria-expanded="false">Show Guide</button>
-    <div class="card-detail">${exerciseCardDetail(e)}</div>
-  `);
-
-  container.innerHTML = `
-    <div class="exercise-desktop">${desktopHTML}</div>
-    <div class="exercise-mobile">
-      <div class="exercise-mobile-intro">${intro}</div>
-      <div id="exercise-swipe-wrap"></div>
-    </div>
-  `;
-
-  if (typeof CardSwipe !== 'undefined' && swipeSlides.length > 0) {
-    CardSwipe.init('exercise-swipe-wrap', swipeSlides);
-  }
-
-  initExerciseTimers();
+  renderPillars(targetId);
 }
-
-function selectDiet(diet) {
-  selectedDiet = diet;
-  renderSupplements();
-}
-
-function selectTier(tier) {
-  selectedTier = tier;
-  renderSupplements();
-}
-
-// Expose functions to global scope for inline onclick handlers
-Object.assign(window, {
-  selectHealthTab,
-  selectMealTab,
-  selectMethod,
-  surpriseMe,
-  selectDiet,
-  selectTier,
-  exportData: typeof exportData !== 'undefined' ? exportData : undefined,
-});
 
 // Auto-initialize based on which page we're on
 document.addEventListener('DOMContentLoaded', () => {
-  const healthApp = document.getElementById('health-app');
-  const foodApp = document.getElementById('food-app');
   const workoutApp = document.getElementById('workout-app');
   const investmentsApp = document.getElementById('investments-app');
-  if (healthApp) safeRender(renderHealth, healthApp);
-  if (foodApp) safeRender(renderFoods, foodApp);
   if (workoutApp) safeRender(() => renderExercises('workout-app'), workoutApp);
   if (investmentsApp) safeRender(() => {
     investmentsApp.innerHTML = renderInvestments();

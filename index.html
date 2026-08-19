@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Evidence-based longevity optimization for Singapore — biomarkers, nutrition, supplements, fasting, vaccines, and FIRE investing.">
+    <meta name="description" content="A carnivore-first longevity protocol — the daily stack, the annual blood panel, daily movement, and financial independence. Few things, done consistently, each justified.">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a7e6f">
-    <title>Macro Longevity — Your Biomarker Optimization Guide</title>
+    <title>Macro Longevity — Carnivore-First Longevity Protocol</title>
     <link rel="stylesheet" href="/css/variables.css">
-    <link rel="stylesheet" href="/css/style.css?v=1782115098">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -25,10 +25,11 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link active">Home</a>
-                <a href="/pages/health.html" class="nav-link">Health</a>
+                <a href="/pages/stack.html" class="nav-link">Daily Stack</a>
+                <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
                 <a href="/pages/workout.html" class="nav-link">Workout</a>
-                <a href="/pages/food.html" class="nav-link">Food</a>
                 <a href="/pages/finance.html" class="nav-link">Finance</a>
+                <a href="/pages/avoid.html" class="nav-link">Avoid</a>
             </div>
         </div>
     </nav>
@@ -37,106 +38,98 @@
         <section class="hero">
             <div class="hero-bg"></div>
             <div class="hero-content">
-                <h1 class="hero-title">Optimize Your <span class="gradient-text">Biomarkers</span> for a Longer Life</h1>
+                <h1 class="hero-title">Longevity, <span class="gradient-text">Without the Hype</span></h1>
                 <p class="hero-subtitle">
-                    Evidence-based guidance on the biomarkers that matter, the foods that move them,
-                    and the supplements that get you there — without burning a hole in your pocket.
+                    The few things that matter — a daily protocol, an annual blood panel,
+                    and the ingredients to avoid. No mechanism marketing. Just what works.
                 </p>
+                <div class="carnivore-banner">
+                    🥩 <strong>Author's note:</strong> I've eaten a strict carnivore diet for years.
+                    This site is built around that lens — every supplement, test and food is graded
+                    for what a meat-and-eggs eater actually needs.
+                </div>
                 <div class="hero-actions">
-                    <a href="/pages/health.html" class="btn btn-primary">Explore Biomarkers</a>
-                    <a href="/pages/food.html" class="btn btn-secondary">Start Eating Better</a>
-                    <a href="/pages/finance.html" class="btn btn-secondary">Plan Your Finances</a>
+                    <a href="/pages/stack.html" class="btn btn-primary">See the Daily Stack</a>
+                    <a href="/pages/blood.html" class="btn btn-secondary">Plan Your Blood Tests</a>
                 </div>
             </div>
         </section>
 
-        <section class="section preview-cards">
+        <section class="section">
             <div class="section-inner">
-                <div class="preview-grid">
-                    <a href="/pages/health.html" class="preview-card">
-                        <div class="preview-icon">🩸</div>
-                        <h3 class="preview-title">20 Key Biomarkers</h3>
-                        <p class="preview-desc">
-                            HbA1c, hs-CRP, ApoB, grip strength, and more — with optimal ranges,
-                            actionable protocols, and budget-friendly strategies.
-                        </p>
-                        <span class="preview-cta">View biomarkers →</span>
-                    </a>
-                    <a href="/pages/food.html" class="preview-card">
-                        <div class="preview-icon">🥗</div>
-                        <h3 class="preview-title">Food That Heals</h3>
-                        <p class="preview-desc">
-                            Protein, vegetables, fruits, and healthy fats — with cooking instructions,
-                            recipes, and cost-per-serving breakdowns for every budget.
-                        </p>
-                        <span class="preview-cta">Explore food →</span>
-                    </a>
-                    <a href="/pages/food.html" class="preview-card">
-                        <div class="preview-icon">💊</div>
-                        <h3 class="preview-title">Supplement Stack</h3>
-                        <p class="preview-desc">
-                            The essential longevity supplements — D3+K2, omega-3, creatine, magnesium,
-                            and more — with dosing, timing, and budget options.
-                        </p>
-                        <span class="preview-cta">View supplements →</span>
-                    </a>
-                </div>
+                <h2 class="section-title">The Daily Protocol</h2>
+                <p class="section-text">
+                    Supplements, foods and extras — every item earns its place. Full details, risks and the skip list on the Daily Stack page.
+                </p>
+                <div id="stack-summary-app"></div>
             </div>
         </section>
 
         <section class="section section-alt">
             <div class="section-inner">
-                <h2 class="section-title">Why Biomarkers Matter</h2>
-                <p class="section-text">
-                    Your blood doesn't care about your age. It cares about your biology.
-                    Biomarkers like HbA1c, hs-CRP, and ApoB tell the real story of your health
-                    — they're the difference between <em>living longer</em> and <em>aging better</em>.
-                </p>
-                <div class="stats-row">
-                    <div class="stat">
-                        <span class="stat-number">37%</span>
-                        <span class="stat-label">Lower diabetic complication risk per 1% HbA1c reduction</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">40%</span>
-                        <span class="stat-label">Of the population is vitamin D deficient</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">12–15%</span>
-                        <span class="stat-label">Mortality reduction per MET improvement in VO₂ max</span>
-                    </div>
+                <div class="preview-grid">
+                    <a href="/pages/stack.html" class="preview-card">
+                        <div class="preview-icon">🍖</div>
+                        <h3 class="preview-title">Daily Stack</h3>
+                        <p class="preview-desc">
+                            Supplements, foods, extras — and the nineteen things to skip.
+                        </p>
+                        <span class="preview-cta">View the protocol →</span>
+                    </a>
+                    <a href="/pages/blood.html" class="preview-card">
+                        <div class="preview-icon">🩸</div>
+                        <h3 class="preview-title">Blood Tests</h3>
+                        <p class="preview-desc">
+                            The annual panel that matters, the one-time tests that settle questions forever,
+                            and the low-value tests that only drain your wallet.
+                        </p>
+                        <span class="preview-cta">Plan your panel →</span>
+                    </a>
+                    <a href="/pages/workout.html" class="preview-card">
+                        <div class="preview-icon">🏋️</div>
+                        <h3 class="preview-title">Daily Workout</h3>
+                        <p class="preview-desc">
+                            Twelve equipment-free exercises with built-in timers and sound cues.
+                            Five minutes a day moves every longevity marker that matters.
+                        </p>
+                        <span class="preview-cta">Start moving →</span>
+                    </a>
+                    <a href="/pages/finance.html" class="preview-card">
+                        <div class="preview-icon">💰</div>
+                        <h3 class="preview-title">Finance</h3>
+                        <p class="preview-desc">
+                            Investment combos and the FIRE calculator — because financial health
+                            is part of longevity, and stress about money shortens both.
+                        </p>
+                        <span class="preview-cta">Plan your money →</span>
+                    </a>
                 </div>
             </div>
         </section>
 
         <section class="section">
             <div class="section-inner text-center">
-                <h2 class="section-title">Built for Real Life</h2>
-                <p class="section-text">
-                    Every recommendation on this site considers both <strong>efficacy and affordability</strong>.
-                    You don't need a thousand-dollar supplement stack or a personal chef.
-                    You need the right information, applied consistently.
-                </p>
+                <h2 class="section-title">The Philosophy</h2>
                 <div class="feature-grid">
                     <div class="feature-item">
                         <span class="feature-icon">🎯</span>
-                        <h4>Targeted Protocols</h4>
-                        <p>Each biomarker has specific, actionable steps to move the needle.</p>
+                        <h4>Less Is More</h4>
+                        <p>Fewer supplements, fewer tests, fewer habits — each one earning its place across multiple health domains.</p>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">💰</span>
-                        <h4>Budget-First Approach</h4>
-                        <p>Cheaper alternatives that work just as well — because consistency beats perfection.</p>
+                        <span class="feature-icon">🔬</span>
+                        <h4>Outcomes Over Mechanisms</h4>
+                        <p>Evidence grades come from human outcome data — meta-analyses and RCTs — not from marketing words like "NAD+" or "autophagy".</p>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">🍳</span>
-                        <h4>Cook It Yourself</h4>
-                        <p>Specific cooking temps, timings, and recipes. Air fry at 190°C for 12 minutes, not "cook until done".</p>
+                        <span class="feature-icon">💸</span>
+                        <h4>Redundant Means Skip</h4>
+                        <p>If your diet already covers it, the supplement gets a "probably redundant — skip" label. Your money stays yours.</p>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">📊</span>
-                        <h4>Evidence-Graded</h4>
-                        <p>Recommendations grounded in peer-reviewed research and clinical guidelines.</p>
+                        <span class="feature-icon">🥩</span>
+                        <h4>Carnivore-Honest</h4>
+                        <p>Iron, B12 and zinc are covered — and iron is genuinely dangerous to add. What carnivores lack is stated plainly, with solutions.</p>
                     </div>
                 </div>
             </div>
@@ -150,7 +143,7 @@
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
-                Evidence-informed guidance for biomarker optimization and longevity.
+                Evidence-informed guidance for a carnivore-first longevity protocol.
                 Not medical advice. Consult your physician before starting any supplement
                 or dietary regimen.
             </p>
@@ -159,8 +152,9 @@
         </div>
     </footer>
 
+    <script type="module" src="/js/stack.js"></script>
     <script type="module" src="/js/export.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item active"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/health.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩺</span><span class="bottom-nav-label">Health</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/food.html" class="bottom-nav-item"><span class="bottom-nav-icon">🍽️</span><span class="bottom-nav-label">Food</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a></div></nav>
+<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item active"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a></div></nav>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}</script>
 </body>
 </html>
