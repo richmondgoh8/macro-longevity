@@ -3,8 +3,8 @@
 
 export const BLOOD_TIERS = {
   annual: {
-    label: "📅 Annual Core",
-    desc: "The 12 tests that matter every year. ~S$250–450 at a private clinic; Healthier SG covers the basics (BP, glucose, lipids) at polyclinics.",
+    label: "📅 Core Panel",
+    desc: "The high-value core checks, with frequency set by the marker and your risk. ~S$250–450 at a private clinic; Healthier SG covers the basics (BP, glucose, lipids) at polyclinics.",
   },
   "one-time": {
     label: "💎 One-Time (Lifetime)",
@@ -33,7 +33,7 @@ export const ANNUAL_PANEL = [
     frequency: "Annual",
     optimalRange: "<5.7% · carnivore: expect 4.8–5.3%",
     why: "The cheapest reliable screen for dysglycaemia and the trend that catches what a single glucose reading misses.",
-    carnivoreNote: "Expect low-normal. A rising HbA1c on zero-carb is a red flag for something non-dietary — the trend is the signal.",
+    carnivoreNote: "Expect low-normal. A rising HbA1c on zero-carb is a red flag for something non-dietary — the trend is the signal. Post-meal walks and vinegar only matter if you eat carbs; on a zero-GL carnivore plate expect a flat curve, so HbA1c trend — not spikes — is your anchor.",
   },
   {
     id: "fasting-insulin",
@@ -82,12 +82,12 @@ export const ANNUAL_PANEL = [
   },
   {
     id: "kidney",
-    name: "Creatinine + eGFR (+ cystatin C once)",
+    name: "Creatinine + eGFR",
     tier: "annual",
-    frequency: "Annual · cystatin C once",
+    frequency: "Annual",
     optimalRange: "eGFR >90 · creatinine up to 110–125 µmol/L can be normal for muscular men",
-    why: "Standard kidney screen — but creatinine is a muscle-mass and dietary artifact that systematically mislabels fit carnivores. Per 2024 KDIGO guidelines, using a combined creatinine-cystatin C equation (eGFRcr-cys) is recommended for a more accurate assessment when clinical decisions depend on it.",
-    carnivoreNote: "High meat intake + muscle mass raise creatinine and BUN. Add cystatin C once — the dual-marker equation is the KDIGO-endorsed fix. If your eGFR-cr reads <90 while you lift heavy and eat meat, cystatin C settles whether it's real.",
+    why: "Standard kidney screen — but creatinine is a muscle-mass and dietary artifact that systematically mislabels fit carnivores. If eGFR-creatinine reads <90, add cystatin C once and use the combined eGFRcr-cys equation (2024 KDIGO recommended) for an accurate assessment.",
+    carnivoreNote: "High meat intake + muscle mass raise creatinine and BUN. The one-time Cystatin C test below is the KDIGO-endorsed fix when needed.",
   },
   {
     id: "tsh",
@@ -243,13 +243,13 @@ export const ANNUAL_PANEL = [
     carnivoreNote: "Eggs and fatty fish provide some vitamin E. If serum is low, consider increasing egg intake or adding almonds/walnuts — not a standalone supplement (the SELECT trial showed no benefit from isolated vitamin E supplementation).",
   },
   {
-    id: "sleep-apnea",
-    name: "Sleep Apnea Self-Check",
+    id: "nt-probnp",
+    name: "NT-proBNP (Cardiac Wall Stress)",
     tier: "periodic",
-    frequency: "Any time symptoms appear — treat as high-ROI",
-    optimalRange: "See a doctor if 2+ of: loud snoring, witnessed gasping/apnoea, daytime sleepiness, resistant hypertension, nocturia, morning headache, neck ≥17\"",
-    why: "Untreated sleep apnea drives resistant hypertension, glucose dysregulation and cardiovascular risk — and it's common. Not a blood test, but higher-ROI than most of this page.",
-    carnivoreNote: "On carnivore, persistent fatigue is more often undiagnosed apnea than 'electrolytes'. A home sleep test in Singapore runs ~S$200–500.",
+    frequency: "Every 3–5 years if ≥50, HTN, dyspnea, or strong family CVD · otherwise not needed",
+    optimalRange: "<125 pg/mL (<15 pmol/L) · age-adjusted cutoffs higher",
+    why: "Useful when symptoms or risk factors raise concern for heart failure, but not a routine longevity screen for every healthy adult. It can support referral decisions alongside symptoms, examination, kidney function and blood pressure.",
+    carnivoreNote: "Interpret with eGFR and BMI — low eGFR raises NT-proBNP, obesity lowers it. Carnivore high protein does not directly raise it.",
   },
 ];
 
@@ -272,7 +272,7 @@ export const LOW_VALUE_TESTS = [
   {
     id: "microbiome",
     name: "Microbiome Panels",
-    why: "No guideline supports stool testing in healthy adults. On carnivore the result is predictably low-diversity, and its meaning is unknown.",
+    why: "No guideline supports routine stool microbiome testing in healthy adults. Results vary by method and the meaning is not sufficiently actionable for a diet or supplement decision.",
   },
   {
     id: "longevity-panels",
@@ -316,9 +316,9 @@ export const BEYOND_PANEL = [
   },
   {
     icon: "📏",
-    name: "Waist Circumference",
-    action: "Measure at the navel, monthly trend",
-    why: "Captures visceral fat — a metabolic and CV risk marker that a DEXA costs 10× more to tell you.",
+    name: "Waist Circumference (Visceral Fat Proxy)",
+    action: "Measure at the navel, monthly. Trend beats scale weight: −3 cm matters more than −1 kg. Risk cuts: ≥94 cm men / ≥80 cm women (Asian thresholds).",
+    why: "Waist circumference is a cheap proxy for central adiposity and a useful trend alongside blood pressure, glucose and fitness. It is not a direct measurement of visceral fat, and a single number should not dictate a supplement or diet change.",
   },
   {
     icon: "🏃",
@@ -342,13 +342,13 @@ export const BEYOND_PANEL = [
     icon: "🤝",
     name: "Social Connection",
     action: "Weekly contact with people you care about; join something",
-    why: "Isolation is associated with ~30% higher all-cause mortality — comparable to smoking and free to improve.",
+    why: "Low social connection is associated with worse mental and physical health outcomes. It is a low-cost domain to protect because it supports adherence, mood and quality of life.",
   },
   {
     icon: "🦷",
     name: "Dental Care",
     action: "Fluoride brush 2×/day · interdental cleaning · regular dental visits",
-    why: "Periodontal disease tracks cardiovascular risk; oral hygiene is a real longevity habit.",
+    why: "Oral disease is common, preventable and costly to quality of life. Good daily hygiene and appropriate dental care are worthwhile even though associations with cardiovascular disease do not prove that dental care prevents it.",
   },
 ];
 

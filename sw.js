@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline';
+const CACHE_NAME = 'macro-longevity-offline-v2';
 const STATIC_ASSETS = [
   '/offline.html',
   '/favicon.svg',

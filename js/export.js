@@ -1,4 +1,5 @@
-import { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, SKIP_LIST, CONDITIONAL_LIST } from './data/stack.js';
+import { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, UPF_GUIDE, SKIP_LIST, CONDITIONAL_LIST } from './data/stack.js';
+import { CORE_OUTCOMES } from './data/core.js';
 import { ANNUAL_PANEL, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS } from './data/blood.js';
 import { INVESTMENTS } from './data/finance.js';
 import { PILLARS, EXERCISES } from './data/workout.js';
@@ -6,13 +7,16 @@ import { PILLARS, EXERCISES } from './data/workout.js';
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-nav-toggle]');
     if (btn) {
-        document.querySelector('.nav').classList.toggle('nav-open');
-        document.body.classList.toggle('nav-open');
+        var isOpen = document.querySelector('.nav').classList.toggle('nav-open');
+        document.body.classList.toggle('nav-open', isOpen);
+        btn.setAttribute('aria-expanded', String(isOpen));
         return;
     }
     if (!e.target.closest('.nav') && document.querySelector('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
         document.querySelector('.nav').classList.remove('nav-open');
         document.body.classList.remove('nav-open');
+        var menuButton = document.querySelector('[data-nav-toggle]');
+        if (menuButton) menuButton.setAttribute('aria-expanded', 'false');
     }
 });
 
@@ -30,6 +34,8 @@ function exportData() {
         foodSpices: FOOD_SPICES,
         extras: EXTRAS,
         avoidIngredients: AVOID_INGREDIENTS,
+        upfGuide: UPF_GUIDE,
+        coreOutcomes: CORE_OUTCOMES,
         conditionalList: CONDITIONAL_LIST,
         skipList: SKIP_LIST,
         bloodPanel: ANNUAL_PANEL,
@@ -44,12 +50,13 @@ function exportData() {
 
     let md = `# Macro Longevity Knowledge Base\n\n`;
     md += `Exported: ${data.exportedAt}\nSource: ${data.source}\n\n`;
-    md += `> Carnivore-first, strong and moderate evidence only. Not medical advice.\n\n`;
+    md += `> Carnivore-first, evidence-graded and outcome-focused. Not medical advice.\n\n`;
     md += `---\n\n`;
 
     md += `## Supplements (${data.supplements.length})\n\n`;
     data.supplements.forEach(s => {
         md += `### ${s.icon} ${s.name}\n`;
+        if (s.evidence) md += `- **Evidence:** ${s.evidence}\n`;
         md += `- **Dose:** ${s.dose}\n`;
         md += `- **Timing:** ${s.timing}\n`;
         md += `- **Pairing:** ${s.pairing}\n`;
@@ -62,6 +69,7 @@ function exportData() {
     md += `## Food & Spices (${data.foodSpices.length})\n\n`;
     data.foodSpices.forEach(f => {
         md += `### ${f.icon} ${f.name}\n`;
+        if (f.evidence) md += `- **Evidence:** ${f.evidence}\n`;
         md += `- **Serving:** ${f.serving}\n`;
         md += `- **When:** ${f.timing}\n`;
         md += `- **Why:** ${f.why}\n`;
@@ -72,6 +80,7 @@ function exportData() {
     md += `## Extras (${data.extras.length})\n\n`;
     data.extras.forEach(f => {
         md += `### ${f.icon} ${f.name}\n`;
+        if (f.evidence) md += `- **Evidence:** ${f.evidence}\n`;
         md += `- **Serving:** ${f.serving}\n`;
         md += `- **When:** ${f.timing}\n`;
         md += `- **Why:** ${f.why}\n`;
@@ -82,9 +91,20 @@ function exportData() {
     md += `## Ingredients to Avoid (${data.avoidIngredients.length})\n\n`;
     data.avoidIngredients.forEach(a => {
         md += `### ${a.name}\n`;
+        if (a.evidence) md += `- **Evidence:** ${a.evidence}\n`;
         md += `- **Where it hides:** ${a.where}\n`;
         md += `- **Why:** ${a.why}\n`;
         md += `- **Replace with:** ${a.replace}\n\n`;
+    });
+
+    md += `## How to Identify Ultra-Processed Food\n\n${data.upfGuide.intro}\n\n`;
+    data.upfGuide.steps.forEach((step, i) => { md += `${i + 1}. ${step}\n`; });
+    md += `\n**Red-flag markers:** ${data.upfGuide.redFlags.join('; ')}\n\n`;
+    md += `**Not automatically UPF:** ${data.upfGuide.notAutomatic.join('; ')}\n\n`;
+
+    md += `## Core Outcome Coverage\n\n`;
+    data.coreOutcomes.forEach(o => {
+        md += `### ${o.icon} ${o.name}\n- **Core:** ${o.core}\n- **Targeted:** ${o.targeted}\n- **Track:** ${o.measure}\n\n`;
     });
 
     md += `## Skip List — Do Not Buy (${data.skipList.length})\n\n`;
@@ -97,6 +117,7 @@ function exportData() {
     md += `## Conditional — Context-Dependent (${data.conditionalList.length})\n\n`;
     data.conditionalList.forEach(s => {
         md += `### ${s.icon} ${s.name}\n`;
+        if (s.evidence) md += `- **Evidence:** ${s.evidence}\n`;
         md += `- **Who:** ${s.who}\n`;
         md += `- **Dose:** ${s.dose}\n`;
         md += `- **Why:** ${s.why}\n`;
@@ -107,6 +128,7 @@ function exportData() {
     md += `## Annual Blood Panel (${data.bloodPanel.length})\n\n`;
     data.bloodPanel.forEach(t => {
         md += `### ${t.name}\n`;
+        if (t.evidence) md += `- **Evidence:** ${t.evidence}\n`;
         md += `- **Frequency:** ${t.frequency}\n`;
         md += `- **Target:** ${t.optimalRange}\n`;
         md += `- **Why:** ${t.why}\n`;

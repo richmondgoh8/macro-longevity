@@ -22,7 +22,7 @@ index.html                  Home — carnivore note, daily stack at a glance, pa
 pages/
   stack.html                Daily Stack: Supplements / Food & Spices / Extras & Habits (sub-tabs)
   blood.html                Blood Tests: Annual core, One-time, Periodic, Low-value tests
-  workout.html              Daily workout: 12 exercises with built-in timers and sound cues
+  workout.html              Daily workout: 10 exercises with built-in timers and sound cues
   finance.html              Investment Combos, FIRE Calculator + Passive Income Tracker
   avoid.html                Ingredients to Avoid (full-page list, 7 items)
 css/
@@ -35,7 +35,8 @@ js/
   export.js                 Markdown export + nav toggle
   components/card-swipe.js  Viewport-filling swipeable card stack for mobile
   data/
-    stack.js                DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, SKIP_LIST
+    stack.js                DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, UPF_GUIDE, SKIP_LIST, CONDITIONAL_LIST
+    core.js                 CORE_OUTCOMES — six outcome domains covered by the protocol
     blood.js                ANNUAL_PANEL, LOW_VALUE_TESTS
     workout.js              EXERCISES
     finance.js              INVESTMENTS
@@ -45,16 +46,19 @@ js/
 
 | Array | Count | Notes |
 |-------|-------|-------|
-| `DAILY_SUPPLEMENTS` | 7 | Dose, timing, pairing, synergy, why, carnivore note |
-| `FOOD_SPICES` | 6 | Foods that act as supplements (liver, eggs, fatty fish, bone broth, spices) |
-| `EXTRAS` | 3 | Drinks with outcome evidence (coffee, walnuts, green tea) |
-| `AVOID_INGREDIENTS` | 5 | Strict elimination list (fructose, trans fats, refined carbs…) |
-| `SKIP_LIST` | 19 | "Do not buy" — redundant or low-evidence supplements |
-| `ANNUAL_PANEL` | 22 | Tiers: annual core / one-time / periodic, with optimal ranges |
+| `DAILY_SUPPLEMENTS` | 2 | Core protocol only; dose, timing, pairing, synergy, why, carnivore note |
+| `FOOD_SPICES` | 10 | Food-first choices and optional spices |
+| `EXTRAS` | 8 | Optional drinks, habits and plant additions |
+| `AVOID_INGREDIENTS` | 7 | High-ROI avoid list for added sugar, alcohol, processed meat, trans fats and UPF |
+| `UPF_GUIDE` | 4 steps | Practical NOVA-style label screen; no fake five-ingredient cutoff |
+| `CORE_OUTCOMES` | 6 | Sleep, stress, glucose, ApoB, mitochondria and gut coverage |
+| `SKIP_LIST` | 21 | "Do not buy" — redundant, speculative or low-evidence supplements |
+| `CONDITIONAL_LIST` | 9 | Use only for a defined symptom, food pattern, lab result or clinical indication |
+| `ANNUAL_PANEL` | 26 | Tiers: core / one-time / periodic, with optimal ranges |
 | `LOW_VALUE_TESTS` | 9 | Expensive tests with no actionable value |
 | `BEYOND_PANEL` | 8 | Non-lab high-ROI habits (BP, sleep apnea, waist, fitness, smoking, alcohol, social, dental) |
 | `APOB_PLAN` / `APOB_EFFECTS` | 7 / 8 | ApoB-elevated next-steps module + "what helps what" table |
-| `EXERCISES` | 12 | Equipment-free, with timers |
+| `EXERCISES` | 10 | Minimal-equipment, with timers |
 | `INVESTMENTS` | 5 | Singapore FIRE combos |
 
 ## Design system

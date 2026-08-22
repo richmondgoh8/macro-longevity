@@ -6,7 +6,7 @@ export const PILLARS = [
     id: "zone2",
     name: "Aerobic Base (Zone 2)",
     icon: "🫀",
-    description: "The foundation of longevity training. 150–300 min/week at 60–70% max heart rate (conversational pace). Builds mitochondrial number and efficiency, enhances fat oxidation, and improves insulin sensitivity.",
+    description: "Build the aerobic base with 150–300 min/week of moderate activity, usually at a conversational pace. It improves cardiorespiratory fitness and supports metabolic health without requiring a laboratory-defined Zone 2.",
     target: "60–70% max HR · conversational pace · lactate <2 mmol/L",
     frequency: "3–5 sessions of 45–60 min/week",
     examples: ["Brisk walking on incline", "Cycling", "Jogging", "Swimming", "Rowing"],
@@ -16,14 +16,14 @@ export const PILLARS = [
       "Insulin sensitivity — lowers fasting glucose and HbA1c",
       "Base aerobic capacity — the engine for all other training",
     ],
-    whyLongevity: "Zone 2 training is the single most impactful exercise modality for metabolic health. It improves mitochondrial function at the cellular level, which declines with age. Low lactate output means you can sustain it for long durations without fatigue.",
+    whyLongevity: "Moderate aerobic activity is one part of a high-ROI training base. Heart-rate zones are estimates, so use the talk test and progress gradually; the weekly total and consistency matter more than a precise lactate number.",
     timer: { type: "countdown", defaultMinutes: 45 },
   },
   {
     id: "vo2max",
     name: "Maximal Aerobic Output (VO₂ Max)",
     icon: "⚡",
-    description: "1–2 sessions/week of high-intensity intervals. VO₂ max is the strongest predictor of all-cause mortality — surpassing smoking, hypertension, and diabetes as a risk factor.",
+    description: "Add 1 session/week of high-intensity intervals once your base is established. Cardiorespiratory fitness is a strong health marker, but the association is not a licence to train maximally every day.",
     target: "90–95% max HR during work intervals",
     frequency: "1–2 sessions/week",
     protocol: {
@@ -36,11 +36,11 @@ export const PILLARS = [
       totalMinutes: 46,
     },
     benefits: [
-      "VO₂ max improvement — each 1-MET increase = 13–15% mortality reduction",
+      "VO₂ max improvement — higher fitness is consistently associated with better health outcomes",
       "Cardiovascular resilience — stronger heart, better blood flow",
-      "Longevity — strongest predictor of survival, surpassing all traditional risk factors",
+      "Longevity — fitness is a valuable marker to improve alongside blood pressure, sleep and strength",
     ],
-    whyLongevity: "Individuals with the lowest fitness have a mortality risk over 5× higher than the most fit. VO₂ max training produces the greatest gains in cardiorespiratory fitness. The Norwegian 4×4 protocol (4 min at 90-95% HR, 3 min recovery, ×4) is the most evidence-backed method.",
+    whyLongevity: "Higher cardiorespiratory fitness is strongly associated with lower morbidity and mortality. Intervals can improve fitness efficiently, but the Norwegian 4×4 is one workable option, not a mandatory or uniquely proven longevity protocol.",
     timer: {
       type: "intervals",
       warmup: 600,
@@ -57,6 +57,12 @@ export const PILLARS = [
     description: "2–3 sessions/week. Progressive overload with emphasis on compound movements and the posterior chain (glutes, hamstrings, spinal erectors). Eccentric loading (slow lowering) maximises strength and bone density stimulus.",
     target: "Compound movements · 3 sets × 6–12 reps · 3–4s eccentric",
     frequency: "2–3 sessions/week",
+    benefits: [
+      "Posterior chain — glutes/hamstrings/spinal erectors for standing & climbing",
+      "Bone density via spinal loading & grip strength — mortality predictor",
+      "Functional carry capacity — groceries, luggage, stairs",
+      "Eccentric strength — injury resilience & fall prevention",
+    ],
     exercises: [
       {
         id: "deadlifts",
@@ -95,7 +101,7 @@ export const PILLARS = [
         name: "Push-Ups / Overhead Press",
         icon: "💪",
         description: "Upper body push pattern. Push-ups for chest and core; overhead press for shoulders and total body stability.",
-        whyLongevity: "Push-up capacity correlates with cardiovascular health — 40+ push-ups is associated with 96% lower cardiovascular event risk. Overhead pressing maintains shoulder function.",
+        whyLongevity: "Push-up capacity is a rough fitness marker, while progressive pushing maintains upper-body strength and shoulder function. Use an easier variation and build gradually.",
         instructions: [
           "Push-ups: Plank position, lower chest to ground, push back up",
           "Overhead press: Hold weight at shoulders, press overhead, lower with control",
@@ -163,6 +169,12 @@ export const PILLARS = [
     description: "5–10 min daily or as warm-up/cool-down. Maintains joint range of motion and prevents the compensation patterns that cause injury.",
     target: "Full range of motion · controlled movement · breathe through stretches",
     frequency: "Daily or as part of warm-ups/cool-downs",
+    benefits: [
+      "Joint ROM — prevents compensation patterns & back/knee pain",
+      "Spinal disc health via flexion/extension pumping",
+      "Hip mobility for gait & fall prevention",
+      "Most efficient full-body mobility in one flow",
+    ],
     exercises: [
       {
         id: "cat-cow",

@@ -156,4 +156,25 @@
   --carnivore: #6b21a8;
   --carnivore-bg: #f3eefb;
   --carnivore-border: #ddd0f0;
+
+  /* ─── GENUI v2.0 — EVIDENCE BADGE SEMANTICS ─── */
+  --evidence-strong: var(--color-success);
+  --evidence-strong-bg: var(--color-success-light);
+  --evidence-moderate: var(--color-warning);
+  --evidence-moderate-bg: var(--tint-secondary-10);
+  --evidence-weak: var(--color-accent);
+  --evidence-weak-bg: var(--tint-accent-15);
+  --evidence-skip: var(--color-text-muted);
+  --evidence-skip-bg: var(--color-bg-alt);
+
+  /* ─── GLASS OVERLAY (mobile nav) ─── */
+  --glass-overlay: rgba(255, 255, 255, 0.96);
+
+  /* ─── BUDGET CARD TOKENS (finance) ─── */
+  --budget-expense: #2563eb;
+  --budget-expense-bg: #f0f6ff;
+  --budget-invest: var(--color-success);
+  --budget-invest-bg: var(--color-success-light);
+  --budget-savings: var(--color-warning);
+  --budget-savings-bg: var(--color-secondary-light);
 }

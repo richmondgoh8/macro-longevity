@@ -40,9 +40,9 @@ function renderInvestments() {
         <div class="budget-sliders" id="budgetSliders" style="display:none">
           <div class="budget-slider-row">
             <div class="budget-slider-label">
-              <span class="budget-slider-name" style="color:#2563eb;font-weight:700">Expenses</span>
-              <span class="budget-slider-name" style="color:#2563eb;font-weight:700">Investments</span>
-              <span class="budget-slider-name" style="color:var(--color-text-muted)">Savings</span>
+              <span class="budget-slider-name" style="color:var(--budget-expense);font-weight:700">Expenses</span>
+              <span class="budget-slider-name" style="color:var(--budget-invest);font-weight:700">Investments</span>
+              <span class="budget-slider-name" style="color:var(--budget-savings)">Savings</span>
             </div>
           </div>
           <div class="budget-slider-row">
@@ -151,22 +151,22 @@ function updateBudget() {
 
   results.innerHTML = `
     <div class="budget-breakdown">
-      <div class="budget-card" style="background:#f0f6ff">
-        <div class="budget-card-label" style="color:#2563eb">Expenses</div>
-        <div class="budget-card-amt" style="color:#2563eb">SGD ${Math.round(salary * vE / 100).toLocaleString()}</div>
-        <div class="budget-card-pct" style="color:#2563eb">${vE}%</div>
+      <div class="budget-card" style="background:var(--budget-expense-bg)">
+        <div class="budget-card-label" style="color:var(--budget-expense)">Expenses</div>
+        <div class="budget-card-amt" style="color:var(--budget-expense)">SGD ${Math.round(salary * vE / 100).toLocaleString()}</div>
+        <div class="budget-card-pct" style="color:var(--budget-expense)">${vE}%</div>
         <div class="budget-card-desc" style="color:var(--color-text-muted)">Housing, food, transport, bills, insurance</div>
       </div>
-      <div class="budget-card" style="background:#e8f5e9">
-        <div class="budget-card-label" style="color:#2e7d32">Investments</div>
-        <div class="budget-card-amt" style="color:#2e7d32">SGD ${budgetInvestments.toLocaleString()}</div>
-        <div class="budget-card-pct" style="color:#2e7d32">${vI}%</div>
+      <div class="budget-card" style="background:var(--budget-invest-bg)">
+        <div class="budget-card-label" style="color:var(--budget-invest)">Investments</div>
+        <div class="budget-card-amt" style="color:var(--budget-invest)">SGD ${budgetInvestments.toLocaleString()}</div>
+        <div class="budget-card-pct" style="color:var(--budget-invest)">${vI}%</div>
         <div class="budget-card-desc" style="color:var(--color-text-muted)">Stocks, ETFs, CPF top-ups, robos</div>
       </div>
-      <div class="budget-card" style="background:#fef3e7">
-        <div class="budget-card-label" style="color:#e8993a">Savings</div>
-        <div class="budget-card-amt" style="color:#e8993a">SGD ${Math.round(salary * vS / 100).toLocaleString()}</div>
-        <div class="budget-card-pct" style="color:#e8993a">${vS}%</div>
+      <div class="budget-card" style="background:var(--budget-savings-bg)">
+        <div class="budget-card-label" style="color:var(--budget-savings)">Savings</div>
+        <div class="budget-card-amt" style="color:var(--budget-savings)">SGD ${Math.round(salary * vS / 100).toLocaleString()}</div>
+        <div class="budget-card-pct" style="color:var(--budget-savings)">${vS}%</div>
         <div class="budget-card-desc" style="color:var(--color-text-muted)">High-yield savings account (UOB One / OCBC 360)</div>
       </div>
     </div>
@@ -192,7 +192,10 @@ function updateBudget() {
 
 let audioCtx = null;
 function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx) return audioCtx;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  try { audioCtx = new Ctx(); } catch(e) { return null; }
   return audioCtx;
 }
 document.addEventListener("click", () => {
@@ -202,6 +205,7 @@ document.addEventListener("click", () => {
 function playTone(freq, duration, type, startTime, gainVal) {
   try {
     const ctx = getAudioCtx();
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = type || "sine";
@@ -218,6 +222,7 @@ function playTone(freq, duration, type, startTime, gainVal) {
 function playWhistle(startFreq, endFreq, duration) {
   try {
     const ctx = getAudioCtx();
+    if (!ctx) return;
     const t = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -296,46 +301,58 @@ const REST_MUSIC_URL = "https://cdn.freesound.org/previews/858/858311_462105-lq.
 const MUSIC_START_OFFSET = 5;
 
 function loadMusic() {
-  if (musicBuffer || musicLoading) return musicLoading;
+  if (musicBuffer) return Promise.resolve(musicBuffer);
+  if (musicLoading) return musicLoading;
+  const ctx = getAudioCtx();
+  if (!ctx) return Promise.resolve(null);
   musicLoading = (async () => {
     try {
-      const ctx = getAudioCtx();
       const resp = await fetch(MUSIC_URL);
+      if (!resp.ok) throw new Error(`music fetch ${resp.status}`);
       const buf = await resp.arrayBuffer();
       musicBuffer = await ctx.decodeAudioData(buf);
-    } catch(e) { musicBuffer = null; }
+      return musicBuffer;
+    } catch(e) { console.warn("Music load failed (work):", e.message || e); musicBuffer = null; musicLoading = null; return null; }
   })();
   return musicLoading;
 }
 
 function loadRestMusic() {
-  if (restMusicBuffer || restMusicLoading) return restMusicLoading;
+  if (restMusicBuffer) return Promise.resolve(restMusicBuffer);
+  if (restMusicLoading) return restMusicLoading;
+  const ctx = getAudioCtx();
+  if (!ctx) return Promise.resolve(null);
   restMusicLoading = (async () => {
     try {
-      const ctx = getAudioCtx();
       const resp = await fetch(REST_MUSIC_URL);
+      if (!resp.ok) throw new Error(`rest music fetch ${resp.status}`);
       const buf = await resp.arrayBuffer();
       restMusicBuffer = await ctx.decodeAudioData(buf);
-    } catch(e) { restMusicBuffer = null; }
+      return restMusicBuffer;
+    } catch(e) { console.warn("Music load failed (rest):", e.message || e); restMusicBuffer = null; restMusicLoading = null; return null; }
   })();
   return restMusicLoading;
 }
 
 async function startMusic(isWork) {
   stopMusic();
-  const buf = isWork ? musicBuffer : restMusicBuffer;
-  if (!buf) { isWork ? await loadMusic() : await loadRestMusic(); }
   const ctx = getAudioCtx();
-  const activeBuf = isWork ? musicBuffer : restMusicBuffer;
-  if (!ctx || !activeBuf) return;
+  if (!ctx) return;
+  if (ctx.state === "suspended") { try { await ctx.resume(); } catch(e) {} }
+  let activeBuf = isWork ? musicBuffer : restMusicBuffer;
+  if (!activeBuf) {
+    await (isWork ? loadMusic() : loadRestMusic());
+    activeBuf = isWork ? musicBuffer : restMusicBuffer;
+  }
+  if (!activeBuf) return;
 
   musicSource = ctx.createBufferSource();
   musicSource.buffer = activeBuf;
   musicSource.loop = true;
   musicGain = ctx.createGain();
-  musicGain.gain.value = isWork ? 0.2 : 0.4;
+  musicGain.gain.value = isWork ? 0.28 : 0.4;
   musicSource.connect(musicGain).connect(ctx.destination);
-  musicSource.start(0, isWork ? MUSIC_START_OFFSET : 0);
+  try { musicSource.start(0, isWork ? MUSIC_START_OFFSET : 0); } catch(e) { console.warn("Music start failed:", e.message || e); }
 }
 
 function stopMusic() {
@@ -367,18 +384,31 @@ async function loadSound(name, url) {
     const ctx = getAudioCtx();
     if (!ctx) return;
     const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`sound ${name} fetch ${resp.status}`);
     const buf = await resp.arrayBuffer();
     soundBuffers[name] = await ctx.decodeAudioData(buf);
   } catch(e) {
-    soundBuffers[name] = null;
+    console.warn(`Sound load failed (${name}):`, e.message || e);
+    // don't cache null — leave undefined so next playSound can retry
+    delete soundBuffers[name];
   }
 }
 
-function playSound(name) {
-  const buf = soundBuffers[name];
+async function playSound(name) {
+  let buf = soundBuffers[name];
+  if (!buf) {
+    // retry once if we have a context now (user has interacted)
+    const ctx = getAudioCtx();
+    if (ctx && SOUND_URLS[name]) {
+      await loadSound(name, SOUND_URLS[name]);
+      buf = soundBuffers[name];
+    }
+  }
   if (!buf) return false;
   try {
     const ctx = getAudioCtx();
+    if (!ctx) return false;
+    if (ctx.state === "suspended") { try { await ctx.resume(); } catch(e) {} }
     const src = ctx.createBufferSource();
     src.buffer = buf;
     const gain = ctx.createGain();
@@ -390,11 +420,12 @@ function playSound(name) {
 }
 
 function initExerciseSounds() {
+  // Lazy-load sounds on first user gesture — retryable, don't cache early null ctx
   for (const [name, url] of Object.entries(SOUND_URLS)) {
+    // fire-and-forget but retryable; if ctx null first time, playSound will retry on demand
     loadSound(name, url);
   }
-  loadMusic();
-  loadRestMusic();
+  // Music is lazy-loaded on first Start so resume() can succeed; no eager fetch here
 }
 
 /* ============================
@@ -705,6 +736,7 @@ function pillarOverviewCard(p) {
     p.id === "vo2max" ? `${p.protocol.name} · ${p.protocol.totalMinutes} min` :
     p.id === "strength" ? p.frequency :
     p.frequency;
+  const benefits = Array.isArray(p.benefits) ? p.benefits : [];
   return `
     <article class="pillar-card" id="pillar-${p.id}">
       <div class="pillar-card-head">
@@ -716,7 +748,7 @@ function pillarOverviewCard(p) {
       </div>
       <p class="pillar-desc">${p.description}</p>
       <div class="pillar-benefits">
-        ${p.benefits.map(b => `<span class="pillar-benefit">✓ ${b}</span>`).join("")}
+        ${benefits.map(b => `<span class="pillar-benefit">✓ ${b}</span>`).join("")}
       </div>
     </article>`;
 }
@@ -739,7 +771,7 @@ function zone2TimerHTML(pillar) {
         <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
         <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
       </div>
-      <div class="timer-label" id="label-${id}">Ready — ${m} min at conversational pace</div>
+      <div class="timer-label" id="label-${id}">Ready — ${m} min at conversational pace · No music, whistle cues only</div>
     </div>`;
 }
 

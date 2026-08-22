@@ -1,12 +1,18 @@
 // blood.js — Blood Tests rendering (annual panel, deficiency markers, low-value tests)
 import { ANNUAL_PANEL, BLOOD_TIERS, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS } from './data/blood.js';
 
+function evidenceBadge(level) {
+  if (!level) return "";
+  const label = level.charAt(0).toUpperCase() + level.slice(1);
+  return `<span class="evidence-badge evidence-badge-${level}">${label}</span>`;
+}
 function testCard(t) {
   return `
     <article class="blood-card">
       <div class="blood-card-head">
         <h3 class="blood-card-name">${t.name}</h3>
         <span class="blood-card-freq">${t.frequency}</span>
+        ${t.evidence ? evidenceBadge(t.evidence) : ""}
       </div>
       <p class="blood-card-range"><span class="stack-line-label">Target</span> <span class="blood-range">${t.optimalRange}</span></p>
       <p class="blood-card-why">${t.why}</p>
@@ -37,8 +43,9 @@ export function renderBlood() {
     <div class="blood-prep">
       <h3 class="blood-prep-title">📋 Before You Draw</h3>
       <p class="blood-prep-text">
-        12 h fast · morning draw · well hydrated · 48 h after your last hard workout.
-        Otherwise creatinine, AST, CRP, uric acid, lipids and potassium will all mislead you.
+        Follow the lab's fasting instructions · arrive normally hydrated · keep the timing and
+        training conditions consistent when you trend results. A hard workout can transiently
+        change creatinine, AST and CRP, so avoid testing immediately after unusually hard training.
       </p>
       <p class="blood-prep-text">
         In Singapore: Healthier SG screening covers the basics (BP, glucose, lipids) at polyclinics.
@@ -96,7 +103,10 @@ export function renderBlood() {
       <div class="blood-grid">
         ${LOW_VALUE_TESTS.map(t => `
           <article class="blood-card blood-card-low">
-            <h3 class="blood-card-name">${t.name}</h3>
+            <div class="blood-card-head">
+              <h3 class="blood-card-name">${t.name}</h3>
+              <span class="evidence-badge evidence-badge-skip">Skip</span>
+            </div>
             <p class="blood-card-why">${t.why}</p>
           </article>
         `).join("")}
