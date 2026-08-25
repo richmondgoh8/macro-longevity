@@ -7,8 +7,11 @@ import {
   UPF_GUIDE,
   SKIP_LIST,
   CONDITIONAL_LIST,
+  TIMING_GUIDE,
+  AVOID_LABEL_GUIDE,
 } from './data/stack.js';
 import { CORE_OUTCOMES } from './data/core.js';
+import { icon } from './icons.js';
 
 let stackTab = "supplements";
 
@@ -17,10 +20,37 @@ function selectStackTab(tab) {
   renderStack();
 }
 
+const EVIDENCE_ICON = {
+  core: 'check', conditional: 'info', optional: 'sparkles',
+  experimental: 'flask', skip: 'x',
+  strong: 'check', moderate: 'info', weak: 'sparkles',
+};
+
 function evidenceBadge(level) {
   if (!level) return "";
   const label = level.charAt(0).toUpperCase() + level.slice(1);
-  return `<span class="evidence-badge evidence-badge-${level}">${label}</span>`;
+  const ic = EVIDENCE_ICON[level] ? icon(EVIDENCE_ICON[level], { size: 14 }) : "";
+  return `<span class="evidence-badge evidence-badge-${level}">${ic}${label}</span>`;
+}
+
+function synergyHTML(items) {
+  if (!items || !items.length) return "";
+  return `<div class="stack-line stack-synergy"><span class="stack-line-label">Practical pairing</span><span>${items.map(item => typeof item === "string" ? item : `${item.label}: ${item.note}`).join(" · ")}</span></div>`;
+}
+
+function timingGuideHTML() {
+  return `
+    <details class="stack-timing-guide" open>
+      <summary><span><span class="eyebrow">Use the protocol</span><strong>Timing &amp; pairing map</strong></span><span class="stack-timing-toggle">Hide</span></summary>
+      <div class="stack-timing-grid">
+        ${TIMING_GUIDE.map(slot => `
+          <article class="stack-timing-slot">
+            <h3>${slot.label}</h3>
+            <ul>${slot.items.map(item => `<li>${item}</li>`).join("")}</ul>
+            <p>${slot.note}</p>
+          </article>`).join("")}
+      </div>
+    </details>`;
 }
 
 const stackTabCache = {};
@@ -71,8 +101,6 @@ function coreCoverageHTML() {
 }
 
 function supplementCard(s) {
-  const synergy = s.synergy && s.synergy.length
-    ? `<div class="stack-line"><span class="stack-line-label">✨ Synergy</span> ${s.synergy.join(", ")}</div>` : "";
   const carnivore = s.carnivoreNote
     ? `<div class="carnivore-note">🥩 ${s.carnivoreNote}</div>` : "";
   return `
@@ -88,7 +116,7 @@ function supplementCard(s) {
       <div class="stack-lines">
         <div class="stack-line"><span class="stack-line-label">⏰ Timing</span> ${s.timing}</div>
         <div class="stack-line"><span class="stack-line-label">🍽 Pairing</span> ${s.pairing}</div>
-        ${synergy}
+        ${synergyHTML(s.synergy)}
       </div>
       <details class="meal-details stack-why">
         <summary>Why</summary>
@@ -111,6 +139,8 @@ function foodCard(f) {
       </div>
       <div class="stack-lines">
         <div class="stack-line"><span class="stack-line-label">⏰ When</span> ${f.timing}</div>
+        ${f.pairing ? `<div class="stack-line"><span class="stack-line-label">🍽 Pairing</span> ${f.pairing}</div>` : ""}
+        ${synergyHTML(f.synergy)}
       </div>
       <details class="meal-details stack-why">
         <summary>Why</summary>
@@ -133,6 +163,9 @@ function conditionalCard(s) {
       <div class="stack-lines">
         <div class="stack-line"><span class="stack-line-label">👤 Who</span> ${s.who}</div>
         <div class="stack-line"><span class="stack-line-label">💊 Dose</span> ${s.dose}</div>
+        ${s.timing ? `<div class="stack-line"><span class="stack-line-label">⏰ Timing</span> ${s.timing}</div>` : ""}
+        ${s.pairing ? `<div class="stack-line"><span class="stack-line-label">🍽 Pairing</span> ${s.pairing}</div>` : ""}
+        ${synergyHTML(s.synergy)}
       </div>
       <details class="meal-details stack-why">
         <summary>Why</summary>
@@ -194,7 +227,7 @@ export function renderStack() {
   if (!container) return;
 
   if (!container.querySelector('.meal-tabs')) {
-    container.innerHTML = coreCoverageHTML() + stackTabsHTML() + '<div class="stack-content"></div>';
+    container.innerHTML = coreCoverageHTML() + timingGuideHTML() + stackTabsHTML() + '<div class="stack-content"></div>';
   } else {
     container.querySelectorAll('.meal-tab').forEach((btn, i) => {
       btn.classList.toggle('active', ["supplements", "food-spices", "extras", "conditional", "skip"][i] === stackTab);
@@ -209,7 +242,6 @@ export function renderStack() {
   } else {
     contentEl.innerHTML = stackTabCache[stackTab];
   }
-  window.scrollTo(0, 0);
 }
 
 export function renderAvoidPage() {
@@ -239,7 +271,7 @@ export function renderAvoidPage() {
       <ol class="upf-steps">
         ${UPF_GUIDE.steps.map(step => `<li>${step}</li>`).join("")}
       </ol>
-      <div class="upf-guide-grid">
+       <div class="upf-guide-grid">
         <div class="upf-guide-box upf-guide-box-red">
           <h3>Red-flag markers</h3>
           <ul>${UPF_GUIDE.redFlags.map(item => `<li>${item}</li>`).join("")}</ul>
@@ -248,8 +280,46 @@ export function renderAvoidPage() {
           <h3>Not automatically UPF</h3>
           <ul>${UPF_GUIDE.notAutomatic.map(item => `<li>${item}</li>`).join("")}</ul>
         </div>
+         </div>
+       </section>`;
+
+  container.insertAdjacentHTML('beforeend', `
+    <section class="avoid-label-guide" aria-labelledby="avoid-label-title">
+      <div class="avoid-label-head">
+        <p class="eyebrow">Exact label screen</p>
+        <h2 id="avoid-label-title">What to scan for on the label</h2>
+        <p>Search a product ingredient or browse the five practical screens below. These are decision rules, not a claim that every isolated additive is dangerous.</p>
+        <label class="avoid-search-label" for="avoid-label-search">Search ingredients</label>
+        <input id="avoid-label-search" class="avoid-label-search" type="search" placeholder="e.g. maltodextrin, nitrite, flavour" data-avoid-search>
       </div>
-    </section>`;
+      <div class="avoid-label-grid">
+        ${AVOID_LABEL_GUIDE.map((group, index) => `
+          <article class="avoid-label-group" data-avoid-label-card data-search-text="${[group.name, group.priority, ...group.markers, group.rule, group.context].join(" ").toLowerCase()}">
+            <div class="avoid-label-group-head">
+              <span class="avoid-label-number">0${index + 1}</span>
+              <div><span class="avoid-label-priority">${group.priority}</span><h3>${group.name}</h3></div>
+            </div>
+            <div class="avoid-marker-list">${group.markers.map(marker => `<code>${marker}</code>`).join("")}</div>
+            <p><strong>Rule</strong> ${group.rule}</p>
+            <p class="avoid-label-context"><strong>Context</strong> ${group.context}</p>
+          </article>`).join("")}
+      </div>
+      <p class="avoid-label-empty" data-avoid-empty hidden>No matching label markers. Try a shorter ingredient or browse the full guide.</p>
+    </section>`);
+
+  const search = container.querySelector('[data-avoid-search]');
+  const cards = [...container.querySelectorAll('[data-avoid-label-card]')];
+  const empty = container.querySelector('[data-avoid-empty]');
+  search?.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach(card => {
+      const matches = !query || card.dataset.searchText.includes(query);
+      card.hidden = !matches;
+      if (matches) visible++;
+    });
+    if (empty) empty.hidden = visible > 0;
+  });
 }
 
 export function renderFoodProtocol() {

@@ -1,8 +1,30 @@
-import { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, UPF_GUIDE, SKIP_LIST, CONDITIONAL_LIST } from './data/stack.js';
+import { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, AVOID_LABEL_GUIDE, UPF_GUIDE, TIMING_GUIDE, SKIP_LIST, CONDITIONAL_LIST } from './data/stack.js';
 import { CORE_OUTCOMES } from './data/core.js';
 import { ANNUAL_PANEL, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS } from './data/blood.js';
 import { INVESTMENTS } from './data/finance.js';
 import { PILLARS, EXERCISES } from './data/workout.js';
+import { PILLARS as MASTER_PILLARS, LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS } from './data/pillars.js';
+import { EIGHTY_TWENTY, SOCIAL_MENTAL, FRONTIER, SCREENING_TIERS, BIOLOGY } from './data/protocol.js';
+import { HAWKER, HEALTHIER_SG, SODIUM, ENVIRONMENT } from './data/singapore.js';
+import { icon } from './icons.js';
+import './theme.js';
+
+const bottomNavIcons = {
+    Home: 'home',
+    Stack: 'pill',
+    Blood: 'droplet',
+    Workout: 'activity',
+    Finance: 'chart',
+    Avoid: 'shield',
+    Blueprint: 'flask',
+};
+
+document.querySelectorAll('.bottom-nav-item').forEach((item) => {
+    const label = item.querySelector('.bottom-nav-label')?.textContent.trim();
+    const iconName = bottomNavIcons[label];
+    const target = item.querySelector('.bottom-nav-icon');
+    if (iconName && target) target.innerHTML = icon(iconName, { size: 18 });
+});
 
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-nav-toggle]');
@@ -34,7 +56,9 @@ function exportData() {
         foodSpices: FOOD_SPICES,
         extras: EXTRAS,
         avoidIngredients: AVOID_INGREDIENTS,
+        avoidLabelGuide: AVOID_LABEL_GUIDE,
         upfGuide: UPF_GUIDE,
+        timingGuide: TIMING_GUIDE,
         coreOutcomes: CORE_OUTCOMES,
         conditionalList: CONDITIONAL_LIST,
         skipList: SKIP_LIST,
@@ -46,6 +70,19 @@ function exportData() {
         investments: INVESTMENTS,
         pillars: PILLARS,
         exercises: EXERCISES,
+        masterPillars: MASTER_PILLARS,
+        longevity101: LONGEVITY_101,
+        decisionRule: DECISION_RULE,
+        evidenceTiers: EVIDENCE_TIERS,
+        eightyTwenty: EIGHTY_TWENTY,
+        socialMental: SOCIAL_MENTAL,
+        frontier: FRONTIER,
+        screeningTiers: SCREENING_TIERS,
+        biology: BIOLOGY,
+        hawker: HAWKER,
+        healthierSG: HEALTHIER_SG,
+        sodium: SODIUM,
+        environment: ENVIRONMENT,
     };
 
     let md = `# Macro Longevity Knowledge Base\n\n`;
@@ -72,6 +109,8 @@ function exportData() {
         if (f.evidence) md += `- **Evidence:** ${f.evidence}\n`;
         md += `- **Serving:** ${f.serving}\n`;
         md += `- **When:** ${f.timing}\n`;
+        if (f.pairing) md += `- **Pairing:** ${f.pairing}\n`;
+        if (f.synergy && f.synergy.length) md += `- **Synergy:** ${f.synergy.join(', ')}\n`;
         md += `- **Why:** ${f.why}\n`;
         if (f.risk) md += `- **Risk:** ${f.risk}\n`;
         md += `\n`;
@@ -100,7 +139,22 @@ function exportData() {
     md += `## How to Identify Ultra-Processed Food\n\n${data.upfGuide.intro}\n\n`;
     data.upfGuide.steps.forEach((step, i) => { md += `${i + 1}. ${step}\n`; });
     md += `\n**Red-flag markers:** ${data.upfGuide.redFlags.join('; ')}\n\n`;
-    md += `**Not automatically UPF:** ${data.upfGuide.notAutomatic.join('; ')}\n\n`;
+        md += `**Not automatically UPF:** ${data.upfGuide.notAutomatic.join('; ')}\n\n`;
+
+    md += `## Exact Avoid-Label Guide\n\n`;
+    data.avoidLabelGuide.forEach(group => {
+        md += `### ${group.name} (${group.priority})\n`;
+        md += `- **Markers:** ${group.markers.join('; ')}\n`;
+        md += `- **Rule:** ${group.rule}\n`;
+        md += `- **Context:** ${group.context}\n\n`;
+    });
+
+    md += `## Timing & Pairing Map\n\n`;
+    data.timingGuide.forEach(slot => {
+        md += `### ${slot.label}\n`;
+        slot.items.forEach(item => { md += `- ${item}\n`; });
+        md += `- **Note:** ${slot.note}\n\n`;
+    });
 
     md += `## Core Outcome Coverage\n\n`;
     data.coreOutcomes.forEach(o => {
@@ -120,6 +174,9 @@ function exportData() {
         if (s.evidence) md += `- **Evidence:** ${s.evidence}\n`;
         md += `- **Who:** ${s.who}\n`;
         md += `- **Dose:** ${s.dose}\n`;
+        if (s.timing) md += `- **Timing:** ${s.timing}\n`;
+        if (s.pairing) md += `- **Pairing:** ${s.pairing}\n`;
+        if (s.synergy && s.synergy.length) md += `- **Synergy:** ${s.synergy.join(', ')}\n`;
         md += `- **Why:** ${s.why}\n`;
         md += `- **Caution:** ${s.caution}\n`;
         md += `\n`;
@@ -194,6 +251,63 @@ function exportData() {
         }
         md += `\n`;
     });
+
+    md += `## 4-Pillar Master Model (Longevity OS)\n\n`;
+    data.masterPillars.forEach(p => {
+        md += `### ${p.kicker}: ${p.name}\n- **Scope:** ${p.desc}\n- **Includes:** ${p.tags.join(', ')}\n- **Explore:** ${p.href}\n\n`;
+    });
+
+    md += `## Evidence Taxonomy & Decision Rule\n\n`;
+    data.evidenceTiers.forEach(t => { md += `- **${t.label}** — ${t.def}\n`; });
+    md += `\n**Decision rule:** ${data.decisionRule}\n\n`;
+
+    md += `## The Longevity 101\n\n`;
+    data.longevity101.forEach((item, i) => { md += `${i + 1}. ${item.replace(/<[^>]+>/g, '')}\n`; });
+    md += `\n`;
+
+    md += `## 80/20 Protocol\n\n`;
+    md += `**Today:**\n` + data.eightyTwenty.today.map(t => `- ${t}`).join('\n') + `\n\n`;
+    md += `**This week:**\n` + data.eightyTwenty.week.map(t => `- ${t}`).join('\n') + `\n\n`;
+    md += `**This year:**\n` + data.eightyTwenty.year.map(t => `- ${t}`).join('\n') + `\n\n`;
+    md += `**Do this instead:**\n`;
+    data.eightyTwenty.instead.forEach(r => { md += `- Instead of ${r.skip} → ${r.do} (${r.why})\n`; });
+    md += `\n**Minimal Singapore protocol:** ${data.eightyTwenty.minimal}\n\n`;
+
+    md += `## Screening Tiers (actionability)\n\n`;
+    data.screeningTiers.forEach(t => { md += `- **Tier ${t.tier} — ${t.label}:** ${t.examples}\n`; });
+    md += `\n`;
+
+    md += `## Biology & the 12 Hallmarks\n\n${data.biology.intro}\n\n`;
+    md += `Hallmarks: ${data.biology.hallmarks.join('; ')}\n\n`;
+    md += `**Mitochondrial supplement reality check:**\n`;
+    data.biology.mitochondrial.reality.forEach(r => { md += `- ${r.name} (${r.verdict}): ${r.text}\n`; });
+    md += `\n`;
+
+    md += `## Social, Mental Health & Recovery\n\n${data.socialMental.intro}\n\n`;
+    data.socialMental.actions.forEach(a => { md += `- ${a}\n`; });
+    md += `\n*${data.socialMental.principle}*\n\n`;
+
+    md += `## Frontier Geroscience\n\n${data.frontier.intro}\n\n`;
+    md += `**Therapies:**\n`;
+    data.frontier.therapies.forEach(t => { md += `- ${t.name} (${t.status}): ${t.text}\n`; });
+    md += `\n**Optional tools:**\n`;
+    data.frontier.optional.forEach(t => { md += `- ${t.name} (${t.verdict}): ${t.text}\n`; });
+    md += `\n`;
+
+    md += `## Singapore Localization\n\n`;
+    md += `### Hawker strategy\n${data.hawker.intro}\n`;
+    data.hawker.steps.forEach(s => { md += `- ${s.step}: ${s.text}\n`; });
+    md += `\nTemplates:\n` + data.hawker.templates.map(t => `- ${t.meal}: ${t.tip}`).join('\n') + `\n`;
+    md += `\nBudget pantry: ${data.hawker.pantry.join(' • ')}\n\n`;
+    md += `### Healthier SG Screening\n${data.healthierSG.intro}\n`;
+    data.healthierSG.fees.forEach(f => { md += `- ${f.group}: ${f.fee}\n`; });
+    md += `${data.healthierSG.note}\n\n`;
+    md += `### Sodium bottleneck\n${data.sodium.note}\n\n`;
+    md += `### Environment (heat / UV / haze)\n${data.environment.intro}\n`;
+    md += `WBGT: ` + data.environment.heat.map(h => `${h.wbgt} (${h.level}): ${h.action}`).join('; ') + `\n`;
+    md += `UV: ${data.environment.uv}\n`;
+    md += `Haze (PSI): ` + data.environment.haze.map(h => `${h.psi} (${h.level}): ${h.action}`).join('; ') + `\n`;
+    md += `10-second decision: ${data.environment.decision}\n\n`;
 
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);

@@ -1,6 +1,6 @@
 import { PILLARS, EXERCISES } from './data/workout.js';
 import { INVESTMENTS } from './data/finance.js';
-import { CardSwipe } from './components/card-swipe.js';
+import { icon } from './icons.js';
 
 function safeRender(fn, container, fallback) {
   try { fn(); }
@@ -482,7 +482,7 @@ function advanceTimerPhase(id) {
   if (s.type === "countdown") {
     s.status = "done";
     const el = s._el;
-    if (el.label) el.label.textContent = "✅ DONE";
+    if (el.label) el.label.textContent = "COMPLETE";
     playAllDone();
     updateTimerControls(id, "done");
     if (el.bar) el.bar.style.transform = "scaleX(0)";
@@ -497,7 +497,7 @@ function advanceTimerPhase(id) {
       s._resetFlags();
       playStartWhistle();
       startMusic(true);
-      if (s._el.label) s._el.label.textContent = "⚡ WORK";
+      if (s._el.label) s._el.label.textContent = "WORK";
       if (s._el.phase) s._el.phase.textContent = `Interval ${s.currentRound}/${s.config.rounds}`;
     } else if (s.phase === "work") {
       playWorkEnd();
@@ -506,7 +506,7 @@ function advanceTimerPhase(id) {
       s.phaseTotal = s.config.recovery;
       s._resetFlags();
       startMusic(false);
-      if (s._el.label) s._el.label.textContent = "😮‍💨 RECOVER";
+      if (s._el.label) s._el.label.textContent = "RECOVER";
     } else if (s.phase === "recovery") {
       s.currentRound++;
       if (s.currentRound > s.config.rounds) {
@@ -515,7 +515,7 @@ function advanceTimerPhase(id) {
         s.phaseTotal = s.config.cooldown;
         s._resetFlags();
         startMusic(false);
-        if (s._el.label) s._el.label.textContent = "🧘 COOLDOWN";
+        if (s._el.label) s._el.label.textContent = "COOLDOWN";
         if (s._el.phase) s._el.phase.textContent = "Final cooldown";
       } else {
         s.phase = "work";
@@ -524,12 +524,12 @@ function advanceTimerPhase(id) {
         s._resetFlags();
         playRestOver();
         startMusic(true);
-        if (s._el.label) s._el.label.textContent = "⚡ WORK";
+        if (s._el.label) s._el.label.textContent = "WORK";
         if (s._el.phase) s._el.phase.textContent = `Interval ${s.currentRound}/${s.config.rounds}`;
       }
     } else if (s.phase === "cooldown") {
       s.status = "done";
-      if (s._el.label) s._el.label.textContent = "✅ DONE";
+      if (s._el.label) s._el.label.textContent = "COMPLETE";
       playAllDone();
       updateTimerControls(id, "done");
       if (s._el.bar) s._el.bar.style.transform = "scaleX(0)";
@@ -543,7 +543,7 @@ function advanceTimerPhase(id) {
       playWorkEnd();
       if (s.currentSet >= s.totalSets) {
         s.status = "done";
-        if (s._el.label) s._el.label.textContent = "✅ DONE";
+        if (s._el.label) s._el.label.textContent = "COMPLETE";
         playAllDone();
         updateTimerControls(id, "done");
         if (s._el.bar) s._el.bar.style.transform = "scaleX(0)";
@@ -554,14 +554,14 @@ function advanceTimerPhase(id) {
       s.phaseTotal = s.restSeconds;
       s._resetFlags();
       startMusic(false);
-      if (s._el.label) s._el.label.textContent = "💤 REST";
+      if (s._el.label) s._el.label.textContent = "REST";
       if (s._el.sets) s._el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
     } else {
       playRestOver();
       s.currentSet++;
       if (s.currentSet > s.totalSets) {
         s.status = "done";
-        if (s._el.label) s._el.label.textContent = "✅ DONE";
+        if (s._el.label) s._el.label.textContent = "COMPLETE";
         playAllDone();
         updateTimerControls(id, "done");
         if (s._el.bar) s._el.bar.style.transform = "scaleX(0)";
@@ -573,7 +573,7 @@ function advanceTimerPhase(id) {
       s._resetFlags();
       playStartWhistle();
       startMusic(true);
-      if (s._el.label) s._el.label.textContent = "⏱️ WORK";
+      if (s._el.label) s._el.label.textContent = "WORK";
       if (s._el.sets) s._el.sets.textContent = `${s.currentSet}/${s.totalSets}`;
     }
     updateSetIndicators(id, s.currentSet, s.totalSets);
@@ -612,10 +612,10 @@ function updateTimerControls(id, state) {
   document.querySelectorAll(`.timer-start[data-exercise="${id}"]`).forEach(start => {
     const pause = start.closest('.timer-controls').querySelector('.timer-pause');
     const stop = start.closest('.timer-controls').querySelector('.timer-stop');
-    if (state === "idle") { start.style.display = ""; start.textContent = "▶ Start"; pause.style.display = "none"; stop.style.display = "none"; }
-    else if (state === "running") { start.style.display = "none"; pause.style.display = ""; pause.textContent = "⏸ Pause"; stop.style.display = ""; }
-    else if (state === "paused") { start.style.display = ""; start.textContent = "▶ Resume"; pause.style.display = "none"; stop.style.display = ""; }
-    else if (state === "done") { start.style.display = ""; start.textContent = "↻ Restart"; pause.style.display = "none"; stop.style.display = "none"; }
+    if (state === "idle") { start.style.display = ""; start.textContent = "Start"; pause.style.display = "none"; stop.style.display = "none"; }
+    else if (state === "running") { start.style.display = "none"; pause.style.display = ""; pause.textContent = "Pause"; stop.style.display = ""; }
+    else if (state === "paused") { start.style.display = ""; start.textContent = "Resume"; pause.style.display = "none"; stop.style.display = ""; }
+    else if (state === "done") { start.style.display = ""; start.textContent = "Restart"; pause.style.display = "none"; stop.style.display = "none"; }
   });
 }
 
@@ -650,6 +650,7 @@ function handleTimerAction(id, action) {
     s.status = "running";
     s.lastTick = Date.now();
     updateTimerControls(id, "running");
+    if (s._el.label) s._el.label.textContent = s.type === "countdown" ? "ACTIVE · CONVERSATIONAL PACE" : s.type === "intervals" ? "WARM-UP" : `WORK · SET ${s.currentSet}/${s.totalSets}`;
     playStartWhistle();
     if (s.type !== "countdown") startMusic(true);
     timerTick(id);
@@ -717,6 +718,22 @@ function initExerciseTimers() {
   const container = document.querySelector("#workout-app");
   if (!container) return;
   container.addEventListener("click", (e) => {
+    const tab = e.target.closest("[data-pillar-tab]");
+    if (tab) {
+      const selected = tab.dataset.pillarTab;
+      container.querySelectorAll("[data-pillar-tab]").forEach(button => {
+        const active = button === tab;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-selected", String(active));
+      });
+      container.querySelectorAll(".pillar-section").forEach(section => {
+        section.hidden = section.dataset.pillar !== selected;
+      });
+      const current = container.querySelector("[data-current-pillar]");
+      const pillar = PILLARS.find(item => item.id === selected);
+      if (current && pillar) current.textContent = pillar.shortName || pillar.name;
+      return;
+    }
     const start = e.target.closest(".timer-start");
     const pause = e.target.closest(".timer-pause");
     const stop = e.target.closest(".timer-stop");
@@ -732,23 +749,24 @@ function initExerciseTimers() {
    4-Pillar Exercise Rendering
    ============================ */
 function pillarOverviewCard(p) {
-  const freq = p.id === "zone2" ? p.frequency :
-    p.id === "vo2max" ? `${p.protocol.name} · ${p.protocol.totalMinutes} min` :
-    p.id === "strength" ? p.frequency :
-    p.frequency;
   const benefits = Array.isArray(p.benefits) ? p.benefits : [];
+  const iconName = { zone2: "activity", vo2max: "activity", strength: "dumbbell", mobility: "target" }[p.id] || "activity";
   return `
-    <article class="pillar-card" id="pillar-${p.id}">
+    <article class="workout-pillar-summary" id="pillar-${p.id}">
       <div class="pillar-card-head">
-        <span class="pillar-icon">${p.icon}</span>
-        <div>
-          <h2 class="pillar-name">${p.name}</h2>
-          <span class="pillar-freq">${freq}</span>
+        <span class="workout-pillar-icon">${icon(iconName, { size: 24 })}</span>
+        <div class="workout-pillar-lockup">
+          <span class="workout-pillar-kicker">${p.kicker || "TRAINING DOMAIN"}</span>
+          <h2 class="pillar-name">${p.shortName || p.name}</h2>
         </div>
       </div>
       <p class="pillar-desc">${p.description}</p>
-      <div class="pillar-benefits">
-        ${benefits.map(b => `<span class="pillar-benefit">✓ ${b}</span>`).join("")}
+      <div class="workout-meta-grid">
+        <div><span>Weekly dose</span><strong>${p.frequency}</strong></div>
+        <div><span>Target</span><strong>${p.target}</strong></div>
+      </div>
+      <div class="workout-benefits">
+        ${benefits.slice(0, 3).map(b => `<span>${b}</span>`).join("")}
       </div>
     </article>`;
 }
@@ -767,11 +785,11 @@ function zone2TimerHTML(pillar) {
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">
-        <button class="timer-btn timer-start" data-exercise="${id}">▶ Start</button>
-        <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
-        <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
+         <button class="timer-btn timer-start" data-exercise="${id}">Start session</button>
+         <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">Pause</button>
+         <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">Reset</button>
       </div>
-      <div class="timer-label" id="label-${id}">Ready — ${m} min at conversational pace · No music, whistle cues only</div>
+       <div class="timer-label" id="label-${id}" aria-live="polite">Ready — ${m} min at conversational pace · No music, whistle cues only</div>
     </div>`;
 }
 
@@ -788,54 +806,62 @@ function vo2TimerHTML(pillar) {
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">
-        <button class="timer-btn timer-start" data-exercise="${id}">▶ Start</button>
-        <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
-        <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
+         <button class="timer-btn timer-start" data-exercise="${id}">Start session</button>
+         <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">Pause</button>
+         <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">Reset</button>
       </div>
-      <div class="timer-label" id="label-${id}">Ready — ${t.warmup/60}min warmup → ${t.rounds}×(${t.work/60}min work + ${t.recovery/60}min recovery) → ${t.cooldown/60}min cooldown</div>
+       <div class="timer-label" id="label-${id}" aria-live="polite">Ready — ${t.warmup/60}min warmup → ${t.rounds}×(${t.work/60}min work + ${t.recovery/60}min recovery) → ${t.cooldown/60}min cooldown</div>
     </div>`;
 }
 
 function strengthExerciseCard(ex) {
   const id = ex.id;
+  const index = PILLARS.flatMap(p => p.exercises || []).findIndex(item => item.id === id) + 1;
   return `
     <div class="pillar-exercise-card" id="ex-${id}">
-      <div class="exercise-header">
-        <div class="exercise-name">${ex.icon || "🏋️"} ${ex.name}</div>
-      </div>
-      <p class="exercise-desc">${ex.description}</p>
-      <div class="exercise-timer" id="timer-${id}">
-        <div class="timer-config">
-          <span id="config-${id}">${ex.sets} × ${ex.workSeconds}s work · ${ex.restSeconds}s rest</span>
-          <span class="set-indicators">
-            ${Array.from({length: ex.sets}, (_, i) => `<span class="set-dot${i === 0 ? " active" : ""}" data-exercise="${id}"></span>`).join("")}
-          </span>
+      <div class="exercise-index">${String(index).padStart(2, "0")}</div>
+      <div class="exercise-main">
+        <div class="exercise-header">
+          <span class="exercise-pattern">${ex.pattern || "COMPOUND MOVEMENT"}</span>
+          <h3 class="exercise-name">${ex.name}</h3>
         </div>
-        <div class="timer-display">
-          <span class="timer-time" id="time-${id}">${String(Math.floor(ex.workSeconds/60)).padStart(2,"0")}:${String(ex.workSeconds%60).padStart(2,"0")}</span>
-          <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
-        </div>
-        <div class="timer-controls">
-          <button class="timer-btn timer-start" data-exercise="${id}">▶ Start</button>
-          <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">⏸ Pause</button>
-          <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">⏹ Stop</button>
-        </div>
-        <div class="timer-label" id="label-${id}">Ready</div>
-      </div>
-      <div class="exercise-set-counter">Set <span id="sets-${id}">1/${ex.sets}</span></div>
-      <details class="exercise-details">
-        <summary>📖 Guide</summary>
-        <div class="exercise-detail-content">
-          <div class="exercise-detail-section">
-            <h5>🎯 Why</h5>
-            <p class="exercise-detail-text">${ex.whyLongevity}</p>
+        <p class="exercise-desc">${ex.description}</p>
+        <div class="exercise-dose"><span>${ex.sets} sets</span><span>${ex.reps || `${ex.workSeconds}s work`}</span><span>${ex.equipment || "Adaptable load"}</span></div>
+        <details class="exercise-details">
+          <summary>${icon("info", { size: 16 })} Show form cues</summary>
+          <div class="exercise-detail-content">
+            <div class="exercise-detail-section">
+              <h5>Why it belongs</h5>
+              <p class="exercise-detail-text">${ex.whyLongevity}</p>
+            </div>
+            <div class="exercise-detail-section">
+              <h5>How to perform</h5>
+              <ol class="checklist">${ex.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
+            </div>
           </div>
-          <div class="exercise-detail-section">
-            <h5>📋 Steps</h5>
-            <ol class="checklist">${ex.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
+        </details>
+      </div>
+      <div class="exercise-timer-column">
+        <div class="exercise-timer" id="timer-${id}">
+          <div class="timer-config">
+            <span id="config-${id}">${ex.sets} × ${ex.workSeconds}s work · ${ex.restSeconds}s rest</span>
+            <span class="set-indicators">
+              ${Array.from({length: ex.sets}, (_, i) => `<span class="set-dot${i === 0 ? " active" : ""}" data-exercise="${id}"></span>`).join("")}
+            </span>
           </div>
+          <div class="timer-display">
+            <span class="timer-time" id="time-${id}">${String(Math.floor(ex.workSeconds/60)).padStart(2,"0")}:${String(ex.workSeconds%60).padStart(2,"0")}</span>
+            <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
+          </div>
+          <div class="timer-controls">
+            <button class="timer-btn timer-start" data-exercise="${id}">Start</button>
+            <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">Pause</button>
+            <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">Reset</button>
+          </div>
+          <div class="timer-label" id="label-${id}" aria-live="polite">Ready</div>
         </div>
-      </details>
+        <div class="exercise-set-counter">Set <span id="sets-${id}">1/${ex.sets}</span></div>
+      </div>
     </div>`;
 }
 
@@ -843,13 +869,30 @@ function renderPillars(targetId) {
   const container = document.getElementById(targetId || "workout-app");
   if (!container) return;
 
-  initExerciseSounds();
-
   const intro = `
-    <div class="exercise-intro">
-      <h3>4 Pillars of Longevity Training</h3>
-      <p>The four most impactful exercise domains for healthspan and lifespan. Each pillar addresses a distinct physiological system. Together, they cover cardiovascular fitness, mitochondrial health, muscular strength, and movement quality.</p>
-    </div>`;
+    <section class="workout-console-intro">
+      <div class="workout-console-copy">
+        <span class="section-eyebrow">The minimum effective week</span>
+        <h2>Four inputs. One durable body.</h2>
+        <p>Use the pillars as a menu, not a punishment. Build the aerobic base first, add intensity when ready, train strength progressively, and keep joints moving daily.</p>
+      </div>
+      <div class="workout-metrics" aria-label="Weekly training framework">
+        <div><strong>4</strong><span>training domains</span></div>
+        <div><strong>150–300</strong><span>Zone 2 min / week</span></div>
+        <div><strong>2–3</strong><span>strength sessions</span></div>
+      </div>
+    </section>
+    <section class="workout-index" aria-label="Choose a training domain">
+      <div class="workout-index-heading"><span>Choose a session</span><span data-current-pillar>${PILLARS[0].shortName || PILLARS[0].name}</span></div>
+      <div class="workout-tabs" role="tablist">
+        ${PILLARS.map((p, i) => `
+          <button class="workout-tab${i === 0 ? " is-active" : ""}" type="button" role="tab" aria-selected="${i === 0}" aria-controls="section-${p.id}" data-pillar-tab="${p.id}">
+            <span class="workout-tab-number">0${i + 1}</span>
+            <span class="workout-tab-copy"><span>${p.kicker || "TRAINING"}</span><strong>${p.shortName || p.name}</strong></span>
+            <span class="workout-tab-dose">${p.frequency}</span>
+          </button>`).join("")}
+      </div>
+    </section>`;
 
   const pillarHTML = PILLARS.map(p => {
     let timerHTML = "";
@@ -865,7 +908,7 @@ function renderPillars(targetId) {
 
     const whyHTML = p.whyLongevity ? `
       <details class="exercise-details">
-        <summary>📖 Why This Matters</summary>
+        <summary>${icon("flask", { size: 16 })} Why this matters</summary>
         <div class="exercise-detail-content">
           <div class="exercise-detail-section">
             <p class="exercise-detail-text">${p.whyLongevity}</p>
@@ -874,11 +917,12 @@ function renderPillars(targetId) {
       </details>` : "";
 
     return `
-      <section class="pillar-section" id="section-${p.id}">
+      <section class="pillar-section" data-pillar="${p.id}" id="section-${p.id}" role="tabpanel"${p.id !== PILLARS[0].id ? " hidden" : ""}>
         ${pillarOverviewCard(p)}
+        <div class="workout-protocol-heading"><span>Session protocol</span><span>${p.dose || p.frequency}</span></div>
         ${timerHTML}
         ${exercisesHTML}
-        ${whyHTML}
+        <div class="workout-notes">${whyHTML}</div>
       </section>`;
   }).join("");
 

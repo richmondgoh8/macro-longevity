@@ -1,6 +1,9 @@
 /* ============================================
    Macro Longevity — Design Token Variables
-   Follows DESIGN.md v1.0 exactly
+   GENUI.md v3.0 — "Clinical / Evidence-First"
+   Evolved from v2.0: refined clinical-biotech palette,
+   5-tier evidence taxonomy, 4-pillar accents, full dark mode.
+   All v2 token names preserved for backward compatibility.
    ============================================ */
 
 /* ─── SELF-HOSTED FONTS (Latin subset, font-display: swap) ─── */
@@ -32,57 +35,47 @@
 }
 
 :root {
-  /* ─── COLOR ─────────────────── */
-  --color-primary: #0a7e6f;
-  --color-primary-hover: #0a6b5e;
-  --color-primary-light: #e8f5f3;
-  --color-primary-dark: #065a4f;
-  --color-secondary: #e8993a;
-  --color-secondary-light: #fef3e2;
-  --color-secondary-hover: #d4882e;
-  --color-accent: #d65a3a;
-  --color-accent-light: #fde8e2;
-  --color-bg: #f8f7f4;
+  /* ─── COLOR — evolved clinical-biotech palette ─── */
+  --color-primary: #0F766E;          /* deep clinical teal */
+  --color-primary-hover: #0c5f58;
+  --color-primary-light: #e6f4f2;
+  --color-primary-dark: #0a4f49;
+  --color-secondary: #D97706;        /* amber — conditional / energy */
+  --color-secondary-light: #fdf2e2;
+  --color-secondary-hover: #b45309;
+  --color-accent: #059669;           /* health green — positive action */
+  --color-accent-light: #e7f6ef;
+  --color-accent-hover: #047857;
+  --color-bg: #f7f8f7;
   --color-bg-card: #ffffff;
-  --color-bg-alt: #f0eeea;
-  --color-text: #1a232e;
-  --color-text-secondary: #5a6573;
-  --color-text-muted: #8a95a3;
-  --color-success: #2a9d58;
-  --color-danger: #d9534f;
-  --color-warning: #e8993a;
-  --color-border: #e5e2dd;
-  --color-border-light: #f0eee8;
+  --color-bg-alt: #eef1ef;
+  --color-text: #16202b;
+  --color-text-secondary: #51606f;
+  --color-text-muted: #8893a1;
+  --color-success: #059669;
+  --color-danger: #dc2626;
+  --color-warning: #D97706;
+  --color-border: #e3e7e4;
+  --color-border-light: #eef1ee;
 
   /* ─── TYPOGRAPHY ────────────── */
-  /* Display font (geometric sans — DESIGN.md Strategy B) */
   --font-display: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  /* Body font (neutral sans) */
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  /* Monospace for data */
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* 4-Size Scale — DESIGN.md §3.1 */
-  /* SM: captions, metadata, labels */
-  --text-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);   /* 13–15px */
-  /* MD: body text, UI default */
-  --text-md: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);           /* 16–20px */
-  /* LG: section headings, H2 */
-  --text-lg: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);          /* 22–32px */
-  /* XL: page headline, hero */
-  --text-xl: clamp(1.75rem, 1.2rem + 2.5vw, 3.5rem);         /* 28–56px */
-
-  /* Overline / micro-tag (5th size via letter-spacing) */
+  /* 4-Size Scale (fluid) — GENUI §3.1 */
+  --text-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);
+  --text-md: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  --text-lg: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
+  --text-xl: clamp(1.75rem, 1.2rem + 2.5vw, 3.5rem);
   --text-overline: 0.75rem;
 
-  /* Weights */
   --weight-normal: 400;
   --weight-medium: 500;
   --weight-semi: 600;
   --weight-bold: 700;
   --weight-black: 900;
 
-  /* Line heights */
   --leading-tight: 1.15;
   --leading-snug: 1.35;
   --leading-normal: 1.6;
@@ -102,22 +95,23 @@
   --space-20: 80px;
 
   /* ─── RADIUS ────────────────── */
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 9999px;
 
   /* ─── SHADOWS ───────────────── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.14);
+  --shadow-sm: 0 1px 2px rgba(16, 32, 43, 0.06), 0 1px 3px rgba(16, 32, 43, 0.05);
+  --shadow-md: 0 4px 10px rgba(16, 32, 43, 0.07), 0 2px 4px rgba(16, 32, 43, 0.05);
+  --shadow-lg: 0 12px 28px rgba(16, 32, 43, 0.10);
+  --shadow-xl: 0 24px 60px rgba(16, 32, 43, 0.12);
 
-  /* ─── TRANSITIONS ───────────── */
+  /* ─── TRANSITIONS / MOTION ──── */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
@@ -131,50 +125,160 @@
 
   /* ─── SEMANTIC STATE COLORS ─── */
   --color-on-primary: #ffffff;
-  --color-success-light: #e8f5e9;
-  --color-success-dark: #2a7d3a;
-  --color-warning-dark: #a06820;
-  --color-danger-dark: #b43a1a;
-  --color-danger-darker: #8a3a22;
+  --color-success-light: #e7f6ef;
+  --color-success-dark: #047857;
+  --color-warning-dark: #b45309;
+  --color-danger-dark: #b91c1c;
+  --color-danger-darker: #7f1d1d;
 
-  /* ─── DERIVED TINTS ─────────── */
-  --glass-nav: rgba(255, 255, 255, 0.92);
+  /* ─── DERIVED TINTS (auto-follow --color-primary etc.) ─── */
+  --glass-nav: rgba(255, 255, 255, 0.86);
+  --glass-overlay: rgba(255, 255, 255, 0.94);
   --tint-primary-6: color-mix(in srgb, var(--color-primary) 6%, transparent);
   --tint-primary-10: color-mix(in srgb, var(--color-primary) 10%, transparent);
   --tint-primary-12: color-mix(in srgb, var(--color-primary) 12%, transparent);
   --tint-primary-15: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  --tint-primary-25: color-mix(in srgb, var(--color-primary) 25%, transparent);
   --tint-secondary-6: color-mix(in srgb, var(--color-secondary) 6%, transparent);
   --tint-secondary-10: color-mix(in srgb, var(--color-secondary) 10%, transparent);
   --tint-secondary-15: color-mix(in srgb, var(--color-secondary) 15%, transparent);
   --tint-secondary-25: color-mix(in srgb, var(--color-secondary) 25%, transparent);
   --tint-accent-15: color-mix(in srgb, var(--color-accent) 15%, transparent);
   --tint-accent-20: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  --footer-text: rgba(255, 255, 255, 0.7);
-  --footer-copy: rgba(255, 255, 255, 0.4);
+  --footer-bg: var(--color-text);
+  --footer-text: rgba(255, 255, 255, 0.72);
+  --footer-copy: rgba(255, 255, 255, 0.42);
 
-  /* ─── GENUI v2.0 — CARNIVORE SEMANTICS ─── */
-  --carnivore: #6b21a8;
+  /* ─── GENUI v2.0 — CARNIVORE SEMANTICS (preserved) ─── */
+  --carnivore: #7C3AED;
   --carnivore-bg: #f3eefb;
   --carnivore-border: #ddd0f0;
 
-  /* ─── GENUI v2.0 — EVIDENCE BADGE SEMANTICS ─── */
-  --evidence-strong: var(--color-success);
-  --evidence-strong-bg: var(--color-success-light);
-  --evidence-moderate: var(--color-warning);
-  --evidence-moderate-bg: var(--tint-secondary-10);
-  --evidence-weak: var(--color-accent);
-  --evidence-weak-bg: var(--tint-accent-15);
+  /* ─── GENUI v3.0 — 5-TIER EVIDENCE TAXONOMY ───
+     Mirrors the Longevity OS report: CORE / CONDITIONAL /
+     OPTIONAL / EXPERIMENTAL / SKIP. v2 names kept as aliases. */
+  --evidence-core: var(--color-primary);
+  --evidence-core-bg: var(--tint-primary-12);
+  --evidence-conditional: var(--color-secondary);
+  --evidence-conditional-bg: var(--tint-secondary-12);
+  --evidence-optional: #0284C7;          /* sky */
+  --evidence-optional-bg: color-mix(in srgb, #0284C7 12%, transparent);
+  --evidence-experimental: #7C3AED;      /* violet */
+  --evidence-experimental-bg: color-mix(in srgb, #7C3AED 12%, transparent);
   --evidence-skip: var(--color-text-muted);
   --evidence-skip-bg: var(--color-bg-alt);
 
-  /* ─── GLASS OVERLAY (mobile nav) ─── */
-  --glass-overlay: rgba(255, 255, 255, 0.96);
+  /* v2 backward-compat aliases */
+  --evidence-strong: var(--evidence-core);
+  --evidence-strong-bg: var(--evidence-core-bg);
+  --evidence-moderate: var(--evidence-conditional);
+  --evidence-moderate-bg: var(--evidence-conditional-bg);
+  --evidence-weak: var(--evidence-optional);
+  --evidence-weak-bg: var(--evidence-optional-bg);
 
-  /* ─── BUDGET CARD TOKENS (finance) ─── */
+  /* ─── GENUI v3.0 — 4-PILLAR ACCENTS ───
+     P1 Prevent Disease · P2 Slow Biological Aging ·
+     P3 Build & Preserve Reserve · P4 Optimize Fundamentals */
+  --pillar-1: #e11d48;                   /* rose — disease risk */
+  --pillar-1-bg: color-mix(in srgb, #e11d48 10%, transparent);
+  --pillar-2: #7C3AED;                   /* violet — biology/aging */
+  --pillar-2-bg: color-mix(in srgb, #7C3AED 10%, transparent);
+  --pillar-3: #D97706;                   /* amber — reserve */
+  --pillar-3-bg: color-mix(in srgb, #D97706 10%, transparent);
+  --pillar-4: #0F766E;                   /* teal — fundamentals */
+  --pillar-4-bg: color-mix(in srgb, #0F766E 10%, transparent);
+
+  /* ─── BUDGET CARD TOKENS (finance, preserved) ─── */
   --budget-expense: #2563eb;
   --budget-expense-bg: #f0f6ff;
   --budget-invest: var(--color-success);
   --budget-invest-bg: var(--color-success-light);
   --budget-savings: var(--color-warning);
   --budget-savings-bg: var(--color-secondary-light);
+}
+
+/* ════════════════════════════════════════════════════════════
+   DARK MODE — applied via [data-theme="dark"] on <html>.
+   Honors prefers-color-scheme when no explicit choice is set.
+   ════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0B0F14;
+    --color-bg-card: #121A23;
+    --color-bg-alt: #0E151D;
+    --color-text: #E6EBF2;
+    --color-text-secondary: #9AA7B8;
+    --color-text-muted: #6B7888;
+    --color-border: #1F2A35;
+    --color-border-light: #18222C;
+    --color-primary: #2DD4BF;
+    --color-primary-hover: #14B8A6;
+    --color-primary-light: #0c2f2b;
+    --color-primary-dark: #5eead4;
+    --color-secondary: #F59E0B;
+    --color-secondary-light: #2a200c;
+    --color-accent: #34D399;
+    --color-accent-light: #0c241c;
+    --color-danger: #F87171;
+    --glass-nav: rgba(11, 15, 20, 0.88);
+    --glass-overlay: rgba(11, 15, 20, 0.94);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.55);
+    --color-success-light: #0c241c;
+    --color-secondary-light: #2a200c;
+    --carnivore-bg: #1c1630;
+    --carnivore-border: #2e2350;
+    --carnivore: #A78BFA;
+    --evidence-optional: #38BDF8;
+    --evidence-experimental: #A78BFA;
+    --pillar-1: #FB7185;
+    --pillar-2: #A78BFA;
+    --pillar-3: #FBBF24;
+    --pillar-4: #2DD4BF;
+    --footer-bg: #0E151D;
+    --footer-text: rgba(230, 235, 242, 0.72);
+    --footer-copy: rgba(230, 235, 242, 0.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #0B0F14;
+  --color-bg-card: #121A23;
+  --color-bg-alt: #0E151D;
+  --color-text: #E6EBF2;
+  --color-text-secondary: #9AA7B8;
+  --color-text-muted: #6B7888;
+  --color-border: #1F2A35;
+  --color-border-light: #18222C;
+  --color-primary: #2DD4BF;
+  --color-primary-hover: #14B8A6;
+  --color-primary-light: #0c2f2b;
+  --color-primary-dark: #5eead4;
+  --color-secondary: #F59E0B;
+  --color-secondary-light: #2a200c;
+  --color-accent: #34D399;
+  --color-accent-light: #0c241c;
+  --color-danger: #F87171;
+  --glass-nav: rgba(11, 15, 20, 0.88);
+  --glass-overlay: rgba(11, 15, 20, 0.94);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --color-success-light: #0c241c;
+  --color-secondary-light: #2a200c;
+  --carnivore-bg: #1c1630;
+  --carnivore-border: #2e2350;
+  --carnivore: #A78BFA;
+  --evidence-optional: #38BDF8;
+  --evidence-experimental: #A78BFA;
+  --pillar-1: #FB7185;
+  --pillar-2: #A78BFA;
+  --pillar-3: #FBBF24;
+  --pillar-4: #2DD4BF;
+  --footer-bg: #0E151D;
+  --footer-text: rgba(230, 235, 242, 0.72);
+  --footer-copy: rgba(230, 235, 242, 0.4);
 }

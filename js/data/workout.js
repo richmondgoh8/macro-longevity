@@ -5,10 +5,13 @@ export const PILLARS = [
   {
     id: "zone2",
     name: "Aerobic Base (Zone 2)",
+    shortName: "Aerobic Base",
+    kicker: "01 / ENGINE",
     icon: "🫀",
     description: "Build the aerobic base with 150–300 min/week of moderate activity, usually at a conversational pace. It improves cardiorespiratory fitness and supports metabolic health without requiring a laboratory-defined Zone 2.",
-    target: "60–70% max HR · conversational pace · lactate <2 mmol/L",
+    target: "Talk test · conversational pace · 60–70% estimated max HR",
     frequency: "3–5 sessions of 45–60 min/week",
+    dose: "45 min · 3–5× weekly",
     examples: ["Brisk walking on incline", "Cycling", "Jogging", "Swimming", "Rowing"],
     benefits: [
       "Mitochondrial biogenesis — more and better mitochondria",
@@ -22,10 +25,13 @@ export const PILLARS = [
   {
     id: "vo2max",
     name: "Maximal Aerobic Output (VO₂ Max)",
+    shortName: "VO₂ Max",
+    kicker: "02 / CAPACITY",
     icon: "⚡",
     description: "Add 1 session/week of high-intensity intervals once your base is established. Cardiorespiratory fitness is a strong health marker, but the association is not a licence to train maximally every day.",
     target: "90–95% max HR during work intervals",
     frequency: "1–2 sessions/week",
+    dose: "4 × 4 min · 1× weekly",
     protocol: {
       name: "Norwegian 4×4",
       warmup: 10,
@@ -53,10 +59,13 @@ export const PILLARS = [
   {
     id: "strength",
     name: "Strength & Posterior Chain",
+    shortName: "Strength",
+    kicker: "03 / RESERVE",
     icon: "🏋️",
     description: "2–3 sessions/week. Progressive overload with emphasis on compound movements and the posterior chain (glutes, hamstrings, spinal erectors). Eccentric loading (slow lowering) maximises strength and bone density stimulus.",
     target: "Compound movements · 3 sets × 6–12 reps · 3–4s eccentric",
     frequency: "2–3 sessions/week",
+    dose: "3 sets · 6–12 reps",
     benefits: [
       "Posterior chain — glutes/hamstrings/spinal erectors for standing & climbing",
       "Bone density via spinal loading & grip strength — mortality predictor",
@@ -67,6 +76,9 @@ export const PILLARS = [
       {
         id: "deadlifts",
         name: "Deadlifts",
+        pattern: "POSTERIOR CHAIN",
+        reps: "6–10 reps",
+        equipment: "Barbell, dumbbell or heavy bag",
         icon: "🏋️",
         description: "The king of posterior chain exercises. Targets glutes, hamstrings, spinal erectors, grip, and core simultaneously.",
         whyLongevity: "Deadlifts build the posterior chain — the engine for standing, walking, and climbing stairs. Spinal loading maintains bone density. Grip strength is a mortality predictor.",
@@ -83,6 +95,9 @@ export const PILLARS = [
       {
         id: "goblet-squats",
         name: "Goblet Squats",
+        pattern: "SQUAT PATTERN",
+        reps: "8–12 reps",
+        equipment: "Dumbbell, kettlebell or backpack",
         icon: "🦵",
         description: "Front-loaded squat that builds leg strength, hip mobility, and core stability. The kettlebell or dumbbell acts as a counterbalance.",
         whyLongevity: "Squats maintain functional independence — getting up from a chair unassisted predicts lifespan. Builds bone density in hips and spine.",
@@ -99,6 +114,9 @@ export const PILLARS = [
       {
         id: "push-press",
         name: "Push-Ups / Overhead Press",
+        pattern: "UPPER-BODY PUSH",
+        reps: "6–12 reps",
+        equipment: "Floor, dumbbells or bands",
         icon: "💪",
         description: "Upper body push pattern. Push-ups for chest and core; overhead press for shoulders and total body stability.",
         whyLongevity: "Push-up capacity is a rough fitness marker, while progressive pushing maintains upper-body strength and shoulder function. Use an easier variation and build gradually.",
@@ -115,6 +133,9 @@ export const PILLARS = [
       {
         id: "rows",
         name: "Rows / Pull-Ups",
+        pattern: "UPPER-BODY PULL",
+        reps: "6–12 reps",
+        equipment: "Band, dumbbell or pull-up bar",
         icon: "🏋️",
         description: "Upper body pull pattern. Balances push work, strengthens back and biceps, improves posture.",
         whyLongevity: "Pulling strength maintains posture and prevents the rounded-shoulder pattern that worsens with age. Back strength is critical for lifting and carrying.",
@@ -131,6 +152,9 @@ export const PILLARS = [
       {
         id: "farmer-walks",
         name: "Loaded Carries (Farmer's Walk)",
+        pattern: "CARRY / GRIP",
+        reps: "30–40 sec",
+        equipment: "Dumbbells, kettlebells or bags",
         icon: "🚶",
         description: "Walk with heavy weights in each hand. Builds grip, core, and total-body functional strength.",
         whyLongevity: "Loaded carries train grip strength (a mortality predictor), core stability under load, and the ability to carry groceries, luggage, and children — real-world functional fitness.",
@@ -147,6 +171,9 @@ export const PILLARS = [
       {
         id: "hip-thrusts",
         name: "Glute Bridges / Hip Thrusts",
+        pattern: "HIP EXTENSION",
+        reps: "8–12 reps",
+        equipment: "Bodyweight, band or weight",
         icon: "🔥",
         description: "Isolates glute activation and hip extension. The most effective exercise for targeting the glutes directly.",
         whyLongevity: "Strong glutes stabilise hips and lower back, reducing back pain. Hip extension strength links to walking speed and fall prevention — critical for aging well.",
@@ -165,10 +192,13 @@ export const PILLARS = [
   {
     id: "mobility",
     name: "Mobility & Injury Prevention",
+    shortName: "Mobility",
+    kicker: "04 / CONTROL",
     icon: "🧘",
     description: "5–10 min daily or as warm-up/cool-down. Maintains joint range of motion and prevents the compensation patterns that cause injury.",
     target: "Full range of motion · controlled movement · breathe through stretches",
     frequency: "Daily or as part of warm-ups/cool-downs",
+    dose: "5–10 min · daily",
     benefits: [
       "Joint ROM — prevents compensation patterns & back/knee pain",
       "Spinal disc health via flexion/extension pumping",
