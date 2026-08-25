@@ -4,21 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Singapore FIRE calculator with 4% rule, CPF LIFE estimates, investment combos, and passive income tracker.">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; media-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
+    <link rel="canonical" href="https://macro-longevity.com/pages/finance.html">
+    <meta property="og:title" content="Finance — Macro Longevity">
+    <meta property="og:description" content="Investment planning and a Singapore-focused FIRE calculator with transparent assumptions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://macro-longevity.com/pages/finance.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0a7e6f">
+    <meta name="theme-color" content="#0F766E">
     <title>Finance — Macro Longevity</title>
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/style.css">
-
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <nav class="nav">
+    <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <span class="nav-logo-icon">⟁</span>
+                <span class="nav-logo-icon" aria-hidden="true"></span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
@@ -30,7 +34,7 @@
                 <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
                 <a href="/pages/protocol.html" class="nav-link">Blueprint</a>
                 <a href="/pages/workout.html" class="nav-link">Workout</a>
-                <a href="/pages/finance.html" class="nav-link active">Finance</a>
+                <a href="/pages/finance.html" class="nav-link active" aria-current="page">Finance</a>
                 <a href="/pages/avoid.html" class="nav-link">Avoid</a>
             </div>
         </div>
@@ -39,111 +43,113 @@
     <main id="main">
         <section class="page-header">
             <div class="section-inner">
-                <h1 class="page-title">Finance & FIRE</h1>
-                <p class="page-desc">Investment combos for Singapore, FIRE calculator with 4% rule and CPF LIFE estimates, plus a passive income tracker.</p>
+                <h1 class="page-title">Finance &amp; FIRE</h1>
+                <p class="page-desc">Investment combos for Singapore, a FIRE calculator with 4% rule and CPF LIFE estimates, plus a passive income tracker.</p>
             </div>
         </section>
 
         <section class="section">
             <div class="section-inner">
-                <div class="meal-tabs" id="financeTabs" data-finance-tabs>
-                    <button class="meal-tab active" data-finance-tab="investments">📈 Investment Combos</button>
-                    <button class="meal-tab" data-finance-tab="fire">🧮 FIRE Calculator</button>
+                <div class="meal-tabs" id="financeTabs" data-finance-tabs role="tablist" aria-label="Finance views">
+                    <button type="button" class="meal-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-selected="true" aria-controls="financeInvestments">Investment combos</button>
+                    <button type="button" class="meal-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-selected="false" aria-controls="financeFire">FIRE calculator</button>
                 </div>
-                <select class="meal-tab-select" data-finance-select>
-                    <option value="investments" selected>📈 Investment Combos</option>
-                    <option value="fire">🧮 FIRE Calculator</option>
+                <label class="sr-only" for="financeViewSelect">Finance view</label>
+                <select id="financeViewSelect" class="meal-tab-select" data-finance-select aria-label="Finance view">
+                    <option value="investments" selected>Investment combos</option>
+                    <option value="fire">FIRE calculator</option>
                 </select>
             </div>
         </section>
 
-        <section class="section" id="financeInvestments">
+        <section class="section" id="financeInvestments" role="tabpanel" aria-labelledby="finance-tab-investments">
             <div class="section-inner" id="investments-app"></div>
         </section>
 
-        <section class="section" id="financeFire" style="display:none">
+        <section class="section" id="financeFire" role="tabpanel" aria-labelledby="finance-tab-fire" hidden>
             <div class="section-inner fire-calc">
-                <div class="page-header" style="background: none; padding: 0; margin-bottom: 16px">
-                    <h1 class="page-title" style="font-size: 22px">Singapore FIRE Calculator</h1>
+                <div class="page-header fire-subheader">
+                    <h2 class="page-title">Singapore FIRE Calculator</h2>
                     <p class="page-desc">How much do you need to retire early? Uses the 4% rule, CPF LIFE estimates, and Singapore-specific assumptions.</p>
                 </div>
                 <div class="fire-grid">
                     <div class="fire-field">
-                        <label>Your Current Age</label>
+                        <label for="age">Your current age</label>
                         <input type="number" id="age" value="30" min="18" max="70" data-fire-input>
                     </div>
                     <div class="fire-field">
-                        <label>Target Retirement Age</label>
+                        <label for="retireAge">Target retirement age</label>
                         <input type="number" id="retireAge" value="55" min="30" max="70" data-fire-input>
                     </div>
-                    <div class="fire-field" style="grid-column:1/-1;background:var(--color-bg);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--color-border-light)">
-                        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--color-text-muted);margin-bottom:12px">💳 Your Monthly Expenses</div>
+                    <div class="fire-field fire-expense-section">
+                        <h3 class="fire-section-title">Your monthly expenses</h3>
                         <div class="fire-field">
-                            <label>Monthly Living Expenses (food, transport, bills, insurance)</label>
+                            <label for="livingExpenses">Monthly living expenses (food, transport, bills, insurance)</label>
                             <input type="number" id="livingExpenses" value="1600" min="0" step="100" data-fire-input>
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+                        <div class="fire-expense-grid">
                             <div class="fire-field">
-                                <label>HDB Loan Balance (SGD)</label>
+                                <label for="hdbBalance">HDB loan balance (SGD)</label>
                                 <input type="number" id="hdbBalance" value="250000" min="0" step="10000" data-fire-input>
                             </div>
                             <div class="fire-field">
-                                <label>Monthly HDB Payment (SGD)</label>
+                                <label for="hdbMonthly">Monthly HDB payment (SGD)</label>
                                 <input type="number" id="hdbMonthly" value="1000" min="0" step="50" data-fire-input>
                             </div>
                             <div class="fire-field">
-                                <label>Years Left on Loan</label>
+                                <label for="hdbYears">Years left on loan</label>
                                 <input type="number" id="hdbYears" value="25" min="0" max="30" step="1" data-fire-input>
                             </div>
                         </div>
-                        <div class="fire-field" style="margin-top:12px">
-                            <label>Other Loans (car, study, personal) — Monthly Payment</label>
+                        <div class="fire-field fire-field-spaced">
+                            <label for="otherLoans">Other loans (car, study, personal) — monthly payment</label>
                             <input type="number" id="otherLoans" value="0" min="0" step="50" data-fire-input>
                         </div>
                     </div>
                     <div class="fire-field">
-                        <label>💰 Current Savings & Investments (SGD)</label>
-                        <div style="font-size:12px;color:var(--color-text-muted)">Cash, stocks, ETFs, robos, Endowus etc.</div>
+                        <label for="portfolio">Current savings and investments (SGD)</label>
+                        <span class="fire-help">Cash, stocks, ETFs, robos, Endowus etc.</span>
                         <input type="number" id="portfolio" value="20000" min="0" step="5000" data-fire-input>
                     </div>
                     <div class="fire-field">
-                        <label>📅 Monthly Savings You Can Set Aside</label>
-                        <div style="font-size:12px;color:var(--color-text-muted)">How much you put into investments each month</div>
+                        <label for="monthly">Monthly savings you can set aside</label>
+                        <span class="fire-help">How much you put into investments each month.</span>
                         <input type="number" id="monthly" value="1000" min="0" step="100" data-fire-input>
                     </div>
                     <div class="fire-field">
-                        <label>📈 Expected Annual Return on Investments (%)</label>
-                        <div style="font-size:12px;color:var(--color-text-muted)">6-8% is realistic for global stocks (VWRA/CSPX)</div>
+                        <label for="return">Expected annual return on investments (%)</label>
+                        <span class="fire-help">Use a range you can defend; market returns are uncertain.</span>
                         <input type="number" id="return" value="6" min="0" max="15" step="0.5" data-fire-input>
                     </div>
                     <div class="fire-field">
-                        <label>🏦 CPF OA Balance (SGD)</label>
+                        <label for="cpfOa">CPF OA balance (SGD)</label>
                         <input type="number" id="cpfOa" value="35000" min="0" step="5000" data-fire-input>
                     </div>
                     <div class="fire-field">
-                        <label>🏦 CPF SA Balance (SGD)</label>
+                        <label for="cpfSa">CPF SA balance (SGD)</label>
                         <input type="number" id="cpfSa" value="20000" min="0" step="5000" data-fire-input>
                     </div>
                 </div>
 
-                <div class="fire-results" id="fireResults"></div>
+                <div class="fire-results" id="fireResults" aria-live="polite" aria-atomic="false"></div>
                 <div class="fire-assumptions" id="fireAssumptions"></div>
 
                 <div class="pi-section" id="piSection">
-                    <h2>📊 Passive Income Tracker</h2>
-                    <p class="pi-desc">Track your dividend and interest income across all holdings. Add your assets, enter the amount and annual rate — monthly income calculates automatically.</p>
+                    <h2>Passive income tracker</h2>
+                    <p class="pi-desc">Track dividend and interest income across holdings. Add an asset, enter the principal and annual rate, and monthly income calculates automatically.</p>
                     <div id="piContent"></div>
+                    <div id="piStatus" class="pi-status" role="status" aria-live="polite"></div>
                 </div>
 
                 <div class="fire-chart-container">
-                    <h3>📈 Portfolio Growth Projection</h3>
+                    <h3>Portfolio growth projection</h3>
                     <div class="fire-chart">
-                        <svg id="fireChart" width="100%" viewBox="0 0 600 240"></svg>
+                        <svg id="fireChart" role="img" aria-labelledby="fireChartTitle fireChartDesc" viewBox="0 0 600 240"></svg>
                     </div>
                 </div>
 
                 <div class="fire-note">
-                    <strong>⚠️ Important:</strong> This calculator uses simplified assumptions. The 4% rule (FIRE Number = 25x annual expenses) is based on US historical data. Singapore's higher healthcare costs and CPF LIFE payouts mean your actual number may differ. CPF LIFE payouts from age 65 onwards can significantly reduce the portfolio you need — aim for your investments to last from retirement age to 65, then CPF LIFE takes over. The CPF LIFE estimate is a rough heuristic — actual payouts depend on your retirement sum, chosen plan (Standard/Escalating/Basic), and payout start age. Use the CPF payout estimator at cpf.gov.sg for accurate figures. This is not financial advice. Consult a licensed adviser.
+                    <strong>Important:</strong> This calculator uses simplified assumptions. The 4% rule is based on US historical data. Singapore healthcare costs and CPF LIFE payouts may change your actual plan. The CPF LIFE estimate is a rough heuristic; use the CPF payout estimator at cpf.gov.sg for accurate figures. This is not financial advice. Consult a licensed adviser.
                 </div>
             </div>
         </section>
@@ -152,328 +158,20 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <span class="footer-logo">⟁</span>
+                <span class="footer-logo" aria-hidden="true"></span>
                 <span>MacroLongevity</span>
             </div>
-            <p class="footer-text">
-                Not financial advice. This information is for educational purposes only.
-                Consult a licensed financial adviser before making investment decisions.
-            </p>
-            <button class="export-btn" data-export>📥 Export All Data (Markdown)</button>
+            <p class="footer-text">Not financial advice. This information is for educational purposes only. Consult a licensed financial adviser before making investment decisions.</p>
+            <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
+    <nav class="bottom-nav" aria-label="Mobile primary navigation"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item active" aria-current="page"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Avoid</span></a><a href="/pages/protocol.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Blueprint</span></a></div></nav>
+
     <script type="module" src="/js/render.js"></script>
+    <script type="module" src="/js/finance.js"></script>
     <script type="module" src="/js/export.js"></script>
-    <script>
-    function fmt(n) {
-        if (n >= 1000000) return 'SGD ' + (n/1000000).toFixed(1) + 'M';
-        return 'SGD ' + Math.round(n).toLocaleString();
-    }
-    function fmtMonth(n) {
-        return 'SGD ' + Math.round(n).toLocaleString() + '/month';
-    }
-
-    let _fireRAF = null;
-    function calcFireDebounced() {
-        if (_fireRAF) cancelAnimationFrame(_fireRAF);
-        _fireRAF = requestAnimationFrame(calcFire);
-    }
-    function calcFire() {
-        const age = parseFloat(document.getElementById('age').value) || 30;
-        const retireAge = parseFloat(document.getElementById('retireAge').value) || 55;
-        const livingExp = parseFloat(document.getElementById('livingExpenses').value) || 0;
-        const hdbBal = parseFloat(document.getElementById('hdbBalance').value) || 0;
-        const hdbPay = parseFloat(document.getElementById('hdbMonthly').value) || 0;
-        const hdbYearsLeft = parseFloat(document.getElementById('hdbYears').value) || 0;
-        const otherLoans = parseFloat(document.getElementById('otherLoans').value) || 0;
-        const portfolio = parseFloat(document.getElementById('portfolio').value) || 0;
-        const monthly = parseFloat(document.getElementById('monthly').value) || 0;
-        const annReturn = (parseFloat(document.getElementById('return').value) || 6) / 100;
-        const cpfOa = parseFloat(document.getElementById('cpfOa').value) || 0;
-        const cpfSa = parseFloat(document.getElementById('cpfSa').value) || 0;
-
-        const years = retireAge - age;
-        if (years <= 0) { document.getElementById('fireResults').innerHTML = ''; document.getElementById('fireAssumptions').innerHTML = ''; return; }
-        const months = years * 12;
-        const monthlyReturn = annReturn / 12;
-
-        const totalMonthlyExp = livingExp + hdbPay + otherLoans;
-        const totalAnnualExp = totalMonthlyExp * 12;
-
-        const loanPaidByRetire = Math.min(1, hdbYearsLeft > 0 ? years / hdbYearsLeft : 1);
-        const hdbRemainingAtRetire = hdbBal * (1 - Math.min(1, loanPaidByRetire));
-        const loanPaidOffCompletely = years >= hdbYearsLeft;
-
-        const monthlyExpAtRetire = loanPaidOffCompletely ? livingExp + otherLoans : livingExp + hdbPay * Math.max(0, 1 - years/hdbYearsLeft) + otherLoans;
-        const annualExpAtRetire = monthlyExpAtRetire * 12;
-
-        const fireNumber = annualExpAtRetire * 25;
-
-        const totalPortfolio = portfolio;
-        let fvPortfolio = portfolio * Math.pow(1 + monthlyReturn, months);
-        if (monthly > 0) {
-            fvPortfolio += monthly * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
-        }
-        const fvOa = cpfOa * Math.pow(1 + 0.025/12, months);
-        const fvSa = cpfSa * Math.pow(1 + 0.04/12, months);
-        const projectedTotal = fvPortfolio + fvOa + fvSa;
-
-        const monthlyFromPortfolio = (projectedTotal * 0.04) / 12;
-
-        const cpfLifeMonthly = Math.min(2000, Math.max(300, (fvOa + fvSa) * 0.003));
-        const totalMonthlyIncome = monthlyFromPortfolio + cpfLifeMonthly;
-
-        const monthlyShortfall = monthlyExpAtRetire - totalMonthlyIncome;
-        const onTrack = monthlyShortfall <= 0;
-
-        let neededMonthly = 0;
-        if (!onTrack && months > 0) {
-            const neededFV = fireNumber - (fvOa + fvSa);
-            const pvPart = portfolio * Math.pow(1 + monthlyReturn, months);
-            const remainingFV = neededFV - pvPart;
-            if (remainingFV > 0 && monthlyReturn > 0) {
-                neededMonthly = remainingFV * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
-            }
-        }
-
-        let data = [];
-        let val = totalPortfolio + cpfOa + cpfSa;
-        for (let y = 0; y <= Math.max(years, 30); y++) {
-            if (y <= years) {
-                val = portfolio * Math.pow(1 + annReturn, y);
-                if (monthly > 0) val += monthly * 12 * ((Math.pow(1 + annReturn, y) - 1) / (annReturn));
-                const cpv = (cpfOa + cpfSa) * Math.pow(1 + 0.03, y);
-                data.push(Math.round(val + cpv));
-            } else {
-                val = val * (1 + annReturn) - annualExpAtRetire;
-                if (val < 0) val = 0;
-                data.push(Math.round(val));
-            }
-        }
-
-        document.getElementById('fireResults').innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;margin-bottom:4px">
-                <h3 style="font-size:22px;font-weight:800;color:var(--color-text)">Your Retirement Picture at Age ${retireAge}</h3>
-            </div>
-
-            <div class="fire-result-card ${onTrack ? 'primary' : 'warn'}">
-                <div class="label">Monthly Income in Retirement</div>
-                <div class="value" style="font-size:22px">${fmtMonth(totalMonthlyIncome)}</div>
-                <div class="sub">${cpfLifeMonthly > 0 ? 'SGD ' + Math.round(cpfLifeMonthly) + '/mo from CPF LIFE + ' : ''}portfolio withdrawals</div>
-            </div>
-            <div class="fire-result-card ${onTrack ? 'primary' : 'danger'}">
-                <div class="label">Monthly Expenses at ${retireAge}</div>
-                <div class="value" style="font-size:22px">${fmtMonth(monthlyExpAtRetire)}</div>
-                <div class="sub">${loanPaidOffCompletely ? '✅ HDB loan fully paid off!' : hdbRemainingAtRetire > 0 ? 'HDB loan balance: ' + fmt(hdbRemainingAtRetire) : ''}</div>
-            </div>
-            <div class="fire-result-card ${onTrack ? 'primary' : 'danger'}">
-                <div class="label">Monthly ${onTrack ? 'Surplus' : 'Shortfall'}</div>
-                <div class="value" style="font-size:22px">${onTrack ? '✅' : '❌'} ${fmtMonth(Math.abs(monthlyShortfall))}</div>
-                <div class="sub">${onTrack ? 'You\'ll have extra cash each month' : 'Gap you need to close'}</div>
-            </div>
-
-            <div class="fire-result-card" style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px">
-                <div><div class="label">Total Savings Needed</div><div class="value" style="font-size:20px">${fmt(fireNumber)}</div></div>
-                <div><div class="label">Projected Portfolio</div><div class="value" style="font-size:20px">${fmt(projectedTotal)}</div></div>
-                <div><div class="label">Monthly from Portfolio</div><div class="value" style="font-size:20px">${fmtMonth(monthlyFromPortfolio)}</div></div>
-                <div><div class="label">CPF LIFE Estimate</div><div class="value" style="font-size:20px">${fmtMonth(cpfLifeMonthly)}</div></div>
-                <div><div class="label">HDB Loan at Retirement</div><div class="value" style="font-size:20px">${loanPaidOffCompletely ? '✅ Paid' : fmt(hdbRemainingAtRetire)}</div></div>
-            </div>
-
-            ${!onTrack ? `
-            <div class="fire-result-card warn" style="grid-column:1/-1">
-                <div class="label">To Close the Gap, Save This Much Per Month Instead</div>
-                <div class="value" style="font-size:24px">${fmtMonth(neededMonthly > 0 ? neededMonthly : monthly)}</div>
-                <div class="sub">Currently saving ${fmtMonth(monthly)} · ${neededMonthly > monthly ? 'Need to increase by ' + fmtMonth(neededMonthly - monthly) : 'You\'re already saving enough, but portfolio needs time to grow.'}</div>
-            </div>` : ''}
-
-            <div class="fire-result-card" style="grid-column:1/-1;padding:16px;text-align:left">
-                <div style="font-size:14px;line-height:1.7;color:var(--color-text-secondary)">
-                    <strong>🏠 HDB Loan Summary:</strong> You have ${fmt(hdbBal)} remaining over ${hdbYearsLeft} years (${fmtMonth(hdbPay)}/mo).
-                    ${years >= hdbYearsLeft ? '✅ Your loan will be fully paid off by retirement!' : 'At retirement, ~' + Math.round((1 - years/hdbYearsLeft)*100) + '% of the loan will remain (' + fmt(hdbRemainingAtRetire) + ').'}
-                    ${!loanPaidOffCompletely ? ' Consider paying down the loan faster or refinancing to reduce retirement expenses.' : ''}
-                </div>
-            </div>
-        `;
-
-        document.getElementById('fireAssumptions').innerHTML = '';
-
-        drawFireChart(data, fireNumber);
-    }
-
-    function drawFireChart(data, fireLine) {
-        const svg = document.getElementById('fireChart');
-        const rect = svg.parentElement.getBoundingClientRect();
-        const w = Math.max(300, Math.min(800, rect.width - 4));
-        const aspect = 2.2;
-        const h = Math.round(w / aspect);
-        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-        svg.setAttribute('height', h);
-        const pad = { top: 20, right: 24, bottom: 30, left: 72 };
-        const cw = w - pad.left - pad.right;
-        const ch = h - pad.top - pad.bottom;
-
-        const maxVal = Math.max(...data) * 1.15;
-        const minVal = 0;
-        const years = data.length - 1;
-
-        let paths = '';
-        let firePath = '';
-        const fireY = pad.top + ch - ((fireLine - minVal) / (maxVal - minVal)) * ch;
-
-        data.forEach((v, i) => {
-            const x = pad.left + (i / years) * cw;
-            const y = pad.top + ch - ((v - minVal) / (maxVal - minVal)) * ch;
-            paths += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
-        });
-
-        let gridHtml = '';
-        const yLabelSize = Math.max(9, Math.min(11, w / 60));
-        for (let i = 0; i <= 4; i++) {
-            const y1 = pad.top + (i / 4) * ch;
-            const val = maxVal - (i / 4) * (maxVal - minVal);
-            gridHtml += `<line x1="${pad.left}" y1="${y1}" x2="${w - pad.right}" y2="${y1}" stroke="#e5e2dd" stroke-width="1"/>`;
-            gridHtml += `<text x="${pad.left - 6}" y="${y1 + 4}" text-anchor="end" fill="#8a95a3" font-size="${yLabelSize}" font-family="Inter,sans-serif">${fmt(val)}</text>`;
-        }
-
-        const xLabelSize = Math.max(9, Math.min(11, w / 60));
-        const xStep = Math.max(1, Math.ceil(5 / (w / 300)));
-        for (let i = 0; i <= years; i += xStep) {
-            const x = pad.left + (i / years) * cw;
-            const label = i + 'y';
-            gridHtml += `<text x="${x}" y="${h - 8}" text-anchor="middle" fill="#8a95a3" font-size="${xLabelSize}" font-family="Inter,sans-serif">${label}</text>`;
-        }
-
-        if (fireLine > 0) {
-            firePath = `<line x1="${pad.left}" y1="${fireY}" x2="${w - pad.right}" y2="${fireY}" stroke="#e8993a" stroke-width="2" stroke-dasharray="6,4"/>`;
-            firePath += `<text x="${w - pad.right - 4}" y="${fireY - 6}" text-anchor="end" fill="#e8993a" font-size="11" font-weight="600" font-family="Inter,sans-serif">FIRE Line</text>`;
-        }
-
-        const fillId = 'fillGrad_' + w;
-        const defs = `<defs><linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(10,126,111,0.2)"/><stop offset="100%" stop-color="rgba(10,126,111,0)"/></linearGradient></defs>`;
-
-        svg.innerHTML = defs +
-            gridHtml +
-            `<path d="${paths}" fill="none" stroke="#0a7e6f" stroke-width="2.5" stroke-linejoin="round"/>` +
-            `<path d="${paths}L${pad.left + (data.length-1)/years*cw},${pad.top+ch}L${pad.left},${pad.top+ch}Z" fill="url(#${fillId})" opacity="0.5"/>` +
-            firePath +
-            `<text x="${pad.left}" y="${pad.top - 4}" fill="#1a232e" font-size="12" font-weight="600" font-family="Inter,sans-serif">Portfolio Value</text>` +
-            `<text x="${w/2}" y="${h - 8}" text-anchor="middle" fill="#1a232e" font-size="12" font-weight="600" font-family="Inter,sans-serif">Years from Now</text>`;
-    }
-
-    // Passive Income Tracker
-    const PI_KEY = 'passiveIncome';
-
-    function loadPiData() {
-        try { return JSON.parse(localStorage.getItem(PI_KEY)) || []; } catch { return []; }
-    }
-
-    function savePiData(data) {
-        localStorage.setItem(PI_KEY, JSON.stringify(data));
-    }
-
-    function delPiRow(idx) {
-        const data = loadPiData();
-        data.splice(idx, 1);
-        savePiData(data);
-        renderPiTable();
-    }
-
-    function addPiRow() {
-        const data = loadPiData();
-        data.push({ name: '', principal: 0, rate: 0 });
-        savePiData(data);
-        renderPiTable();
-    }
-
-    function renderPiTable() {
-        const data = loadPiData();
-        const container = document.getElementById('piContent');
-        let totalPrincipal = 0, totalMonthly = 0;
-
-        if (data.length === 0) {
-            container.innerHTML = `<div class="pi-empty">No assets yet. Add your first dividend stock, bond, or CPF account to see your monthly passive income.</div>
-                <button class="pi-btn pi-btn-primary" onclick="addPiRow()">+ Add Asset</button>`;
-            return;
-        }
-
-        let rows = '';
-        data.forEach((r, i) => {
-            const principal = parseFloat(r.principal) || 0;
-            const rate = parseFloat(r.rate) || 0;
-            const monthly = principal * rate / 100 / 12;
-            totalPrincipal += principal;
-            totalMonthly += monthly;
-            rows += `<tr>
-                <td><input type="text" value="${r.name.replace(/"/g, '&quot;')}" placeholder="e.g. DBS Stock" onchange="updatePiField(${i},'name',this.value)"></td>
-                <td><input type="number" value="${principal || ''}" min="0" placeholder="0" onchange="updatePiField(${i},'principal',parseFloat(this.value)||0)"></td>
-                <td><input type="number" value="${rate || ''}" min="0" max="100" step="0.1" placeholder="0" onchange="updatePiField(${i},'rate',parseFloat(this.value)||0)"></td>
-                <td class="pi-monthly">SGD ${Math.round(monthly).toLocaleString()}/mo</td>
-                <td><button class="pi-btn pi-btn-danger" onclick="delPiRow(${i})">✕</button></td>
-            </tr>`;
-        });
-
-        const annualTotal = totalMonthly * 12;
-        container.innerHTML = `
-            <table class="pi-table">
-                <thead><tr>
-                    <th style="width:30%">Asset</th>
-                    <th style="width:22%">Principal (SGD)</th>
-                    <th style="width:18%">Rate (%)</th>
-                    <th style="width:20%">Monthly Income</th>
-                    <th style="width:10%"></th>
-                </tr></thead>
-                <tbody>${rows}
-                    <tr class="pi-total-row">
-                        <td><strong>Total</strong></td>
-                        <td><strong>SGD ${Math.round(totalPrincipal).toLocaleString()}</strong></td>
-                        <td><strong>${totalPrincipal > 0 ? (totalMonthly * 12 / totalPrincipal * 100).toFixed(1) : 0}%</strong></td>
-                        <td class="pi-monthly"><strong>SGD ${Math.round(totalMonthly).toLocaleString()}/mo</strong></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pi-total-bar">
-                <div class="pi-stat"><div class="pi-stat-label">Total Principal</div><div class="pi-stat-value">SGD ${Math.round(totalPrincipal).toLocaleString()}</div></div>
-                <div class="pi-stat"><div class="pi-stat-label">Monthly Passive Income</div><div class="pi-stat-value">SGD ${Math.round(totalMonthly).toLocaleString()}</div></div>
-                <div class="pi-stat"><div class="pi-stat-label">Annual Passive Income</div><div class="pi-stat-value">SGD ${Math.round(annualTotal).toLocaleString()}</div></div>
-                <div class="pi-stat"><div class="pi-stat-label">Blended Yield</div><div class="pi-stat-value">${totalPrincipal > 0 ? (annualTotal / totalPrincipal * 100).toFixed(1) : 0}%</div></div>
-            </div>
-            <div style="margin-top:12px"><button class="pi-btn pi-btn-primary" onclick="addPiRow()">+ Add Asset</button></div>`;
-    }
-
-    function updatePiField(idx, field, value) {
-        const data = loadPiData();
-        if (!data[idx]) return;
-        data[idx][field] = value;
-        savePiData(data);
-        renderPiTable();
-    }
-
-    document.addEventListener('input', function(e) {
-        if (e.target.closest('[data-fire-input]')) calcFireDebounced();
-    });
-    document.addEventListener('click', function(e) {
-        var tabBtn = e.target.closest('[data-finance-tab]');
-        if (tabBtn) selectFinanceTab(tabBtn.getAttribute('data-finance-tab'));
-    });
-    document.addEventListener('change', function(e) {
-        var sel = e.target.closest('[data-finance-select]');
-        if (sel) selectFinanceTab(sel.value);
-    });
-    function selectFinanceTab(tab) {
-        const tabs = document.querySelectorAll('#financeTabs .meal-tab');
-        const selects = document.querySelectorAll('.meal-tab-select');
-        tabs.forEach((t, i) => t.classList.toggle('active', (i === 0 && tab === 'investments') || (i === 1 && tab === 'fire')));
-        selects.forEach(s => s.value = tab);
-        document.getElementById('financeInvestments').style.display = tab === 'investments' ? '' : 'none';
-        document.getElementById('financeFire').style.display = tab === 'fire' ? '' : 'none';
-        if (tab === 'fire') { calcFire(); renderPiTable(); }
-    }
-
-    </script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item active"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a><a href="/pages/protocol.html" class="bottom-nav-item"><span class="bottom-nav-icon">📐</span><span class="bottom-nav-label">Blueprint</span></a></div></nav>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}</script>
+    <script src="/js/register-sw.js" defer></script>
 </body>
+</html>

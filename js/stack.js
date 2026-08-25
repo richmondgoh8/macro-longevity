@@ -66,11 +66,12 @@ function stackTabsHTML() {
   };
   return `
     <div class="meal-controls">
-      <div class="meal-tabs">
+      <div class="meal-tabs" role="tablist" aria-label="Daily Stack views">
         ${tabs.map(t =>
-          `<button class="meal-tab ${stackTab === t ? "active" : ""}" onclick="selectStackTab('${t}')">${labels[t]}</button>`
+          `<button type="button" class="meal-tab ${stackTab === t ? "active" : ""}" data-stack-tab="${t}" role="tab" aria-selected="${stackTab === t}">${labels[t]}</button>`
         ).join("")}
-        <select class="meal-tab-select" onchange="selectStackTab(this.value)">
+        <label class="sr-only" for="stackTabSelect">Stack view</label>
+        <select id="stackTabSelect" class="meal-tab-select" data-stack-select>
           ${tabs.map(t =>
             `<option value="${t}" ${stackTab === t ? "selected" : ""}>${labels[t].replace(/^[^\s]+\s/, "")}</option>`
           ).join("")}
@@ -227,10 +228,12 @@ export function renderStack() {
   if (!container) return;
 
   if (!container.querySelector('.meal-tabs')) {
-    container.innerHTML = coreCoverageHTML() + timingGuideHTML() + stackTabsHTML() + '<div class="stack-content"></div>';
+    container.innerHTML = coreCoverageHTML() + timingGuideHTML() + stackTabsHTML() + '<div class="stack-content" id="stackContent" role="tabpanel" aria-live="polite"></div>';
   } else {
     container.querySelectorAll('.meal-tab').forEach((btn, i) => {
-      btn.classList.toggle('active', ["supplements", "food-spices", "extras", "conditional", "skip"][i] === stackTab);
+      const selected = ["supplements", "food-spices", "extras", "conditional", "skip"][i] === stackTab;
+      btn.classList.toggle('active', selected);
+      btn.setAttribute('aria-selected', String(selected));
     });
     container.querySelector('.meal-tab-select').value = stackTab;
   }
@@ -347,10 +350,18 @@ export function renderFoodProtocol() {
     <p class="stack-table-note">Full details, risks and the ${SKIP_LIST.length}-item skip list → <a href="/pages/stack.html">Daily Stack</a></p>`;
 }
 
-Object.assign(window, { selectStackTab });
-
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('stack-app')) renderStack();
   if (document.getElementById('stack-summary-app')) renderFoodProtocol();
   if (document.getElementById('avoid-app')) renderAvoidPage();
+});
+
+document.addEventListener('click', (event) => {
+  const tab = event.target.closest('[data-stack-tab]');
+  if (tab) selectStackTab(tab.dataset.stackTab);
+});
+
+document.addEventListener('change', (event) => {
+  const select = event.target.closest('[data-stack-select]');
+  if (select) selectStackTab(select.value);
 });

@@ -19,7 +19,7 @@ let budgetInvestments = 0;
 function renderInvestments() {
   return `<div class="page-header">
     <div class="section-inner">
-      <h1 class="page-title">Investment Combos (Singapore Edition)</h1>
+     <h2 class="page-title">Investment Combos (Singapore Edition)</h2>
       <p class="page-desc">Pre-built portfolio combos based on r/singaporefi wisdom. Each combo shows how different instruments work together, why they synergize, and exactly how to execute. Pick the one that matches your goal and risk tolerance.</p>
     </div>
   </div>
@@ -32,7 +32,7 @@ function renderInvestments() {
         <p class="budget-desc">Enter your monthly take-home salary. The 50/30/20 rule splits it into Expenses, Investments, and Savings. Drag the sliders to adjust.</p>
         <div class="budget-input-row">
           <div class="budget-field">
-            <label>Monthly Take-Home Salary</label>
+             <label for="budgetSalary">Monthly take-home salary</label>
             <input type="number" id="budgetSalary" value="" min="0" step="500" placeholder="e.g. 5000" data-budget-input>
           </div>
         </div>
@@ -46,12 +46,12 @@ function renderInvestments() {
             </div>
           </div>
           <div class="budget-slider-row">
-            <label>Expenses <span id="budgetPctExpenses">50</span>%</label>
+             <label for="sliderExpenses">Expenses <span id="budgetPctExpenses">50</span>%</label>
             <input type="range" id="sliderExpenses" min="0" max="100" value="50" data-budget-input>
             <span class="budget-slider-val" id="budgetValExpenses">SGD 0</span>
           </div>
           <div class="budget-slider-row">
-            <label>Investments <span id="budgetPctInvestments">30</span>%</label>
+             <label for="sliderInvestments">Investments <span id="budgetPctInvestments">30</span>%</label>
             <input type="range" id="sliderInvestments" min="0" max="100" value="30" data-budget-input>
             <span class="budget-slider-val" id="budgetValInvestments">SGD 0</span>
           </div>
@@ -659,6 +659,7 @@ function handleTimerAction(id, action) {
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
     stopMusic();
     updateTimerControls(id, "paused");
+    if (s._el.label) s._el.label.textContent = "PAUSED";
   } else if (action === "stop") {
     s.status = "idle";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
@@ -725,6 +726,7 @@ function initExerciseTimers() {
         const active = button === tab;
         button.classList.toggle("is-active", active);
         button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
       });
       container.querySelectorAll(".pillar-section").forEach(section => {
         section.hidden = section.dataset.pillar !== selected;
@@ -742,6 +744,17 @@ function initExerciseTimers() {
     if (start) handleTimerAction(exId, "start");
     else if (pause) handleTimerAction(exId, "pause");
     else if (stop) handleTimerAction(exId, "stop");
+  });
+  container.addEventListener("keydown", (e) => {
+    const tab = e.target.closest("[data-pillar-tab]");
+    if (!tab || !["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) return;
+    const tabs = [...container.querySelectorAll("[data-pillar-tab]")];
+    const current = tabs.indexOf(tab);
+    const direction = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+    const next = tabs[(current + direction + tabs.length) % tabs.length];
+    e.preventDefault();
+    next.focus();
+    next.click();
   });
 }
 
@@ -780,8 +793,8 @@ function zone2TimerHTML(pillar) {
       <div class="timer-config">
         <span class="timer-phase-label" id="phase-${id}">Zone 2 Steady State</span>
       </div>
-      <div class="timer-display">
-        <span class="timer-time" id="time-${id}">${String(m).padStart(2,"0")}:00</span>
+       <div class="timer-display">
+         <span class="timer-time" id="time-${id}" role="timer" aria-label="Time remaining" aria-live="off">${String(m).padStart(2,"0")}:00</span>
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">
@@ -789,7 +802,7 @@ function zone2TimerHTML(pillar) {
          <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">Pause</button>
          <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">Reset</button>
       </div>
-       <div class="timer-label" id="label-${id}" aria-live="polite">Ready — ${m} min at conversational pace · No music, whistle cues only</div>
+        <div class="timer-label" id="label-${id}" role="status" aria-live="polite">Ready — ${m} min at conversational pace · No music, whistle cues only</div>
     </div>`;
 }
 
@@ -801,8 +814,8 @@ function vo2TimerHTML(pillar) {
       <div class="timer-config">
         <span class="timer-phase-label" id="phase-${id}">${pillar.protocol.name}</span>
       </div>
-      <div class="timer-display">
-        <span class="timer-time" id="time-${id}">00:00</span>
+       <div class="timer-display">
+         <span class="timer-time" id="time-${id}" role="timer" aria-label="Time remaining" aria-live="off">00:00</span>
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">
@@ -810,7 +823,7 @@ function vo2TimerHTML(pillar) {
          <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">Pause</button>
          <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">Reset</button>
       </div>
-       <div class="timer-label" id="label-${id}" aria-live="polite">Ready — ${t.warmup/60}min warmup → ${t.rounds}×(${t.work/60}min work + ${t.recovery/60}min recovery) → ${t.cooldown/60}min cooldown</div>
+        <div class="timer-label" id="label-${id}" role="status" aria-live="polite">Ready — ${t.warmup/60}min warmup → ${t.rounds}×(${t.work/60}min work + ${t.recovery/60}min recovery) → ${t.cooldown/60}min cooldown</div>
     </div>`;
 }
 
@@ -849,8 +862,8 @@ function strengthExerciseCard(ex) {
               ${Array.from({length: ex.sets}, (_, i) => `<span class="set-dot${i === 0 ? " active" : ""}" data-exercise="${id}"></span>`).join("")}
             </span>
           </div>
-          <div class="timer-display">
-            <span class="timer-time" id="time-${id}">${String(Math.floor(ex.workSeconds/60)).padStart(2,"0")}:${String(ex.workSeconds%60).padStart(2,"0")}</span>
+           <div class="timer-display">
+             <span class="timer-time" id="time-${id}" role="timer" aria-label="Time remaining" aria-live="off">${String(Math.floor(ex.workSeconds/60)).padStart(2,"0")}:${String(ex.workSeconds%60).padStart(2,"0")}</span>
             <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
           </div>
           <div class="timer-controls">
@@ -858,7 +871,7 @@ function strengthExerciseCard(ex) {
             <button class="timer-btn timer-pause" data-exercise="${id}" style="display:none">Pause</button>
             <button class="timer-btn timer-stop" data-exercise="${id}" style="display:none">Reset</button>
           </div>
-          <div class="timer-label" id="label-${id}" aria-live="polite">Ready</div>
+           <div class="timer-label" id="label-${id}" role="status" aria-live="polite">Ready</div>
         </div>
         <div class="exercise-set-counter">Set <span id="sets-${id}">1/${ex.sets}</span></div>
       </div>
@@ -886,7 +899,7 @@ function renderPillars(targetId) {
       <div class="workout-index-heading"><span>Choose a session</span><span data-current-pillar>${PILLARS[0].shortName || PILLARS[0].name}</span></div>
       <div class="workout-tabs" role="tablist">
         ${PILLARS.map((p, i) => `
-          <button class="workout-tab${i === 0 ? " is-active" : ""}" type="button" role="tab" aria-selected="${i === 0}" aria-controls="section-${p.id}" data-pillar-tab="${p.id}">
+           <button class="workout-tab${i === 0 ? " is-active" : ""}" id="pillar-tab-${p.id}" type="button" role="tab" aria-selected="${i === 0}" aria-controls="section-${p.id}" tabindex="${i === 0 ? 0 : -1}" data-pillar-tab="${p.id}">
             <span class="workout-tab-number">0${i + 1}</span>
             <span class="workout-tab-copy"><span>${p.kicker || "TRAINING"}</span><strong>${p.shortName || p.name}</strong></span>
             <span class="workout-tab-dose">${p.frequency}</span>
@@ -917,7 +930,7 @@ function renderPillars(targetId) {
       </details>` : "";
 
     return `
-      <section class="pillar-section" data-pillar="${p.id}" id="section-${p.id}" role="tabpanel"${p.id !== PILLARS[0].id ? " hidden" : ""}>
+       <section class="pillar-section" data-pillar="${p.id}" id="section-${p.id}" role="tabpanel" aria-labelledby="pillar-tab-${p.id}"${p.id !== PILLARS[0].id ? " hidden" : ""}>
         ${pillarOverviewCard(p)}
         <div class="workout-protocol-heading"><span>Session protocol</span><span>${p.dose || p.frequency}</span></div>
         ${timerHTML}
@@ -1016,7 +1029,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if (workoutApp) safeRender(() => renderExercises('workout-app'), workoutApp);
   if (investmentsApp) safeRender(() => {
     investmentsApp.innerHTML = renderInvestments();
-    if (typeof calcFire === 'function') calcFire();
-    if (typeof renderPiTable === 'function') renderPiTable();
   }, investmentsApp);
 });

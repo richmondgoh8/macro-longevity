@@ -1,11 +1,3 @@
-import { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, AVOID_LABEL_GUIDE, UPF_GUIDE, TIMING_GUIDE, SKIP_LIST, CONDITIONAL_LIST } from './data/stack.js';
-import { CORE_OUTCOMES } from './data/core.js';
-import { ANNUAL_PANEL, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS } from './data/blood.js';
-import { INVESTMENTS } from './data/finance.js';
-import { PILLARS, EXERCISES } from './data/workout.js';
-import { PILLARS as MASTER_PILLARS, LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS } from './data/pillars.js';
-import { EIGHTY_TWENTY, SOCIAL_MENTAL, FRONTIER, SCREENING_TIERS, BIOLOGY } from './data/protocol.js';
-import { HAWKER, HEALTHIER_SG, SODIUM, ENVIRONMENT } from './data/singapore.js';
 import { icon } from './icons.js';
 import './theme.js';
 
@@ -25,6 +17,8 @@ document.querySelectorAll('.bottom-nav-item').forEach((item) => {
     const target = item.querySelector('.bottom-nav-icon');
     if (iconName && target) target.innerHTML = icon(iconName, { size: 18 });
 });
+document.querySelectorAll('.bottom-nav').forEach((nav) => nav.setAttribute('aria-label', 'Mobile primary navigation'));
+document.querySelectorAll('.bottom-nav-item.active').forEach((item) => item.setAttribute('aria-current', 'page'));
 
 document.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-nav-toggle]');
@@ -48,7 +42,39 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function exportData() {
+async function exportData() {
+    const [
+        { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, AVOID_LABEL_GUIDE, UPF_GUIDE, TIMING_GUIDE, SKIP_LIST, CONDITIONAL_LIST },
+        { CORE_OUTCOMES },
+        { ANNUAL_PANEL, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS },
+        { INVESTMENTS },
+        { PILLARS, EXERCISES },
+        { PILLARS: MASTER_PILLARS, LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS },
+        { EIGHTY_TWENTY, SOCIAL_MENTAL, FRONTIER, SCREENING_TIERS, BIOLOGY },
+        { HAWKER, HEALTHIER_SG, SODIUM, ENVIRONMENT },
+    ] = await Promise.all([
+        import('./data/stack.js'),
+        import('./data/core.js'),
+        import('./data/blood.js'),
+        import('./data/finance.js'),
+        import('./data/workout.js'),
+        import('./data/pillars.js'),
+        import('./data/protocol.js'),
+        import('./data/singapore.js'),
+    ]);
+
+    let passiveIncome = [];
+    try {
+        const stored = JSON.parse(localStorage.getItem('passiveIncome') || '[]');
+        if (Array.isArray(stored)) {
+            passiveIncome = stored.filter((row) => row && typeof row === 'object').map((row) => ({
+                name: typeof row.name === 'string' ? row.name.slice(0, 120) : '',
+                principal: Number.isFinite(Number(row.principal)) ? Math.max(0, Number(row.principal)) : 0,
+                rate: Number.isFinite(Number(row.rate)) ? Math.min(100, Math.max(0, Number(row.rate))) : 0,
+            }));
+        }
+    } catch {}
+
     const data = {
         exportedAt: new Date().toISOString(),
         source: "macro-longevity.com",
@@ -68,6 +94,7 @@ function exportData() {
         apobPlan: APOB_PLAN,
         apobEffects: APOB_EFFECTS,
         investments: INVESTMENTS,
+        passiveIncome,
         pillars: PILLARS,
         exercises: EXERCISES,
         masterPillars: MASTER_PILLARS,
@@ -231,6 +258,16 @@ function exportData() {
         }
         md += `\n`;
     });
+
+    md += `## Passive Income Tracker (${data.passiveIncome.length})\n\n`;
+    if (data.passiveIncome.length) {
+        data.passiveIncome.forEach((asset) => {
+            md += `- **${asset.name || 'Unnamed asset'}:** SGD ${asset.principal.toLocaleString()} at ${asset.rate}% annual rate\n`;
+        });
+    } else {
+        md += `No assets recorded.\n`;
+    }
+    md += `\n`;
 
     md += `## 4 Pillars of Longevity Training\n\n`;
     data.pillars.forEach(p => {

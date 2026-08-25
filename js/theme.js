@@ -52,7 +52,9 @@ function replaceLogoGlyph() {
   // '⟁' (U+27C1) is missing from the self-hosted latin font subsets and renders
   // as tofu on most platforms — swap it for the inline SVG mark.
   document.querySelectorAll('.nav-logo-icon, .footer-logo').forEach((el) => {
-    if (el.textContent.trim() === '⟁') el.innerHTML = icon('dna', { size: 22 });
+    if (el.tagName !== 'IMG' && (el.textContent.trim() === '⟁' || !el.querySelector('svg'))) {
+      el.innerHTML = icon('dna', { size: 22 });
+    }
   });
 }
 

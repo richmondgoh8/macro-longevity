@@ -141,6 +141,7 @@
   --tint-primary-25: color-mix(in srgb, var(--color-primary) 25%, transparent);
   --tint-secondary-6: color-mix(in srgb, var(--color-secondary) 6%, transparent);
   --tint-secondary-10: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+  --tint-secondary-12: color-mix(in srgb, var(--color-secondary) 12%, transparent);
   --tint-secondary-15: color-mix(in srgb, var(--color-secondary) 15%, transparent);
   --tint-secondary-25: color-mix(in srgb, var(--color-secondary) 25%, transparent);
   --tint-accent-15: color-mix(in srgb, var(--color-accent) 15%, transparent);
@@ -148,6 +149,9 @@
   --footer-bg: var(--color-text);
   --footer-text: rgba(255, 255, 255, 0.72);
   --footer-copy: rgba(255, 255, 255, 0.42);
+  --footer-text-strong: #ffffff;
+  --footer-border: rgba(255, 255, 255, 0.3);
+  --footer-surface: rgba(255, 255, 255, 0.1);
 
   /* ─── GENUI v2.0 — CARNIVORE SEMANTICS (preserved) ─── */
   --carnivore: #7C3AED;
@@ -215,6 +219,7 @@
     --color-primary-hover: #14B8A6;
     --color-primary-light: #0c2f2b;
     --color-primary-dark: #5eead4;
+    --color-on-primary: #062e2a;
     --color-secondary: #F59E0B;
     --color-secondary-light: #2a200c;
     --color-accent: #34D399;
@@ -240,6 +245,9 @@
     --footer-bg: #0E151D;
     --footer-text: rgba(230, 235, 242, 0.72);
     --footer-copy: rgba(230, 235, 242, 0.4);
+    --footer-text-strong: #E6EBF2;
+    --footer-border: rgba(230, 235, 242, 0.3);
+    --footer-surface: rgba(230, 235, 242, 0.1);
   }
 }
 
@@ -256,6 +264,7 @@
   --color-primary-hover: #14B8A6;
   --color-primary-light: #0c2f2b;
   --color-primary-dark: #5eead4;
+  --color-on-primary: #062e2a;
   --color-secondary: #F59E0B;
   --color-secondary-light: #2a200c;
   --color-accent: #34D399;
@@ -281,4 +290,7 @@
   --footer-bg: #0E151D;
   --footer-text: rgba(230, 235, 242, 0.72);
   --footer-copy: rgba(230, 235, 242, 0.4);
+  --footer-text-strong: #E6EBF2;
+  --footer-border: rgba(230, 235, 242, 0.3);
+  --footer-surface: rgba(230, 235, 242, 0.1);
 }

@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A carnivore-first longevity protocol — the daily stack, the annual blood panel, daily movement, and financial independence. Few things, done consistently, each justified.">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; media-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
+    <link rel="canonical" href="https://macro-longevity.com/">
+    <meta property="og:title" content="Macro Longevity — Carnivore-First Longevity Protocol">
+    <meta property="og:description" content="An evidence-informed longevity protocol covering daily habits, blood tests, training, and financial resilience.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://macro-longevity.com/">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a7e6f">
@@ -14,17 +19,17 @@
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <nav class="nav">
+    <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <span class="nav-logo-icon">⟁</span>
+                <span class="nav-logo-icon" aria-hidden="true"></span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-links">
-                <a href="/" class="nav-link active">Home</a>
+                <a href="/" class="nav-link active" aria-current="page">Home</a>
                 <a href="/pages/stack.html" class="nav-link">Daily Stack</a>
                 <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
                 <a href="/pages/protocol.html" class="nav-link">Blueprint</a>
@@ -97,7 +102,7 @@
                         <div class="preview-icon">🍖</div>
                         <h3 class="preview-title">Daily Stack</h3>
                         <p class="preview-desc">
-                            Supplements, foods, extras — and the fifteen things to skip.
+                             Supplements, foods, extras — and the 21 things to skip.
                         </p>
                         <span class="preview-cta">View the protocol →</span>
                     </a>
@@ -164,7 +169,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <span class="footer-logo">⟁</span>
+                <span class="footer-logo" aria-hidden="true"></span>
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
@@ -172,7 +177,7 @@
                 Not medical advice. Consult your physician before starting any supplement
                 or dietary regimen.
             </p>
-            <button class="export-btn" data-export>📥 Export All Data (Markdown)</button>
+            <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
@@ -181,6 +186,6 @@
     <script type="module" src="/js/home.js"></script>
     <script type="module" src="/js/export.js"></script>
 <nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item active"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a><a href="/pages/protocol.html" class="bottom-nav-item"><span class="bottom-nav-icon">📐</span><span class="bottom-nav-label">Blueprint</span></a></div></nav>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}</script>
+ <script src="/js/register-sw.js" defer></script>
 </body>
 </html>

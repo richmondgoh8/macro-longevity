@@ -113,6 +113,8 @@ node --check js/export.js
 node --check js/components/card-swipe.js
 ```
 
+Run the dependency-free repository audit with `make audit`. It checks page security metadata, labels, tab wiring, service-worker assets, content safety guards, and JavaScript syntax.
+
 ## License
 
 MIT — Copyright (c) 2026 Richmond Goh.

@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="The Macro Longevity Blueprint — 80/20 protocol, screening tiers, biology, social health, frontier geroscience and Singapore localization. Evidence-graded, no hype.">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; media-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
+    <link rel="canonical" href="https://macro-longevity.com/pages/protocol.html">
+    <meta property="og:title" content="Blueprint — Macro Longevity">
+    <meta property="og:description" content="The 80/20 longevity protocol, screening tiers, biology, recovery, and Singapore localization.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://macro-longevity.com/pages/protocol.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0F766E">
@@ -14,10 +19,10 @@
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
-    <nav class="nav">
+    <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <span class="nav-logo-icon">⟁</span>
+                <span class="nav-logo-icon" aria-hidden="true"></span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
@@ -27,7 +32,7 @@
                 <a href="/" class="nav-link">Home</a>
                 <a href="/pages/stack.html" class="nav-link">Daily Stack</a>
                 <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
-                <a href="/pages/protocol.html" class="nav-link active">Blueprint</a>
+                <a href="/pages/protocol.html" class="nav-link active" aria-current="page">Blueprint</a>
                 <a href="/pages/workout.html" class="nav-link">Workout</a>
                 <a href="/pages/finance.html" class="nav-link">Finance</a>
                 <a href="/pages/avoid.html" class="nav-link">Avoid</a>
@@ -52,7 +57,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <span class="footer-logo">⟁</span>
+                <span class="footer-logo" aria-hidden="true"></span>
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
@@ -60,7 +65,7 @@
                 Not medical advice. Consult your physician before starting any supplement
                 or dietary regimen, especially with existing conditions or medications.
             </p>
-            <button class="export-btn" data-export>📥 Export All Data (Markdown)</button>
+            <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
@@ -68,6 +73,6 @@
     <script type="module" src="/js/protocol.js"></script>
     <script type="module" src="/js/export.js"></script>
 <nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/protocol.html" class="bottom-nav-item active"><span class="bottom-nav-icon">📐</span><span class="bottom-nav-label">Blueprint</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a></div></nav>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}</script>
+ <script src="/js/register-sw.js" defer></script>
 </body>
 </html>

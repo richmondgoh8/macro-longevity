@@ -4,7 +4,7 @@ export const INVESTMENTS = [
   {
     id: "safe-starter",
     name: "Safe Starter Combo",
-    goal: "For beginners or risk-averse investors. Prioritises capital preservation with steady ~3-4% returns. Zero chance of loss.",
+    goal: "For beginners or risk-averse investors. Prioritises capital preservation with an intended ~3-4% return range, while acknowledging that market-linked holdings can lose value.",
     icon: "🛡️",
     totalReturn: "~3.5-4.0% p.a.",
     riskLevel: "very low",
@@ -14,7 +14,7 @@ export const INVESTMENTS = [
       { asset: "MBH (SG Bond ETF)", pct: "20%", why: "~3-3.5% yield. SGD-denominated bond ETF for steady income." },
       { asset: "DBS / OCBC Bank Stocks", pct: "13%", why: "~5-6% dividend yield with dividend growth. Blue-chip SG stocks with decades of track record." },
     ],
-    synergy: "This combo covers all time horizons. SSB handles 1-10 years (redeemable anytime). DBS/OCBC stocks provide dividend income and capital growth — bank stocks are defensive in Singapore (oligopoly pricing power). CPF SA anchors retirement with risk-free 4.0%. MBH fills the gap for bond exposure. Key insight: the DBS/OCBC portion adds yield (~5.5%) without adding FX or tech-sector risk. Everything is SGD-denominated, zero currency risk. The blended return beats any insurance savings plan by 1-2% with lower commissions. The 20% Savings bucket from your budget covers your high-yield savings account (UOB One / OCBC 360).",
+     synergy: "This combo covers multiple time horizons. SSB handles 1-10 years and can be redeemed, while CPF SA provides a government-backed retirement anchor. MBH and bank stocks are still market-linked and can fall in value; SGD denomination removes direct FX exposure but does not remove investment risk. The 20% Savings bucket from your budget covers your high-yield savings account (UOB One / OCBC 360).",
     howToExecute: "1. Set up CPF OA→SA transfer every January. 2. Buy SGD 10k SSB every 6 months via internet banking. 3. Buy DBS or OCBC shares quarterly via FSMOne or moomoo (SGD 500-1000/trade). 4. Buy MBH through FSMOne or IBKR monthly (SGD 200). 5. Keep your emergency fund and salary account in a high-yield savings account (UOB One / OCBC 360). 6. Review once a year, rebalance if DBS/OCBC has grown >15% of portfolio.",
     tips: [
       "UOB One is best for 4% on 100k with salary + 5 card txns. Credit your salary there and let the Savings bucket from your budget handle this.",
@@ -112,4 +112,3 @@ export const INVESTMENTS = [
     ],
   },
 ];
-
