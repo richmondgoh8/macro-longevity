@@ -1,6 +1,6 @@
 # macro-longevity
 
-Static HTML/CSS/JS carnivore-first longevity site — daily stack, blood tests, workout, finance. Zero build step, zero dependencies.
+Static HTML/CSS/JS food-first longevity site — daily nutrition stack, blood tests, workout, finance. Zero build step, zero dependencies.
 
 ## Quick start
 
@@ -20,7 +20,7 @@ make serve   # or: python3 -m http.server 8080
 ```
 index.html                  Home — carnivore note, daily stack at a glance, page links
 pages/
-  stack.html                Daily Stack: Supplements / Food & Spices / Extras & Habits (sub-tabs)
+  stack.html                Daily Stack: multi-meal planner, nutrient checklist, supplements & recovery
   blood.html                Blood Tests: Annual core, One-time, Periodic, Low-value tests
   workout.html              Daily workout: 10 exercises with built-in timers and sound cues
   finance.html              Investment Combos, FIRE Calculator + Passive Income Tracker
@@ -48,6 +48,7 @@ js/
     pillars.js              PILLARS (4-Pillar master model), LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS
     protocol.js             EIGHTY_TWENTY, SOCIAL_MENTAL, FRONTIER, SCREENING_TIERS, BIOLOGY
     singapore.js            HAWKER, HEALTHIER_SG, SODIUM, ENVIRONMENT
+    nutrition.js            Daily targets, builder items, reusable meal plans, high-ROI foods, supplements and recovery
 ```
 
 ## Data counts
@@ -62,9 +63,13 @@ js/
 | `UPF_GUIDE` | 4 steps | Practical NOVA-style label screen; no fake five-ingredient cutoff |
 | `TIMING_GUIDE` | 4 slots | Meal-fat, training, evening and medicine-separation guidance |
 | `CORE_OUTCOMES` | 6 | Sleep, stress, glucose, ApoB, mitochondria and gut coverage |
+| `NUTRIENT_TARGETS` | 30 | Adult-male baseline: protein, essential fats, minerals, vitamins, fibre and choline |
+| `COMPOUND_TARGETS` | 7 | Minimal evidence-first compounds: food-first, conditional and optional layers |
+| `BUILDER_ITEMS` | 52 | Specific foods, servings, supplements and safety flags for the Daily Stack builder |
+| `MEAL_PLANS` | 6 | Reusable multi-item meals for the Daily Stack planner |
 | `SKIP_LIST` | 21 | "Do not buy" — redundant, speculative or low-evidence supplements |
 | `CONDITIONAL_LIST` | 10 | Use only for a defined symptom, food pattern, lab result or clinical indication |
-| `ANNUAL_PANEL` | 26 | Tiers: core / one-time / periodic, with optimal ranges |
+| `ANNUAL_PANEL` | 27 | Tiers: core / one-time / periodic, with optimal ranges |
 | `LOW_VALUE_TESTS` | 9 | Expensive tests with no actionable value |
 | `BEYOND_PANEL` | 8 | Non-lab high-ROI habits (BP, sleep apnea, waist, fitness, smoking, alcohol, social, dental) |
 | `APOB_PLAN` / `APOB_EFFECTS` | 7 / 8 | ApoB-elevated next-steps module + "what helps what" table |

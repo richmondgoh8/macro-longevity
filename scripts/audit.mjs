@@ -45,9 +45,24 @@ const financeData = read('js/data/finance.js');
 check(!/Zero chance of loss/i.test(financeData), 'js/data/finance.js: absolute loss claim remains');
 check(read('css/variables.css').includes('--tint-secondary-12:'), 'css/variables.css: conditional tint token missing');
 
+const nutritionData = read('js/data/nutrition.js');
+['protein', 'leucine', 'ala', 'epaDha', 'la', 'magnesium', 'potassium', 'calcium', 'zinc', 'selenium', 'iron', 'copper', 'iodine', 'vitaminD', 'vitaminC', 'folate', 'b12', 'b1', 'b2', 'b3', 'b5', 'b6', 'biotin', 'vitaminA', 'vitaminE', 'vitaminK', 'fiber', 'choline'].forEach((id) => {
+  check(nutritionData.includes(`id: "${id}"`), `js/data/nutrition.js: nutrient target missing: ${id}`);
+});
+check(nutritionData.includes('FOUNDATION_STACK'), 'js/data/nutrition.js: foundation preset missing');
+check(nutritionData.includes('MITOCHONDRIAL_SUPPORT'), 'js/data/nutrition.js: mitochondrial support module missing');
+check(nutritionData.includes('COMPOUND_TARGETS'), 'js/data/nutrition.js: minimal stack targets missing');
+check(nutritionData.includes('MEAL_PLANS'), 'js/data/nutrition.js: reusable meal plans missing');
+check(nutritionData.includes('label: "Fiber"'), 'js/data/nutrition.js: standalone Fiber group missing');
+check(nutritionData.includes('Protein powder (whey)'), 'js/data/nutrition.js: protein powder label missing');
+check(nutritionData.includes('actions: { food:'), 'js/data/nutrition.js: target action metadata missing');
+['creatine', 'epaDha', 'vitaminD', 'magnesium', 'choline', 'glycine', 'taurine'].forEach((id) => {
+  check(nutritionData.includes(`id: "${id}"`), `js/data/nutrition.js: minimal stack target missing: ${id}`);
+});
+
 const javascriptFiles = [
   'js/data/stack.js', 'js/data/blood.js', 'js/data/workout.js', 'js/data/finance.js',
-  'js/data/pillars.js', 'js/data/protocol.js', 'js/data/singapore.js', 'js/stack.js',
+  'js/data/pillars.js', 'js/data/protocol.js', 'js/data/singapore.js', 'js/data/nutrition.js', 'js/stack.js',
   'js/blood.js', 'js/render.js', 'js/export.js', 'js/home.js', 'js/protocol.js',
   'js/icons.js', 'js/theme.js', 'js/finance.js', 'js/register-sw.js', 'sw.js',
   'js/components/card-swipe.js',

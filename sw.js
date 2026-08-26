@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v9';
+const CACHE_NAME = 'macro-longevity-offline-v13';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -29,6 +29,7 @@ const STATIC_ASSETS = [
   '/js/data/pillars.js',
   '/js/data/protocol.js',
   '/js/data/singapore.js',
+  '/js/data/nutrition.js',
   '/offline.html',
   '/favicon.svg',
   '/manifest.json',
