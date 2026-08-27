@@ -1,4 +1,5 @@
 // finance.js — FIRE calculator and passive-income tracker.
+import { confirmAction, iconButton } from './components/ui.js';
 
 const PI_KEY = 'passiveIncome';
 
@@ -99,43 +100,43 @@ function calcFire() {
   }
 
   results.innerHTML = `
-    <div style="grid-column:1/-1;text-align:center;margin-bottom:4px">
-      <h3 style="font-size:22px;font-weight:800;color:var(--color-text)">Your Retirement Picture at Age ${retireAge}</h3>
+    <div class="fire-results-heading">
+      <h3>Your Retirement Picture at Age ${retireAge}</h3>
     </div>
 
     <div class="fire-result-card ${onTrack ? 'primary' : 'warn'}">
       <div class="label">Monthly Income in Retirement</div>
-      <div class="value" style="font-size:22px">${fmtMonth(totalMonthlyIncome)}</div>
+      <div class="value fire-value-lg">${fmtMonth(totalMonthlyIncome)}</div>
       <div class="sub">${cpfLifeMonthly > 0 ? 'SGD ' + Math.round(cpfLifeMonthly) + '/mo from CPF LIFE + ' : ''}portfolio withdrawals</div>
     </div>
     <div class="fire-result-card ${onTrack ? 'primary' : 'danger'}">
       <div class="label">Monthly Expenses at ${retireAge}</div>
-      <div class="value" style="font-size:22px">${fmtMonth(monthlyExpAtRetire)}</div>
+      <div class="value fire-value-lg">${fmtMonth(monthlyExpAtRetire)}</div>
       <div class="sub">${loanPaidOffCompletely ? 'HDB loan fully paid off.' : hdbRemainingAtRetire > 0 ? 'HDB loan balance: ' + fmt(hdbRemainingAtRetire) : ''}</div>
     </div>
     <div class="fire-result-card ${onTrack ? 'primary' : 'danger'}">
       <div class="label">Monthly ${onTrack ? 'Surplus' : 'Shortfall'}</div>
-      <div class="value" style="font-size:22px">${fmtMonth(Math.abs(monthlyShortfall))}</div>
+      <div class="value fire-value-lg">${fmtMonth(Math.abs(monthlyShortfall))}</div>
       <div class="sub">${onTrack ? 'Projected surplus each month' : 'Gap to close before retirement'}</div>
     </div>
 
-    <div class="fire-result-card" style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px">
-      <div><div class="label">Total Savings Needed</div><div class="value" style="font-size:20px">${fmt(fireNumber)}</div></div>
-      <div><div class="label">Projected Portfolio</div><div class="value" style="font-size:20px">${fmt(projectedTotal)}</div></div>
-      <div><div class="label">Monthly from Portfolio</div><div class="value" style="font-size:20px">${fmtMonth(monthlyFromPortfolio)}</div></div>
-      <div><div class="label">CPF LIFE Estimate</div><div class="value" style="font-size:20px">${fmtMonth(cpfLifeMonthly)}</div></div>
-      <div><div class="label">HDB Loan at Retirement</div><div class="value" style="font-size:20px">${loanPaidOffCompletely ? 'Paid' : fmt(hdbRemainingAtRetire)}</div></div>
+    <div class="fire-result-card fire-summary-card">
+      <div><div class="label">Total Savings Needed</div><div class="value fire-value-md">${fmt(fireNumber)}</div></div>
+      <div><div class="label">Projected Portfolio</div><div class="value fire-value-md">${fmt(projectedTotal)}</div></div>
+      <div><div class="label">Monthly from Portfolio</div><div class="value fire-value-md">${fmtMonth(monthlyFromPortfolio)}</div></div>
+      <div><div class="label">CPF LIFE Estimate</div><div class="value fire-value-md">${fmtMonth(cpfLifeMonthly)}</div></div>
+      <div><div class="label">HDB Loan at Retirement</div><div class="value fire-value-md">${loanPaidOffCompletely ? 'Paid' : fmt(hdbRemainingAtRetire)}</div></div>
     </div>
 
     ${!onTrack ? `
     <div class="fire-result-card warn" style="grid-column:1/-1">
       <div class="label">To Close the Gap, Save This Much Per Month Instead</div>
-      <div class="value" style="font-size:24px">${fmtMonth(neededMonthly > 0 ? neededMonthly : monthly)}</div>
+      <div class="value fire-value-xl">${fmtMonth(neededMonthly > 0 ? neededMonthly : monthly)}</div>
       <div class="sub">Currently saving ${fmtMonth(monthly)} · ${neededMonthly > monthly ? 'Need to increase by ' + fmtMonth(neededMonthly - monthly) : 'The projection needs more time or a different target.'}</div>
     </div>` : ''}
 
     <div class="fire-result-card" style="grid-column:1/-1;padding:16px;text-align:left">
-      <div style="font-size:14px;line-height:1.7;color:var(--color-text-secondary)">
+      <div class="fire-summary-copy">
         <strong>HDB Loan Summary:</strong> You have ${fmt(hdbBal)} remaining over ${hdbYearsLeft} years (${fmtMonth(hdbPay)}).
         ${years >= hdbYearsLeft ? 'Your loan will be fully paid off by retirement.' : 'At retirement, approximately ' + Math.round((1 - years / hdbYearsLeft) * 100) + '% of the loan will remain (' + fmt(hdbRemainingAtRetire) + ').'}
         ${!loanPaidOffCompletely ? ' Consider paying down the loan faster or refinancing to reduce retirement expenses.' : ''}
@@ -197,11 +198,9 @@ function drawFireChart(data, fireLine = 0) {
     firePath += `<text x="${w - pad.right - 4}" y="${fireY - 6}" text-anchor="end" class="chart-fire-label" font-size="11">FIRE target</text>`;
   }
 
-  const fillId = 'fillGrad_' + w;
-  const defs = `<defs><linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" class="chart-fill-start"/><stop offset="100%" class="chart-fill-end"/></linearGradient></defs>`;
-  svg.innerHTML += defs + gridHtml +
+  svg.innerHTML += gridHtml +
     `<path d="${paths}" fill="none" class="chart-value-line"/>` +
-    `<path d="${paths}L${pad.left + cw},${pad.top + ch}L${pad.left},${pad.top + ch}Z" fill="url(#${fillId})" class="chart-value-area"/>` +
+    `<path d="${paths}L${pad.left + cw},${pad.top + ch}L${pad.left},${pad.top + ch}Z" class="chart-value-area"/>` +
     firePath +
     `<text x="${pad.left}" y="${pad.top - 4}" class="chart-title-label" font-size="12">Portfolio value</text>` +
     `<text x="${w / 2}" y="${h - 8}" text-anchor="middle" class="chart-title-label" font-size="12">Years from now</text>`;
@@ -305,7 +304,7 @@ function renderPiTable() {
       <td><label class="sr-only" for="pi-principal-${index}">Principal in SGD, row ${index + 1}</label><input id="pi-principal-${index}" type="number" value="${row.principal || ''}" min="0" placeholder="0" data-pi-field="principal" data-index="${index}"></td>
       <td><label class="sr-only" for="pi-rate-${index}">Annual rate in percent, row ${index + 1}</label><input id="pi-rate-${index}" type="number" value="${row.rate || ''}" min="0" max="100" step="0.1" placeholder="0" data-pi-field="rate" data-index="${index}"></td>
       <td class="pi-monthly">SGD ${Math.round(monthly).toLocaleString()}/mo</td>
-      <td><button type="button" class="pi-btn pi-btn-danger" data-pi-action="delete" data-index="${index}" aria-label="Delete ${escapeHTML(row.name || 'asset ' + (index + 1))}">Delete</button></td>
+      <td>${iconButton({ iconName: 'delete', label: `Delete ${row.name || `asset ${index + 1}`}`, tone: 'danger', tooltip: 'Delete asset', data: { 'pi-action': 'delete', index } })}</td>
     </tr>`;
   }).join('');
 
@@ -341,24 +340,28 @@ function renderPiTable() {
     <div style="margin-top:12px"><button type="button" class="pi-btn pi-btn-primary" data-pi-action="add">Add asset</button></div>`;
 }
 
-function selectFinanceTab(tab) {
-  const isFire = tab === 'fire';
+function selectFinanceTab(tab, { updateHash = false } = {}) {
+  const views = ['investments', 'fire', 'income'];
+  const selectedView = views.includes(tab) ? tab : 'investments';
   document.querySelectorAll('[data-finance-tab]').forEach((button) => {
-    const selected = button.dataset.financeTab === tab;
+    const selected = button.dataset.financeTab === selectedView;
     button.classList.toggle('active', selected);
     button.setAttribute('aria-selected', String(selected));
+    button.tabIndex = selected ? 0 : -1;
   });
   const select = document.querySelector('[data-finance-select]');
-  if (select) select.value = tab;
+  if (select) select.value = selectedView;
 
-  const investments = document.getElementById('financeInvestments');
-  const fire = document.getElementById('financeFire');
-  if (investments) investments.hidden = isFire;
-  if (fire) fire.hidden = !isFire;
-  if (isFire) {
+  document.getElementById('financeInvestments').hidden = selectedView !== 'investments';
+  document.getElementById('financeFire').hidden = selectedView !== 'fire';
+  document.getElementById('financeIncome').hidden = selectedView !== 'income';
+  if (selectedView === 'fire') {
     calcFire();
+  }
+  if (selectedView === 'income') {
     renderPiTable();
   }
+  if (updateHash && window.location.hash !== `#${selectedView}`) history.pushState(null, '', `#${selectedView}`);
 }
 
 function init() {
@@ -367,24 +370,51 @@ function init() {
   document.addEventListener('input', (event) => {
     if (event.target.closest('[data-fire-input]')) calcFireDebounced();
   });
-  document.addEventListener('click', (event) => {
+  document.addEventListener('click', async (event) => {
     const tab = event.target.closest('[data-finance-tab]');
-    if (tab) selectFinanceTab(tab.dataset.financeTab);
+    if (tab) selectFinanceTab(tab.dataset.financeTab, { updateHash: true });
 
     const action = event.target.closest('[data-pi-action]');
     if (!action) return;
     if (action.dataset.piAction === 'add') addPiRow();
-    if (action.dataset.piAction === 'delete') delPiRow(Number(action.dataset.index));
+    if (action.dataset.piAction === 'delete') {
+      const index = Number(action.dataset.index);
+      const row = loadPiData()[index];
+      if (!row) return;
+      const confirmed = await confirmAction({
+        title: `Delete “${row.name || `Asset ${index + 1}`}”?`,
+        summary: 'This permanently removes the asset from your passive income tracker.',
+        details: `Principal: SGD ${Math.round(row.principal).toLocaleString()} · Annual yield: ${row.rate}%`,
+        confirmLabel: 'Delete asset',
+        returnFocus: action,
+      });
+      if (confirmed) delPiRow(index);
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    const current = event.target.closest('[data-finance-tab]');
+    if (!current || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    const tabs = [...document.querySelectorAll('[data-finance-tab]')];
+    let index = tabs.indexOf(current);
+    if (event.key === 'Home') index = 0;
+    else if (event.key === 'End') index = tabs.length - 1;
+    else index = (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    event.preventDefault();
+    tabs[index].focus();
+    selectFinanceTab(tabs[index].dataset.financeTab, { updateHash: true });
   });
   document.addEventListener('change', (event) => {
     const select = event.target.closest('[data-finance-select]');
-    if (select) selectFinanceTab(select.value);
+    if (select) selectFinanceTab(select.value, { updateHash: true });
 
     const field = event.target.closest('[data-pi-field]');
     if (field) updatePiField(Number(field.dataset.index), field.dataset.piField, field.value);
   });
 
-  selectFinanceTab('investments');
+  const initial = window.location.hash.slice(1);
+  selectFinanceTab(['investments', 'fire', 'income'].includes(initial) ? initial : 'investments');
+  if (!initial) history.replaceState(null, '', '#investments');
+  window.addEventListener('popstate', () => selectFinanceTab(window.location.hash.slice(1)));
 }
 
 if (document.readyState === 'loading') {

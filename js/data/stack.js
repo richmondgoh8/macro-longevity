@@ -511,14 +511,14 @@ export const CONDITIONAL_LIST = [
   },
   {
     id: "d3",
-    name: "Vitamin D3 (K2 Optional)",
+    name: "Vitamin D3 + K2",
     icon: "☀️",
     evidence: "conditional",
     who: "Low 25(OH)D, very little sun exposure, or low intake of fatty fish; dose to the lab result.",
-    why: "Vitamin D is useful for deficiency, not as a blanket anti-aging pill. Test, supplement conservatively, and do not treat K2 as a mandatory partner; routine K2 outcome evidence is limited.",
+    why: "Vitamin D is useful for deficiency, not as a blanket anti-aging pill. Test and supplement conservatively; if using this combination, review the K2 component and interactions with a clinician.",
     dose: "Often 800–2,000 IU/day, adjusted to 25(OH)D and clinician advice",
     timing: "With a meal containing fat if indicated; EVOO, eggs or fatty fish are practical examples.",
-    pairing: "EVOO is an example of meal fat, not a required vehicle. K2 is not an automatic partner.",
+    pairing: "Take with a meal if that improves adherence. K2 can interact with warfarin and should be reviewed with a clinician.",
     synergy: ["EVOO / eggs / fatty fish: practical fat-containing meal", "Fatty fish: food-first Vitamin D source"],
     caution: "Avoid chronic high dosing without monitoring. K2 can interact with warfarin; pregnancy and hypercalcaemia need clinician input.",
   },
@@ -632,7 +632,7 @@ export const TIMING_GUIDE = [
   {
     id: "meal-fat",
     label: "With a meal containing fat",
-    items: ["Vitamin D3, if indicated", "CoQ10, if a clinician recommends it", "EVOO, eggs or fatty fish as food examples"],
+    items: ["Vitamin D3 + K2, if indicated", "CoQ10, if a clinician recommends it", "EVOO, eggs or fatty fish as food examples"],
     note: "Meal fat can support absorption of fat-soluble items. EVOO is an example, not a required supplement vehicle.",
   },
   {

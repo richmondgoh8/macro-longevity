@@ -1,5 +1,10 @@
 // blood.js — Blood Tests rendering (annual panel, deficiency markers, low-value tests)
-import { ANNUAL_PANEL, BLOOD_TIERS, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS } from './data/blood.js';
+import { ANNUAL_PANEL, BLOOD_TIERS, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_EFFECTS } from './data/blood.js';
+import { escapeHTML } from './components/ui.js';
+
+function labelWithoutMarker(value) {
+  return String(value ?? '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
+}
 
 function evidenceBadge(level) {
   if (!level) return "";
@@ -8,31 +13,32 @@ function evidenceBadge(level) {
 }
 function testCard(t) {
   return `
-    <article class="blood-card">
-      <div class="blood-card-head">
-        <h3 class="blood-card-name">${t.name}</h3>
-        <span class="blood-card-freq">${t.frequency}</span>
-        ${t.evidence ? evidenceBadge(t.evidence) : ""}
-      </div>
-      <p class="blood-card-range"><span class="stack-line-label">Target</span> <span class="blood-range">${t.optimalRange}</span></p>
-      <p class="blood-card-why">${t.why}</p>
-      ${t.carnivoreNote ? `<div class="carnivore-note">🥩 ${t.carnivoreNote}</div>` : ""}
-    </article>`;
+    <details class="blood-card blood-test-row">
+      <summary><span><span class="blood-card-name" role="heading" aria-level="3">${t.name}</span><span class="blood-card-range"><span class="stack-line-label">Target</span> <span class="blood-range">${t.optimalRange}</span></span></span><span class="blood-test-meta"><span class="blood-card-freq">${t.frequency}</span>${t.evidence ? evidenceBadge(t.evidence) : ""}</span></summary>
+      <div class="blood-test-detail"><p class="blood-card-why">${t.why}</p>${t.carnivoreNote ? `<div class="carnivore-note">${t.carnivoreNote}</div>` : ""}</div>
+    </details>`;
 }
 
-function tierSection(tier) {
+function disclosureSection({ title, description, body, count = '', open = false, className = '' }) {
+  return `<details class="progressive-section blood-tier ${className}"${open ? ' open' : ''}>
+    <summary>
+      <span class="progressive-section-heading"><span class="blood-tier-title" role="heading" aria-level="2">${escapeHTML(title)}</span><span class="blood-tier-desc">${escapeHTML(description)}</span></span>
+      ${count ? `<span class="progressive-section-count">${escapeHTML(count)}</span>` : ''}
+    </summary>
+    <div class="progressive-section-body">${body}</div>
+  </details>`;
+}
+
+function tierSection(tier, open = false) {
   const meta = BLOOD_TIERS[tier];
   const items = ANNUAL_PANEL.filter(t => t.tier === tier);
-  return `
-    <section class="blood-tier">
-      <div class="blood-tier-head">
-        <h2 class="blood-tier-title">${meta.label}</h2>
-        <p class="blood-tier-desc">${meta.desc}</p>
-      </div>
-      <div class="blood-grid">
-        ${items.map(testCard).join("")}
-      </div>
-    </section>`;
+  return disclosureSection({
+    title: labelWithoutMarker(meta.label),
+    description: meta.desc,
+    count: `${items.length} tests`,
+    open,
+    body: `<div class="blood-grid">${items.map(testCard).join("")}</div>`,
+  });
 }
 
 export function renderBlood() {
@@ -41,7 +47,7 @@ export function renderBlood() {
 
   const preparation = `
     <div class="blood-prep">
-      <h3 class="blood-prep-title">📋 Before You Draw</h3>
+      <h3 class="blood-prep-title">Before You Draw</h3>
       <p class="blood-prep-text">
         Follow the lab's fasting instructions · arrive normally hydrated · keep the timing and
         training conditions consistent when you trend results. A hard workout can transiently
@@ -56,17 +62,14 @@ export function renderBlood() {
 
   container.innerHTML = `
     ${preparation}
-    ${tierSection("annual")}
+    ${tierSection("annual", true)}
     ${tierSection("one-time")}
     ${tierSection("periodic")}
-    <section class="blood-tier">
-      <div class="blood-tier-head">
-        <h2 class="blood-tier-title">🧭 ApoB Elevated? Next Steps</h2>
-        <p class="blood-tier-desc">Low triglycerides and high HDL are favourable context — not proof that a high ApoB is harmless. Work through these in order.</p>
-      </div>
-      <ol class="apob-steps">
-        ${APOB_PLAN.map(s => `<li><strong>${s.step}.</strong> ${s.action}</li>`).join("")}
-      </ol>
+    ${disclosureSection({
+      title: 'ApoB elevated? Options',
+      description: 'Low triglycerides and high HDL are favourable context — not proof that a high ApoB is harmless. Compare the practical options below with your clinician.',
+      count: `${APOB_EFFECTS.length} interventions`,
+      body: `
       <div class="stack-table apob-table">
         <div class="stack-table-row stack-table-header">
           <span>Intervention</span><span>Also helps</span><span>Lowers ApoB?</span>
@@ -77,29 +80,30 @@ export function renderBlood() {
           </div>
         `).join("")}
       </div>
-    </section>
-    <section class="blood-tier">
-      <div class="blood-tier-head">
-        <h2 class="blood-tier-title">💪 Beyond the Blood Panel</h2>
-        <p class="blood-tier-desc">Not lab tests — and more important than most of them. These eight checkable habits outperform most supplements and most of the low-value tests below.</p>
-      </div>
+    `})}
+    ${disclosureSection({
+      title: 'Beyond the blood panel',
+      description: 'These checkable habits matter more than most supplements and most low-value tests.',
+      count: `${BEYOND_PANEL.length} habits`,
+      body: `
       <div class="blood-grid">
         ${BEYOND_PANEL.map(t => `
           <article class="blood-card">
             <div class="blood-card-head">
-              <h3 class="blood-card-name">${t.icon} ${t.name}</h3>
+              <h3 class="blood-card-name">${t.name}</h3>
             </div>
             <p class="blood-card-why"><span class="stack-line-label">Do</span> ${t.action}</p>
             <p class="blood-card-why">${t.why}</p>
           </article>
         `).join("")}
       </div>
-    </section>
-    <section class="blood-tier">
-      <div class="blood-tier-head">
-        <h2 class="blood-tier-title">🚫 Low-Value Tests — Save Your Money</h2>
-        <p class="blood-tier-desc">Expensive, fashionable, and nothing actionable comes out of them.</p>
-      </div>
+    `})}
+    ${disclosureSection({
+      title: 'Low-value tests — save your money',
+      description: 'Expensive or fashionable tests that rarely produce an actionable decision.',
+      count: `${LOW_VALUE_TESTS.length} tests`,
+      className: 'progressive-section-muted',
+      body: `
       <div class="blood-grid">
         ${LOW_VALUE_TESTS.map(t => `
           <article class="blood-card blood-card-low">
@@ -111,7 +115,7 @@ export function renderBlood() {
           </article>
         `).join("")}
       </div>
-    </section>`;
+    `})}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

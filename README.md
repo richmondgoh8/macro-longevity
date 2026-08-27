@@ -30,15 +30,17 @@ css/
   variables.css             Design tokens — colors, typography (4-size fluid), spacing (8px grid)
   style.css                 All component styles, responsive (768px, 480px)
 js/
-  stack.js                  Daily Stack rendering (ES module)
+  stack.js                  Daily Stack planner rendering (ES module)
+  avoid.js                  Lightweight Ingredient guide rendering and search
+  stack-preview.js          Lightweight home-page protocol preview
+  site.js                   Shared navigation and lazy export bootstrap
   blood.js                  Blood Tests rendering (ES module)
   render.js                Workout + Finance rendering
   home.js                  Home: 4-Pillar spine, Longevity 101, decision rule, evidence legend
   protocol.js              Blueprint page rendering
-  icons.js                 Inline SVG icon system (replaces emoji in structural UI)
-  theme.js                 Dark/light theme toggle (persisted), injected via export.js
   export.js                Markdown export + nav toggle
   components/card-swipe.js  Viewport-filling swipeable card stack for mobile
+  components/ui.js           Shared escaping and presentation primitives
   data/
     stack.js                DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, UPF_GUIDE, SKIP_LIST, CONDITIONAL_LIST
     core.js                 CORE_OUTCOMES — six outcome domains covered by the protocol
@@ -64,7 +66,7 @@ js/
 | `TIMING_GUIDE` | 4 slots | Meal-fat, training, evening and medicine-separation guidance |
 | `CORE_OUTCOMES` | 6 | Sleep, stress, glucose, ApoB, mitochondria and gut coverage |
 | `NUTRIENT_TARGETS` | 30 | Adult-male baseline: protein, essential fats, minerals, vitamins, fibre and choline |
-| `COMPOUND_TARGETS` | 7 | Minimal evidence-first compounds: food-first, conditional and optional layers |
+| `COMPOUND_TARGETS` | 7 | Targeted compounds: food-first, conditional and optional layers |
 | `BUILDER_ITEMS` | 52 | Specific foods, servings, supplements and safety flags for the Daily Stack builder |
 | `MEAL_PLANS` | 6 | Reusable multi-item meals for the Daily Stack planner |
 | `SKIP_LIST` | 21 | "Do not buy" — redundant, speculative or low-evidence supplements |
@@ -78,20 +80,20 @@ js/
 
 ## Design system
 
-Follows `GENUI.md` v3.0 (supersedes `DESIGN.md` for this app). Key tokens in `css/variables.css`:
+Follows [`DESIGN.md`](DESIGN.md). Key tokens in `css/variables.css`:
 
 - **Typography**: 4 sizes with `clamp()` fluid scaling (`--text-sm` through `--text-xl`)
-- **Font pairing**: DM Sans (display) + Inter (body), JetBrains Mono for data — self-hosted, no external fetch
+- **Typography**: Geist for interface text and Geist Mono for measured data — self-hosted, no external fetch
 - **Spacing**: 8px grid (`--space-2` through `--space-20`)
 - **Evidence taxonomy (5 tiers)**: `--evidence-core/conditional/optional/experimental/skip` — mirrors the Longevity OS report (CORE / CONDITIONAL / OPTIONAL / EXPERIMENTAL / SKIP)
 - **4-Pillar accents**: `--pillar-1..4` (rose / violet / amber / teal)
-- **Dark mode**: full light/dark surface set via `[data-theme]`; defaults to `prefers-color-scheme`
-- **Icons**: inline SVG from `js/icons.js` (structural UI); emoji kept only as food-content decoration
+- **Theme**: light-only interface with a single neutral surface system
+- **Icons**: text-first interface; data visualizations may use SVG, but navigation and cards do not use icon markers
 - **Carnivore notes**: `--carnivore`, `--carnivore-bg`, `--carnivore-border`
 
 ## Mobile UX
 
-- Bottom tab bar (<768px): Home | Stack | Blood | Blueprint | Workout | Finance | Avoid
+- Bottom tab bar (<768px): Home | Nutrition | Health | Training | Finance
 - Swipeable card stacks for dense content (workout exercises)
 - Sub-tab controls (stack page) hide buttons and show `<select>` dropdown on mobile
 - Timing tables scroll horizontally on narrow screens
@@ -110,8 +112,6 @@ node --check js/stack.js
 node --check js/blood.js
 node --check js/home.js
 node --check js/protocol.js
-node --check js/icons.js
-node --check js/theme.js
 node --check js/export.js
 node --check js/render.js
 node --check js/export.js
@@ -119,6 +119,8 @@ node --check js/components/card-swipe.js
 ```
 
 Run the dependency-free repository audit with `make audit`. It checks page security metadata, labels, tab wiring, service-worker assets, content safety guards, and JavaScript syntax.
+
+Run the real-browser quality suite with `npm run test:ui`. Use `npm run test:ui:headed` to debug interactively, `npm run test:visual:update` to intentionally refresh screenshot baselines, and `npm run test:perf` for the throttled performance budgets. These packages are development-only; the deployed site remains dependency-free.
 
 ## License
 

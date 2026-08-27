@@ -1,15 +1,14 @@
 import { PILLARS, EXERCISES } from './data/workout.js';
 import { INVESTMENTS } from './data/finance.js';
-import { icon } from './icons.js';
 
 function safeRender(fn, container, fallback) {
   try { fn(); }
   catch (err) {
     console.error('Render error:', err);
     if (container) {
-      container.innerHTML = `<div style="padding:24px;text-align:center;color:var(--color-text-secondary)">
-        <p style="font-size:18px;margin-bottom:8px">Something went wrong.</p>
-        <p style="font-size:14px;color:var(--color-text-muted)">${fallback || 'Please refresh the page.'}</p>
+      container.innerHTML = `<div class="render-error">
+        <p class="render-error-title">Something went wrong.</p>
+        <p class="render-error-copy">${fallback || 'Please refresh the page.'}</p>
       </div>`;
     }
   }
@@ -28,7 +27,7 @@ function renderInvestments() {
       <p class="invest-disclaimer">Not financial advice. Information sourced from MAS, CPF Board, r/singaporefi, and HardwareZone for educational purposes. Consult a licensed adviser.</p>
 
       <div class="budget-tool" id="budgetTool">
-        <h3 class="budget-title">💵 Your Budget at a Glance</h3>
+        <h3 class="budget-title">Your Budget at a Glance</h3>
         <p class="budget-desc">Enter your monthly take-home salary. The 50/30/20 rule splits it into Expenses, Investments, and Savings. Drag the sliders to adjust.</p>
         <div class="budget-input-row">
           <div class="budget-field">
@@ -62,15 +61,14 @@ function renderInvestments() {
       ${INVESTMENTS.map(c => `
         <article class="invest-card" id="inv-${c.id}">
           <div class="invest-card-top">
-            <span class="invest-icon">${c.icon}</span>
             <div>
               <h2 class="invest-name">${c.name}</h2>
               <span class="invest-goal">${c.goal}</span>
             </div>
           </div>
           <div class="invest-meta-bar">
-            <span>📈 ${c.totalReturn}</span>
-            <span>⚠️ ${c.riskLevel}</span>
+            <span>${c.totalReturn}</span>
+            <span>${c.riskLevel}</span>
           </div>
           <div class="invest-table ${budgetInvestments > 0 ? '' : 'invest-table-hide-mo'}">
             <div class="invest-table-header"><span>Asset</span><span>Allocation</span><span>Monthly</span><span>Why</span></div>
@@ -87,15 +85,15 @@ function renderInvestments() {
             }).join("")}
           </div>
           <details class="meal-details">
-            <summary>🧩 Why These Work Together</summary>
+            <summary>Why These Work Together</summary>
             <p class="invest-body-text">${c.synergy}</p>
           </details>
           <details class="meal-details">
-            <summary>📋 Step-by-Step Execution</summary>
+            <summary>Step-by-Step Execution</summary>
             <p class="invest-body-text">${c.howToExecute}</p>
           </details>
           <details class="meal-details">
-            <summary>💡 Tips from r/singaporefi</summary>
+            <summary>Tips from r/singaporefi</summary>
             <ul class="checklist">
               ${c.tips.map(t => `<li>${t}</li>`).join("")}
             </ul>
@@ -763,11 +761,9 @@ function initExerciseTimers() {
    ============================ */
 function pillarOverviewCard(p) {
   const benefits = Array.isArray(p.benefits) ? p.benefits : [];
-  const iconName = { zone2: "activity", vo2max: "activity", strength: "dumbbell", mobility: "target" }[p.id] || "activity";
   return `
     <article class="workout-pillar-summary" id="pillar-${p.id}">
       <div class="pillar-card-head">
-        <span class="workout-pillar-icon">${icon(iconName, { size: 24 })}</span>
         <div class="workout-pillar-lockup">
           <span class="workout-pillar-kicker">${p.kicker || "TRAINING DOMAIN"}</span>
           <h2 class="pillar-name">${p.shortName || p.name}</h2>
@@ -841,7 +837,7 @@ function strengthExerciseCard(ex) {
         <p class="exercise-desc">${ex.description}</p>
         <div class="exercise-dose"><span>${ex.sets} sets</span><span>${ex.reps || `${ex.workSeconds}s work`}</span><span>${ex.equipment || "Adaptable load"}</span></div>
         <details class="exercise-details">
-          <summary>${icon("info", { size: 16 })} Show form cues</summary>
+          <summary>Show form cues</summary>
           <div class="exercise-detail-content">
             <div class="exercise-detail-section">
               <h5>Why it belongs</h5>
@@ -898,12 +894,14 @@ function renderPillars(targetId) {
     <section class="workout-index" aria-label="Choose a training domain">
       <div class="workout-index-heading"><span>Choose a session</span><span data-current-pillar>${PILLARS[0].shortName || PILLARS[0].name}</span></div>
       <div class="workout-tabs" role="tablist">
-        ${PILLARS.map((p, i) => `
+        ${PILLARS.map((p, i) => {
+          const kicker = p.kicker || `0${i + 1} / TRAINING`;
+          return `
            <button class="workout-tab${i === 0 ? " is-active" : ""}" id="pillar-tab-${p.id}" type="button" role="tab" aria-selected="${i === 0}" aria-controls="section-${p.id}" tabindex="${i === 0 ? 0 : -1}" data-pillar-tab="${p.id}">
-            <span class="workout-tab-number">0${i + 1}</span>
-            <span class="workout-tab-copy"><span>${p.kicker || "TRAINING"}</span><strong>${p.shortName || p.name}</strong></span>
+            <span class="workout-tab-copy"><span>${kicker}</span><strong>${p.shortName || p.name}</strong></span>
             <span class="workout-tab-dose">${p.frequency}</span>
-          </button>`).join("")}
+          </button>`;
+        }).join("")}
       </div>
     </section>`;
 
@@ -921,7 +919,7 @@ function renderPillars(targetId) {
 
     const whyHTML = p.whyLongevity ? `
       <details class="exercise-details">
-        <summary>${icon("flask", { size: 16 })} Why this matters</summary>
+        <summary>Why this matters</summary>
         <div class="exercise-detail-content">
           <div class="exercise-detail-section">
             <p class="exercise-detail-text">${p.whyLongevity}</p>
@@ -983,7 +981,7 @@ function exerciseCardFace(e) {
     <div class="exercise-header">
       <div class="exercise-name">${e.name}</div>
     </div>
-    <div class="exercise-target" id="target-${e.id}">🎯 ${def.target}</div>
+    <div class="exercise-target" id="target-${e.id}">${def.target}</div>
     <p class="exercise-desc">${e.description}</p>
     <div class="exercise-timer" id="timer-${e.id}">
       <div class="timer-config">
@@ -1009,11 +1007,11 @@ function exerciseCardFace(e) {
 function exerciseCardDetail(e) {
   return `
     <div class="exercise-detail-section">
-      <h5>🎯 Why This Exercise</h5>
+      <h5>Why This Exercise</h5>
       <p class="exercise-detail-text">${e.whyLongevity}</p>
     </div>
     <div class="exercise-detail-section">
-      <h5>📋 Step-by-Step</h5>
+      <h5>Step-by-Step</h5>
       <ol class="checklist">${e.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
     </div>`;
 }

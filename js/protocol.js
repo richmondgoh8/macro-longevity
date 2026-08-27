@@ -1,6 +1,5 @@
 // protocol.js — renders the Blueprint page (80/20, screening tiers, biology,
 // social & mental health, frontier geroscience, Singapore localization).
-import { icon } from './icons.js';
 import { EIGHTY_TWENTY, SOCIAL_MENTAL, FRONTIER, SCREENING_TIERS, BIOLOGY } from './data/protocol.js';
 import { HAWKER, HEALTHIER_SG, SODIUM, ENVIRONMENT } from './data/singapore.js';
 
@@ -12,18 +11,20 @@ function evBadge(tier, label) {
     'optional-contextual': 'optional', frontier: 'experimental',
   };
   const cls = 'evidence-badge-' + (map[t] || 'optional');
-  const icMap = { core: 'check', conditional: 'info', optional: 'sparkles', experimental: 'flask', skip: 'x' };
-  const ic = icMap[map[t]] ? icon(icMap[map[t]], { size: 14 }) : '';
-  return `<span class="evidence-badge ${cls}">${ic}${(label || tier).toUpperCase()}</span>`;
+  return `<span class="evidence-badge ${cls}">${(label || tier).toUpperCase()}</span>`;
 }
 
 function section(title, eyebrow, inner, id) {
+  const initiallyOpen = id === 'protocol-8020';
   return `
-    <section class="section"${id ? ` id="${id}"` : ''}>
+    <section class="section protocol-progressive-shell"${id ? ` id="${id}"` : ''}>
       <div class="section-inner">
-        ${eyebrow ? `<p class="section-eyebrow">${eyebrow}</p>` : ''}
-        <h2 class="section-title">${title}</h2>
-        ${inner}
+        <details class="progressive-section protocol-progressive"${initiallyOpen ? ' open' : ''}>
+          <summary>
+            <span class="progressive-section-heading">${eyebrow ? `<span class="section-eyebrow">${eyebrow}</span>` : ''}<span class="section-title" role="heading" aria-level="2">${title}</span></span>
+          </summary>
+          <div class="progressive-section-body">${inner}</div>
+        </details>
       </div>
     </section>`;
 }
@@ -35,12 +36,10 @@ function render8020() {
       <ul class="checklist">${items.map((i) => `<li>${i}</li>`).join('')}</ul>
     </article>`;
   const instead = EIGHTY_TWENTY.instead.map((r) => `
-    <article class="stack-card">
-      <div class="stack-lines">
-        <div class="stack-line"><span class="stack-line-label">Instead of</span> ${r.skip}</div>
-        <div class="stack-line"><span class="stack-line-label">Do</span> ${r.do}</div>
-        <div class="stack-line"><span class="stack-line-label">Why</span> ${r.why}</div>
-      </div>
+    <article class="instead-card">
+      <div class="instead-card-row instead-card-skip"><span class="instead-card-label">Instead of</span><span class="instead-card-copy">${r.skip}</span></div>
+      <div class="instead-card-row instead-card-do"><span class="instead-card-label">Do this</span><span class="instead-card-copy">${r.do}</span></div>
+      <div class="instead-card-row instead-card-why"><span class="instead-card-label">Why</span><span class="instead-card-copy">${r.why}</span></div>
     </article>`).join('');
   return section('The 80/20 protocol', 'What to do today, this week, this year', `
     <div class="core-coverage-grid">
@@ -48,10 +47,9 @@ function render8020() {
       ${col('This week', EIGHTY_TWENTY.week)}
       ${col('This year', EIGHTY_TWENTY.year)}
     </div>
-    <h3 class="core-coverage-card" style="margin-top:var(--space-8);border:none;background:none;padding:0;">Do this instead</h3>
-    <div class="stack-grid">${instead}</div>
+    <h3 style="margin-top:var(--space-10);">Do this instead</h3>
+    <div class="instead-grid" data-instead-grid>${instead}</div>
     <div class="callout callout-rule" style="margin-top:var(--space-6);">
-      <span class="callout-icon">${icon('target', { size: 20 })}</span>
       <div class="callout-body">
         <div class="callout-title">Minimal Singapore protocol</div>
         <div class="callout-text">${EIGHTY_TWENTY.minimal}</div>
@@ -63,7 +61,6 @@ function renderScreening() {
   const tiers = SCREENING_TIERS.map((t) => `
     <article class="stack-card">
       <div class="stack-card-head">
-        <span class="stack-card-icon" aria-hidden="true">${t.tier}</span>
         <div class="stack-card-title-group">
           <h3 class="stack-card-name">Tier ${t.tier} — ${t.label}</h3>
         </div>
@@ -104,7 +101,6 @@ function renderSocial() {
     <p class="lede">${SOCIAL_MENTAL.intro}</p>
     <ul class="checklist" style="max-width:720px;margin:0 auto var(--space-6);">${SOCIAL_MENTAL.actions.map((a) => `<li>${a}</li>`).join('')}</ul>
     <div class="callout callout-warning">
-      <span class="callout-icon">${icon('alert', { size: 20 })}</span>
       <div class="callout-body">
         <div class="callout-title">Recovery principle</div>
         <div class="callout-text">${SOCIAL_MENTAL.principle}</div>
@@ -178,7 +174,6 @@ function renderSingapore() {
       <div class="stack-lines" style="margin-top:var(--space-2);"><span class="stack-line-label">Haze (PSI)</span></div>
       <div class="stack-lines">${haze}</div>
       <div class="callout callout-rule" style="margin-top:var(--space-4);">
-        <span class="callout-icon">${icon('alert', { size: 20 })}</span>
         <div class="callout-body"><div class="callout-title">10-second outdoor decision</div><div class="callout-text">${ENVIRONMENT.decision}</div></div>
       </div>
     </article>`, 'protocol-singapore');
@@ -189,6 +184,8 @@ function init() {
   if (!mount) return;
   mount.innerHTML =
     render8020() + renderScreening() + renderBiology() + renderSocial() + renderFrontier() + renderSingapore();
+  const target = window.location.hash ? document.querySelector(window.location.hash) : null;
+  target?.querySelector('.progressive-section')?.setAttribute('open', '');
 }
 
 if (document.readyState === 'loading') {

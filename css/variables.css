@@ -1,67 +1,60 @@
 /* ============================================
    Macro Longevity — Design Token Variables
-   GENUI.md v3.0 — "Clinical / Evidence-First"
-   Evolved from v2.0: refined clinical-biotech palette,
-   5-tier evidence taxonomy, 4-pillar accents, full dark mode.
+   DESIGN.md — "Quiet clinical utility"
+   Shared visual language: Geist, restrained surfaces, clear hierarchy,
+   5-tier evidence taxonomy, 4-pillar accents, light-only surfaces.
    All v2 token names preserved for backward compatibility.
    ============================================ */
 
-/* ─── SELF-HOSTED FONTS (Latin subset, font-display: swap) ─── */
+/* ─── SELF-HOSTED FONTS (variable WOFF2, no external requests) ─── */
 @font-face {
-  font-family: 'DM Sans';
+  font-family: 'Geist';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/dm-sans-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/geist-sans.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Geist Mono';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/inter-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 100 800;
-  font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('/fonts/geist-mono.woff2') format('woff2');
 }
 
 :root {
+  color-scheme: light;
   /* ─── COLOR — evolved clinical-biotech palette ─── */
-  --color-primary: #0F766E;          /* deep clinical teal */
-  --color-primary-hover: #0c5f58;
-  --color-primary-light: #e6f4f2;
-  --color-primary-dark: #0a4f49;
-  --color-secondary: #D97706;        /* amber — conditional / energy */
-  --color-secondary-light: #fdf2e2;
-  --color-secondary-hover: #b45309;
-  --color-accent: #059669;           /* health green — positive action */
-  --color-accent-light: #e7f6ef;
-  --color-accent-hover: #047857;
-  --color-bg: #f7f8f7;
+  --color-primary: #076e65;          /* confident wellness teal */
+  --color-primary-hover: #055b54;
+  --color-primary-light: #e5f5f1;
+  --color-primary-dark: #064e48;
+  --color-secondary: #9f5217;        /* warm amber — conditional / energy */
+  --color-secondary-light: #fff1df;
+  --color-secondary-hover: #9f5217;
+  --color-accent: #23845d;           /* leaf green — positive action */
+  --color-accent-light: #e9f6ee;
+  --color-accent-hover: #176b49;
+  --color-bg: #f8f5ee;
   --color-bg-card: #ffffff;
-  --color-bg-alt: #eef1ef;
-  --color-text: #16202b;
-  --color-text-secondary: #51606f;
-  --color-text-muted: #8893a1;
-  --color-success: #059669;
-  --color-danger: #dc2626;
-  --color-warning: #D97706;
-  --color-border: #e3e7e4;
-  --color-border-light: #eef1ee;
+  --color-bg-alt: #edf4ef;
+  --color-bg-warm: #fffaf2;
+  --color-bg-sage: #e6f0e8;
+  --color-text: #17231f;
+  --color-text-secondary: #4c6159;
+  --color-text-muted: #5f716a;
+  --color-success: #23845d;
+  --color-danger: #a62f36;
+  --color-warning: #9f5217;
+  --color-border: #cbd9d1;
+  --color-border-light: #e0e9e4;
 
   /* ─── TYPOGRAPHY ────────────── */
-  --font-display: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-display);
+  --font-sans: var(--font-display);
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* 4-Size Scale (fluid) — GENUI §3.1 */
   --text-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);
@@ -69,6 +62,13 @@
   --text-lg: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
   --text-xl: clamp(1.75rem, 1.2rem + 2.5vw, 3.5rem);
   --text-overline: 0.75rem;
+  --text-display: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  --text-page: clamp(1.65rem, 1.3rem + 1.1vw, 2.25rem);
+  --text-section: clamp(1.125rem, 1rem + .35vw, 1.35rem);
+  --text-card: 1rem;
+  --text-body: .9375rem;
+  --text-label: .75rem;
+  --text-meta: .8125rem;
 
   --weight-normal: 400;
   --weight-medium: 500;
@@ -93,19 +93,20 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
+  --space-24: 96px;
 
   /* ─── RADIUS ────────────────── */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
   --radius-full: 9999px;
 
   /* ─── SHADOWS ───────────────── */
-  --shadow-sm: 0 1px 2px rgba(16, 32, 43, 0.06), 0 1px 3px rgba(16, 32, 43, 0.05);
-  --shadow-md: 0 4px 10px rgba(16, 32, 43, 0.07), 0 2px 4px rgba(16, 32, 43, 0.05);
-  --shadow-lg: 0 12px 28px rgba(16, 32, 43, 0.10);
-  --shadow-xl: 0 24px 60px rgba(16, 32, 43, 0.12);
+  --shadow-sm: 0 2px 8px rgba(23, 35, 31, 0.06);
+  --shadow-md: 0 10px 28px rgba(23, 35, 31, 0.08);
+  --shadow-lg: 0 18px 44px rgba(23, 35, 31, 0.11);
+  --shadow-xl: 0 28px 64px rgba(23, 35, 31, 0.14);
 
   /* ─── TRANSITIONS / MOTION ──── */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
@@ -148,7 +149,7 @@
   --tint-accent-20: color-mix(in srgb, var(--color-accent) 20%, transparent);
   --footer-bg: var(--color-text);
   --footer-text: rgba(255, 255, 255, 0.72);
-  --footer-copy: rgba(255, 255, 255, 0.42);
+  --footer-copy: rgba(255, 255, 255, 0.68);
   --footer-text-strong: #ffffff;
   --footer-border: rgba(255, 255, 255, 0.3);
   --footer-surface: rgba(255, 255, 255, 0.1);
@@ -187,7 +188,7 @@
   --pillar-1-bg: color-mix(in srgb, #e11d48 10%, transparent);
   --pillar-2: #7C3AED;                   /* violet — biology/aging */
   --pillar-2-bg: color-mix(in srgb, #7C3AED 10%, transparent);
-  --pillar-3: #D97706;                   /* amber — reserve */
+  --pillar-3: #9f5217;                   /* amber — reserve */
   --pillar-3-bg: color-mix(in srgb, #D97706 10%, transparent);
   --pillar-4: #0F766E;                   /* teal — fundamentals */
   --pillar-4-bg: color-mix(in srgb, #0F766E 10%, transparent);
@@ -199,98 +200,4 @@
   --budget-invest-bg: var(--color-success-light);
   --budget-savings: var(--color-warning);
   --budget-savings-bg: var(--color-secondary-light);
-}
-
-/* ════════════════════════════════════════════════════════════
-   DARK MODE — applied via [data-theme="dark"] on <html>.
-   Honors prefers-color-scheme when no explicit choice is set.
-   ════════════════════════════════════════════════════════════ */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-bg: #0B0F14;
-    --color-bg-card: #121A23;
-    --color-bg-alt: #0E151D;
-    --color-text: #E6EBF2;
-    --color-text-secondary: #9AA7B8;
-    --color-text-muted: #6B7888;
-    --color-border: #1F2A35;
-    --color-border-light: #18222C;
-    --color-primary: #2DD4BF;
-    --color-primary-hover: #14B8A6;
-    --color-primary-light: #0c2f2b;
-    --color-primary-dark: #5eead4;
-    --color-on-primary: #062e2a;
-    --color-secondary: #F59E0B;
-    --color-secondary-light: #2a200c;
-    --color-accent: #34D399;
-    --color-accent-light: #0c241c;
-    --color-danger: #F87171;
-    --glass-nav: rgba(11, 15, 20, 0.88);
-    --glass-overlay: rgba(11, 15, 20, 0.94);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
-    --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.55);
-    --color-success-light: #0c241c;
-    --color-secondary-light: #2a200c;
-    --carnivore-bg: #1c1630;
-    --carnivore-border: #2e2350;
-    --carnivore: #A78BFA;
-    --evidence-optional: #38BDF8;
-    --evidence-experimental: #A78BFA;
-    --pillar-1: #FB7185;
-    --pillar-2: #A78BFA;
-    --pillar-3: #FBBF24;
-    --pillar-4: #2DD4BF;
-    --footer-bg: #0E151D;
-    --footer-text: rgba(230, 235, 242, 0.72);
-    --footer-copy: rgba(230, 235, 242, 0.4);
-    --footer-text-strong: #E6EBF2;
-    --footer-border: rgba(230, 235, 242, 0.3);
-    --footer-surface: rgba(230, 235, 242, 0.1);
-  }
-}
-
-:root[data-theme="dark"] {
-  --color-bg: #0B0F14;
-  --color-bg-card: #121A23;
-  --color-bg-alt: #0E151D;
-  --color-text: #E6EBF2;
-  --color-text-secondary: #9AA7B8;
-  --color-text-muted: #6B7888;
-  --color-border: #1F2A35;
-  --color-border-light: #18222C;
-  --color-primary: #2DD4BF;
-  --color-primary-hover: #14B8A6;
-  --color-primary-light: #0c2f2b;
-  --color-primary-dark: #5eead4;
-  --color-on-primary: #062e2a;
-  --color-secondary: #F59E0B;
-  --color-secondary-light: #2a200c;
-  --color-accent: #34D399;
-  --color-accent-light: #0c241c;
-  --color-danger: #F87171;
-  --glass-nav: rgba(11, 15, 20, 0.88);
-  --glass-overlay: rgba(11, 15, 20, 0.94);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.55);
-  --color-success-light: #0c241c;
-  --color-secondary-light: #2a200c;
-  --carnivore-bg: #1c1630;
-  --carnivore-border: #2e2350;
-  --carnivore: #A78BFA;
-  --evidence-optional: #38BDF8;
-  --evidence-experimental: #A78BFA;
-  --pillar-1: #FB7185;
-  --pillar-2: #A78BFA;
-  --pillar-3: #FBBF24;
-  --pillar-4: #2DD4BF;
-  --footer-bg: #0E151D;
-  --footer-text: rgba(230, 235, 242, 0.72);
-  --footer-copy: rgba(230, 235, 242, 0.4);
-  --footer-text-strong: #E6EBF2;
-  --footer-border: rgba(230, 235, 242, 0.3);
-  --footer-surface: rgba(230, 235, 242, 0.1);
 }

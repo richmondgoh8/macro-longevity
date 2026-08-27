@@ -3,21 +3,15 @@ import {
   DAILY_SUPPLEMENTS,
   FOOD_SPICES,
   EXTRAS,
-  AVOID_INGREDIENTS,
-  UPF_GUIDE,
   SKIP_LIST,
   CONDITIONAL_LIST,
   TIMING_GUIDE,
-  AVOID_LABEL_GUIDE,
 } from './data/stack.js';
 import { CORE_OUTCOMES } from './data/core.js';
 import {
   NUTRIENT_TARGETS,
   NUTRIENT_GROUPS,
-  NUTRIENT_REFERENCES,
-  COMPOUND_TARGETS,
   BUILDER_ITEMS,
-  FOUNDATION_STACK,
   MEAL_PLANS,
   HIGH_ROI_FOODS,
   MITOCHONDRIAL_SUPPORT,
@@ -25,9 +19,8 @@ import {
   EFFICIENCY_PRACTICES,
   FOOD_TRAPS,
   SUPPLEMENT_GUIDANCE,
-  NUTRITION_SOURCES,
 } from './data/nutrition.js';
-import { icon } from './icons.js';
+import { confirmAction, escapeHTML, icon, iconButton, showToast } from './components/ui.js';
 
 let stackTab = "supplements";
 let selectedBuilderItems = ["eggs", "broccoli", "chia", "salmon"];
@@ -35,15 +28,21 @@ let activeBuilderCategory = "all";
 let bodyWeightKg = 75;
 const STACK_STORAGE_KEY = "ml-daily-stacks";
 const MEALS_STORAGE_KEY = "ml-daily-meals";
+const MEAL_LIBRARY_STORAGE_KEY = "ml-daily-meal-library";
 const CURRENT_DAY_STORAGE_KEY = "ml-daily-current";
 let quickSelectedItemIds = [];
 let quickItemQuantities = {};
 let selectedMealIds = ["chia-protein-oatmeal"];
 let selectedMealQuantities = {};
+let selectedMealItemQuantities = {};
+let expandedQuickServings = new Set();
+let expandedMealServings = new Set();
 let activeQuickCategory = "all";
+let plannerSearchQuery = "";
 let plannerMode = "meals";
 let mealComposerMode = null;
 let mealComposerMealId = null;
+let mealComposerSource = null;
 let mealComposerItems = [];
 let mealComposerName = "";
 
@@ -56,15 +55,16 @@ function restoreCurrentDay() {
     const current = JSON.parse(localStorage.getItem(CURRENT_DAY_STORAGE_KEY) || "null");
     if (!current || typeof current !== "object") return;
     if (Array.isArray(current.quickItemIds)) quickSelectedItemIds = [...new Set(current.quickItemIds.filter((id) => BUILDER_ITEMS.some((item) => item.id === id)))];
-    if (Array.isArray(current.mealIds)) selectedMealIds = [...new Set(current.mealIds.filter((id) => MEAL_PLANS.some((meal) => meal.id === id) || getSavedMeals().some((meal) => meal.id === id)))];
+    if (Array.isArray(current.mealIds)) selectedMealIds = [...new Set(current.mealIds.filter((id) => mealLibrary().some((meal) => meal.id === id)))];
     if (current.quickItemQuantities && typeof current.quickItemQuantities === "object") quickItemQuantities = current.quickItemQuantities;
     if (current.mealQuantities && typeof current.mealQuantities === "object") selectedMealQuantities = current.mealQuantities;
+    if (current.mealItemQuantities && typeof current.mealItemQuantities === "object") selectedMealItemQuantities = current.mealItemQuantities;
     if (Number.isFinite(Number(current.bodyWeightKg))) bodyWeightKg = Math.min(250, Math.max(35, Number(current.bodyWeightKg)));
   } catch {}
 }
 
 function persistCurrentDay() {
-  try { localStorage.setItem(CURRENT_DAY_STORAGE_KEY, JSON.stringify({ mealIds: selectedMealIds, quickItemIds: quickSelectedItemIds, mealQuantities: selectedMealQuantities, quickItemQuantities, bodyWeightKg })); } catch {}
+  try { localStorage.setItem(CURRENT_DAY_STORAGE_KEY, JSON.stringify({ mealIds: selectedMealIds, quickItemIds: quickSelectedItemIds, mealQuantities: selectedMealQuantities, mealItemQuantities: selectedMealItemQuantities, quickItemQuantities, bodyWeightKg })); } catch {}
 }
 
 function normalizePortion(value) {
@@ -74,6 +74,7 @@ function normalizePortion(value) {
 }
 
 function formatPortion(value) {
+  if (Number(value) === 0) return "0";
   const portion = normalizePortion(value);
   return Number.isInteger(portion) ? String(portion) : portion.toFixed(2).replace(/0$/, "");
 }
@@ -84,6 +85,10 @@ function itemPortion(id) {
 
 function mealPortion(id) {
   return normalizePortion(selectedMealQuantities[id]);
+}
+
+function mealItemPortion(mealId, itemId) {
+  return normalizePortion(selectedMealItemQuantities[mealId]?.[itemId]);
 }
 
 function selectedPortionTotal(values, ids) {
@@ -99,17 +104,10 @@ function selectStackTab(tab) {
   renderLegacyProtocol();
 }
 
-const EVIDENCE_ICON = {
-  core: 'check', conditional: 'info', optional: 'sparkles',
-  experimental: 'flask', skip: 'x',
-  strong: 'check', moderate: 'info', weak: 'sparkles',
-};
-
 function evidenceBadge(level) {
   if (!level) return "";
   const label = level.charAt(0).toUpperCase() + level.slice(1);
-  const ic = EVIDENCE_ICON[level] ? icon(EVIDENCE_ICON[level], { size: 14 }) : "";
-  return `<span class="evidence-badge evidence-badge-${level}">${ic}${label}</span>`;
+  return `<span class="evidence-badge evidence-badge-${level}">${label}</span>`;
 }
 
 function synergyHTML(items) {
@@ -137,11 +135,11 @@ const stackTabCache = {};
 function stackTabsHTML() {
   const tabs = ["supplements", "food-spices", "extras", "conditional", "skip"];
   const labels = {
-    supplements: "💊 Core Protocol",
-    "food-spices": "🍖 Food & Spices",
-    extras: "☕ Extras",
-    conditional: "⚠️ Conditional",
-    skip: "⛔ Skip List",
+    supplements: "Core Protocol",
+    "food-spices": "Food & Spices",
+    extras: "Extras",
+    conditional: "Conditional",
+    skip: "Skip List",
   };
   return `
     <div class="meal-controls">
@@ -170,7 +168,7 @@ function coreCoverageHTML() {
       <div class="core-coverage-grid">
         ${CORE_OUTCOMES.map(outcome => `
           <article class="core-coverage-card">
-            <h3>${outcome.icon} ${outcome.name}</h3>
+            <h3>${outcome.name}</h3>
             <p><span class="core-line-label">Core</span> ${outcome.core}</p>
             <p><span class="core-line-label">Targeted</span> ${outcome.targeted}</p>
             <p class="core-measure"><span class="core-line-label">Track</span> ${outcome.measure}</p>
@@ -182,11 +180,10 @@ function coreCoverageHTML() {
 
 function supplementCard(s) {
   const carnivore = s.carnivoreNote
-    ? `<div class="carnivore-note">🥩 ${s.carnivoreNote}</div>` : "";
+    ? `<div class="carnivore-note">${s.carnivoreNote}</div>` : "";
   return `
     <article class="stack-card">
       <div class="stack-card-head">
-        <span class="stack-card-icon" aria-hidden="true">${s.icon}</span>
         <div class="stack-card-title-group">
           <h3 class="stack-card-name">${s.name}</h3>
           <span class="stack-card-dose">${s.dose}</span>
@@ -194,8 +191,8 @@ function supplementCard(s) {
         ${evidenceBadge(s.evidence)}
       </div>
       <div class="stack-lines">
-        <div class="stack-line"><span class="stack-line-label">⏰ Timing</span> ${s.timing}</div>
-        <div class="stack-line"><span class="stack-line-label">🍽 Pairing</span> ${s.pairing}</div>
+        <div class="stack-line"><span class="stack-line-label">Timing</span> ${s.timing}</div>
+        <div class="stack-line"><span class="stack-line-label">Pairing</span> ${s.pairing}</div>
         ${synergyHTML(s.synergy)}
       </div>
       <details class="meal-details stack-why">
@@ -210,7 +207,6 @@ function foodCard(f) {
   return `
     <article class="stack-card">
       <div class="stack-card-head">
-        <span class="stack-card-icon" aria-hidden="true">${f.icon}</span>
         <div class="stack-card-title-group">
           <h3 class="stack-card-name">${f.name}</h3>
           <span class="stack-card-dose">${f.serving}</span>
@@ -218,15 +214,15 @@ function foodCard(f) {
         ${evidenceBadge(f.evidence)}
       </div>
       <div class="stack-lines">
-        <div class="stack-line"><span class="stack-line-label">⏰ When</span> ${f.timing}</div>
-        ${f.pairing ? `<div class="stack-line"><span class="stack-line-label">🍽 Pairing</span> ${f.pairing}</div>` : ""}
+        <div class="stack-line"><span class="stack-line-label">When</span> ${f.timing}</div>
+        ${f.pairing ? `<div class="stack-line"><span class="stack-line-label">Pairing</span> ${f.pairing}</div>` : ""}
         ${synergyHTML(f.synergy)}
       </div>
       <details class="meal-details stack-why">
         <summary>Why</summary>
         <p class="stack-why-text">${f.why}</p>
       </details>
-      ${f.risk ? `<div class="stack-risk">⚠️ ${f.risk}</div>` : ""}
+      ${f.risk ? `<div class="stack-risk">${f.risk}</div>` : ""}
     </article>`;
 }
 
@@ -234,24 +230,23 @@ function conditionalCard(s) {
   return `
     <article class="stack-card stack-card-conditional">
       <div class="stack-card-head">
-        <span class="stack-card-icon" aria-hidden="true">${s.icon}</span>
         <div class="stack-card-title-group">
           <h3 class="stack-card-name">${s.name}</h3>
         </div>
         ${evidenceBadge(s.evidence || 'weak')}
       </div>
       <div class="stack-lines">
-        <div class="stack-line"><span class="stack-line-label">👤 Who</span> ${s.who}</div>
-        <div class="stack-line"><span class="stack-line-label">💊 Dose</span> ${s.dose}</div>
-        ${s.timing ? `<div class="stack-line"><span class="stack-line-label">⏰ Timing</span> ${s.timing}</div>` : ""}
-        ${s.pairing ? `<div class="stack-line"><span class="stack-line-label">🍽 Pairing</span> ${s.pairing}</div>` : ""}
+        <div class="stack-line"><span class="stack-line-label">Who</span> ${s.who}</div>
+        <div class="stack-line"><span class="stack-line-label">Dose</span> ${s.dose}</div>
+        ${s.timing ? `<div class="stack-line"><span class="stack-line-label">Timing</span> ${s.timing}</div>` : ""}
+        ${s.pairing ? `<div class="stack-line"><span class="stack-line-label">Pairing</span> ${s.pairing}</div>` : ""}
         ${synergyHTML(s.synergy)}
       </div>
       <details class="meal-details stack-why">
         <summary>Why</summary>
         <p class="stack-why-text">${s.why}</p>
       </details>
-      <div class="stack-risk">⚠️ ${s.caution}</div>
+      <div class="stack-risk">${s.caution}</div>
     </article>`;
 }
 
@@ -259,7 +254,6 @@ function skipCard(s) {
   return `
     <article class="stack-card stack-card-skip">
       <div class="stack-card-head">
-        <span class="stack-card-icon" aria-hidden="true">${s.icon}</span>
         <div class="stack-card-title-group">
           <h3 class="stack-card-name">${s.name}</h3>
         </div>
@@ -300,12 +294,6 @@ function renderStackContent() {
     <div class="stack-grid">
       ${SKIP_LIST.map(skipCard).join("")}
     </div>`;
-}
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
-  }[char]));
 }
 
 function getSavedStacks() {
@@ -355,75 +343,6 @@ function formatAmount(value, unit) {
   return `${value < 10 ? value.toFixed(1).replace(/\.0$/, "") : Math.round(value).toLocaleString()} ${unit}`;
 }
 
-function minimalStatus(target, nutrients, compounds) {
-  if (target.statusMode === "selected-dose") {
-    const amount = compounds[target.id] || 0;
-    const supplement = BUILDER_ITEMS.some((item) => selectedItem(item.id) && item.category === "supplement" && item.compounds?.[target.id]);
-    if (!amount) return { tone: "neutral", label: "Not selected", detail: "Optional; add only if it has a clear job." };
-    return { tone: supplement ? "covered" : "partial", label: `${formatAmount(amount, "g")} selected`, detail: supplement ? "Supplement dose shown; use a short, outcome-based trial where appropriate." : "Food contribution selected; amount is a planning estimate, not a required daily target." };
-  }
-  if (target.statusMode === "fish-or-supplement") {
-    const fish = (nutrients.epaDha || 0) >= .5;
-    const supplement = (compounds.epaDha || 0) >= 1;
-    if (fish) return { tone: "covered", label: "Food covered", detail: "Fatty fish selected; think in weekly servings rather than a forced daily capsule." };
-    if (supplement) return { tone: "covered", label: "~1 g supplement selected", detail: "Use when fatty fish is not consistent; higher-dose use needs a reason." };
-    return { tone: "gap", label: "Food or supplement gap", detail: "Choose oily fish 2–3×/week or add an EPA+DHA option if fish is impractical." };
-  }
-  if (target.statusMode === "status-guided") {
-    const supplement = selectedItem("vitamin-d");
-    return supplement
-      ? { tone: "conditional", label: "D3 selected", detail: "Confirm the dose and 25(OH)D status rather than treating this as an automatic need." }
-      : { tone: "conditional", label: "Status guided", detail: nutrients.vitaminD ? "Food contribution present; sun exposure and blood status decide the next step." : "Food is usually limited; use sun exposure and a 25(OH)D test to guide decisions." };
-  }
-  if (target.statusMode === "gap") {
-    const food = nutrients.magnesium || 0;
-    const supplement = selectedSupplementTotal("magnesium");
-    const gap = Math.max(0, 400 - food);
-    if (supplement) return { tone: "covered", label: `${formatAmount(food, "mg")} food + ${formatAmount(supplement, "mg")} supplement`, detail: `Total ${formatAmount(food + supplement, "mg")}; keep supplemental magnesium at or below 350 mg/day unless advised.` };
-    return { tone: gap > 0 ? "gap" : "covered", label: gap > 0 ? `Food gap ≈ ${formatAmount(gap, "mg")}` : "Food target reached", detail: "Use seeds, nuts, leafy greens and oats before adding a pill." };
-  }
-  if (target.statusMode === "nutrient") {
-    const amount = nutrients[target.id] || 0;
-    const percent = Math.round(amount / 550 * 100);
-    return { tone: percent >= 80 ? "covered" : percent >= 40 ? "partial" : "gap", label: `${formatAmount(amount, "mg")} / 550 mg`, detail: "Food-first target; eggs, meat, fish and dairy make this easier." };
-  }
-  if (target.statusMode === "food-presence-or-dose") {
-    const supplement = compounds.taurine || 0;
-    if (supplement) return { tone: "conditional", label: `${formatAmount(supplement, "g")} trial selected`, detail: "Optional optimization; no universal daily target or longevity requirement." };
-    if (foodCompoundPresent("taurine")) return { tone: "partial", label: "Food source present", detail: "Seafood and meat contribute, but food amounts vary and are not estimated here." };
-    return { tone: "neutral", label: "Optional · no RDA", detail: "Consider food first; only trial a supplement if you have a specific outcome to observe." };
-  }
-  return { tone: "neutral", label: "Review context", detail: "No universal daily target." };
-}
-
-function minimalStackCardsHTML() {
-  const nutrients = builderTotals();
-  const compounds = compoundTotals();
-  const layerLabels = {
-    core: "Core · strongest practical case",
-    "food-or-supplement": "Food or supplement",
-    "core-conditional": "Core · conditional",
-    "food-first": "Food first",
-    "optional-optimization": "Optional optimization",
-  };
-  return COMPOUND_TARGETS.map((target) => {
-    const status = minimalStatus(target, nutrients, compounds);
-    return `<article class="minimal-stack-card minimal-stack-card-${target.layer}">
-      <div class="minimal-stack-card-top"><span class="minimal-stack-layer">${layerLabels[target.layer] || target.layer}</span><span class="minimal-stack-evidence">${target.evidence}</span></div>
-      <h3>${target.name}</h3><strong class="minimal-stack-target">${target.target}</strong>
-      <div class="minimal-stack-status minimal-stack-status-${status.tone}"><strong>${status.label}</strong><span>${status.detail}</span></div>
-      <p><strong>Food first</strong> ${target.food}</p><p>${target.why}</p>
-    </article>`;
-  }).join("");
-}
-
-function minimalStackHTML() {
-  return `<section class="minimal-stack-section" aria-labelledby="minimal-stack-title">
-    <div class="nutrition-section-head"><div><p class="eyebrow">Minimal evidence-first stack</p><h2 id="minimal-stack-title">Know what is covered before adding a pill</h2><p>This group sits beside the nutrient baseline. It combines food presence, nutrient coverage and selected doses, so optional compounds do not pretend to have an RDA.</p></div><span class="checklist-key">Core → conditional → optional</span></div>
-    <div class="minimal-stack-grid" data-minimal-stack>${minimalStackCardsHTML()}</div>
-  </section>`;
-}
-
 function coverageHTML() {
   const totals = builderTotals();
   const selected = BUILDER_ITEMS.filter((item) => selectedBuilderItems.includes(item.id));
@@ -436,7 +355,7 @@ function coverageHTML() {
 
   return `
     <div class="coverage-summary">
-      <div class="coverage-score"><strong>${covered}/${trackedTargets.length}</strong><span>near target</span></div>
+      <div class="coverage-score"><strong>${covered}/${trackedTargets.length}</strong><span>covered</span></div>
       <div class="coverage-copy"><strong>${selected.length} choices selected</strong><span>Adult male baseline · ${bodyWeightKg} kg protein reference. Planning aid, not a lab result.</span></div>
     </div>
     <div class="coverage-list">
@@ -460,9 +379,9 @@ function coverageHTML() {
 function builderItemHTML(item) {
   const selected = selectedBuilderItems.includes(item.id);
   const qualifier = item.frequency === "weekly" ? " · weekly" : item.conditional ? " · conditional" : "";
-  const watch = item.watch ? " · ⚠ safety note" : "";
+  const watch = item.watch ? " · safety note" : "";
   return `<button type="button" class="builder-item ${selected ? "selected" : ""}" data-builder-item="${item.id}" aria-pressed="${selected}"${item.watch ? ` title="${escapeHTML(item.watch)}"` : ""}>
-    <span class="builder-item-top"><span class="builder-item-icon">${item.icon}</span><span class="builder-item-check">${selected ? "✓" : "+"}</span></span>
+    <span class="builder-item-top"><span class="builder-item-check">${selected ? "✓" : "+"}</span></span>
     <strong>${item.name}</strong><span class="builder-serving">${item.serving}</span><small>${item.note}${qualifier}${watch}</small>
   </button>`;
 }
@@ -475,7 +394,7 @@ function builderHTML() {
     <section class="stack-builder" aria-labelledby="builder-title">
       <div class="builder-head">
         <div><p class="eyebrow">Build my daily stack</p><h2 id="builder-title">Choose a few foods. See what is still missing.</h2><p>Start with meals, then use a supplement only when it solves a defined gap or goal. Your selections stay on this device.</p></div>
-        <div class="builder-actions"><span class="stack-count" data-stack-count>${selectedBuilderItems.length} selected</span><button class="button button-secondary" type="button" data-load-foundation>Try foundation</button><button class="button button-secondary" type="button" data-clear-stack>Clear</button></div>
+        <div class="builder-actions"><span class="stack-count" data-stack-count>${selectedBuilderItems.length} selected</span><button class="button button-secondary" type="button" data-clear-stack>Clear</button></div>
       </div>
       <div class="builder-profile"><label for="body-weight">Protein reference body weight</label><div><input id="body-weight" type="number" min="35" max="250" step="1" value="${bodyWeightKg}" data-body-weight><span>kg · uses 1.2 g/kg floor; adjust to your context</span></div></div>
       <div class="builder-layout">
@@ -509,9 +428,8 @@ function nutrientChecklistHTML() {
     <div class="reference-note"><strong>How to read this:</strong> RDA/AI values come from reference guidance; food amounts are rounded planning estimates from USDA FoodData Central. EPA/DHA is a practical intake pattern, and protein/leucine are performance-oriented planning markers.</div>
     <div class="nutrient-groups">
       ${NUTRIENT_GROUPS.map((group) => `<section class="nutrient-group" aria-labelledby="nutrient-group-${group.id}"><div class="nutrient-group-head"><h3 id="nutrient-group-${group.id}">${group.label}</h3><span>${NUTRIENT_TARGETS.filter((target) => target.group === group.id).length} checks</span></div><div class="nutrient-grid">${NUTRIENT_TARGETS.filter((target) => target.group === group.id).map((target) => {
-        const reference = NUTRIENT_REFERENCES[target.source] || NUTRIENT_REFERENCES.food;
         const foods = (target.sources || []).map((id) => itemMap.get(id)?.name).filter(Boolean).join(" · ");
-        return `<article class="nutrient-card ${target.track === false ? "nutrient-card-marker" : ""}"><div class="nutrient-card-top"><span class="nutrient-mark">${target.track === false ? "↗" : target.id === "ala" || target.id === "epaDha" || target.id === "la" ? "ω" : "•"}</span><span class="nutrient-target">${target.target}</span></div><h4>${target.name}</h4><p>${target.why}</p>${target.frequency ? `<span class="nutrient-frequency">${target.frequency}</span>` : ""}<div class="nutrient-sources"><strong>Easiest sources</strong><span>${foods || "Varied whole foods"}</span><a href="${reference.url}" target="_blank" rel="noopener">${reference.label} ↗</a></div></article>`;
+        return `<article class="nutrient-card"><div class="nutrient-card-top"><span class="nutrient-target">${target.target}</span></div><h4>${target.name}</h4><p>${target.why}</p>${target.frequency ? `<span class="nutrient-frequency">${target.frequency}</span>` : ""}<div class="nutrient-sources"><strong>Easiest sources</strong><span>${foods || "Varied whole foods"}</span></div></article>`;
       }).join("")}</div></section>`).join("")}
     </div>
   </section>`;
@@ -520,15 +438,14 @@ function nutrientChecklistHTML() {
 function nutritionContentHTML() {
   return `
     ${builderHTML()}
-    ${minimalStackHTML()}
     ${nutrientChecklistHTML()}
     <section class="mitochondrial-section" aria-labelledby="mitochondrial-title"><div class="nutrition-section-head"><div><p class="eyebrow">Mitochondrial machinery</p><h2 id="mitochondrial-title">Know the cofactors before buying the pill</h2><p>Energy metabolism depends on ordinary nutrients and training signals. The “mitochondrial” label is not itself evidence that a supplement improves outcomes.</p></div></div><div class="mitochondrial-grid">${MITOCHONDRIAL_SUPPORT.map((item) => `<article class="mitochondrial-card"><h3>${item.name}</h3><strong>${item.items}</strong><p>${item.text}</p></article>`).join("")}</div></section>
-    <section class="high-roi-section" aria-labelledby="roi-title"><div class="nutrition-section-head"><div><p class="eyebrow">High-ROI foods</p><h2 id="roi-title">Small staples that earn their shelf space</h2></div></div><div class="roi-grid">${HIGH_ROI_FOODS.map((food) => `<article class="roi-card"><span class="roi-icon">${food.icon}</span><div><h3>${food.name}</h3><span class="roi-amount">${food.amount}</span><p>${food.benefit}</p></div></article>`).join("")}</div></section>
-    <section class="efficiency-section" aria-labelledby="efficiency-title"><div class="nutrition-section-head"><div><p class="eyebrow">Cellular &amp; cardiovascular efficiency</p><h2 id="efficiency-title">Make the system work better</h2><p>Mitochondria respond to repeated demand. The practical levers are fitness, muscle, sleep, food quality and recovery — not a shelf of “mitochondrial” pills.</p></div></div><div class="practice-grid">${EFFICIENCY_PRACTICES.map((practice) => `<article class="practice-card"><span>${practice.icon}</span><div><h3>${practice.title}</h3><strong>${practice.dose}</strong><p>${practice.body}</p></div></article>`).join("")}</div></section>
+    <section class="high-roi-section" aria-labelledby="roi-title"><div class="nutrition-section-head"><div><p class="eyebrow">High-ROI foods</p><h2 id="roi-title">Small staples that earn their shelf space</h2></div></div><div class="roi-grid">${HIGH_ROI_FOODS.map((food) => `<article class="roi-card"><div><h3>${food.name}</h3><span class="roi-amount">${food.amount}</span><p>${food.benefit}</p></div></article>`).join("")}</div></section>
+    <section class="efficiency-section" aria-labelledby="efficiency-title"><div class="nutrition-section-head"><div><p class="eyebrow">Cellular &amp; cardiovascular efficiency</p><h2 id="efficiency-title">Make the system work better</h2><p>Mitochondria respond to repeated demand. The practical levers are fitness, muscle, sleep, food quality and recovery — not a shelf of “mitochondrial” pills.</p></div></div><div class="practice-grid">${EFFICIENCY_PRACTICES.map((practice) => `<article class="practice-card"><div><h3>${practice.title}</h3><strong>${practice.dose}</strong><p>${practice.body}</p></div></article>`).join("")}</div></section>
     <section class="breathing-section" aria-labelledby="breathing-title"><div class="nutrition-section-head"><div><p class="eyebrow">Breathing &amp; recovery</p><h2 id="breathing-title">Use the exhale as a brake</h2><p>Slow, comfortable breathing can shift attention and autonomic balance toward calm. It is a recovery tool, not a treatment for disease. Stop if light-headed.</p></div></div><div class="breathing-grid">${BREATHING_PROTOCOLS.map((protocol) => `<article class="breathing-card"><span class="breathing-orb" aria-hidden="true"></span><h3>${protocol.name}</h3><strong>${protocol.dose}</strong><p>${protocol.how}</p><small>${protocol.use}</small></article>`).join("")}</div></section>
-    <section class="supplement-section" aria-labelledby="supplement-title"><div class="nutrition-section-head"><div><p class="eyebrow">Supplement guidance</p><h2 id="supplement-title">A defined job before a daily dose</h2><p>Food is the default. A supplement earns a place when the food substitution is impractical, a measurement shows a gap, or a short trial has a clear outcome.</p></div></div><div class="supplement-guidance-grid">${SUPPLEMENT_GUIDANCE.map((item) => `<article class="supplement-guidance-card"><div class="supplement-guidance-head"><span>${item.icon}</span><div><h3>${item.name}</h3><span class="guidance-label">${item.label}</span></div></div><p><strong>Use</strong> ${item.dose}</p><p><strong>Why</strong> ${item.benefit}</p><p class="guidance-safety"><strong>Safety</strong> ${item.safety}</p></article>`).join("")}</div></section>
-    <section class="traps-section" aria-labelledby="traps-title"><div class="nutrition-section-head"><div><p class="eyebrow">Food traps</p><h2 id="traps-title">“Sugar-free” still needs a label check</h2></div></div><div class="traps-grid">${FOOD_TRAPS.map((trap) => `<article class="trap-card"><span>↗</span><h3>${trap.title}</h3><p>${trap.body}</p></article>`).join("")}</div></section>
-    <section class="sources-section"><p><strong>Evidence notes:</strong> Planning estimates are rounded. Read the source material and speak with a clinician for medical conditions, pregnancy, medication use or persistent symptoms.</p><div>${NUTRITION_SOURCES.map((source) => `<a href="${source.url}" target="_blank" rel="noopener">${source.label} ↗</a>`).join("")}</div></section>`;
+    <section class="supplement-section" aria-labelledby="supplement-title"><div class="nutrition-section-head"><div><p class="eyebrow">Supplement guidance</p><h2 id="supplement-title">A defined job before a daily dose</h2><p>Food is the default. A supplement earns a place when the food substitution is impractical, a measurement shows a gap, or a short trial has a clear outcome.</p></div></div><div class="supplement-guidance-grid">${SUPPLEMENT_GUIDANCE.map((item) => `<article class="supplement-guidance-card"><div class="supplement-guidance-head"><div><h3>${item.name}</h3><span class="guidance-label">${item.label}</span></div></div><p><strong>Use</strong> ${item.dose}</p><p><strong>Why</strong> ${item.benefit}</p><p class="guidance-safety"><strong>Safety</strong> ${item.safety}</p></article>`).join("")}</div></section>
+    <section class="traps-section" aria-labelledby="traps-title"><div class="nutrition-section-head"><div><p class="eyebrow">Food traps</p><h2 id="traps-title">“Sugar-free” still needs a label check</h2></div></div><div class="traps-grid">${FOOD_TRAPS.map((trap) => `<article class="trap-card"><h3>${trap.title}</h3><p>${trap.body}</p></article>`).join("")}</div></section>
+    <section class="sources-section"><p><strong>Planning note:</strong> Estimates are rounded. Speak with a clinician for medical conditions, pregnancy, medication use or persistent symptoms.</p></section>`;
 }
 
 function updateBuilderUI() {
@@ -536,8 +453,6 @@ function updateBuilderUI() {
   if (!container) return;
   const coverage = container.querySelector("[data-coverage]");
   if (coverage) coverage.innerHTML = coverageHTML();
-  const minimal = container.querySelector("[data-minimal-stack]");
-  if (minimal) minimal.innerHTML = minimalStackCardsHTML();
   container.querySelectorAll("[data-builder-item]").forEach((button) => {
     const selected = selectedBuilderItems.includes(button.dataset.builderItem);
     button.classList.toggle("selected", selected);
@@ -582,8 +497,27 @@ function setSavedMeals(meals) {
   try { localStorage.setItem(MEALS_STORAGE_KEY, JSON.stringify(meals.slice(0, 30))); } catch {}
 }
 
+function getMealLibraryState() {
+  try {
+    const state = JSON.parse(localStorage.getItem(MEAL_LIBRARY_STORAGE_KEY) || "{}");
+    return {
+      overrides: state && typeof state.overrides === "object" && !Array.isArray(state.overrides) ? state.overrides : {},
+      hidden: Array.isArray(state?.hidden) ? [...new Set(state.hidden.filter((id) => typeof id === "string"))] : [],
+    };
+  } catch { return { overrides: {}, hidden: [] }; }
+}
+
+function setMealLibraryState(state) {
+  try { localStorage.setItem(MEAL_LIBRARY_STORAGE_KEY, JSON.stringify({ overrides: state.overrides || {}, hidden: state.hidden || [] })); } catch {}
+}
+
 function mealLibrary() {
-  return [...MEAL_PLANS, ...getSavedMeals()].map((meal) => ({
+  const state = getMealLibraryState();
+  const presets = MEAL_PLANS
+    .filter((meal) => !state.hidden.includes(meal.id))
+    .map((meal) => ({ ...meal, ...(state.overrides[meal.id] || {}), source: "preset", presetId: meal.id }));
+  const saved = getSavedMeals().map((meal) => ({ ...meal, source: "saved" }));
+  return [...presets, ...saved].map((meal) => ({
     ...meal,
     items: meal.items.filter((id) => BUILDER_ITEMS.some((item) => item.id === id)),
   }));
@@ -592,6 +526,7 @@ function mealLibrary() {
 function resetMealComposer() {
   mealComposerMode = null;
   mealComposerMealId = null;
+  mealComposerSource = null;
   mealComposerItems = [];
   mealComposerName = "";
 }
@@ -609,8 +544,9 @@ function activeDailyItemQuantities() {
   const quantities = {};
   quickSelectedItemIds.forEach((id) => addQuantity(quantities, id, itemPortion(id)));
   selectedMealIds.forEach((id) => {
+    const meal = meals.find((candidate) => candidate.id === id);
     const portion = mealPortion(id);
-    (meals.find((meal) => meal.id === id)?.items || []).forEach((itemId) => addQuantity(quantities, itemId, portion));
+    (meal?.items || []).forEach((itemId) => addQuantity(quantities, itemId, portion * mealItemPortion(id, itemId)));
   });
   return quantities;
 }
@@ -637,55 +573,76 @@ function quickItem(id) {
   return BUILDER_ITEMS.find((item) => item.id === id);
 }
 
+function normalizeSearchText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function fuzzyTokenMatch(token, word) {
+  if (!token || !word) return false;
+  if (word.includes(token)) return true;
+  if (token.length < 3) return false;
+  let cursor = 0;
+  for (const character of token) {
+    cursor = word.indexOf(character, cursor);
+    if (cursor === -1) return false;
+    cursor += 1;
+  }
+  return true;
+}
+
+function matchesPlannerSearch(query, fields) {
+  const tokens = normalizeSearchText(query).trim().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return true;
+  const words = normalizeSearchText(fields.join(" ")).split(/[^a-z0-9]+/).filter(Boolean);
+  return tokens.every((token) => words.some((word) => fuzzyTokenMatch(token, word)));
+}
+
+function filteredQuickItems() {
+  return BUILDER_ITEMS.filter((item) => {
+    const categoryMatches = activeQuickCategory === "all" || item.category === activeQuickCategory;
+    const searchMatches = matchesPlannerSearch(plannerSearchQuery, [item.name, item.serving, item.note, item.category]);
+    return categoryMatches && searchMatches;
+  });
+}
+
+function filteredMeals() {
+  return mealLibrary().filter((meal) => matchesPlannerSearch(plannerSearchQuery, [meal.name, meal.description, ...(meal.tags || []), ...meal.items.map((id) => quickItem(id)?.name || "")]));
+}
+
+function plannerSearchHTML() {
+  return `<label class="planner-search"><span class="planner-search-label">Fast find</span><input type="search" value="${escapeHTML(plannerSearchQuery)}" placeholder="Search foods or preset meals" aria-label="Fast find foods or preset meals" autocomplete="off" data-planner-search></label>`;
+}
+
+function quickSearchEmptyHTML() {
+  return `<p class="saved-empty planner-search-empty">No foods or supplements match “${escapeHTML(plannerSearchQuery.trim())}”. Try fewer letters.</p>`;
+}
+
+function mealSearchEmptyHTML() {
+  return plannerSearchQuery.trim()
+    ? `<p class="saved-empty meal-empty planner-search-empty">No meals match “${escapeHTML(plannerSearchQuery.trim())}”. Try fewer letters.</p>`
+    : `<p class="saved-empty meal-empty">No meals available. Restore preset meals or create one in Quick Add.</p>`;
+}
+
+function renderPlannerSearchResults(root) {
+  if (plannerMode === "meals") {
+    const grid = root?.querySelector(".meal-library-grid");
+    if (!grid) return;
+    const meals = filteredMeals();
+    grid.innerHTML = meals.length ? meals.map((meal) => mealCardHTML(meal)).join("") : mealSearchEmptyHTML();
+  } else {
+    const grid = root?.querySelector(".quick-item-grid");
+    if (!grid) return;
+    const items = filteredQuickItems();
+    grid.innerHTML = items.length ? items.map(quickItemHTML).join("") : quickSearchEmptyHTML();
+  }
+  updateMealPlannerUI();
+}
+
 function itemIsActive(id) {
   return activeDailyItemIds().includes(id);
-}
-
-function actionButtonHTML(label, targetId, type, itemId) {
-  const active = itemIsActive(itemId);
-  return `<button type="button" class="target-action ${active ? "is-selected" : ""}" data-target-action="${targetId}" data-target-action-type="${type}" data-target-item="${itemId}" aria-pressed="${active}">${active ? "✓ Already selected" : `+ ${label}`}</button>`;
-}
-
-function targetStatusV2(target, nutrients, compounds) {
-  const amount = nutrients[target.id] || 0;
-  if (target.statusMode === "fish-or-supplement") {
-    if (amount >= .5) return { tone: "covered", label: "Food covered", detail: "Oily fish is in the selected plan." };
-    if ((compounds.epaDha || 0) >= 1) return { tone: "covered", label: "Supplement selected", detail: "Keep the dose and clinical context in view." };
-    return { tone: "gap", label: "Food or supplement gap", detail: "Add oily fish, or use the supplement action when fish is impractical." };
-  }
-  if (target.statusMode === "status-guided") return itemIsActive("vitamin-d") ? { tone: "conditional", label: "D3 selected", detail: "Confirm dose and 25(OH)D status." } : { tone: "conditional", label: "Status guided", detail: amount ? "Food contribution present; status guides the next step." : "Use sun, food and a 25(OH)D test to guide decisions." };
-  if (target.statusMode === "gap") {
-    const supplemental = BUILDER_ITEMS.find((item) => item.id === "magnesium-glycinate")?.nutrients?.magnesium && itemIsActive("magnesium-glycinate");
-    if (supplemental) return { tone: "covered", label: `${formatAmount(amount, "mg")} food + supplement`, detail: "Keep supplemental magnesium at or below 350 mg/day unless advised." };
-    return amount >= 400 ? { tone: "covered", label: "Food target reached", detail: "Food sources are carrying the target." } : { tone: "gap", label: `Food gap ≈ ${formatAmount(Math.max(0, 400 - amount), "mg")}`, detail: "Seeds, nuts, greens and oats are practical first choices." };
-  }
-  if (target.statusMode === "nutrient") {
-    const percent = Math.round(amount / 550 * 100);
-    return { tone: percent >= 80 ? "covered" : percent >= 40 ? "partial" : "gap", label: `${formatAmount(amount, "mg")} / 550 mg`, detail: "Food-first target; eggs, meat, fish and dairy help." };
-  }
-  if (target.statusMode === "food-presence-or-dose") return compounds.taurine ? { tone: "conditional", label: `${formatAmount(compounds.taurine, "g")} trial selected`, detail: "Optional optimization; no universal RDA." } : BUILDER_ITEMS.some((item) => itemIsActive(item.id) && (item.compoundSources || []).includes("taurine")) ? { tone: "partial", label: "Food source present", detail: "Seafood and meat contribute, but food amounts vary." } : { tone: "neutral", label: "Optional · no RDA", detail: "Consider food first and track a specific outcome." };
-  if (target.statusMode === "selected-dose") return compounds[target.id] ? { tone: "covered", label: `${formatAmount(compounds[target.id], "g")} selected`, detail: "A selected dose or food contribution is shown." } : { tone: "neutral", label: "Not selected", detail: "Optional; add only if it has a clear job." };
-  return { tone: "neutral", label: "Review context", detail: "No universal daily target." };
-}
-
-function minimalStackCardsHTMLV2() {
-  const nutrients = dailyTotals();
-  const compounds = dailyCompoundTotals();
-  const labels = { core: "Core · practical case", "food-or-supplement": "Food or supplement", "core-conditional": "Core · conditional", "food-first": "Food first", "optional-optimization": "Optional optimization" };
-  return COMPOUND_TARGETS.map((target) => {
-    const status = targetStatusV2(target, nutrients, compounds);
-    const actions = target.actions || {};
-    const foodId = Array.isArray(actions.food) ? actions.food[0] : actions.food;
-    const food = quickItem(foodId);
-    const supplement = quickItem(actions.supplement);
-    return `<article class="minimal-stack-card minimal-stack-card-${target.layer}" data-target-card="${target.id}">
-      <div class="minimal-stack-card-top"><span class="minimal-stack-layer">${labels[target.layer] || target.layer}</span><span class="minimal-stack-evidence">${target.evidence}</span></div>
-      <h3>${target.name}</h3><strong class="minimal-stack-target">${target.target}</strong>
-      <div class="minimal-stack-status minimal-stack-status-${status.tone}"><strong>${status.label}</strong><span>${status.detail}</span></div>
-      <p><strong>Food first</strong> ${target.food}</p><p>${target.why}</p>
-      <div class="target-actions"><span class="target-actions-label">Add to plan</span>${food ? actionButtonHTML(`Food: ${food.name}`, target.id, "food", food.id) : ""}${supplement ? actionButtonHTML(`Supplement: ${supplement.name}`, target.id, "supplement", supplement.id) : ""}</div>
-    </article>`;
-  }).join("");
 }
 
 function coverageAmount(target, nutrients, compounds) {
@@ -714,6 +671,27 @@ function coverageWarnings(ids, nutrients) {
   return { excesses, watchedItems };
 }
 
+function coverageRowHTML(target, totals, compounds) {
+  const amount = coverageAmount(target, totals, compounds);
+  const goal = targetGoal(target);
+  const percent = Math.min(100, Math.round(amount / goal * 100));
+  const state = coverageState(percent);
+  return `<div class="coverage-row coverage-row-${state}"><div class="coverage-label"><span>${escapeHTML(target.name)}</span><span>${formatAmount(amount, target.unit)} <small>/ ${target.dynamic === "protein" ? `${goal} g` : target.shortTarget}</small></span></div><div class="coverage-track"><span class="coverage-fill coverage-${state}" style="width:${Math.max(3, percent)}%"></span></div></div>`;
+}
+
+function coverageSourceNames(target) {
+  const sources = (target.sources || []).map((id) => quickItem(id)?.name).filter(Boolean).slice(0, 3);
+  return sources.length ? sources.join(" · ") : "Review the food pattern";
+}
+
+function priorityGapHTML(target, totals, compounds) {
+  const amount = coverageAmount(target, totals, compounds);
+  const goal = targetGoal(target);
+  const percent = Math.min(100, Math.round(amount / goal * 100));
+  const state = coverageState(percent);
+  return `<article class="coverage-priority-item coverage-row-${state}"><div class="coverage-priority-head"><strong>${escapeHTML(target.name)}</strong><span>${formatAmount(amount, target.unit)} <small>/ ${target.dynamic === "protein" ? `${goal} g` : target.shortTarget}</small></span></div><div class="coverage-track"><span class="coverage-fill coverage-${state}" style="width:${Math.max(3, percent)}%"></span></div><p>Food-first: ${escapeHTML(coverageSourceNames(target))}</p></article>`;
+}
+
 function coverageHTMLV2() {
   const ids = activeDailyItemIds();
   const totals = dailyTotals(ids);
@@ -728,20 +706,15 @@ function coverageHTMLV2() {
   const groupSummaries = NUTRIENT_GROUPS.map((group) => {
     const groupTargets = tracked.filter((target) => target.group === group.id);
     const groupCovered = groupTargets.filter((target) => coverageAmount(target, totals, compounds) >= targetGoal(target) * .8).length;
-    const rows = groupTargets.map((target) => {
-      const amount = coverageAmount(target, totals, compounds);
-      const goal = targetGoal(target);
-      const percent = Math.min(100, Math.round(amount / goal * 100));
-      const state = coverageState(percent);
-      return `<div class="coverage-row coverage-row-${state}"><div class="coverage-label"><span>${target.name}</span><span>${formatAmount(amount, target.unit)} <small>/ ${target.dynamic === "protein" ? `${goal} g` : target.shortTarget}</small></span></div><div class="coverage-track"><span class="coverage-fill coverage-${state}" style="width:${Math.max(3, percent)}%"></span></div></div>`;
-    }).join("");
-    return `<details class="coverage-group"><summary><span>${group.label}</span><strong>${groupCovered}/${groupTargets.length} near target</strong></summary><div class="coverage-group-rows">${rows}</div></details>`;
+    const rows = groupTargets.map((target) => coverageRowHTML(target, totals, compounds)).join("");
+    return `<details class="coverage-group"><summary><span>${escapeHTML(group.label)}</span><strong>${groupCovered}/${groupTargets.length} covered</strong></summary><div class="coverage-group-rows">${rows}</div></details>`;
   }).join("");
+  const priorityGaps = gaps.slice(0, 3);
   const warningText = [
     ...warnings.excesses.map(([id, rule]) => `${rule[1]}: ${formatAmount((id === "magnesium" ? amountsForWarnings(ids).magnesium : totals[id]) || 0, rule[2])}`),
     ...warnings.watchedItems.map((name) => `${name} has a safety note`),
   ];
-  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>nutrients near target</span></div><p class="coverage-summary-note">Planning estimate · ${bodyWeightKg} kg protein reference</p></div><div class="coverage-highlights" aria-label="Daily nutrient highlights"><div class="coverage-highlight"><span>Protein</span><strong>${formatAmount(totals.protein || 0, "g")} <small>/ ${proteinTarget} g</small></strong></div><div class="coverage-highlight"><span>Fiber</span><strong>${formatAmount(totals.fiber || 0, "g")} <small>/ 38 g</small></strong></div><div class="coverage-highlight"><span>EPA + DHA</span><strong>${formatAmount(epaFood + epaSupplement, "g")} <small>${epaSupplement ? `(${formatAmount(epaFood, "g")} food + ${formatAmount(epaSupplement, "g")} supplement)` : "food"}</small></strong></div></div><div class="coverage-groups">${groupSummaries}</div><div class="coverage-callouts"><div class="coverage-callout ${gaps.length ? "is-gap" : "is-good"}"><strong>${gaps.length ? `${gaps.length} nutrient gap${gaps.length === 1 ? "" : "s"}` : "Foundation covered"}</strong><span>${gaps.length ? gaps.slice(0, 4).map((gap) => gap.name).join(" · ") : "Most reference targets are near target."}${gaps.length > 4 ? ` + ${gaps.length - 4} more` : ""}</span></div>${warningText.length ? `<div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div>` : ""}</div>`;
+  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Planning estimate · ${bodyWeightKg} kg protein reference</p></div><div class="coverage-highlights" aria-label="Daily nutrient highlights"><div class="coverage-highlight"><span>Protein</span><strong>${formatAmount(totals.protein || 0, "g")} <small>/ ${proteinTarget} g</small></strong></div><div class="coverage-highlight"><span>Fiber</span><strong>${formatAmount(totals.fiber || 0, "g")} <small>/ 38 g</small></strong></div><div class="coverage-highlight"><span>EPA + DHA</span><strong>${formatAmount(epaFood + epaSupplement, "g")} <small>${epaSupplement ? `(${formatAmount(epaFood, "g")} food + ${formatAmount(epaSupplement, "g")} supplement)` : "food"}</small></strong></div></div><section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="coverage-priority-title"><div class="coverage-block-head"><strong id="coverage-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><details class="coverage-all"><summary><span>All nutrient coverage</span><strong>${covered}/${tracked.length} covered${gaps.length > priorityGaps.length ? ` · ${gaps.length - priorityGaps.length} more gaps` : ""}</strong></summary><div class="coverage-groups">${groupSummaries}</div></details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
 }
 
 function amountsForWarnings(ids) {
@@ -750,45 +723,46 @@ function amountsForWarnings(ids) {
 
 function mealCardHTML(meal, selected = selectedMealIds.includes(meal.id)) {
   const items = meal.items.map((id) => quickItem(id)).filter(Boolean);
-  const saved = getSavedMeals().some((candidate) => candidate.id === meal.id);
-  const savedActions = saved ? `<button type="button" class="text-button" data-meal-edit="${meal.id}">Edit</button><button type="button" class="text-button" data-meal-duplicate="${meal.id}">Duplicate</button>` : "";
-  return `<article class="meal-card ${selected ? "is-selected" : ""}"><div class="meal-card-head"><span class="meal-card-icon">${meal.icon || "🍽️"}</span><div><h3>${escapeHTML(meal.name)}</h3><p>${escapeHTML(meal.description || "Reusable meal plan")}</p></div><button type="button" class="meal-toggle-icon ${selected ? "is-selected" : ""}" data-meal-toggle="${meal.id}" aria-label="${selected ? "Remove" : "Add"} ${escapeHTML(meal.name)} ${selected ? "from" : "to"} plan" aria-pressed="${selected}" title="${selected ? "Remove from plan" : "Add to plan"}">${selected ? "✓" : "+"}</button></div><div class="meal-ingredients">${items.map((item) => `<span title="${escapeHTML(item.serving)}">${item.icon} ${escapeHTML(item.name)}</span>`).join("")}</div>${savedActions ? `<div class="meal-card-actions">${savedActions}</div>` : ""}</article>`;
+  const servingsOpen = selected && expandedMealServings.has(meal.id);
+  const actions = `<div class="meal-card-actions" role="group" aria-label="${escapeHTML(meal.name)} actions">${iconButton({ iconName: selected ? 'check' : 'add', label: `${selected ? 'Remove' : 'Add'} ${meal.name} ${selected ? 'from' : 'to'} plan`, pressed: selected, tooltip: selected ? 'Remove from plan' : 'Add to plan', data: { 'meal-toggle': meal.id } })}${iconButton({ iconName: 'edit', label: `Edit ${meal.name}`, tooltip: 'Edit meal', data: { 'meal-edit': meal.id } })}${iconButton({ iconName: 'delete', label: `Delete ${meal.name}`, tone: 'danger', tooltip: 'Delete meal', data: { 'meal-delete': meal.id } })}</div>`;
+  const servingToggle = `<button type="button" class="text-button serving-editor-toggle" data-meal-serving-toggle="${escapeHTML(meal.id)}" aria-label="${selected ? "Adjust serving sizes" : "Add meal to plan before adjusting serving sizes"}" aria-expanded="${servingsOpen}" aria-controls="meal-serving-${escapeHTML(meal.id)}"${selected ? "" : " disabled title=\"Add this meal to the plan before adjusting serving sizes\""}>${selected ? (servingsOpen ? "Hide serving controls" : "Adjust servings") : "Add to plan first"}</button>`;
+  return `<article class="meal-card ${selected ? "is-selected" : ""}" data-meal-card="${meal.id}"><div class="meal-card-head"><div><h3>${escapeHTML(meal.name)}</h3><p class="meal-card-meta">${items.length} ingredient${items.length === 1 ? "" : "s"}</p></div>${actions}</div><ul class="meal-ingredients ${servingsOpen ? "has-ingredient-portions" : ""}" id="meal-serving-${escapeHTML(meal.id)}" aria-label="Ingredients">${items.map((item) => `<li title="${escapeHTML(item.serving)}"><span class="meal-ingredient-name">${escapeHTML(item.name)}</span>${portionControlHTML("meal-item", item.id, mealItemPortion(meal.id, item.id), servingsOpen, "Serving", `data-portion-meal-id="${escapeHTML(meal.id)}"`)}</li>`).join("")}</ul>${servingToggle}${portionControlHTML("meal", meal.id, mealPortion(meal.id), servingsOpen, "Meal portions")}</article>`;
 }
 
 function plannerControlsHTML() {
-  return `<div class="planner-controls" role="tablist" aria-label="Planner input mode">
-    <button type="button" class="planner-mode-tab ${plannerMode === "meals" ? "active" : ""}" data-planner-mode="meals" role="tab" aria-selected="${plannerMode === "meals"}" aria-controls="planner-meals">Meals <span data-planner-meal-count>${formatPortion(selectedPortionTotal(selectedMealQuantities, selectedMealIds))}</span></button>
-    <button type="button" class="planner-mode-tab ${plannerMode === "quick-add" ? "active" : ""}" data-planner-mode="quick-add" role="tab" aria-selected="${plannerMode === "quick-add"}" aria-controls="planner-quick-add">Quick add <span data-planner-quick-count>${formatPortion(selectedPortionTotal(quickItemQuantities, quickSelectedItemIds))}</span></button>
+  return `<div class="planner-controls"><div class="planner-mode-tabs" role="tablist" aria-label="Planner input mode">
+    <button type="button" class="planner-mode-tab ${plannerMode === "meals" ? "active" : ""}" data-planner-mode="meals" role="tab" aria-selected="${plannerMode === "meals"}" tabindex="${plannerMode === "meals" ? 0 : -1}" aria-controls="planner-meals">Meals <span data-planner-meal-count>${formatPortion(selectedPortionTotal(selectedMealQuantities, selectedMealIds))}</span></button>
+    <button type="button" class="planner-mode-tab ${plannerMode === "quick-add" ? "active" : ""}" data-planner-mode="quick-add" role="tab" aria-selected="${plannerMode === "quick-add"}" tabindex="${plannerMode === "quick-add" ? 0 : -1}" aria-controls="planner-quick-add">Quick add <span data-planner-quick-count>${formatPortion(selectedPortionTotal(quickItemQuantities, quickSelectedItemIds))}</span></button>
+    </div>
     <button class="button button-secondary planner-clear" type="button" data-clear-stack>Clear plan</button>
-    <span class="save-status planner-status" data-planner-status role="status" aria-live="polite"></span>
   </div>`;
 }
 
-function portionControlHTML(scope, id, value, visible = true) {
-  return `<div class="portion-control ${visible ? "" : "is-hidden"}" data-portion-control data-portion-scope="${scope}" data-portion-id="${id}" aria-hidden="${visible ? "false" : "true"}"><span>Portion</span><button type="button" data-portion-action="decrease" aria-label="Decrease portion">−</button><input type="number" min="0.25" max="20" step="0.25" value="${formatPortion(value)}" data-portion-input aria-label="Portion size"><button type="button" data-portion-action="increase" aria-label="Increase portion">+</button></div>`;
+function portionControlHTML(scope, id, value, visible = true, label = "Portion", attributes = "") {
+  return `<div class="portion-control ${visible ? "" : "is-hidden"}" data-portion-control data-portion-scope="${scope}" data-portion-id="${id}" ${attributes} aria-hidden="${visible ? "false" : "true"}"><span>${label}</span><button type="button" data-portion-action="decrease" aria-label="Decrease ${label.toLowerCase()}">${icon('minus')}</button><input type="number" min="0.25" max="20" step="0.25" value="${formatPortion(value)}" data-portion-input aria-label="${label} size"><button type="button" data-portion-action="increase" aria-label="Increase ${label.toLowerCase()}">${icon('add')}</button></div>`;
 }
 
 function quickItemHTML(item) {
   const selected = quickSelectionForDisplay().includes(item.id);
-  const portion = mealComposerMode === "edit" ? "" : portionControlHTML("quick", item.id, itemPortion(item.id), selected);
-  return `<article class="builder-item ${selected ? "selected" : ""}" data-quick-card="${item.id}"><span class="builder-item-top"><span class="builder-item-icon">${item.icon}</span><button type="button" class="builder-item-toggle ${selected ? "is-selected" : ""}" data-quick-item="${item.id}" aria-label="${selected ? "Remove" : "Add"} ${escapeHTML(item.name)} ${selected ? "from" : "to"} plan" aria-pressed="${selected}" title="${selected ? "Remove from plan" : "Add to plan"}">${selected ? "✓" : "+"}</button></span><strong>${escapeHTML(item.name)}</strong><span class="builder-serving">${escapeHTML(item.serving)}</span><small>${escapeHTML(item.note || "")}${item.watch ? " · ⚠ safety note" : ""}</small>${portion}</article>`;
+  const servingsOpen = selected && expandedQuickServings.has(item.id);
+  const portion = mealComposerMode === "edit" ? "" : portionControlHTML("quick", item.id, itemPortion(item.id), servingsOpen, "Serving", `id="quick-serving-${escapeHTML(item.id)}"`);
+  const target = mealComposerMode === 'edit' ? 'meal' : 'plan';
+  const toggle = iconButton({ iconName: selected ? 'check' : 'add', label: `${selected ? 'Remove' : 'Add'} ${item.name} ${selected ? 'from' : 'to'} ${target}`, pressed: selected, tooltip: selected ? `Remove from ${target}` : `Add to ${target}`, data: { 'quick-item': item.id } });
+  const servingToggle = mealComposerMode === "edit" ? "" : `<button type="button" class="text-button serving-editor-toggle" data-quick-serving-toggle="${escapeHTML(item.id)}" aria-label="${selected ? "Adjust serving sizes" : "Add item to plan before adjusting serving sizes"}" aria-expanded="${servingsOpen}" aria-controls="quick-serving-${escapeHTML(item.id)}"${selected ? "" : " disabled title=\"Add this item to the plan before adjusting serving sizes\""}>${selected ? (servingsOpen ? "Hide serving controls" : "Adjust servings") : "Add to plan first"}</button>`;
+  return `<article class="builder-item ${selected ? "selected" : ""}" data-quick-card="${item.id}"><span class="builder-item-top">${toggle}</span><strong>${escapeHTML(item.name)}</strong><span class="builder-serving">${escapeHTML(item.serving)}</span><small>${escapeHTML(item.note || "")}${item.watch ? " · safety note" : ""}</small>${servingToggle}${portion}</article>`;
 }
 
 function mealComposerDialogHTML() {
-  return `<dialog class="meal-save-dialog" data-meal-dialog aria-labelledby="meal-dialog-title"><form class="meal-save-dialog-form" data-meal-dialog-form><div class="meal-dialog-head"><div><p class="eyebrow">Reusable meal</p><h2 id="meal-dialog-title">Save selection as a meal</h2></div><button type="button" class="text-button" data-meal-dialog-cancel aria-label="Close">×</button></div><label for="meal-dialog-name">Meal name</label><input id="meal-dialog-name" type="text" maxlength="80" placeholder="e.g. Weekday salmon plate" data-meal-dialog-name required><p class="meal-dialog-items" data-meal-dialog-items></p><div class="meal-dialog-actions"><button type="button" class="button button-secondary" data-meal-dialog-cancel>Cancel</button><button type="submit" class="button button-primary" data-meal-dialog-confirm>Save meal</button></div><p class="save-status" data-meal-dialog-status role="status"></p></form></dialog>`;
+  return `<dialog class="meal-save-dialog" data-meal-dialog aria-labelledby="meal-dialog-title"><form class="meal-save-dialog-form" data-meal-dialog-form><div class="meal-dialog-head"><div><p class="eyebrow">Reusable meal</p><h2 id="meal-dialog-title">Save selection as a meal</h2></div>${iconButton({ iconName: 'close', label: 'Close', tooltip: 'Close', data: { 'meal-dialog-cancel': '' } })}</div><label for="meal-dialog-name">Meal name</label><input id="meal-dialog-name" type="text" maxlength="80" placeholder="e.g. Weekday salmon plate" data-meal-dialog-name required><p class="meal-dialog-items" data-meal-dialog-items></p><div class="meal-dialog-actions"><button type="button" class="button button-secondary" data-meal-dialog-cancel>Cancel</button><button type="submit" class="button button-primary" data-meal-dialog-confirm>Save meal</button></div><p class="save-status" data-meal-dialog-status role="status"></p></form></dialog>`;
 }
 
 function quickAddHTML() {
   const categories = [["all", "All"], ["protein", "Protein"], ["volume", "Volume + fibre"], ["fat", "Healthy fat"], ["functional", "Functional"], ["supplement", "Supplements"]];
-  const quickItems = BUILDER_ITEMS.filter((item) => activeQuickCategory === "all" || item.category === activeQuickCategory);
+  const quickItems = filteredQuickItems();
   const editing = mealComposerMode === "edit";
   const quickPortions = selectedPortionTotal(quickItemQuantities, quickSelectedItemIds);
-  const composerAction = editing ? `<div class="meal-edit-bar"><span>Editing <strong>${escapeHTML(mealComposerName)}</strong></span><div><button type="button" class="button button-secondary" data-meal-compose-open>Save changes</button><button type="button" class="text-button" data-meal-compose-cancel>Cancel</button></div></div>` : `<div class="quick-add-save"><span><strong data-quick-selection-count>${formatPortion(quickPortions)}</strong> portion${quickPortions === 1 ? "" : "s"} selected</span><button type="button" class="button button-secondary" data-meal-compose-open ${quickSelectedItemIds.length ? "" : "disabled"}>Save to meals</button></div>`;
-  return `<section class="quick-add-panel" id="planner-quick-add" aria-labelledby="quick-add-title"><div class="planner-section-head"><div><p class="eyebrow">Quick add</p><h3 id="quick-add-title">Choose foods and supplements</h3><p>Choose a food once per portion; selected items can also become a reusable meal.</p></div></div>${composerAction}<div class="builder-filters" role="tablist" aria-label="Quick-add item types">${categories.map(([id, label]) => `<button type="button" class="builder-filter ${activeQuickCategory === id ? "active" : ""}" data-quick-category="${id}" role="tab" aria-selected="${activeQuickCategory === id}">${label}</button>`).join("")}</div><div class="builder-item-grid quick-item-grid">${quickItems.map(quickItemHTML).join("")}</div></section>`;
-}
-
-function selectedMealsHTML(selected) {
-  return selected.length ? selected.map((meal) => `<span class="selected-meal-chip" role="listitem"><span aria-hidden="true">${meal.icon || "🍽️"}</span><strong>${escapeHTML(meal.name)}</strong>${portionControlHTML("meal", meal.id, mealPortion(meal.id))}<button type="button" class="selected-meal-remove" data-meal-remove="${meal.id}" aria-label="Remove ${escapeHTML(meal.name)}">×</button></span>`).join("") : `<span class="selected-empty">No meals selected</span>`;
+  const composerAction = editing ? `<div class="meal-edit-bar"><label for="meal-edit-name">Editing meal</label><input id="meal-edit-name" type="text" maxlength="80" value="${escapeHTML(mealComposerName)}" data-meal-edit-name><span><strong data-quick-selection-count>${mealComposerItems.length}</strong> ingredients selected</span><div><button type="button" class="button button-primary" data-meal-edit-save>Save changes</button><button type="button" class="button button-secondary" data-meal-compose-cancel>Cancel</button></div><p class="save-status" data-meal-edit-status role="status"></p></div>` : `<div class="quick-add-save"><span><strong data-quick-selection-count>${formatPortion(quickPortions)}</strong> portion${quickPortions === 1 ? "" : "s"} selected</span><button type="button" class="button button-secondary" data-meal-compose-open ${quickSelectedItemIds.length ? "" : "disabled"}>Save to meals</button></div>`;
+  return `<section class="quick-add-panel" id="planner-quick-add" aria-labelledby="quick-add-title"><div class="planner-section-head"><div><p class="eyebrow">Quick add</p><h3 id="quick-add-title">Choose foods and supplements</h3><p>Choose a food once per portion; selected items can also become a reusable meal.</p></div></div>${composerAction}<div class="builder-filters" aria-label="Filter quick-add items">${categories.map(([id, label]) => `<button type="button" class="builder-filter ${activeQuickCategory === id ? "active" : ""}" data-quick-category="${id}" aria-pressed="${activeQuickCategory === id}">${label}</button>`).join("")}</div><div class="builder-item-grid planner-card-grid quick-item-grid">${quickItems.length ? quickItems.map(quickItemHTML).join("") : quickSearchEmptyHTML()}</div></section>`;
 }
 
 function updateQuickAddUI(root) {
@@ -799,10 +773,20 @@ function updateQuickAddUI(root) {
     button.classList.toggle("is-selected", active);
     const card = button.closest("[data-quick-card]");
     card?.classList.toggle("selected", active);
-    const check = button;
-    if (check) check.textContent = active ? "✓" : "+";
+    const target = mealComposerMode === 'edit' ? 'meal' : 'plan';
+    button.innerHTML = `${icon(active ? 'check' : 'add')}<span class="ui-tooltip" role="tooltip">${active ? `Remove from ${target}` : `Add to ${target}`}</span>`;
+    button.setAttribute('aria-label', `${active ? 'Remove' : 'Add'} ${card?.querySelector('strong')?.textContent || 'item'} ${active ? 'from' : 'to'} ${target}`);
+    const servingsOpen = active && expandedQuickServings.has(button.dataset.quickItem);
+    const servingToggle = card?.querySelector('[data-quick-serving-toggle]');
+    if (servingToggle) {
+      servingToggle.disabled = !active;
+      servingToggle.setAttribute('aria-expanded', String(servingsOpen));
+      servingToggle.setAttribute('aria-label', active ? 'Adjust serving sizes' : 'Add item to plan before adjusting serving sizes');
+      servingToggle.title = active ? '' : 'Add this item to the plan before adjusting serving sizes';
+      servingToggle.textContent = active ? (servingsOpen ? 'Hide serving controls' : 'Adjust servings') : 'Add to plan first';
+    }
     const portion = card?.querySelector("[data-portion-control]");
-    if (portion) { portion.classList.toggle("is-hidden", !active); portion.setAttribute("aria-hidden", String(!active)); }
+    if (portion) { portion.classList.toggle("is-hidden", !servingsOpen); portion.setAttribute("aria-hidden", String(!servingsOpen)); }
     const input = portion?.querySelector("[data-portion-input]");
     if (input) input.value = formatPortion(itemPortion(button.dataset.quickItem));
   });
@@ -832,38 +816,97 @@ function closeMealComposer(root) {
   if (dialog?.open) dialog.close();
 }
 
-function saveMealComposer(root) {
+function saveMealComposer(root, values = {}) {
   const input = root.querySelector("[data-meal-dialog-name]");
-  const status = root.querySelector("[data-meal-dialog-status]");
-  const name = input?.value.trim() || "";
+  const status = values.status || root.querySelector("[data-meal-dialog-status]");
+  const name = typeof values.name === 'string' ? values.name.trim() : input?.value.trim() || "";
   const items = [...new Set(mealComposerItems)].filter((id) => BUILDER_ITEMS.some((item) => item.id === id));
   if (!name || !items.length) {
     if (status) status.textContent = !name ? "Add a meal name." : "Choose at least one item.";
-    return;
+    return false;
   }
   const now = new Date().toISOString();
   const saved = getSavedMeals();
-  const existing = mealComposerMode === "edit" ? saved.find((meal) => meal.id === mealComposerMealId) : null;
+  const existing = mealComposerMode === "edit" ? mealLibrary().find((meal) => meal.id === mealComposerMealId) : null;
   const id = existing?.id || `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "meal"}-${Date.now()}`;
-  const meal = { id, name, items, createdAt: existing?.createdAt || now, updatedAt: now, icon: existing?.icon || "🍽️", description: existing?.description || "A saved meal made from selected items.", tags: existing?.tags || ["saved"] };
-  setSavedMeals([meal, ...saved.filter((candidate) => candidate.id !== id)]);
-  if (!existing && !selectedMealIds.includes(id)) { selectedMealIds = [...selectedMealIds, id]; selectedMealQuantities[id] = 1; }
+  const meal = { id, name, items, createdAt: existing?.createdAt || now, updatedAt: now, tags: existing?.tags || ["saved"] };
+  if (existing?.source === "preset" || mealComposerSource === "preset") {
+    const state = getMealLibraryState();
+    setMealLibraryState({ ...state, overrides: { ...state.overrides, [id]: meal } });
+  } else {
+    setSavedMeals([meal, ...saved.filter((candidate) => candidate.id !== id)]);
+  }
+  if (!existing && !selectedMealIds.includes(id)) { selectedMealIds = [...selectedMealIds, id]; selectedMealQuantities[id] = 1; selectedMealItemQuantities[id] = {}; }
+  if (!existing) { quickSelectedItemIds = []; quickItemQuantities = {}; }
   persistCurrentDay();
   closeMealComposer(root);
   resetMealComposer();
-  plannerMode = "meals";
   renderStack();
   setPlannerStatus("[data-planner-status]", `${existing ? "Updated" : "Saved"} meal “${name}”`);
+  return true;
+}
+
+function deleteMeal(meal) {
+  if (!meal) return;
+  if (meal.source === "preset") {
+    const state = getMealLibraryState();
+    setMealLibraryState({ overrides: Object.fromEntries(Object.entries(state.overrides).filter(([id]) => id !== meal.id)), hidden: [...new Set([...state.hidden, meal.id])] });
+  } else {
+    setSavedMeals(getSavedMeals().filter((candidate) => candidate.id !== meal.id));
+  }
+  selectedMealIds = selectedMealIds.filter((id) => id !== meal.id);
+  delete selectedMealQuantities[meal.id];
+  delete selectedMealItemQuantities[meal.id];
+  expandedMealServings.delete(meal.id);
+  persistCurrentDay();
 }
 
 function plannerHTML() {
-  const meals = mealLibrary();
-  const selected = mealLibrary().filter((meal) => selectedMealIds.includes(meal.id));
+  const meals = filteredMeals();
   const mealPortions = selectedPortionTotal(selectedMealQuantities, selectedMealIds);
   const quickPortions = selectedPortionTotal(quickItemQuantities, quickSelectedItemIds);
-  const mealContent = `<section class="meal-library-section" id="planner-meals" aria-labelledby="meal-library-title"><div class="planner-section-head"><div><p class="eyebrow">Meals</p><h3 id="meal-library-title">Choose a reusable meal</h3><p>Presets and saved meals live together. Add portions from the plan summary.</p></div></div><div class="meal-library-grid">${meals.length ? meals.map((meal) => mealCardHTML(meal)).join("") : `<p class="saved-empty meal-empty">No meals yet. Choose items in Quick add to create one.</p>`}</div></section>`;
+  const libraryState = getMealLibraryState();
+  const restore = Object.keys(libraryState.overrides).length || libraryState.hidden.length
+    ? `<button type="button" class="text-button meal-restore" data-meal-restore>Restore preset meals</button>` : "";
+  const mealContent = `<section class="meal-library-section" id="planner-meals" aria-labelledby="meal-library-title"><div class="planner-section-head"><div><p class="eyebrow">Meals</p><h3 id="meal-library-title">Choose a reusable meal</h3></div>${restore}</div><div class="meal-library-grid planner-card-grid">${meals.length ? meals.map((meal) => mealCardHTML(meal)).join("") : mealSearchEmptyHTML()}</div></section>`;
   const plannerContent = plannerMode === "meals" ? mealContent : quickAddHTML();
-  return `<section class="stack-builder meal-planner" aria-labelledby="planner-title"><div class="builder-head"><div><p class="eyebrow">Daily Stack</p><h2 id="planner-title">Build a nutrition plan from reusable meals</h2><p>Select meals, add individual items when needed, and review the combined nutrient picture.</p></div><div class="builder-actions"><span class="stack-count" data-stack-count>${activeDailyItemIds().length} unique items</span><button class="button button-secondary" type="button" data-load-foundation>Try foundation</button></div></div>${plannerControlsHTML()}<div class="planner-workspace"><aside class="coverage-panel plan-readout" aria-live="polite"><div class="coverage-panel-head"><p class="eyebrow">Plan</p><h3>Plan overview</h3><div class="plan-counts"><span><strong data-plan-meals>${formatPortion(mealPortions)}</strong> meal portions</span><span><strong data-plan-quick>${formatPortion(quickPortions)}</strong> quick portions</span><span><strong data-plan-unique>${activeDailyItemIds().length}</strong> unique foods</span></div></div><div data-coverage>${coverageHTMLV2()}</div></aside><div class="planner-main"><div class="builder-profile"><label for="body-weight">Protein reference body weight</label><div><input id="body-weight" type="number" min="35" max="250" step="1" value="${bodyWeightKg}" data-body-weight><span>kg · uses a 1.2 g/kg floor</span></div></div><section class="selected-meals-panel" aria-labelledby="selected-meals-title"><div class="planner-section-head"><div><p class="eyebrow">Selected meals</p><h3 id="selected-meals-title"><span data-selected-meal-count>${formatPortion(mealPortions)}</span> meal portion${mealPortions === 1 ? "" : "s"} in plan</h3></div></div><div class="selected-meal-list" data-selected-meals role="list">${selectedMealsHTML(selected)}</div></section>${plannerContent}<details class="planner-disclosure evidence-actions"><summary><span><span class="eyebrow">Evidence-first actions</span><strong>Review defined food and supplement options</strong></span><span class="disclosure-count">${COMPOUND_TARGETS.length} targets</span></summary><div class="planner-disclosure-body"><p class="disclosure-note">Food is the default; supplement actions stay explicit and separate.</p><div class="minimal-stack-grid" data-minimal-stack>${minimalStackCardsHTMLV2()}</div></div></details></div></div>${mealComposerDialogHTML()}</section>`;
+  const plannerClass = plannerMode === "quick-add" ? "is-quick-add" : "is-meals";
+  return `<section class="stack-builder meal-planner ${plannerClass}" aria-labelledby="planner-title">
+    <div class="builder-head"><div><p class="eyebrow">Daily Stack</p><h2 id="planner-title">Build a nutrition plan from reusable meals</h2><p>Select meals, adjust portions, then use the nutrient readout to solve meaningful gaps.</p></div></div>
+    ${plannerControlsHTML()}
+    <div class="planner-search-row">${plannerSearchHTML()}</div>
+    <div class="planner-workspace">
+      <div class="planner-main">
+        ${plannerContent}
+      </div>
+      <aside class="coverage-panel plan-readout" aria-live="polite"><div class="coverage-panel-head"><p class="eyebrow">Review</p><h3>Coverage and gaps</h3><div class="plan-counts"><span><strong data-plan-meals>${formatPortion(mealPortions)}</strong> meal portions</span><span><strong data-plan-quick>${formatPortion(quickPortions)}</strong> quick portions</span></div><details class="coverage-settings"><summary>Coverage settings</summary><div class="builder-profile"><label for="body-weight">Protein reference body weight</label><div><input id="body-weight" type="number" min="35" max="250" step="1" value="${bodyWeightKg}" data-body-weight><span>kg · uses a 1.2 g/kg floor</span></div></div></details></div><div data-coverage>${coverageHTMLV2()}</div></aside>
+    </div>
+    ${mealComposerDialogHTML()}
+  </section>`;
+}
+
+function renderPlannerMode(root) {
+  const main = root?.querySelector('.planner-main');
+  const planner = root?.querySelector('.meal-planner');
+  if (!main || !planner) return;
+  const libraryState = getMealLibraryState();
+  const restore = Object.keys(libraryState.overrides).length || libraryState.hidden.length
+    ? `<button type="button" class="text-button meal-restore" data-meal-restore>Restore preset meals</button>` : "";
+  if (plannerMode === 'meals') {
+    const meals = filteredMeals();
+    main.innerHTML = `<section class="meal-library-section" id="planner-meals" aria-labelledby="meal-library-title"><div class="planner-section-head"><div><p class="eyebrow">Meals</p><h3 id="meal-library-title">Choose a reusable meal</h3></div>${restore}</div><div class="meal-library-grid planner-card-grid">${meals.length ? meals.map((meal) => mealCardHTML(meal)).join("") : mealSearchEmptyHTML()}</div></section>`;
+  } else {
+    main.innerHTML = quickAddHTML();
+  }
+  planner.classList.toggle('is-meals', plannerMode === 'meals');
+  planner.classList.toggle('is-quick-add', plannerMode === 'quick-add');
+  root.querySelectorAll('[data-planner-mode]').forEach((button) => {
+    const active = button.dataset.plannerMode === plannerMode;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', String(active));
+    button.tabIndex = active ? 0 : -1;
+  });
+  updateMealPlannerUI();
 }
 
 function updateMealPlannerUI() {
@@ -872,151 +915,68 @@ function updateMealPlannerUI() {
   persistCurrentDay();
   const coverage = root.querySelector("[data-coverage]");
   if (coverage) coverage.innerHTML = coverageHTMLV2();
-  const minimal = root.querySelector("[data-minimal-stack]");
-  if (minimal) minimal.innerHTML = minimalStackCardsHTMLV2();
   updateQuickAddUI(root);
   root.querySelectorAll("[data-meal-toggle]").forEach((button) => {
     const selected = selectedMealIds.includes(button.dataset.mealToggle);
+    const servingsOpen = selected && expandedMealServings.has(button.dataset.mealToggle);
     const name = button.closest(".meal-card")?.querySelector("h3")?.textContent || "meal";
-    button.classList.toggle("is-selected", selected); button.setAttribute("aria-pressed", String(selected)); button.setAttribute("aria-label", `${selected ? "Remove" : "Add"} ${name} ${selected ? "from" : "to"} plan`); button.title = selected ? "Remove from plan" : "Add to plan"; button.textContent = selected ? "✓" : "+";
+    button.setAttribute("aria-pressed", String(selected));
+    button.setAttribute("aria-label", `${selected ? "Remove" : "Add"} ${name} ${selected ? "from" : "to"} plan`);
+    button.innerHTML = `${icon(selected ? 'check' : 'add')}<span class="ui-tooltip" role="tooltip">${selected ? 'Remove from plan' : 'Add to plan'}</span>`;
+    const mealCard = button.closest('.meal-card');
+    const servingToggle = mealCard?.querySelector('[data-meal-serving-toggle]');
+    if (servingToggle) {
+      servingToggle.disabled = !selected;
+      servingToggle.setAttribute('aria-expanded', String(servingsOpen));
+      servingToggle.setAttribute('aria-label', selected ? 'Adjust serving sizes' : 'Add meal to plan before adjusting serving sizes');
+      servingToggle.title = selected ? '' : 'Add this meal to the plan before adjusting serving sizes';
+      servingToggle.textContent = selected ? (servingsOpen ? 'Hide serving controls' : 'Adjust servings') : 'Add to plan first';
+    }
+    const portion = mealCard?.querySelector('[data-portion-scope="meal"]');
+    if (portion) {
+      portion.classList.toggle('is-hidden', !servingsOpen);
+      portion.setAttribute('aria-hidden', String(!servingsOpen));
+      const mealInput = portion.querySelector('[data-portion-input]');
+      if (mealInput) mealInput.value = formatPortion(mealPortion(button.dataset.mealToggle));
+    }
+    mealCard?.querySelectorAll('[data-portion-scope="meal-item"]').forEach((control) => {
+      control.classList.toggle('is-hidden', !servingsOpen);
+      control.setAttribute('aria-hidden', String(!servingsOpen));
+      const itemInput = control.querySelector('[data-portion-input]');
+      if (itemInput) itemInput.value = formatPortion(mealItemPortion(control.dataset.portionMealId, control.dataset.portionId));
+    });
   });
-  root.querySelectorAll("[data-meal-toggle]").forEach((button) => { button.closest('.meal-card')?.classList.toggle('is-selected', selectedMealIds.includes(button.dataset.mealToggle)); });
-  const count = root.querySelector("[data-stack-count]"); if (count) count.textContent = `${activeDailyItemIds().length} unique items`;
+  root.querySelectorAll("[data-meal-toggle]").forEach((button) => {
+    const card = button.closest('.meal-card');
+    const selected = selectedMealIds.includes(button.dataset.mealToggle);
+    const servingsOpen = selected && expandedMealServings.has(button.dataset.mealToggle);
+    card?.classList.toggle('is-selected', selected);
+    card?.querySelector('.meal-ingredients')?.classList.toggle('has-ingredient-portions', servingsOpen);
+  });
   const plannerMealCount = root.querySelector("[data-planner-meal-count]"); if (plannerMealCount) plannerMealCount.textContent = formatPortion(selectedPortionTotal(selectedMealQuantities, selectedMealIds));
   const plannerQuickCount = root.querySelector("[data-planner-quick-count]"); if (plannerQuickCount) plannerQuickCount.textContent = formatPortion(selectedPortionTotal(quickItemQuantities, quickSelectedItemIds));
-  const mealCount = root.querySelector("[data-selected-meal-count]");
   const mealPortions = selectedPortionTotal(selectedMealQuantities, selectedMealIds);
   const quickPortions = selectedPortionTotal(quickItemQuantities, quickSelectedItemIds);
-  if (mealCount) mealCount.parentElement.innerHTML = `<span data-selected-meal-count>${formatPortion(mealPortions)}</span> meal portion${mealPortions === 1 ? "" : "s"} in plan`;
   const mealCounts = root.querySelector("[data-plan-meals]"); if (mealCounts) mealCounts.textContent = formatPortion(mealPortions);
   const quickCounts = root.querySelector("[data-plan-quick]"); if (quickCounts) quickCounts.textContent = formatPortion(quickPortions);
-  const uniqueCounts = root.querySelector("[data-plan-unique]"); if (uniqueCounts) uniqueCounts.textContent = String(activeDailyItemIds().length);
-  const selectedList = root.querySelector("[data-selected-meals]");
-  if (selectedList) selectedList.innerHTML = selectedMealsHTML(mealLibrary().filter((meal) => selectedMealIds.includes(meal.id)));
-  root.querySelectorAll("[data-target-action]").forEach((button) => { const selected = itemIsActive(button.dataset.targetItem); button.classList.toggle("is-selected", selected); button.setAttribute("aria-pressed", String(selected)); button.textContent = selected ? "✓ Already selected" : `+ ${button.dataset.targetActionType === "supplement" ? "Supplement" : "Food"}: ${quickItem(button.dataset.targetItem)?.name || "Add"}`; });
 }
 
-function setPlannerStatus(selector, text) { const status = document.querySelector(selector); if (status) { status.textContent = text; setTimeout(() => { if (status.textContent === text) status.textContent = ""; }, 3500); } }
+function setPlannerStatus(_selector, text) { showToast(text); }
 
 export function renderStack() {
   const container = document.getElementById("stack-app");
   if (!container) return;
-  container.innerHTML = plannerHTML() + `<details class="nutrient-reference"><summary><span><span class="eyebrow">Reference</span><strong>Full nutrient reference and sources</strong></span><span class="library-summary-action">Open</span></summary>${nutrientChecklistHTML()}</details>${legacyLibraryHTML()}`;
+  container.innerHTML = plannerHTML() + legacyLibraryHTML();
   renderLegacyProtocol();
-}
-
-export function renderAvoidPage() {
-  const container = document.getElementById("avoid-app");
-  if (!container) return;
-  container.innerHTML = `
-    <p class="stack-intro">The high-ROI avoid list: added sugar, alcohol, processed meat as a staple, industrial trans fats, ultra-processed food and appetite-driving refined foods. This is a practical carnivore-first filter, not a claim that every food outside it is dangerous.</p>
-    <div class="stack-grid stack-grid-single">
-      ${AVOID_INGREDIENTS.map(a => `
-        <article class="avoid-card">
-          <div class="avoid-card-head">
-            <h3 class="avoid-card-name"><span aria-hidden="true">${a.icon}</span> ${a.name}</h3>
-            ${a.evidence ? evidenceBadge(a.evidence) : ""}
-          </div>
-          <p class="avoid-where"><span class="stack-line-label">Where it hides</span> ${a.where}</p>
-          <p class="avoid-why"><span class="stack-line-label">Why</span> ${a.why}</p>
-          <p class="avoid-replace"><span class="stack-line-label">Replace with</span> ${a.replace}</p>
-        </article>
-      `).join("")}
-    </div>
-    <section class="upf-guide" aria-labelledby="upf-guide-title">
-      <div class="upf-guide-head">
-        <p class="eyebrow">Label literacy</p>
-        <h2 id="upf-guide-title">How to spot ultra-processed food</h2>
-        <p>${UPF_GUIDE.intro}</p>
-      </div>
-      <ol class="upf-steps">
-        ${UPF_GUIDE.steps.map(step => `<li>${step}</li>`).join("")}
-      </ol>
-       <div class="upf-guide-grid">
-        <div class="upf-guide-box upf-guide-box-red">
-          <h3>Red-flag markers</h3>
-          <ul>${UPF_GUIDE.redFlags.map(item => `<li>${item}</li>`).join("")}</ul>
-        </div>
-        <div class="upf-guide-box upf-guide-box-green">
-          <h3>Not automatically UPF</h3>
-          <ul>${UPF_GUIDE.notAutomatic.map(item => `<li>${item}</li>`).join("")}</ul>
-        </div>
-         </div>
-       </section>`;
-
-  container.insertAdjacentHTML('beforeend', `
-    <section class="avoid-label-guide" aria-labelledby="avoid-label-title">
-      <div class="avoid-label-head">
-        <p class="eyebrow">Exact label screen</p>
-        <h2 id="avoid-label-title">What to scan for on the label</h2>
-        <p>Search a product ingredient or browse the five practical screens below. These are decision rules, not a claim that every isolated additive is dangerous.</p>
-        <label class="avoid-search-label" for="avoid-label-search">Search ingredients</label>
-        <input id="avoid-label-search" class="avoid-label-search" type="search" placeholder="e.g. maltodextrin, nitrite, flavour" data-avoid-search>
-      </div>
-      <div class="avoid-label-grid">
-        ${AVOID_LABEL_GUIDE.map((group, index) => `
-          <article class="avoid-label-group" data-avoid-label-card data-search-text="${[group.name, group.priority, ...group.markers, group.rule, group.context].join(" ").toLowerCase()}">
-            <div class="avoid-label-group-head">
-              <span class="avoid-label-number">0${index + 1}</span>
-              <div><span class="avoid-label-priority">${group.priority}</span><h3>${group.name}</h3></div>
-            </div>
-            <div class="avoid-marker-list">${group.markers.map(marker => `<code>${marker}</code>`).join("")}</div>
-            <p><strong>Rule</strong> ${group.rule}</p>
-            <p class="avoid-label-context"><strong>Context</strong> ${group.context}</p>
-          </article>`).join("")}
-      </div>
-      <p class="avoid-label-empty" data-avoid-empty hidden>No matching label markers. Try a shorter ingredient or browse the full guide.</p>
-    </section>`);
-
-  const search = container.querySelector('[data-avoid-search]');
-  const cards = [...container.querySelectorAll('[data-avoid-label-card]')];
-  const empty = container.querySelector('[data-avoid-empty]');
-  search?.addEventListener('input', () => {
-    const query = search.value.trim().toLowerCase();
-    let visible = 0;
-    cards.forEach(card => {
-      const matches = !query || card.dataset.searchText.includes(query);
-      card.hidden = !matches;
-      if (matches) visible++;
-    });
-    if (empty) empty.hidden = visible > 0;
-  });
-}
-
-export function renderFoodProtocol() {
-  const container = document.getElementById("stack-summary-app");
-  if (!container) return;
-  // Home preview: keep the core protocol glanceable; foods/extras are summarised.
-  const visible = DAILY_SUPPLEMENTS;
-  container.innerHTML = `
-    <div class="stack-table">
-      <div class="stack-table-row stack-table-header">
-        <span>What</span><span>How much</span><span>When</span>
-      </div>
-      ${visible.map(s => `
-        <div class="stack-table-row">
-          <span class="stack-table-name"><span aria-hidden="true">${s.icon}</span> ${s.name}</span>
-          <span>${s.dose || s.serving}</span>
-          <span>${s.timing}</span>
-        </div>
-      `).join("")}
-      <div class="stack-table-row" style="background:var(--evidence-skip-bg);font-weight:600;">
-        <span class="stack-table-name">+ ${FOOD_SPICES.length} foods &amp; ${EXTRAS.length} extras</span>
-        <span style="color:var(--color-text-muted);grid-column: 2 / -1">See Daily Stack →</span>
-      </div>
-    </div>
-    <p class="stack-table-note">Full details, risks and the ${SKIP_LIST.length}-item skip list → <a href="/pages/stack.html">Daily Stack</a></p>`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   removeLegacyDailyPlans();
   restoreCurrentDay();
   if (document.getElementById('stack-app')) renderStack();
-  if (document.getElementById('stack-summary-app')) renderFoodProtocol();
-  if (document.getElementById('avoid-app')) renderAvoidPage();
 });
 
-document.addEventListener('click', (event) => {
+document.addEventListener('click', async (event) => {
   const root = document.getElementById('stack-app');
   if (!root) return;
 
@@ -1025,8 +985,44 @@ document.addEventListener('click', (event) => {
 
   const plannerModeTab = event.target.closest('[data-planner-mode]');
   if (plannerModeTab) {
+    plannerSearchQuery = "";
+    const plannerSearch = root.querySelector('[data-planner-search]');
+    if (plannerSearch) plannerSearch.value = "";
     plannerMode = plannerModeTab.dataset.plannerMode;
-    renderStack();
+    renderPlannerMode(root);
+    return;
+  }
+
+  const cardActionExcluded = event.target.closest('button, input, [data-portion-control], .meal-card-actions');
+  const mealCard = event.target.closest('[data-meal-card]');
+  if (mealCard && !cardActionExcluded) {
+    mealCard.querySelector('[data-meal-toggle]')?.click();
+    return;
+  }
+
+  const quickCard = event.target.closest('[data-quick-card]');
+  if (quickCard && !cardActionExcluded) {
+    quickCard.querySelector('[data-quick-item]')?.click();
+    return;
+  }
+
+  const mealServingToggle = event.target.closest('[data-meal-serving-toggle]');
+  if (mealServingToggle) {
+    const id = mealServingToggle.dataset.mealServingToggle;
+    if (mealServingToggle.disabled || !selectedMealIds.includes(id)) return;
+    if (expandedMealServings.has(id)) expandedMealServings.delete(id);
+    else expandedMealServings.add(id);
+    updateMealPlannerUI();
+    return;
+  }
+
+  const quickServingToggle = event.target.closest('[data-quick-serving-toggle]');
+  if (quickServingToggle) {
+    const id = quickServingToggle.dataset.quickServingToggle;
+    if (quickServingToggle.disabled || !quickSelectedItemIds.includes(id)) return;
+    if (expandedQuickServings.has(id)) expandedQuickServings.delete(id);
+    else expandedQuickServings.add(id);
+    updateMealPlannerUI();
     return;
   }
 
@@ -1041,9 +1037,11 @@ document.addEventListener('click', (event) => {
     if (quickSelectedItemIds.includes(id)) {
       quickSelectedItemIds = quickSelectedItemIds.filter((itemId) => itemId !== id);
       delete quickItemQuantities[id];
+      expandedQuickServings.delete(id);
     } else {
       quickSelectedItemIds = [...quickSelectedItemIds, id];
       quickItemQuantities[id] = 1;
+      expandedQuickServings.delete(id);
     }
     updateMealPlannerUI();
     return;
@@ -1054,10 +1052,19 @@ document.addEventListener('click', (event) => {
     const control = portionAction.closest('[data-portion-control]');
     const id = control?.dataset.portionId;
     const scope = control?.dataset.portionScope;
+    const increment = portionAction.dataset.portionAction === "increase" ? .25 : -.25;
+    if (scope === "meal-item") {
+      const mealId = control?.dataset.portionMealId;
+      if (id && mealId) {
+        selectedMealItemQuantities[mealId] ||= {};
+        selectedMealItemQuantities[mealId][id] = normalizePortion(mealItemPortion(mealId, id) + increment);
+        updateMealPlannerUI();
+      }
+      return;
+    }
     const quantities = scope === "meal" ? selectedMealQuantities : quickItemQuantities;
     if (id && quantities) {
-      const current = normalizePortion(quantities[id]);
-      quantities[id] = normalizePortion(current + (portionAction.dataset.portionAction === "increase" ? .25 : -.25));
+      quantities[id] = normalizePortion(normalizePortion(quantities[id]) + increment);
       updateMealPlannerUI();
     }
     return;
@@ -1066,9 +1073,8 @@ document.addEventListener('click', (event) => {
   const quickCategory = event.target.closest('[data-quick-category]');
   if (quickCategory) {
     activeQuickCategory = quickCategory.dataset.quickCategory;
-    root.querySelectorAll('[data-quick-category]').forEach((button) => { const active = button.dataset.quickCategory === activeQuickCategory; button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); });
-    const grid = root.querySelector('.quick-item-grid');
-    if (grid) grid.innerHTML = BUILDER_ITEMS.filter((item) => activeQuickCategory === 'all' || item.category === activeQuickCategory).map(quickItemHTML).join('');
+    root.querySelectorAll('[data-quick-category]').forEach((button) => { const active = button.dataset.quickCategory === activeQuickCategory; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
+    renderPlannerSearchResults(root);
     return;
   }
 
@@ -1078,35 +1084,26 @@ document.addEventListener('click', (event) => {
     if (selectedMealIds.includes(id)) {
       selectedMealIds = selectedMealIds.filter((mealId) => mealId !== id);
       delete selectedMealQuantities[id];
+      delete selectedMealItemQuantities[id];
+      expandedMealServings.delete(id);
     } else {
       selectedMealIds = [...selectedMealIds, id];
       selectedMealQuantities[id] = 1;
+      selectedMealItemQuantities[id] = {};
+      expandedMealServings.delete(id);
     }
     updateMealPlannerUI();
     return;
   }
 
   const mealRemove = event.target.closest('[data-meal-remove]');
-  if (mealRemove) { selectedMealIds = selectedMealIds.filter((id) => id !== mealRemove.dataset.mealRemove); delete selectedMealQuantities[mealRemove.dataset.mealRemove]; updateMealPlannerUI(); return; }
-
-  const targetAction = event.target.closest('[data-target-action]');
-  if (targetAction) {
-    const id = targetAction.dataset.targetItem;
-    if (quickSelectedItemIds.includes(id)) {
-      quickSelectedItemIds = quickSelectedItemIds.filter((itemId) => itemId !== id);
-      delete quickItemQuantities[id];
-    } else {
-      quickSelectedItemIds = [...quickSelectedItemIds, id];
-      quickItemQuantities[id] = 1;
-    }
-    updateMealPlannerUI();
-    return;
-  }
+  if (mealRemove) { selectedMealIds = selectedMealIds.filter((id) => id !== mealRemove.dataset.mealRemove); delete selectedMealQuantities[mealRemove.dataset.mealRemove]; delete selectedMealItemQuantities[mealRemove.dataset.mealRemove]; expandedMealServings.delete(mealRemove.dataset.mealRemove); updateMealPlannerUI(); return; }
 
   if (event.target.closest('[data-meal-compose-open]')) {
     if (mealComposerMode !== "edit") {
       mealComposerMode = "create";
       mealComposerMealId = null;
+      mealComposerSource = "saved";
       mealComposerItems = [...quickSelectedItemIds];
       mealComposerName = "";
     }
@@ -1121,12 +1118,19 @@ document.addEventListener('click', (event) => {
     return;
   }
 
+  if (event.target.closest('[data-meal-edit-save]')) {
+    const name = root.querySelector('[data-meal-edit-name]')?.value || '';
+    saveMealComposer(root, { name, status: root.querySelector('[data-meal-edit-status]') });
+    return;
+  }
+
   const mealEdit = event.target.closest('[data-meal-edit]');
   if (mealEdit) {
-    const meal = getSavedMeals().find((candidate) => candidate.id === mealEdit.dataset.mealEdit);
+    const meal = mealLibrary().find((candidate) => candidate.id === mealEdit.dataset.mealEdit);
     if (meal) {
       mealComposerMode = "edit";
       mealComposerMealId = meal.id;
+      mealComposerSource = meal.source;
       mealComposerItems = [...meal.items];
       mealComposerName = meal.name;
       plannerMode = "quick-add";
@@ -1135,17 +1139,33 @@ document.addEventListener('click', (event) => {
     return;
   }
 
-  const mealDuplicate = event.target.closest('[data-meal-duplicate]');
-  if (mealDuplicate) {
-    const meal = mealLibrary().find((candidate) => candidate.id === mealDuplicate.dataset.mealDuplicate);
+  const mealDelete = event.target.closest('[data-meal-delete]');
+  if (mealDelete) {
+    const meal = mealLibrary().find((candidate) => candidate.id === mealDelete.dataset.mealDelete);
     if (meal) {
-      const now = new Date().toISOString();
-      const copy = { ...meal, id: `${meal.id}-copy-${Date.now()}`, name: `${meal.name} copy`, items: [...meal.items], createdAt: now, updatedAt: now };
-      setSavedMeals([copy, ...getSavedMeals()]);
-      plannerMode = "meals";
+      const items = meal.items.map(quickItem).filter(Boolean).map((item) => item.name);
+      const selected = selectedMealIds.includes(meal.id);
+      const confirmed = await confirmAction({
+        title: `${meal.source === 'preset' ? 'Remove' : 'Delete'} “${meal.name}”?`,
+        summary: meal.source === 'preset'
+          ? 'This preset will be hidden and any edits to it will be reset. You can restore it later.'
+          : 'This permanently removes the meal from your saved meals.',
+        details: `${items.length} ingredient${items.length === 1 ? '' : 's'}: ${items.join(' · ')}${selected ? ' · It will also be removed from today’s plan.' : ''}`,
+        confirmLabel: meal.source === 'preset' ? 'Remove preset' : 'Delete meal',
+        returnFocus: mealDelete,
+      });
+      if (!confirmed) return;
+      deleteMeal(meal);
       renderStack();
-      setPlannerStatus('[data-planner-status]', `Duplicated “${copy.name}”`);
+      setPlannerStatus('[data-planner-status]', `${meal.source === 'preset' ? 'Removed preset' : 'Deleted'} “${meal.name}”`);
     }
+    return;
+  }
+
+  if (event.target.closest('[data-meal-restore]')) {
+    setMealLibraryState({ overrides: {}, hidden: [] });
+    renderStack();
+    setPlannerStatus('[data-planner-status]', "Preset meals restored");
     return;
   }
 
@@ -1155,13 +1175,28 @@ document.addEventListener('click', (event) => {
     return;
   }
 
-  if (event.target.closest('[data-load-foundation]')) { selectedMealIds = []; selectedMealQuantities = {}; quickSelectedItemIds = FOUNDATION_STACK.items.filter((id) => BUILDER_ITEMS.some((item) => item.id === id)); quickItemQuantities = Object.fromEntries(quickSelectedItemIds.map((id) => [id, 1])); updateMealPlannerUI(); setPlannerStatus('[data-planner-status]', FOUNDATION_STACK.note); return; }
-  if (event.target.closest('[data-clear-stack]')) { selectedMealIds = []; quickSelectedItemIds = []; selectedMealQuantities = {}; quickItemQuantities = {}; resetMealComposer(); updateMealPlannerUI(); return; }
+  const clearPlan = event.target.closest('[data-clear-stack]');
+  if (clearPlan) {
+    if (!selectedMealIds.length && !quickSelectedItemIds.length) return;
+    const confirmed = await confirmAction({ title: 'Clear today’s plan?', summary: 'This removes every selected meal and Quick Add item from today. Saved meals are not deleted.', confirmLabel: 'Clear plan', returnFocus: clearPlan });
+    if (!confirmed) return;
+    selectedMealIds = []; quickSelectedItemIds = []; selectedMealQuantities = {}; selectedMealItemQuantities = {}; quickItemQuantities = {}; expandedMealServings.clear(); expandedQuickServings.clear(); resetMealComposer(); updateMealPlannerUI();
+    setPlannerStatus('[data-planner-status]', 'Today’s plan cleared');
+    return;
+  }
 });
 
 document.addEventListener('input', (event) => {
+  const plannerSearch = event.target.closest('[data-planner-search]');
+  if (plannerSearch && document.getElementById('stack-app')) {
+    plannerSearchQuery = plannerSearch.value;
+    renderPlannerSearchResults(document.getElementById('stack-app'));
+    return;
+  }
   const mealName = event.target.closest('[data-meal-dialog-name]');
   if (mealName && document.getElementById('stack-app')) { mealComposerName = mealName.value; return; }
+  const editName = event.target.closest('[data-meal-edit-name]');
+  if (editName && document.getElementById('stack-app')) { mealComposerName = editName.value; return; }
   const weight = event.target.closest('[data-body-weight]');
   if (!weight || !document.getElementById('stack-app')) return;
   const next = Number(weight.value);
@@ -1173,8 +1208,30 @@ document.addEventListener('change', (event) => {
   if (!portionInput || !document.getElementById('stack-app')) return;
   const control = portionInput.closest('[data-portion-control]');
   const id = control?.dataset.portionId;
+  if (control?.dataset.portionScope === "meal-item") {
+    const mealId = control.dataset.portionMealId;
+    if (id && mealId) {
+      selectedMealItemQuantities[mealId] ||= {};
+      selectedMealItemQuantities[mealId][id] = normalizePortion(portionInput.value);
+      updateMealPlannerUI();
+    }
+    return;
+  }
   const quantities = control?.dataset.portionScope === "meal" ? selectedMealQuantities : quickItemQuantities;
   if (id && quantities) { quantities[id] = normalizePortion(portionInput.value); updateMealPlannerUI(); }
+});
+
+document.addEventListener('keydown', (event) => {
+  const tab = event.target.closest('[data-planner-mode]');
+  if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const tabs = [...tab.closest('[role="tablist"]').querySelectorAll('[data-planner-mode]')];
+  let index = tabs.indexOf(tab);
+  if (event.key === 'Home') index = 0;
+  else if (event.key === 'End') index = tabs.length - 1;
+  else index = (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  event.preventDefault();
+  tabs[index].focus();
+  tabs[index].click();
 });
 
 document.addEventListener('submit', (event) => {
@@ -1189,90 +1246,3 @@ document.addEventListener('cancel', (event) => {
   const dialog = event.target.closest?.('[data-meal-dialog]');
   if (dialog && mealComposerMode === 'create') resetMealComposer();
 }, true);
-
-document.addEventListener('click', (event) => {
-  if (document.getElementById('stack-app')) return;
-  const tab = event.target.closest('[data-library-tab]');
-  if (tab) {
-    selectStackTab(tab.dataset.libraryTab);
-    return;
-  }
-  const item = event.target.closest('[data-builder-item]');
-  if (item) {
-    const id = item.dataset.builderItem;
-    selectedBuilderItems = selectedBuilderItems.includes(id)
-      ? selectedBuilderItems.filter((selected) => selected !== id)
-      : [...selectedBuilderItems, id];
-    updateBuilderUI();
-    return;
-  }
-  const category = event.target.closest('[data-builder-category]');
-  if (category) {
-    activeBuilderCategory = category.dataset.builderCategory;
-    const root = document.getElementById('stack-app');
-    if (root) {
-      root.querySelectorAll('[data-builder-category]').forEach((button) => {
-        const selected = button.dataset.builderCategory === activeBuilderCategory;
-        button.classList.toggle('active', selected);
-        button.setAttribute('aria-selected', String(selected));
-      });
-      const grid = root.querySelector('.builder-item-grid');
-      if (grid) grid.innerHTML = builderItemsForCategory().map(builderItemHTML).join('');
-    }
-    return;
-  }
-  if (event.target.closest('[data-load-foundation]')) {
-    selectedBuilderItems = FOUNDATION_STACK.items.filter((id) => BUILDER_ITEMS.some((item) => item.id === id));
-    updateBuilderUI();
-    const status = document.querySelector('[data-save-status]');
-    if (status) { status.textContent = FOUNDATION_STACK.note; setTimeout(() => { status.textContent = ''; }, 4000); }
-    return;
-  }
-  if (event.target.closest('[data-clear-stack]')) {
-    selectedBuilderItems = [];
-    updateBuilderUI();
-    return;
-  }
-  if (event.target.closest('[data-save-stack]')) {
-    const nameInput = document.querySelector('[data-stack-name]');
-    const status = document.querySelector('[data-save-status]');
-    const name = nameInput?.value.trim() || `Stack ${getSavedStacks().length + 1}`;
-    const saved = getSavedStacks().filter((stack) => stack.name.toLowerCase() !== name.toLowerCase());
-    saved.unshift({ name, items: [...selectedBuilderItems], bodyWeightKg, savedAt: new Date().toISOString() });
-    setSavedStacks(saved);
-    if (nameInput) nameInput.value = '';
-    if (status) { status.textContent = `Saved “${name}”`; setTimeout(() => { status.textContent = ''; }, 2500); }
-    renderSavedStacks();
-    return;
-  }
-  const load = event.target.closest('[data-load-stack]');
-  if (load) {
-    const stack = getSavedStacks()[Number(load.dataset.loadStack)];
-    if (stack) {
-      selectedBuilderItems = BUILDER_ITEMS.map((item) => item.id).filter((id) => stack.items.includes(id));
-      if (Number.isFinite(Number(stack.bodyWeightKg))) bodyWeightKg = Math.min(250, Math.max(35, Number(stack.bodyWeightKg)));
-      const weight = document.querySelector('[data-body-weight]');
-      if (weight) weight.value = bodyWeightKg;
-      updateBuilderUI();
-    }
-    return;
-  }
-  const remove = event.target.closest('[data-delete-stack]');
-  if (remove) {
-    const saved = getSavedStacks();
-    saved.splice(Number(remove.dataset.deleteStack), 1);
-    setSavedStacks(saved);
-    renderSavedStacks();
-  }
-});
-
-document.addEventListener('input', (event) => {
-  if (document.getElementById('stack-app')) return;
-  const weight = event.target.closest('[data-body-weight]');
-  if (!weight) return;
-  const next = Number(weight.value);
-  if (Number.isFinite(next) && next >= 35 && next <= 250) {
-    bodyWeightKg = next;
-    updateBuilderUI();
-  }
-});

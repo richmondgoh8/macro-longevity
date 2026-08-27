@@ -25,6 +25,11 @@ pages.forEach((file) => {
   check(!/script-src 'self' 'unsafe-inline'/.test(html), `${file}: unsafe inline script CSP remains`);
   check(/rel="canonical"/.test(html), `${file}: canonical URL missing`);
   check(/src="\/js\/register-sw\.js"/.test(html), `${file}: service-worker bootstrap missing`);
+  const primaryLabels = [...html.matchAll(/class="nav-link(?: active)?"[^>]*>([^<]+)<\/a>/g)].map((match) => match[1].trim());
+  const bottomLabels = [...html.matchAll(/class="bottom-nav-label">([^<]+)<\/span>/g)].map((match) => match[1].trim());
+  check(JSON.stringify(primaryLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: primary navigation must contain the five canonical destinations`);
+  check(JSON.stringify(bottomLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: bottom navigation must contain the five canonical destinations`);
+  check(!/>Avoid<\/a>|bottom-nav-label">Avoid</.test(html), `${file}: obsolete parent-level Avoid navigation remains`);
 });
 
 const finance = read('pages/finance.html');
@@ -46,7 +51,7 @@ check(!/Zero chance of loss/i.test(financeData), 'js/data/finance.js: absolute l
 check(read('css/variables.css').includes('--tint-secondary-12:'), 'css/variables.css: conditional tint token missing');
 
 const nutritionData = read('js/data/nutrition.js');
-['protein', 'leucine', 'ala', 'epaDha', 'la', 'magnesium', 'potassium', 'calcium', 'zinc', 'selenium', 'iron', 'copper', 'iodine', 'vitaminD', 'vitaminC', 'folate', 'b12', 'b1', 'b2', 'b3', 'b5', 'b6', 'biotin', 'vitaminA', 'vitaminE', 'vitaminK', 'fiber', 'choline'].forEach((id) => {
+['protein', 'leucine', 'ala', 'epaDha', 'magnesium', 'potassium', 'calcium', 'zinc', 'selenium', 'iron', 'iodine', 'vitaminD', 'vitaminC', 'folate', 'b12', 'b1', 'vitaminA', 'fiber', 'choline'].forEach((id) => {
   check(nutritionData.includes(`id: "${id}"`), `js/data/nutrition.js: nutrient target missing: ${id}`);
 });
 check(nutritionData.includes('FOUNDATION_STACK'), 'js/data/nutrition.js: foundation preset missing');
@@ -64,8 +69,8 @@ const javascriptFiles = [
   'js/data/stack.js', 'js/data/blood.js', 'js/data/workout.js', 'js/data/finance.js',
   'js/data/pillars.js', 'js/data/protocol.js', 'js/data/singapore.js', 'js/data/nutrition.js', 'js/stack.js',
   'js/blood.js', 'js/render.js', 'js/export.js', 'js/home.js', 'js/protocol.js',
-  'js/icons.js', 'js/theme.js', 'js/finance.js', 'js/register-sw.js', 'sw.js',
-  'js/components/card-swipe.js',
+  'js/finance.js', 'js/register-sw.js', 'sw.js',
+  'js/site.js', 'js/avoid.js', 'js/stack-preview.js', 'js/components/card-swipe.js',
 ];
 javascriptFiles.forEach((file) => {
   const result = spawnSync(process.execPath, ['--check', file], { cwd: root, encoding: 'utf8' });

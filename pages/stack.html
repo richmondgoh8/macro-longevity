@@ -15,6 +15,13 @@
     <meta name="theme-color" content="#0a7e6f">
     <title>Daily Stack — Macro Longevity</title>
     <link rel="stylesheet" href="/css/variables.css">
+    <link rel="preload" href="/fonts/geist-sans.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="modulepreload" href="/js/stack.js">
+    <link rel="modulepreload" href="/js/site.js">
+    <link rel="modulepreload" href="/js/data/stack.js">
+    <link rel="modulepreload" href="/js/data/core.js">
+    <link rel="modulepreload" href="/js/data/nutrition.js">
+    <link rel="modulepreload" href="/js/components/ui.js">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -22,7 +29,6 @@
     <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <span class="nav-logo-icon" aria-hidden="true"></span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
@@ -30,12 +36,10 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/pages/stack.html" class="nav-link active" aria-current="page">Daily Stack</a>
-                <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
-                <a href="/pages/protocol.html" class="nav-link">Blueprint</a>
-                <a href="/pages/workout.html" class="nav-link">Workout</a>
+                <a href="/pages/stack.html" class="nav-link active" aria-current="page">Nutrition</a>
+                <a href="/pages/blood.html" class="nav-link">Health</a>
+                <a href="/pages/workout.html" class="nav-link">Training</a>
                 <a href="/pages/finance.html" class="nav-link">Finance</a>
-                <a href="/pages/avoid.html" class="nav-link">Avoid</a>
             </div>
         </div>
     </nav>
@@ -60,7 +64,6 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <span class="footer-logo" aria-hidden="true"></span>
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
@@ -74,8 +77,8 @@
     </footer>
 
     <script type="module" src="/js/stack.js"></script>
-    <script type="module" src="/js/export.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item active"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a><a href="/pages/protocol.html" class="bottom-nav-item"><span class="bottom-nav-icon">📐</span><span class="bottom-nav-label">Blueprint</span></a></div></nav>
+    <script type="module" src="/js/site.js"></script>
+<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item active"><span class="bottom-nav-label">Nutrition</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
  <script src="/js/register-sw.js" defer></script>
 </body>
 </html>
