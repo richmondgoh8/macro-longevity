@@ -1027,9 +1027,9 @@ function exerciseCardFace(e) {
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${e.id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">
-        <button class="timer-btn timer-start" data-exercise="${e.id}">▶ Start</button>
-        <button class="timer-btn timer-pause" data-exercise="${e.id}" style="display:none">⏸ Pause</button>
-        <button class="timer-btn timer-stop" data-exercise="${e.id}" style="display:none">⏹ Stop</button>
+        <button class="timer-btn timer-start" data-exercise="${e.id}">Start</button>
+        <button class="timer-btn timer-pause" data-exercise="${e.id}" style="display:none">Pause</button>
+        <button class="timer-btn timer-stop" data-exercise="${e.id}" style="display:none">Stop</button>
       </div>
       <div class="timer-label" id="label-${e.id}">Ready</div>
     </div>

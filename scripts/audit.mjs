@@ -25,6 +25,8 @@ pages.forEach((file) => {
   check(!/script-src 'self' 'unsafe-inline'/.test(html), `${file}: unsafe inline script CSP remains`);
   check(/rel="canonical"/.test(html), `${file}: canonical URL missing`);
   check(/src="\/js\/register-sw\.js"/.test(html), `${file}: service-worker bootstrap missing`);
+  check(html.includes('/fonts/inter-latin.woff2'), `${file}: local Inter font preload missing`);
+  check(!html.includes('geist-'), `${file}: legacy Geist font reference remains`);
   const primaryLabels = [...html.matchAll(/class="nav-link(?: active)?"[^>]*>([^<]+)<\/a>/g)].map((match) => match[1].trim());
   const bottomLabels = [...html.matchAll(/class="bottom-nav-label">([^<]+)<\/span>/g)].map((match) => match[1].trim());
   check(JSON.stringify(primaryLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: primary navigation must contain the five canonical destinations`);
@@ -45,6 +47,22 @@ check(stack.includes('role="tablist"'), 'js/stack.js: tablist semantics missing'
 const sw = read('sw.js');
 const assets = [...sw.matchAll(/'([^']+)'/g)].map((match) => match[1]).filter((asset) => asset.startsWith('/'));
 assets.forEach((asset) => check(fs.existsSync(path.join(root, asset.slice(1))), `sw.js: precached asset missing: ${asset}`));
+check(sw.includes('/fonts/inter-latin.woff2') && sw.includes('/fonts/jetbrains-mono-latin.woff2'), 'sw.js: Warm Canvas font assets missing from precache');
+check(!sw.includes('geist-'), 'sw.js: legacy Geist font remains precached');
+
+const variables = read('css/variables.css');
+check(variables.includes('--color-primary: #0075de'), 'css/variables.css: Warm Canvas primary token missing');
+check(variables.includes("font-family: 'Inter'"), 'css/variables.css: Inter font face missing');
+check(variables.includes("font-family: 'JetBrains Mono'"), 'css/variables.css: JetBrains Mono font face missing');
+check(!variables.includes('Geist'), 'css/variables.css: legacy Geist token remains');
+
+const manifest = read('manifest.json');
+check(manifest.includes('"theme_color": "#ffffff"'), 'manifest.json: Warm Canvas theme color missing');
+check(manifest.includes('"background_color": "#f6f5f4"'), 'manifest.json: Warm Canvas background color missing');
+check(read('favicon.svg').includes('fill="#0075de"'), 'favicon.svg: Warm Canvas primary fill missing');
+['fonts/geist-sans.woff2', 'fonts/geist-mono.woff2', 'fonts/dm-sans-latin.woff2'].forEach((file) => {
+  check(!fs.existsSync(path.join(root, file)), `${file}: retired font asset remains`);
+});
 
 const financeData = read('js/data/finance.js');
 check(!/Zero chance of loss/i.test(financeData), 'js/data/finance.js: absolute loss claim remains');

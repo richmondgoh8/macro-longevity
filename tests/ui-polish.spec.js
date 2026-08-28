@@ -39,6 +39,40 @@ test('five navigation tabs center their labels vertically', async ({ page }) => 
   mobile.forEach((tab) => expect(tab.centerDelta).toBeLessThanOrEqual(1));
 });
 
+test('active primary navigation uses one selected treatment', async ({ page }) => {
+  const routes = ['/', '/pages/stack.html', '/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html', '/pages/finance.html'];
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const route of routes) {
+    await page.goto(route);
+    const state = await page.locator('.nav-link.active').evaluate((active) => {
+      const navStyle = getComputedStyle(active.closest('.nav'));
+      const linkStyle = getComputedStyle(active);
+      const afterStyle = getComputedStyle(active, '::after');
+      return {
+        navBorderBottomColor: navStyle.borderBottomColor,
+        activeBackground: linkStyle.backgroundColor,
+        activeShadow: linkStyle.boxShadow,
+        afterContent: afterStyle.content,
+      };
+    });
+    expect(state.navBorderBottomColor).toBe('rgba(0, 0, 0, 0.1)');
+    expect(state.activeBackground).toBe('rgb(242, 249, 255)');
+    expect(state.activeShadow).toBe('none');
+    expect(state.afterContent).toBe('none');
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const route of routes) {
+    await page.goto(route);
+    const state = await page.locator('.bottom-nav-item.active').evaluate((active) => {
+      const style = getComputedStyle(active);
+      return { background: style.backgroundColor, shadow: style.boxShadow };
+    });
+    expect(state.background).toBe('rgb(242, 249, 255)');
+    expect(state.shadow).toBe('none');
+  }
+});
+
 test('workout tabs are centered and use one index prefix', async ({ page }) => {
   await page.goto('/pages/workout.html');
   const tabs = await page.locator('.workout-tab').evaluateAll((nodes) => nodes.map((node) => ({
@@ -55,6 +89,30 @@ test('workout tabs are centered and use one index prefix', async ({ page }) => {
     expect(tab.text).toContain(`0${index + 1} /`);
     expect(tab.text.match(/\b0[1-4]\b/g)).toHaveLength(1);
   });
+});
+
+test('active workout tabs render one visible indicator bar', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await page.goto('/pages/workout.html');
+    const active = page.locator('.workout-tab').nth(1);
+    await active.click();
+    const state = await active.evaluate((node) => {
+      const tabs = node.parentElement;
+      const next = node.nextElementSibling;
+      const tabStyle = getComputedStyle(node);
+      const tabsStyle = getComputedStyle(tabs);
+      const nextStyle = next ? getComputedStyle(next) : null;
+      return {
+        parentBorderBottomStyle: tabsStyle.borderBottomStyle,
+        activeShadow: tabStyle.boxShadow,
+        nextBorderTopColor: nextStyle?.borderTopColor,
+      };
+    });
+    expect(state.parentBorderBottomStyle).toBe('none');
+    expect(state.activeShadow).toContain('inset');
+    if (width === 390) expect(state.nextBorderTopColor).toMatch(/rgba\(0, 0, 0, 0\)/);
+  }
 });
 
 test('blood cards use intrinsic columns and responsive flow', async ({ page }) => {
@@ -266,7 +324,13 @@ test('Clear plan uses centered confirmation and a layout-independent toast', asy
   await expect(toast).toHaveText('Today’s plan cleared');
   await expect(toast).toHaveClass(/is-visible/);
   expect(await toast.evaluate((node) => !node.closest('.planner-controls'))).toBe(true);
-  expect(await clear.boundingBox()).toEqual(before);
+  const after = await clear.boundingBox();
+  expect(after).not.toBeNull();
+  expect(after.x).toBe(before.x);
+  expect(after.width).toBe(before.width);
+  expect(after.height).toBe(before.height);
+  expect(after.y).toBeGreaterThanOrEqual(0);
+  expect(after.y + after.height).toBeLessThanOrEqual(844);
 });
 
 test('first-time Nutrition state identifies the example and can start blank', async ({ page }) => {

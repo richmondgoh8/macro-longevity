@@ -27,7 +27,7 @@ pages/
   avoid.html                Ingredients to Avoid (full-page list, 7 items)
   protocol.html             Blueprint: 4-Pillar model, 80/20, screening tiers, biology, social health, frontier geroscience, Singapore
 css/
-  variables.css             Design tokens — colors, typography (4-size fluid), spacing (8px grid)
+  variables.css             Warm Canvas tokens — colors, typography, 4px base / 8px rhythm
   style.css                 All component styles, responsive (768px, 480px)
 js/
   stack.js                  Daily Stack planner rendering (ES module)
@@ -83,12 +83,12 @@ js/
 Follows [`DESIGN.md`](DESIGN.md). Key tokens in `css/variables.css`:
 
 - **Typography**: 4 sizes with `clamp()` fluid scaling (`--text-sm` through `--text-xl`)
-- **Typography**: Geist for interface text and Geist Mono for measured data — self-hosted, no external fetch
-- **Spacing**: 8px grid (`--space-2` through `--space-20`)
+- **Typography**: Inter for interface text and JetBrains Mono for measured data — self-hosted, no external fetch
+- **Spacing**: 4px base with an 8px primary rhythm (`--space-1` through `--space-30`)
 - **Evidence taxonomy (5 tiers)**: `--evidence-core/conditional/optional/experimental/skip` — mirrors the Longevity OS report (CORE / CONDITIONAL / OPTIONAL / EXPERIMENTAL / SKIP)
-- **4-Pillar accents**: `--pillar-1..4` (rose / violet / amber / teal)
-- **Theme**: light-only interface with a single neutral surface system
-- **Icons**: text-first interface; data visualizations may use SVG, but navigation and cards do not use icon markers
+- **4-Pillar accents**: `--pillar-1..4` (warm red / pink / orange / teal)
+- **Theme**: light-only Warm Canvas interface with white and warm-gray surfaces
+- **Icons**: text-first interface with a small local SVG subset for familiar controls; data visualizations use SVG
 - **Carnivore notes**: `--carnivore`, `--carnivore-bg`, `--carnivore-border`
 
 ## Mobile UX

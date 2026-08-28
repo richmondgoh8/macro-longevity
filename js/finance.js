@@ -173,7 +173,8 @@ function drawFireChart(data, fireLine = 0) {
   data.forEach((value, i) => {
     const x = pad.left + (i / years) * cw;
     const y = pad.top + ch - (value / maxVal) * ch;
-    paths += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+    if (i === 0) paths = `M${x.toFixed(1)},${y.toFixed(1)}`;
+    else paths += `H${x.toFixed(1)}V${y.toFixed(1)}`;
   });
 
   let gridHtml = '';

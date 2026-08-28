@@ -1223,7 +1223,10 @@ document.addEventListener('click', async (event) => {
     if (!selectedMealIds.length && !quickSelectedItemIds.length) return;
     const confirmed = await confirmAction({ title: 'Clear today’s plan?', summary: 'This removes every selected meal and Quick Add item from today. Saved meals are not deleted.', confirmLabel: 'Clear plan', returnFocus: clearPlan });
     if (!confirmed) return;
+    const clearTop = clearPlan.getBoundingClientRect().top;
     selectedMealIds = []; quickSelectedItemIds = []; selectedMealQuantities = {}; selectedMealItemQuantities = {}; quickItemQuantities = {}; expandedMealServings.clear(); expandedQuickServings.clear(); resetMealComposer(); updateMealPlannerUI();
+    const nextClearTop = clearPlan.getBoundingClientRect().top;
+    if (nextClearTop !== clearTop) window.scrollBy({ top: nextClearTop - clearTop, left: 0, behavior: 'instant' });
     setPlannerStatus('[data-planner-status]', 'Today’s plan cleared');
     return;
   }

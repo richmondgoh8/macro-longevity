@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v18';
+const CACHE_NAME = 'macro-longevity-offline-v20-warm-canvas';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -35,8 +35,8 @@ const STATIC_ASSETS = [
   '/offline.html',
   '/favicon.svg',
   '/manifest.json',
-  '/fonts/geist-sans.woff2',
-  '/fonts/geist-mono.woff2',
+  '/fonts/inter-latin.woff2',
+  '/fonts/jetbrains-mono-latin.woff2',
 ];
 
 self.addEventListener('install', (event) => {

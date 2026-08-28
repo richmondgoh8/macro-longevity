@@ -84,7 +84,7 @@ function confirmationDialog() {
     resolve?.(confirmed);
     requestAnimationFrame(() => {
       returnFocus?.focus?.({ preventScroll: true });
-      window.scrollTo(confirmScrollPosition.x, confirmScrollPosition.y);
+      window.scrollTo({ ...confirmScrollPosition, behavior: 'instant' });
     });
   });
   dialog.addEventListener('click', (event) => {
