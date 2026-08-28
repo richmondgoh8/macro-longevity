@@ -1,3 +1,18 @@
+let tooltipImport;
+let pendingTooltip;
+const loadTooltips = (target, type = 'focus') => {
+  pendingTooltip = { target, type, at: performance.now() };
+  tooltipImport ||= import('./components/tooltip.js').then(({ initTooltips }) => initTooltips(pendingTooltip));
+};
+document.addEventListener('pointerover', (event) => {
+  const trigger = event.target.closest?.('[data-tooltip-trigger]');
+  if (trigger && !(event.relatedTarget && trigger.contains(event.relatedTarget))) loadTooltips(trigger, 'pointer');
+}, true);
+document.addEventListener('focusin', (event) => {
+  const trigger = event.target.closest?.('[data-tooltip-trigger]');
+  if (trigger) loadTooltips(trigger);
+}, true);
+
 const CONTEXT_NAV = {
   '/pages/stack.html': { label: 'Nutrition', links: [['/pages/stack.html', 'Daily plan'], ['/pages/avoid.html', 'Ingredient guide']] },
   '/pages/avoid.html': { label: 'Nutrition', links: [['/pages/stack.html', 'Daily plan'], ['/pages/avoid.html', 'Ingredient guide']] },
@@ -21,6 +36,16 @@ document.querySelectorAll('.bottom-nav').forEach((nav) => nav.setAttribute('aria
 document.querySelectorAll('.bottom-nav-item.active').forEach((item) => {
   if (!item.hasAttribute('aria-current')) item.setAttribute('aria-current', new URL(item.href).pathname === window.location.pathname ? 'page' : 'location');
 });
+
+const LONG_PAGE_ROUTES = new Set(['/pages/stack.html', '/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html', '/pages/finance.html']);
+const initLongPageNavigation = () => {
+  if (!LONG_PAGE_ROUTES.has(window.location.pathname)) return;
+  const loadStickyPin = () => import('./components/sticky-pin.js').then(({ initStickyPin }) => queueMicrotask(() => initStickyPin()));
+  // Keep the optional rail out of the critical route payload while retaining a fast first interaction.
+  if (document.readyState === 'complete') setTimeout(loadStickyPin, 0);
+  else window.addEventListener('load', () => setTimeout(loadStickyPin, 0), { once: true });
+};
+initLongPageNavigation();
 
 document.addEventListener('click', async (event) => {
   const menuButton = event.target.closest('[data-nav-toggle]');

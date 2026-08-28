@@ -17,6 +17,37 @@ for (const route of routes) {
   });
 }
 
+test('same-origin route navigation is view-transition ready', async ({ page }) => {
+  await page.goto('/');
+  const transitionRules = await page.evaluate(() => {
+    const texts = [];
+    const collect = (rules) => {
+      for (const rule of rules) {
+        texts.push(rule.cssText);
+        if (rule.cssRules) collect(rule.cssRules);
+      }
+    };
+    for (const sheet of document.styleSheets) {
+      try { collect(sheet.cssRules); } catch { /* Ignore inaccessible third-party sheets. */ }
+    }
+    return texts;
+  });
+  expect(transitionRules.some((text) => text.includes('@view-transition') && text.includes('navigation: auto'))).toBe(true);
+  expect(transitionRules.some((text) => text.includes('@view-transition') && text.includes('navigation: none'))).toBe(true);
+
+  for (const route of routes) {
+    await page.goto(route);
+    await expect(page.locator('link[rel="expect"][href="#view-transition-anchor"][blocking="render"]')).toHaveCount(1);
+    await expect(page.locator('#view-transition-anchor')).toHaveCount(1);
+  }
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Nutrition' }).first().click();
+  await expect(page).toHaveURL(/pages\/stack\.html$/);
+  await expect(page.getByRole('heading', { name: 'Build your Daily Stack' })).toBeVisible();
+});
+
 test('Nutrition context navigation owns the Ingredient guide', async ({ page }) => {
   await page.goto('/pages/stack.html');
   await expect(page.getByRole('navigation', { name: 'Nutrition' }).getByRole('link')).toHaveCount(2);
@@ -44,11 +75,11 @@ test('Planner mode switching is stable and keyboard operable', async ({ page }) 
   await page.goto('/pages/stack.html');
   const planner = page.locator('.meal-planner');
   const marker = await planner.evaluate((node) => { node.dataset.testIdentity = 'stable'; return node.dataset.testIdentity; });
-  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await page.getByRole('button', { name: /Quick add/ }).click();
   await expect(page.getByRole('heading', { name: 'Choose foods and supplements' })).toBeVisible();
   expect(await planner.getAttribute('data-test-identity')).toBe(marker);
-  await page.getByRole('tab', { name: /Quick add/ }).press('ArrowLeft');
-  await expect(page.getByRole('tab', { name: /Meals/ })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('button', { name: /Quick add/ }).press('ArrowLeft');
+  await expect(page.getByRole('button', { name: /Meals/ })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('key pages have no automatically detectable serious accessibility violations', async ({ page }) => {

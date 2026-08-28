@@ -32,6 +32,8 @@ pages.forEach((file) => {
   check(JSON.stringify(primaryLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: primary navigation must contain the five canonical destinations`);
   check(JSON.stringify(bottomLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: bottom navigation must contain the five canonical destinations`);
   check(!/>Avoid<\/a>|bottom-nav-label">Avoid</.test(html), `${file}: obsolete parent-level Avoid navigation remains`);
+  check(html.includes('<link rel="expect" href="#view-transition-anchor" blocking="render">'), `${file}: view-transition render expectation missing`);
+  check((html.match(/id="view-transition-anchor"/g) || []).length === 1, `${file}: expected exactly one view-transition anchor`);
 });
 
 const finance = read('pages/finance.html');
@@ -55,6 +57,11 @@ check(variables.includes('--color-primary: #0075de'), 'css/variables.css: Warm C
 check(variables.includes("font-family: 'Inter'"), 'css/variables.css: Inter font face missing');
 check(variables.includes("font-family: 'JetBrains Mono'"), 'css/variables.css: JetBrains Mono font face missing');
 check(!variables.includes('Geist'), 'css/variables.css: legacy Geist token remains');
+
+const styles = read('css/style.css');
+check(styles.includes('@view-transition') && styles.includes('navigation: auto'), 'css/style.css: cross-document view-transition opt-in missing');
+check(styles.includes('navigation: none') && styles.includes('prefers-reduced-motion: reduce'), 'css/style.css: reduced-motion view-transition opt-out missing');
+check(styles.includes('macro-page-view-transition-out') && styles.includes('macro-page-view-transition-in'), 'css/style.css: view-transition animations missing');
 
 const manifest = read('manifest.json');
 check(manifest.includes('"theme_color": "#ffffff"'), 'manifest.json: Warm Canvas theme color missing');
@@ -89,6 +96,8 @@ const javascriptFiles = [
   'js/blood.js', 'js/render.js', 'js/export.js', 'js/home.js', 'js/protocol.js',
   'js/finance.js', 'js/register-sw.js', 'sw.js',
   'js/site.js', 'js/avoid.js', 'js/stack-preview.js', 'js/components/card-swipe.js',
+  'js/components/modal.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
+  'js/components/toast.js', 'js/components/tooltip.js',
 ];
 javascriptFiles.forEach((file) => {
   const result = spawnSync(process.execPath, ['--check', file], { cwd: root, encoding: 'utf8' });

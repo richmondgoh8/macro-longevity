@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v20-warm-canvas';
+const CACHE_NAME = 'macro-longevity-offline-v27-readable-card-headers';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -10,8 +10,11 @@ const STATIC_ASSETS = [
   '/pages/avoid.html',
   '/css/variables.css',
   '/css/style.css',
+  '/css/tooltip.css',
+  '/css/toast.css',
   '/js/register-sw.js',
   '/js/site.js',
+  '/js/components/tooltip.js',
   '/js/export.js',
   '/js/home.js',
   '/js/stack-preview.js',
@@ -22,7 +25,12 @@ const STATIC_ASSETS = [
   '/js/render.js',
   '/js/finance.js',
   '/js/components/card-swipe.js',
+  '/js/components/spotlight.js',
+  '/js/components/sticky-pin.js',
   '/js/components/ui.js',
+  '/js/components/toast.js',
+  '/js/components/modal.js',
+  '/js/components/confirm.js',
   '/js/data/core.js',
   '/js/data/stack.js',
   '/js/data/blood.js',

@@ -19,8 +19,8 @@ function testCard(t) {
     </details>`;
 }
 
-function disclosureSection({ title, description, body, count = '', open = false, className = '' }) {
-  return `<details class="progressive-section blood-tier ${className}"${open ? ' open' : ''}>
+function disclosureSection({ title, description, body, count = '', open = false, className = '', id = '' }) {
+  return `<details class="progressive-section blood-tier ${className}"${id ? ` id="${id}"` : ''}${open ? ' open' : ''}>
     <summary>
       <span class="progressive-section-heading"><span class="blood-tier-title" role="heading" aria-level="2">${escapeHTML(title)}</span><span class="blood-tier-desc">${escapeHTML(description)}</span></span>
       ${count ? `<span class="progressive-section-count">${escapeHTML(count)}</span>` : ''}
@@ -37,6 +37,7 @@ function tierSection(tier, open = false) {
     description: meta.desc,
     count: `${items.length} tests`,
     open,
+    id: `blood-${tier === 'annual' ? 'annual' : tier === 'one-time' ? 'one-time' : 'periodic'}`,
     body: `<div class="blood-grid">${items.map(testCard).join("")}</div>`,
   });
 }
@@ -46,7 +47,7 @@ export function renderBlood() {
   if (!container) return;
 
   const preparation = `
-    <details class="blood-prep" data-blood-prep open>
+    <details class="blood-prep" id="blood-prep" data-blood-prep open>
       <summary><span><span class="blood-prep-title">Before You Draw</span><span class="blood-prep-summary">Fasting, hydration and timing guidance for comparable results.</span></span></summary>
       <div class="blood-prep-body">
       <p class="blood-prep-text">
@@ -71,6 +72,7 @@ export function renderBlood() {
       title: 'ApoB elevated? Options',
       description: 'Low triglycerides and high HDL are favourable context — not proof that a high ApoB is harmless. Compare the practical options below with your clinician.',
       count: `${APOB_EFFECTS.length} interventions`,
+      id: 'blood-apob',
       body: `
       <div class="stack-table apob-table">
         <div class="stack-table-row stack-table-header">
@@ -87,6 +89,7 @@ export function renderBlood() {
       title: 'Beyond the blood panel',
       description: 'These checkable habits matter more than most supplements and most low-value tests.',
       count: `${BEYOND_PANEL.length} habits`,
+      id: 'blood-beyond',
       body: `
       <div class="blood-grid">
         ${BEYOND_PANEL.map(t => `
@@ -105,6 +108,7 @@ export function renderBlood() {
       description: 'Expensive or fashionable tests that rarely produce an actionable decision.',
       count: `${LOW_VALUE_TESTS.length} tests`,
       className: 'progressive-section-muted',
+      id: 'blood-low-value',
       body: `
       <div class="blood-grid">
         ${LOW_VALUE_TESTS.map(t => `

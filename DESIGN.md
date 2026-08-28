@@ -1,6 +1,9 @@
 ---
 name: "Warm Canvas"
 description: "Approachable minimalism on warm white. Compressed Inter at -2.125px, whisper borders, multi-layer 4-stack shadows, and a single saturated blue accent."
+version: "1.1"
+status: active
+last_reviewed: "2026-08-28"
 tags: [minimal, warm, productivity, saas]
 colors:
   primary:   "#0075de"
@@ -42,6 +45,97 @@ shadows:
 borders:
   card:    "1px solid rgba(0,0,0,0.1)"
   divider: rgba(0,0,0,0.1)
+textures:
+  blueprint_grid:
+    line_color: "color-mix(in srgb, #615d59 6%, transparent)"
+    cell_size: 32px
+    stroke_width: 1px
+    mask: radial
+    scope: site-wide-overlay
+    motion: static
+modals:
+  max_width: 520px
+  viewport_gutter: 16px
+  surface: "#ffffff"
+  scrim: "color-mix(in srgb, #31302e 42%, transparent)"
+  backdrop_blur: 4px
+  radius: 12px
+  shadow: shadow.xl
+  entry_motion: "240ms opacity + scale(.98 → 1)"
+  exit_motion: "120ms opacity + scale(1 → .98)"
+  dismissal: intent-aware
+split_screen_hero:
+  ratio: "1fr / 1fr"
+  collapse_below: 1024px
+  content_order: first
+  visual_surface: tertiary
+  visual: linked-protocol-blueprint
+  mobile_visual: compact-visible
+spotlight_cards:
+  surface: tertiary
+  border: "rgba(255,255,255,0.10)"
+  glow_color: accent
+  glow_radius: 220px
+  glow_opacity: 0.35
+  pointer: fine-only
+  max_per_section: 4
+  reduced_motion: static
+segmented_controls:
+  max_segments: 5
+  track: "color-mix(in srgb, #615d59 12%, transparent)"
+  selected_surface: "#ffffff"
+  selected_shadow: shadow.card
+  radius: 9999px
+  option_min_height: 44px
+  motion: "240ms transform"
+sticky_pin:
+  routes: [nutrition, ingredients, health, blueprint, training, finance]
+  breakpoint: 1024px
+  rail_width: 12rem
+  top_offset: 80px
+  gap: 32px
+  surface: "#ffffff"
+  border: "1px solid rgba(0,0,0,0.1)"
+  radius: 12px
+  shadow: shadow.card
+  active_indicator: primary
+  item_min_height: 44px
+  mobile: wrapped-static
+  motion: "IntersectionObserver state updates"
+toast_notifications:
+  position: top-right
+  desktop_offset: 88px
+  mobile_offset: 72px
+  desktop_inset: 20px
+  mobile_inset: 16px
+  max_width: 360px
+  max_visible: 3
+  stack_gap: 8px
+  surface: "#ffffff"
+  border: "1px solid rgba(0,0,0,0.1)"
+  accent_edge: 4px
+  radius: 12px
+  shadow: shadow.xl
+  success_info_warning_duration: 4500ms
+  action_duration: 9000ms
+  error_persistence: until-dismissed-or-actioned
+  entry_motion: "240ms opacity + translateY(-6px → 0)"
+  exit_motion: "120ms opacity + translateY(0 → -6px)"
+  reduced_motion: static
+tooltips:
+  scope: icon-only-controls
+  trigger: hover-or-focus
+  hover_delay: 300ms
+  focus_delay: 0ms
+  surface: tertiary
+  text: neutral
+  max_width: 180px
+  gap: 8px
+  radius: 4px
+  placement: top-with-bottom-fallback
+  mobile: no-hover
+  dismissal: blur-pointer-leave-or-escape
+  reduced_motion: static
 buttons:
   primary:
     background: #0075de
@@ -87,13 +181,26 @@ dependencies: []
 
 # Warm Canvas
 
+Warm Canvas is the authored design contract for Macro Longevity. Its executable token implementation lives in [`css/variables.css`](css/variables.css); shared and route-level presentation lives in [`css/style.css`](css/style.css), with focused stylesheets for components where noted in the repository README.
+
+## Document contract
+
+- Author raw values and component recipes here, then map them to named CSS variables in `css/variables.css`.
+- Keep this document and the CSS implementation synchronized in the same change. Neither should silently override the other.
+- Prefer the existing primitive → semantic → component token flow. Derived values may use existing tokens with `color-mix()` or `calc()`.
+- Put route content and factual claims in `js/data/`, not in this design specification.
+- Validate implementation with `npm run audit`, the design checks in `tests/design.spec.js`, and reviewed visual baselines.
+
+The sections below serve two audiences: **AI Build Instructions** are the implementation checklist; **Atmosphere through Pro tokens** are the human-readable visual reference.
+
 ## AI Build Instructions
 
 > **Read this section before writing any code.** The rules below
 > are non-negotiable. Every value used in the UI must come from this
-> file's frontmatter — never substitute, approximate, or invent new
-> colors, fonts, radii, or shadows. If a value is missing, ask the
-> user before adding one.
+> file's frontmatter and its mapped CSS variables — never substitute,
+> approximate, or invent new colors, fonts, radii, or shadows. If an
+> authored value is missing, add it deliberately to the contract and
+> implementation together.
 
 ### 1 · Your role
 
@@ -106,11 +213,14 @@ person who authored this file.
 ### 2 · Token compliance
 
 - Pull every color, font family, radius, shadow, and spacing value
-  from the frontmatter at the top of this file.
+  from the frontmatter at the top of this file and map it through
+  `css/variables.css`.
 - Use semantic roles (e.g. `primary`, `accent`, `muted`) — never
   hard-code hex values that bypass the system.
 - When a token can be expressed as a CSS variable, declare it once
   in your global stylesheet and reference it everywhere downstream.
+- Build component tokens from semantic roles; derive opacity and
+  geometry with existing tokens rather than duplicating raw values.
 - Use the local font assets listed in frontmatter; do not add external
   font or icon requests to this dependency-free site.
 
@@ -144,6 +254,71 @@ actions in toolbars. **Ghost** for inline links and table actions.
 - Bar/line variant: `stepped`
 - Highlight strategy: `single` — emphasize a single bar/point per chart.
 
+#### Blueprint grid
+
+- Render two static `1px` linear gradients at `32px` intervals.
+- Derive the line from `secondary` at `6%` opacity and fade it toward viewport edges with a radial mask.
+- Apply it as a pointer-transparent site-wide overlay, including cards and controls.
+- Keep browser top-layer dialogs above the texture and remove it in print, forced-colors and increased-contrast modes.
+
+#### Modal dialogs
+
+- Use a centered native `<dialog>` with a maximum width of `520px`, `16px` viewport gutters, and a maximum height of `calc(100dvh - 32px)`.
+- Dim and softly blur the page with the existing warm-dark token; keep the dialog surface white with the established border, `12px` radius, and XL shadow.
+- Keep a clear title, supporting copy, top-right Close control, and right-aligned actions. Destructive actions use danger red; constructive actions use brand blue.
+- Trap focus with `showModal()`, focus the least-destructive action or first field, support Escape, and restore focus to the trigger after close.
+- Allow backdrop dismissal for non-destructive dialogs only. Destructive confirmations require an explicit Cancel/Close action or Escape.
+- Use `240ms` entry and `120ms` exit fade/scale motion; remove scaling and shorten transitions for reduced-motion users.
+
+#### Toast notifications
+
+- Mount one global top-right notification region outside page content. Keep the desktop offset below the primary navigation and use the compact mobile offset below the header.
+- Use a white `12px` surface with the card border and XL shadow. Identify success, info, warning and error states with a local icon, message semantics and a narrow `4px` semantic accent edge; do not flood the toast with a tinted background.
+- Show at most three notifications at once, newest first, and queue additional notifications for promotion as visible items close.
+- Auto-dismiss success, info and warning messages after `4500ms`; give action toasts `9000ms`; keep errors visible until the user dismisses or completes the action. Pause timers while a toast or one of its controls is hovered or focused.
+- Provide a 44px Dismiss control and optional action control. Use polite status semantics for routine updates and alert semantics for errors without stealing focus from the page.
+- Prefer native `popover="manual"` with an explicit hide control, and keep a fixed-position fallback for browsers without Popover support. Remove transitions for reduced-motion users and hide the region in print.
+
+#### Tooltips
+
+- Use tooltips only as supplemental labels for icon-only controls; keep the control's visible or `aria-label` name complete without the tooltip.
+- Reveal after a `300ms` fine-pointer hover delay and immediately on keyboard focus. Cancel pending reveals on pointer leave and dismiss on blur, pointer leave or Escape without moving focus.
+- Keep one non-interactive `role="tooltip"` label per trigger, connect it with temporary `aria-describedby`, and never place actions or essential instructions inside it.
+- Prefer a compact tertiary surface with neutral text, a `4px` radius and an `8px` gap. Place above the trigger by default, flipping below and aligning to the viewport when needed.
+- Disable hover-triggered behavior for coarse pointers; keep touch controls directly tappable. Remove motion for reduced-motion users and hide tooltips in print and forced-colors-safe styling.
+
+#### Split-screen hero
+
+- Divide the desktop hero into equal content and visual halves at the `1024px` breakpoint.
+- Keep the content half first in source order, top-align the headline, and anchor the primary and secondary CTAs inside it.
+- Use the existing tertiary surface for a linked four-pillar protocol blueprint; labels and destinations come from the `PILLARS` data source.
+- Stack content before the compact blueprint below the breakpoint, keeping every pillar link visible and keyboard accessible.
+- Do not use stock imagery, generic gradients, or a visual half that has no meaningful content.
+
+#### Spotlight cards
+
+- Apply the treatment only to dark tertiary cards, with no more than four spotlights in one section.
+- Keep a `1px` white hairline border and a soft accent-colored radial glow centered on the pointer.
+- Treat the glow as progressive enhancement: card content stays fully legible and keyboard-reachable without it.
+- Enable pointer tracking only for fine pointers; hide the overlay for coarse pointers and forced colors.
+- Remove transition interpolation for reduced-motion users and keep the overlay pointer-transparent.
+
+#### Segmented controls
+
+- Use a connected pill-shaped group for two to five mutually exclusive options.
+- Keep the track warm-neutral and elevate exactly one selected option on a white surface with the card shadow.
+- Give options equal widths, short labels (one to two words), and a minimum 44px touch target.
+- Implement the group with a labelled `role="group"` and native buttons using `aria-pressed`; do not use segmented controls for multi-select or long labels.
+- Preserve ArrowLeft/ArrowRight/Home/End keyboard navigation and move a tokenized active indicator with the `240ms` fast motion token. Disable interpolation for reduced-motion users.
+
+#### Sticky pin rails
+
+- Use one `position: sticky` “On this page” rail on long routes at the `1024px` breakpoint, offset below the primary navigation by `80px`.
+- Keep the rail at `12rem` wide with a `32px` gap, Warm Canvas card surface, card border, `12px` radius and card shadow.
+- Use anchors for document sections and native buttons for tab-controlled views; expose active anchors with `aria-current="location"` and controls with `aria-pressed`.
+- Update the active item with `IntersectionObserver`; do not add a raw scroll listener or nested scrolling region.
+- Below the breakpoint, switch to a static wrapped list with `44px` minimum targets. Respect reduced motion, forced colors and print output.
+
 #### Typography pairings
 
 - **Display (`Inter`)** — h1, h2, hero headlines, brand wordmarks.
@@ -157,7 +332,7 @@ Never do any of the following without explicit instruction from the user:
 - Introduce a new color, font, radius, or shadow that isn't declared above.
 - Mix this system with another (e.g. don't paste in Material or Bootstrap defaults).
 - Use generic gradient defaults (purple→blue, peach→pink) — they break the system's voice.
-- Reach for emoji icons. Use a consistent icon library and size icons in line with body type.
+- Reach for emoji icons. Use the shared local SVG subset and size icons in line with body type.
 - Add motion that exceeds the system's restraint — use the authored motion
   tokens, with interaction feedback at `duration.fast` or faster.
 
@@ -165,12 +340,13 @@ Never do any of the following without explicit instruction from the user:
 
 Run through this checklist for every screen you produce:
 
-- [ ] Every color used appears in the Colors table above.
+- [ ] Every raw color appears in the contract and is exposed through a semantic CSS variable.
 - [ ] Headlines use the display font; body copy uses the body font.
 - [ ] Buttons match one of the declared variants exactly (shape, padding, weight).
 - [ ] Border-radius values come from `radius.sm` / `radius.md` / `radius.lg` / `radius.pill`.
 - [ ] Cards and dividers use the declared border + shadow tokens.
-- [ ] No values were invented; if you needed something missing, you stopped and asked.
+- [ ] New authored values were added to this document and `css/variables.css` together.
+- [ ] `npm run audit` and the relevant browser tests pass.
 
 ---
 
@@ -190,6 +366,10 @@ What makes Warm Canvas distinctive is its **border philosophy**. Rather than hea
 - Multi-layer 4-stack shadows with sub-0.05 opacity
 - Single saturated blue accent (`#0075de`) — the only color in core UI chrome
 - Pill badges (9999px) with tinted blue background for status
+- Static 32px blueprint grid with a warm-neutral 6% line and radial edge fade
+- Equal split-screen hero with a linked four-pillar protocol blueprint
+- Pointer-following spotlight glow on dark tertiary cards
+- Desktop sticky “On this page” rails with a static wrapped mobile fallback
 
 ## 2. Palette
 
@@ -503,14 +683,18 @@ Five-level scale, system-specific recipe.
 - **blockquote:** border `2px solid rgba(0, 117, 222, 0.5)`, padding `0.9em 1.2em`
 - **code:** background `rgba(0, 117, 222, 0.1)`, color `#000000`
 
-### Accessibility (WCAG 2.1)
+### Accessibility contrast reference (WCAG 2.1)
 
-**Overall:** AA
+These calculated token pairs are a design guardrail, not a substitute for route-level accessibility tests. Ratios are rounded to two decimal places.
 
-| Pair | Ratio | Required | Grade | Suggested fix |
-|------|-------|----------|-------|---------------|
-| Body text on surface | 21:1 | AA | AAA | — |
-| Body text on canvas | 21:1 | AA | AAA | — |
-| Muted text on surface | 6.53:1 | AA | AA | — |
-| Accent on surface | 4.57:1 | AA-Large | AA | — |
-| Accent on canvas | 4.57:1 | AA-Large | AA | — |
+| Foreground on white surface | Ratio | Safe text use |
+|-----------------------------|-------|---------------|
+| Body `rgba(0,0,0,0.95)` | 19.44:1 | Normal and large text (AAA) |
+| Secondary `#615d59` | 6.53:1 | Normal and large text (AA) |
+| Muted `#787673` | 4.53:1 | Normal and large text (AA) |
+| Primary `#0075de` | 4.57:1 | Normal and large text (AA) |
+| Accent `#2a9d99` | 3.29:1 | Large text and non-text UI only |
+| Warning `#dd5b00` | 3.77:1 | Large text and non-text UI only |
+| Danger `#a62f36` | 6.82:1 | Normal and large text (AA) |
+
+On warm or tinted surfaces, recalculate the actual foreground/background pair. Do not use accent or warning as normal-sized body text without a stronger foreground token.

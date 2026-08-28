@@ -12,7 +12,7 @@ function renderAvoidPage() {
   if (!container) return;
   const total = AVOID_LABEL_GUIDE.length;
   container.innerHTML = `
-    <section class="avoid-label-guide" aria-labelledby="avoid-label-title" data-avoid-guide>
+    <section class="avoid-label-guide" id="avoid-label-guide" aria-labelledby="avoid-label-title" data-avoid-guide>
       <div class="avoid-label-head">
         <p class="eyebrow">Exact label screen</p>
         <h2 id="avoid-label-title">What to scan for on the label</h2>
@@ -35,7 +35,7 @@ function renderAvoidPage() {
       <p class="avoid-label-empty" data-avoid-empty hidden>No matching label markers. Try a shorter ingredient or clear the search.</p>
     </section>
     <p class="stack-intro">The high-ROI avoid list: added sugar, alcohol, processed meat as a staple, industrial trans fats, ultra-processed food and appetite-driving refined foods. This is a practical carnivore-first filter, not a claim that every food outside it is dangerous.</p>
-    <div class="stack-grid stack-grid-single">
+    <div class="stack-grid stack-grid-single" id="avoid-high-roi">
       ${AVOID_INGREDIENTS.map((item) => {
         const searchText = [item.name, item.where, item.why, item.replace].join(' ').toLowerCase();
         return `<details class="avoid-card avoid-detail-card" data-avoid-detail-card data-search-text="${escapeHTML(searchText)}" open><summary class="avoid-card-head"><h3 class="avoid-card-name">${escapeHTML(item.name)}</h3>${evidenceBadge(item.evidence)}</summary><div class="avoid-detail-body"><p class="avoid-where"><span class="stack-line-label">Where it hides</span> ${escapeHTML(item.where)}</p><p class="avoid-why"><span class="stack-line-label">Why</span> ${escapeHTML(item.why)}</p><p class="avoid-replace"><span class="stack-line-label">Replace with</span> ${escapeHTML(item.replace)}</p></div></details>`;

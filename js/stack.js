@@ -20,7 +20,7 @@ import {
   FOOD_TRAPS,
   SUPPLEMENT_GUIDANCE,
 } from './data/nutrition.js';
-import { confirmAction, escapeHTML, icon, iconButton, showToast } from './components/ui.js';
+import { closeModalDialog, confirmAction, escapeHTML, icon, iconButton, openModalDialog, showToast } from './components/ui.js';
 
 let stackTab = "supplements";
 let selectedBuilderItems = ["eggs", "broccoli", "chia", "salmon"];
@@ -485,7 +485,7 @@ function renderLegacyProtocol() {
 function legacyLibraryHTML() {
   const tabs = ["supplements", "food-spices", "extras", "conditional", "skip"];
   const labels = { supplements: "Core protocol", "food-spices": "Food & spices", extras: "Extras", conditional: "Conditional", skip: "Skip list" };
-  return `<details class="stack-library"><summary><span><span class="eyebrow">Deep library</span><strong>Evidence-graded protocol details</strong></span><span class="library-summary-action">Open</span></summary><div class="stack-library-inner"><div class="meal-controls"><div class="meal-tabs" role="tablist" aria-label="Evidence-graded protocol views">${tabs.map((tab) => `<button type="button" class="meal-tab ${tab === stackTab ? "active" : ""}" data-library-tab="${tab}" role="tab" aria-selected="${tab === stackTab}">${labels[tab]}</button>`).join("")}</div></div><div data-library-content role="tabpanel"></div></div></details>`;
+  return `<details class="stack-library" id="stack-library"><summary><span><span class="eyebrow">Deep library</span><strong>Evidence-graded protocol details</strong></span><span class="library-summary-action">Open</span></summary><div class="stack-library-inner"><div class="meal-controls"><div class="meal-tabs" role="tablist" aria-label="Evidence-graded protocol views">${tabs.map((tab) => `<button type="button" class="meal-tab ${tab === stackTab ? "active" : ""}" data-library-tab="${tab}" role="tab" aria-selected="${tab === stackTab}">${labels[tab]}</button>`).join("")}</div></div><div data-library-content role="tabpanel"></div></div></details>`;
 }
 
 function getSavedMeals() {
@@ -747,9 +747,9 @@ function mealCardHTML(meal, selected = selectedMealIds.includes(meal.id)) {
 }
 
 function plannerControlsHTML() {
-  return `<div class="planner-controls"><div class="planner-mode-tabs" role="tablist" aria-label="Planner input mode">
-    <button type="button" class="planner-mode-tab ${plannerMode === "meals" ? "active" : ""}" data-planner-mode="meals" role="tab" aria-selected="${plannerMode === "meals"}" tabindex="${plannerMode === "meals" ? 0 : -1}" aria-controls="planner-meals">Meals <span data-planner-meal-count>${formatPortion(selectedPortionTotal(selectedMealQuantities, selectedMealIds))}</span></button>
-    <button type="button" class="planner-mode-tab ${plannerMode === "quick-add" ? "active" : ""}" data-planner-mode="quick-add" role="tab" aria-selected="${plannerMode === "quick-add"}" tabindex="${plannerMode === "quick-add" ? 0 : -1}" aria-controls="planner-quick-add">Quick add <span data-planner-quick-count>${formatPortion(selectedPortionTotal(quickItemQuantities, quickSelectedItemIds))}</span></button>
+  return `<div class="planner-controls"><div class="segmented-control planner-mode-tabs" role="group" aria-label="Planner input mode" data-segmented-control data-segmented-active="${plannerMode}">
+    <button type="button" class="segmented-control-option planner-mode-tab ${plannerMode === "meals" ? "active" : ""}" data-planner-mode="meals" data-segmented-option="meals" aria-pressed="${plannerMode === "meals"}" aria-controls="planner-input-panel">Meals <span data-planner-meal-count>${formatPortion(selectedPortionTotal(selectedMealQuantities, selectedMealIds))}</span></button>
+    <button type="button" class="segmented-control-option planner-mode-tab ${plannerMode === "quick-add" ? "active" : ""}" data-planner-mode="quick-add" data-segmented-option="quick-add" aria-pressed="${plannerMode === "quick-add"}" aria-controls="planner-input-panel">Quick add <span data-planner-quick-count>${formatPortion(selectedPortionTotal(quickItemQuantities, quickSelectedItemIds))}</span></button>
     </div>
     <button class="button button-secondary planner-clear" type="button" data-clear-stack>Clear plan</button>
   </div>`;
@@ -770,7 +770,7 @@ function quickItemHTML(item) {
 }
 
 function mealComposerDialogHTML() {
-  return `<dialog class="meal-save-dialog" data-meal-dialog aria-labelledby="meal-dialog-title"><form class="meal-save-dialog-form" data-meal-dialog-form><div class="meal-dialog-head"><div><p class="eyebrow">Reusable meal</p><h2 id="meal-dialog-title">Save selection as a meal</h2></div>${iconButton({ iconName: 'close', label: 'Close', tooltip: 'Close', data: { 'meal-dialog-cancel': '' } })}</div><label for="meal-dialog-name">Meal name</label><input id="meal-dialog-name" type="text" maxlength="80" placeholder="e.g. Weekday salmon plate" data-meal-dialog-name required><p class="meal-dialog-items" data-meal-dialog-items></p><div class="meal-dialog-actions"><button type="button" class="button button-secondary" data-meal-dialog-cancel>Cancel</button><button type="submit" class="button button-primary" data-meal-dialog-confirm>Save meal</button></div><p class="save-status" data-meal-dialog-status role="status"></p></form></dialog>`;
+  return `<dialog class="ui-modal meal-save-dialog" data-meal-dialog aria-labelledby="meal-dialog-title" aria-describedby="meal-dialog-items meal-dialog-status"><form class="ui-modal-form meal-save-dialog-form" data-meal-dialog-form><div class="ui-modal-head meal-dialog-head"><div><p class="eyebrow">Reusable meal</p><h2 id="meal-dialog-title">Save selection as a meal</h2></div>${iconButton({ iconName: 'close', label: 'Close', tooltip: 'Close', data: { 'meal-dialog-cancel': '' } })}</div><label for="meal-dialog-name">Meal name</label><input id="meal-dialog-name" type="text" maxlength="80" placeholder="e.g. Weekday salmon plate" data-meal-dialog-name required><p id="meal-dialog-items" class="meal-dialog-items" data-meal-dialog-items></p><div class="ui-modal-actions meal-dialog-actions"><button type="button" class="button button-secondary" data-meal-dialog-cancel>Cancel</button><button type="submit" class="button button-primary" data-meal-dialog-confirm>Save meal</button></div><p id="meal-dialog-status" class="save-status" data-meal-dialog-status role="status"></p></form></dialog>`;
 }
 
 function quickAddHTML() {
@@ -791,6 +791,7 @@ function updateQuickAddUI(root) {
     const card = button.closest("[data-quick-card]");
     card?.classList.toggle("selected", active);
     const target = mealComposerMode === 'edit' ? 'meal' : 'plan';
+    button.setAttribute('data-tooltip-trigger', '');
     button.innerHTML = `${icon(active ? 'check' : 'add')}<span class="ui-tooltip" role="tooltip">${active ? `Remove from ${target}` : `Add to ${target}`}</span>`;
     button.setAttribute('aria-label', `${active ? 'Remove' : 'Add'} ${card?.querySelector('strong')?.textContent || 'item'} ${active ? 'from' : 'to'} ${target}`);
     const servingsOpen = active && expandedQuickServings.has(button.dataset.quickItem);
@@ -813,9 +814,15 @@ function updateQuickAddUI(root) {
   if (save && mealComposerMode !== "edit") save.disabled = quickSelectedItemIds.length === 0;
 }
 
-function openMealComposer(root) {
+function openMealComposer(root, returnFocus = document.activeElement) {
   const dialog = root.querySelector("[data-meal-dialog]");
   if (!dialog) return;
+  if (!dialog.dataset.modalCleanupBound) {
+    dialog.dataset.modalCleanupBound = "true";
+    dialog.addEventListener('close', () => {
+      if (mealComposerMode === "create") resetMealComposer();
+    });
+  }
   const input = dialog.querySelector("[data-meal-dialog-name]");
   const itemText = dialog.querySelector("[data-meal-dialog-items]");
   const selectedItems = mealComposerItems.map(quickItem).filter(Boolean);
@@ -823,17 +830,15 @@ function openMealComposer(root) {
   dialog.querySelector("#meal-dialog-title").textContent = mealComposerMode === "edit" ? "Save meal changes" : "Save selection as a meal";
   if (input) input.value = mealComposerName;
   if (itemText) itemText.textContent = selectedItems.length ? `${selectedItems.length} item${selectedItems.length === 1 ? "" : "s"}: ${selectedItems.map((item) => item.name).join(" · ")}` : "Choose at least one item before saving.";
-  if (typeof dialog.showModal === "function") dialog.showModal();
-  else dialog.setAttribute("open", "");
-  input?.focus();
+  openModalDialog(dialog, { initialFocus: input, returnFocus, lightDismiss: true });
 }
 
-function closeMealComposer(root) {
+function closeMealComposer(root, returnValue = "cancel") {
   const dialog = root.querySelector("[data-meal-dialog]");
-  if (dialog?.open) dialog.close();
+  return closeModalDialog(dialog, returnValue);
 }
 
-function saveMealComposer(root, values = {}) {
+async function saveMealComposer(root, values = {}) {
   const input = root.querySelector("[data-meal-dialog-name]");
   const status = values.status || root.querySelector("[data-meal-dialog-status]");
   const name = typeof values.name === 'string' ? values.name.trim() : input?.value.trim() || "";
@@ -856,7 +861,7 @@ function saveMealComposer(root, values = {}) {
   if (!existing && !selectedMealIds.includes(id)) { selectedMealIds = [...selectedMealIds, id]; selectedMealQuantities[id] = 1; selectedMealItemQuantities[id] = {}; }
   if (!existing) { quickSelectedItemIds = []; quickItemQuantities = {}; }
   persistCurrentDay();
-  closeMealComposer(root);
+  await closeMealComposer(root, "confirm");
   resetMealComposer();
   renderStack();
   setPlannerStatus("[data-planner-status]", `${existing ? "Updated" : "Saved"} meal “${name}”`);
@@ -895,7 +900,7 @@ function plannerHTML() {
     <div class="planner-search-row">${plannerSearchHTML()}</div>
     ${window.matchMedia('(max-width: 767px)').matches ? mobileCoverageHTML() : ''}
     <div class="planner-workspace">
-      <div class="planner-main">
+      <div class="planner-main" id="planner-input-panel">
         ${plannerContent}
       </div>
       <aside class="coverage-panel plan-readout" aria-live="polite"><div class="coverage-panel-head"><p class="eyebrow">Review</p><h3>Coverage and gaps</h3><div class="plan-counts"><span><strong data-plan-meals>${formatPortion(mealPortions)}</strong> meal portions</span><span><strong data-plan-quick>${formatPortion(quickPortions)}</strong> quick portions</span></div><details class="coverage-settings"><summary>Coverage settings</summary><div class="builder-profile"><label for="body-weight">Protein reference body weight</label><div><input id="body-weight" type="number" min="35" max="250" step="1" value="${bodyWeightKg}" data-body-weight><span>kg · uses a 1.2 g/kg floor</span></div></div></details></div><div data-coverage>${coverageHTMLV2()}</div></aside>
@@ -919,11 +924,11 @@ function renderPlannerMode(root) {
   }
   planner.classList.toggle('is-meals', plannerMode === 'meals');
   planner.classList.toggle('is-quick-add', plannerMode === 'quick-add');
+  root.querySelector('[data-segmented-control]')?.setAttribute('data-segmented-active', plannerMode);
   root.querySelectorAll('[data-planner-mode]').forEach((button) => {
     const active = button.dataset.plannerMode === plannerMode;
     button.classList.toggle('active', active);
-    button.setAttribute('aria-selected', String(active));
-    button.tabIndex = active ? 0 : -1;
+    button.setAttribute('aria-pressed', String(active));
   });
   updateMealPlannerUI({ customized: false });
 }
@@ -952,6 +957,7 @@ function updateMealPlannerUI({ customized = true } = {}) {
     const name = button.closest(".meal-card")?.querySelector("h3")?.textContent || "meal";
     button.setAttribute("aria-pressed", String(selected));
     button.setAttribute("aria-label", `${selected ? "Remove" : "Add"} ${name} ${selected ? "from" : "to"} plan`);
+    button.setAttribute('data-tooltip-trigger', '');
     button.innerHTML = `${icon(selected ? 'check' : 'add')}<span class="ui-tooltip" role="tooltip">${selected ? 'Remove from plan' : 'Add to plan'}</span>`;
     const mealCard = button.closest('.meal-card');
     const servingToggle = mealCard?.querySelector('[data-meal-serving-toggle]');
@@ -991,7 +997,7 @@ function updateMealPlannerUI({ customized = true } = {}) {
   const quickCounts = root.querySelector("[data-plan-quick]"); if (quickCounts) quickCounts.textContent = formatPortion(quickPortions);
 }
 
-function setPlannerStatus(_selector, text) { showToast(text); }
+function setPlannerStatus(_selector, text) { showToast(text, { type: 'success' }); }
 
 export function renderStack() {
   const container = document.getElementById("stack-app");
@@ -1129,7 +1135,8 @@ document.addEventListener('click', async (event) => {
   const mealRemove = event.target.closest('[data-meal-remove]');
   if (mealRemove) { selectedMealIds = selectedMealIds.filter((id) => id !== mealRemove.dataset.mealRemove); delete selectedMealQuantities[mealRemove.dataset.mealRemove]; delete selectedMealItemQuantities[mealRemove.dataset.mealRemove]; expandedMealServings.delete(mealRemove.dataset.mealRemove); updateMealPlannerUI(); return; }
 
-  if (event.target.closest('[data-meal-compose-open]')) {
+  const mealComposeOpen = event.target.closest('[data-meal-compose-open]');
+  if (mealComposeOpen) {
     if (mealComposerMode !== "edit") {
       mealComposerMode = "create";
       mealComposerMealId = null;
@@ -1137,7 +1144,7 @@ document.addEventListener('click', async (event) => {
       mealComposerItems = [...quickSelectedItemIds];
       mealComposerName = "";
     }
-    openMealComposer(root);
+    openMealComposer(root, mealComposeOpen);
     return;
   }
 
@@ -1150,7 +1157,7 @@ document.addEventListener('click', async (event) => {
 
   if (event.target.closest('[data-meal-edit-save]')) {
     const name = root.querySelector('[data-meal-edit-name]')?.value || '';
-    saveMealComposer(root, { name, status: root.querySelector('[data-meal-edit-status]') });
+    await saveMealComposer(root, { name, status: root.querySelector('[data-meal-edit-status]') });
     return;
   }
 
@@ -1200,7 +1207,7 @@ document.addEventListener('click', async (event) => {
   }
 
   if (event.target.closest('[data-meal-dialog-cancel]')) {
-    closeMealComposer(root);
+    await closeMealComposer(root);
     if (mealComposerMode === "create") resetMealComposer();
     return;
   }
@@ -1268,27 +1275,22 @@ document.addEventListener('change', (event) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  const tab = event.target.closest('[data-planner-mode]');
-  if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-  const tabs = [...tab.closest('[role="tablist"]').querySelectorAll('[data-planner-mode]')];
-  let index = tabs.indexOf(tab);
+  const option = event.target.closest('[data-planner-mode]');
+  if (!option || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const options = [...option.closest('[data-segmented-control]').querySelectorAll('[data-planner-mode]')];
+  let index = options.indexOf(option);
   if (event.key === 'Home') index = 0;
-  else if (event.key === 'End') index = tabs.length - 1;
-  else index = (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  else if (event.key === 'End') index = options.length - 1;
+  else index = (index + (event.key === 'ArrowRight' ? 1 : -1) + options.length) % options.length;
   event.preventDefault();
-  tabs[index].focus();
-  tabs[index].click();
+  options[index].focus();
+  options[index].click();
 });
 
-document.addEventListener('submit', (event) => {
+document.addEventListener('submit', async (event) => {
   const form = event.target.closest('[data-meal-dialog-form]');
   const root = document.getElementById('stack-app');
   if (!form || !root) return;
   event.preventDefault();
-  saveMealComposer(root);
+  await saveMealComposer(root);
 });
-
-document.addEventListener('cancel', (event) => {
-  const dialog = event.target.closest?.('[data-meal-dialog]');
-  if (dialog && mealComposerMode === 'create') resetMealComposer();
-}, true);
