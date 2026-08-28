@@ -1,48 +1,4 @@
-import { icon } from './icons.js';
-import './theme.js';
-
-const bottomNavIcons = {
-    Home: 'home',
-    Stack: 'pill',
-    Blood: 'droplet',
-    Workout: 'activity',
-    Finance: 'chart',
-    Avoid: 'shield',
-    Blueprint: 'flask',
-};
-
-document.querySelectorAll('.bottom-nav-item').forEach((item) => {
-    const label = item.querySelector('.bottom-nav-label')?.textContent.trim();
-    const iconName = bottomNavIcons[label];
-    const target = item.querySelector('.bottom-nav-icon');
-    if (iconName && target) target.innerHTML = icon(iconName, { size: 18 });
-});
-document.querySelectorAll('.bottom-nav').forEach((nav) => nav.setAttribute('aria-label', 'Mobile primary navigation'));
-document.querySelectorAll('.bottom-nav-item.active').forEach((item) => item.setAttribute('aria-current', 'page'));
-
-document.addEventListener('click', function(e) {
-    var btn = e.target.closest('[data-nav-toggle]');
-    if (btn) {
-        var isOpen = document.querySelector('.nav').classList.toggle('nav-open');
-        document.body.classList.toggle('nav-open', isOpen);
-        btn.setAttribute('aria-expanded', String(isOpen));
-        return;
-    }
-    if (!e.target.closest('.nav') && document.querySelector('.nav') && document.querySelector('.nav').classList.contains('nav-open')) {
-        document.querySelector('.nav').classList.remove('nav-open');
-        document.body.classList.remove('nav-open');
-        var menuButton = document.querySelector('[data-nav-toggle]');
-        if (menuButton) menuButton.setAttribute('aria-expanded', 'false');
-    }
-});
-
-document.addEventListener('click', function(e) {
-    if (e.target.closest('[data-export]')) {
-        exportData();
-    }
-});
-
-async function exportData() {
+export async function exportData() {
     const [
         { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, AVOID_LABEL_GUIDE, UPF_GUIDE, TIMING_GUIDE, SKIP_LIST, CONDITIONAL_LIST },
         { CORE_OUTCOMES },
@@ -52,6 +8,7 @@ async function exportData() {
         { PILLARS: MASTER_PILLARS, LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS },
         { EIGHTY_TWENTY, SOCIAL_MENTAL, FRONTIER, SCREENING_TIERS, BIOLOGY },
         { HAWKER, HEALTHIER_SG, SODIUM, ENVIRONMENT },
+        { NUTRIENT_GROUPS, NUTRIENT_TARGETS, COMPOUND_TARGETS, BUILDER_ITEMS, FOUNDATION_STACK, MEAL_PLANS, MEAL_BOWLS, HIGH_ROI_FOODS, MITOCHONDRIAL_SUPPORT, BREATHING_PROTOCOLS, EFFICIENCY_PRACTICES, FOOD_TRAPS, SUPPLEMENT_GUIDANCE },
     ] = await Promise.all([
         import('./data/stack.js'),
         import('./data/core.js'),
@@ -61,6 +18,7 @@ async function exportData() {
         import('./data/pillars.js'),
         import('./data/protocol.js'),
         import('./data/singapore.js'),
+        import('./data/nutrition.js'),
     ]);
 
     let passiveIncome = [];
@@ -74,6 +32,11 @@ async function exportData() {
             }));
         }
     } catch {}
+
+    let savedMeals = [];
+    let currentDay = {};
+    try { savedMeals = JSON.parse(localStorage.getItem('ml-daily-meals') || '[]'); } catch {}
+    try { currentDay = JSON.parse(localStorage.getItem('ml-daily-current') || '{}') || {}; } catch {}
 
     const data = {
         exportedAt: new Date().toISOString(),
@@ -110,16 +73,60 @@ async function exportData() {
         healthierSG: HEALTHIER_SG,
         sodium: SODIUM,
         environment: ENVIRONMENT,
+        nutrientTargets: NUTRIENT_TARGETS,
+        nutrientGroups: NUTRIENT_GROUPS,
+        compoundTargets: COMPOUND_TARGETS,
+        builderItems: BUILDER_ITEMS,
+        foundationStack: FOUNDATION_STACK,
+        mealPlans: MEAL_PLANS,
+        mealBowls: MEAL_BOWLS,
+        savedMeals,
+        savedDailyPlans: [],
+        selectedMealIds: Array.isArray(currentDay.mealIds) ? currentDay.mealIds : [],
+        quickAddedItems: Array.isArray(currentDay.quickItemIds) ? currentDay.quickItemIds : [],
+        mealPortions: currentDay.mealQuantities && typeof currentDay.mealQuantities === 'object' ? currentDay.mealQuantities : {},
+        mealItemPortions: currentDay.mealItemQuantities && typeof currentDay.mealItemQuantities === 'object' ? currentDay.mealItemQuantities : {},
+        quickItemPortions: currentDay.quickItemQuantities && typeof currentDay.quickItemQuantities === 'object' ? currentDay.quickItemQuantities : {},
+        currentBodyWeightKg: currentDay.bodyWeightKg,
+        highRoiFoods: HIGH_ROI_FOODS,
+        mitochondrialSupport: MITOCHONDRIAL_SUPPORT,
+        breathingProtocols: BREATHING_PROTOCOLS,
+        efficiencyPractices: EFFICIENCY_PRACTICES,
+        foodTraps: FOOD_TRAPS,
+        supplementGuidance: SUPPLEMENT_GUIDANCE,
+        savedStacks: (() => { try { return JSON.parse(localStorage.getItem('ml-daily-stacks') || '[]'); } catch { return []; } })(),
     };
 
     let md = `# Macro Longevity Knowledge Base\n\n`;
     md += `Exported: ${data.exportedAt}\nSource: ${data.source}\n\n`;
-    md += `> Carnivore-first, evidence-graded and outcome-focused. Not medical advice.\n\n`;
+    md += `> Food-first, evidence-graded and outcome-focused. Not medical advice.\n\n`;
     md += `---\n\n`;
+
+    md += `## Food-first Daily Stack Builder\n\n`;
+    data.nutrientTargets.forEach((target) => { md += `- **${target.name}:** ${target.target} — ${target.why}\n`; });
+    md += `\nReference profile: adult male 19–50. Planning values are approximate and context-dependent.\n`;
+    md += `\n### Targeted compounds\n\n`;
+    data.compoundTargets.forEach((target) => { md += `- **${target.name} (${target.evidence}):** ${target.target} — Food first: ${target.food}\n`; });
+    md += `\nFoundation preset: ${data.foundationStack.items.join(', ')}\n`;
+    md += `\n### Meal library\n\n`;
+    data.mealPlans.forEach((meal) => { md += `- **${meal.name}:** ${meal.items.join(', ')}${meal.tags?.length ? ` — ${meal.tags.join(', ')}` : ''}\n`; });
+    md += `\n### Saved meals\n\n`;
+    if (data.savedMeals.length) data.savedMeals.forEach((meal) => { md += `- **${meal.name}:** ${meal.items.join(', ')}\n`; });
+    else md += `No saved meals on this device.\n`;
+    md += `\n### Current plan\n\n`;
+    md += `- **Meals:** ${data.selectedMealIds.join(', ') || 'None'}\n- **Quick additions:** ${data.quickAddedItems.join(', ') || 'None'}\n- **Meal portions:** ${JSON.stringify(data.mealPortions)}\n- **Meal ingredient portions:** ${JSON.stringify(data.mealItemPortions)}\n- **Quick-item portions:** ${JSON.stringify(data.quickItemPortions)}\n- **Body weight:** ${data.currentBodyWeightKg || 'Not set'} kg\n`;
+    md += `\n### Saved legacy stacks\n\n`;
+    if (data.savedStacks.length) data.savedStacks.forEach((stack) => { md += `- **${stack.name}:** ${stack.items.join(', ')}\n`; });
+    else md += `No saved stacks on this device.\n`;
+    md += `\n### High-ROI foods\n\n`;
+    data.highRoiFoods.forEach((food) => { md += `- **${food.name} (${food.amount}):** ${food.benefit}\n`; });
+    md += `\n### Recovery protocols\n\n`;
+    data.breathingProtocols.forEach((protocol) => { md += `- **${protocol.name} — ${protocol.dose}:** ${protocol.how}\n`; });
+    md += `\n`;
 
     md += `## Supplements (${data.supplements.length})\n\n`;
     data.supplements.forEach(s => {
-        md += `### ${s.icon} ${s.name}\n`;
+        md += `### ${s.name}\n`;
         if (s.evidence) md += `- **Evidence:** ${s.evidence}\n`;
         md += `- **Dose:** ${s.dose}\n`;
         md += `- **Timing:** ${s.timing}\n`;
@@ -132,7 +139,7 @@ async function exportData() {
 
     md += `## Food & Spices (${data.foodSpices.length})\n\n`;
     data.foodSpices.forEach(f => {
-        md += `### ${f.icon} ${f.name}\n`;
+        md += `### ${f.name}\n`;
         if (f.evidence) md += `- **Evidence:** ${f.evidence}\n`;
         md += `- **Serving:** ${f.serving}\n`;
         md += `- **When:** ${f.timing}\n`;
@@ -145,7 +152,7 @@ async function exportData() {
 
     md += `## Extras (${data.extras.length})\n\n`;
     data.extras.forEach(f => {
-        md += `### ${f.icon} ${f.name}\n`;
+        md += `### ${f.name}\n`;
         if (f.evidence) md += `- **Evidence:** ${f.evidence}\n`;
         md += `- **Serving:** ${f.serving}\n`;
         md += `- **When:** ${f.timing}\n`;
@@ -185,19 +192,19 @@ async function exportData() {
 
     md += `## Core Outcome Coverage\n\n`;
     data.coreOutcomes.forEach(o => {
-        md += `### ${o.icon} ${o.name}\n- **Core:** ${o.core}\n- **Targeted:** ${o.targeted}\n- **Track:** ${o.measure}\n\n`;
+        md += `### ${o.name}\n- **Core:** ${o.core}\n- **Targeted:** ${o.targeted}\n- **Track:** ${o.measure}\n\n`;
     });
 
     md += `## Skip List — Do Not Buy (${data.skipList.length})\n\n`;
     data.skipList.forEach(s => {
-        md += `### ${s.icon} ${s.name}\n`;
+        md += `### ${s.name}\n`;
         md += `- **Why skip:** ${s.why}\n`;
         md += `\n`;
     });
 
     md += `## Conditional — Context-Dependent (${data.conditionalList.length})\n\n`;
     data.conditionalList.forEach(s => {
-        md += `### ${s.icon} ${s.name}\n`;
+        md += `### ${s.name}\n`;
         if (s.evidence) md += `- **Evidence:** ${s.evidence}\n`;
         md += `- **Who:** ${s.who}\n`;
         md += `- **Dose:** ${s.dose}\n`;
@@ -228,7 +235,7 @@ async function exportData() {
 
     md += `## Beyond the Blood Panel (${data.beyondPanel.length})\n\n`;
     data.beyondPanel.forEach(t => {
-        md += `### ${t.icon} ${t.name}\n`;
+        md += `### ${t.name}\n`;
         md += `- **Do:** ${t.action}\n`;
         md += `- **Why:** ${t.why}\n\n`;
     });
@@ -271,7 +278,7 @@ async function exportData() {
 
     md += `## 4 Pillars of Longevity Training\n\n`;
     data.pillars.forEach(p => {
-        md += `### ${p.icon} ${p.name}\n`;
+        md += `### ${p.name}\n`;
         md += `- **Frequency:** ${p.frequency}\n`;
         md += `- **Target:** ${p.target}\n`;
         md += `- **Benefits:**\n`;

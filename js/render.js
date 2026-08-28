@@ -1,15 +1,14 @@
 import { PILLARS, EXERCISES } from './data/workout.js';
 import { INVESTMENTS } from './data/finance.js';
-import { icon } from './icons.js';
 
 function safeRender(fn, container, fallback) {
   try { fn(); }
   catch (err) {
     console.error('Render error:', err);
     if (container) {
-      container.innerHTML = `<div style="padding:24px;text-align:center;color:var(--color-text-secondary)">
-        <p style="font-size:18px;margin-bottom:8px">Something went wrong.</p>
-        <p style="font-size:14px;color:var(--color-text-muted)">${fallback || 'Please refresh the page.'}</p>
+      container.innerHTML = `<div class="render-error">
+        <p class="render-error-title">Something went wrong.</p>
+        <p class="render-error-copy">${fallback || 'Please refresh the page.'}</p>
       </div>`;
     }
   }
@@ -28,7 +27,7 @@ function renderInvestments() {
       <p class="invest-disclaimer">Not financial advice. Information sourced from MAS, CPF Board, r/singaporefi, and HardwareZone for educational purposes. Consult a licensed adviser.</p>
 
       <div class="budget-tool" id="budgetTool">
-        <h3 class="budget-title">💵 Your Budget at a Glance</h3>
+        <h3 class="budget-title">Your Budget at a Glance</h3>
         <p class="budget-desc">Enter your monthly take-home salary. The 50/30/20 rule splits it into Expenses, Investments, and Savings. Drag the sliders to adjust.</p>
         <div class="budget-input-row">
           <div class="budget-field">
@@ -60,18 +59,20 @@ function renderInvestments() {
       </div>
 
       ${INVESTMENTS.map(c => `
-        <article class="invest-card" id="inv-${c.id}">
+        <details class="invest-card invest-combo" id="inv-${c.id}" data-invest-combo open>
+          <summary class="invest-combo-summary">
           <div class="invest-card-top">
-            <span class="invest-icon">${c.icon}</span>
             <div>
               <h2 class="invest-name">${c.name}</h2>
               <span class="invest-goal">${c.goal}</span>
             </div>
           </div>
           <div class="invest-meta-bar">
-            <span>📈 ${c.totalReturn}</span>
-            <span>⚠️ ${c.riskLevel}</span>
+            <span>${c.totalReturn}</span>
+            <span>${c.riskLevel}</span>
           </div>
+          </summary>
+          <div class="invest-combo-body">
           <div class="invest-table ${budgetInvestments > 0 ? '' : 'invest-table-hide-mo'}">
             <div class="invest-table-header"><span>Asset</span><span>Allocation</span><span>Monthly</span><span>Why</span></div>
             ${c.portfolio.map(a => {
@@ -87,20 +88,21 @@ function renderInvestments() {
             }).join("")}
           </div>
           <details class="meal-details">
-            <summary>🧩 Why These Work Together</summary>
+            <summary>Why These Work Together</summary>
             <p class="invest-body-text">${c.synergy}</p>
           </details>
           <details class="meal-details">
-            <summary>📋 Step-by-Step Execution</summary>
+            <summary>Step-by-Step Execution</summary>
             <p class="invest-body-text">${c.howToExecute}</p>
           </details>
           <details class="meal-details">
-            <summary>💡 Tips from r/singaporefi</summary>
+            <summary>Tips from r/singaporefi</summary>
             <ul class="checklist">
               ${c.tips.map(t => `<li>${t}</li>`).join("")}
             </ul>
           </details>
-        </article>
+          </div>
+        </details>
       `).join("")}
     </div>
   </div>`;
@@ -433,6 +435,23 @@ function initExerciseSounds() {
    ============================ */
 const timerState = {};
 
+function updateMobileTimerDock(id, state) {
+  const dock = document.querySelector('[data-mobile-timer-dock]');
+  const timer = timerState[id];
+  if (!dock || !timer) return;
+  const visible = state === 'running' || state === 'paused';
+  dock.hidden = !visible;
+  if (!visible) return;
+  dock.dataset.activeTimer = id;
+  const phase = dock.querySelector('[data-mobile-timer-phase]');
+  const time = dock.querySelector('[data-mobile-timer-time]');
+  const sourcePhase = timer._el?.phase?.textContent || timer._el?.label?.textContent || 'Active session';
+  const sourceTime = timer._el?.time?.textContent || '00:00';
+  if (phase) phase.textContent = state === 'paused' ? `Paused · ${sourcePhase}` : sourcePhase;
+  if (time) time.textContent = sourceTime;
+  dock.querySelectorAll('[data-exercise]').forEach((button) => { button.dataset.exercise = id; });
+}
+
 function timerTick(id, config) {
   const s = timerState[id];
   if (!s || s.status === "idle" || s.status === "paused") return;
@@ -453,6 +472,13 @@ function timerTick(id, config) {
   if (el.time && el.time.offsetParent === null) { s._el = timerEls(id); el = s._el; }
   if (el.time) el.time.textContent = timeText;
   if (el.bar) el.bar.style.transform = `scaleX(${pct / 100})`;
+  const dock = document.querySelector('[data-mobile-timer-dock]');
+  if (dock?.dataset.activeTimer === id) {
+    const dockTime = dock.querySelector('[data-mobile-timer-time]');
+    const dockPhase = dock.querySelector('[data-mobile-timer-phase]');
+    if (dockTime) dockTime.textContent = timeText;
+    if (dockPhase && s._el?.phase) dockPhase.textContent = s._el.phase.textContent;
+  }
 
   // Sound milestones
   const timeLeft = s.timeRemaining;
@@ -617,6 +643,7 @@ function updateTimerControls(id, state) {
     else if (state === "paused") { start.style.display = ""; start.textContent = "Resume"; pause.style.display = "none"; stop.style.display = ""; }
     else if (state === "done") { start.style.display = ""; start.textContent = "Restart"; pause.style.display = "none"; stop.style.display = "none"; }
   });
+  updateMobileTimerDock(id, state);
 }
 
 function updateSetIndicators(id, current, total) {
@@ -649,6 +676,7 @@ function handleTimerAction(id, action) {
     if (s.status === "done") { initTimerState(id); s = timerState[id]; }
     s.status = "running";
     s.lastTick = Date.now();
+    updateMobileTimerDock(id, "running");
     updateTimerControls(id, "running");
     if (s._el.label) s._el.label.textContent = s.type === "countdown" ? "ACTIVE · CONVERSATIONAL PACE" : s.type === "intervals" ? "WARM-UP" : `WORK · SET ${s.currentSet}/${s.totalSets}`;
     playStartWhistle();
@@ -658,12 +686,14 @@ function handleTimerAction(id, action) {
     s.status = "paused";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
     stopMusic();
+    updateMobileTimerDock(id, "paused");
     updateTimerControls(id, "paused");
     if (s._el.label) s._el.label.textContent = "PAUSED";
   } else if (action === "stop") {
     s.status = "idle";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
     stopMusic();
+    updateMobileTimerDock(id, "idle");
     initTimerState(id);
     const el2 = timerState[id]._el;
     updateTimerControls(id, "idle");
@@ -763,11 +793,9 @@ function initExerciseTimers() {
    ============================ */
 function pillarOverviewCard(p) {
   const benefits = Array.isArray(p.benefits) ? p.benefits : [];
-  const iconName = { zone2: "activity", vo2max: "activity", strength: "dumbbell", mobility: "target" }[p.id] || "activity";
   return `
     <article class="workout-pillar-summary" id="pillar-${p.id}">
       <div class="pillar-card-head">
-        <span class="workout-pillar-icon">${icon(iconName, { size: 24 })}</span>
         <div class="workout-pillar-lockup">
           <span class="workout-pillar-kicker">${p.kicker || "TRAINING DOMAIN"}</span>
           <h2 class="pillar-name">${p.shortName || p.name}</h2>
@@ -841,7 +869,7 @@ function strengthExerciseCard(ex) {
         <p class="exercise-desc">${ex.description}</p>
         <div class="exercise-dose"><span>${ex.sets} sets</span><span>${ex.reps || `${ex.workSeconds}s work`}</span><span>${ex.equipment || "Adaptable load"}</span></div>
         <details class="exercise-details">
-          <summary>${icon("info", { size: 16 })} Show form cues</summary>
+          <summary>Show form cues</summary>
           <div class="exercise-detail-content">
             <div class="exercise-detail-section">
               <h5>Why it belongs</h5>
@@ -898,12 +926,14 @@ function renderPillars(targetId) {
     <section class="workout-index" aria-label="Choose a training domain">
       <div class="workout-index-heading"><span>Choose a session</span><span data-current-pillar>${PILLARS[0].shortName || PILLARS[0].name}</span></div>
       <div class="workout-tabs" role="tablist">
-        ${PILLARS.map((p, i) => `
+        ${PILLARS.map((p, i) => {
+          const kicker = p.kicker || `0${i + 1} / TRAINING`;
+          return `
            <button class="workout-tab${i === 0 ? " is-active" : ""}" id="pillar-tab-${p.id}" type="button" role="tab" aria-selected="${i === 0}" aria-controls="section-${p.id}" tabindex="${i === 0 ? 0 : -1}" data-pillar-tab="${p.id}">
-            <span class="workout-tab-number">0${i + 1}</span>
-            <span class="workout-tab-copy"><span>${p.kicker || "TRAINING"}</span><strong>${p.shortName || p.name}</strong></span>
+            <span class="workout-tab-copy"><span>${kicker}</span><strong>${p.shortName || p.name}</strong></span>
             <span class="workout-tab-dose">${p.frequency}</span>
-          </button>`).join("")}
+          </button>`;
+        }).join("")}
       </div>
     </section>`;
 
@@ -921,7 +951,7 @@ function renderPillars(targetId) {
 
     const whyHTML = p.whyLongevity ? `
       <details class="exercise-details">
-        <summary>${icon("flask", { size: 16 })} Why this matters</summary>
+        <summary>Why this matters</summary>
         <div class="exercise-detail-content">
           <div class="exercise-detail-section">
             <p class="exercise-detail-text">${p.whyLongevity}</p>
@@ -939,7 +969,7 @@ function renderPillars(targetId) {
       </section>`;
   }).join("");
 
-  container.innerHTML = intro + `<div class="pillars-container">${pillarHTML}</div>`;
+  container.innerHTML = intro + `<div class="pillars-container">${pillarHTML}</div><div class="mobile-timer-dock" data-mobile-timer-dock hidden><div><span data-mobile-timer-phase>Active session</span><strong data-mobile-timer-time>00:00</strong></div><div class="timer-controls"><button class="timer-btn timer-start" data-exercise="">Resume</button><button class="timer-btn timer-pause" data-exercise="">Pause</button><button class="timer-btn timer-stop" data-exercise="">Reset</button></div></div>`;
 
   // Create timer states for each pillar
   const zone2 = PILLARS.find(p => p.id === "zone2");
@@ -983,7 +1013,7 @@ function exerciseCardFace(e) {
     <div class="exercise-header">
       <div class="exercise-name">${e.name}</div>
     </div>
-    <div class="exercise-target" id="target-${e.id}">🎯 ${def.target}</div>
+    <div class="exercise-target" id="target-${e.id}">${def.target}</div>
     <p class="exercise-desc">${e.description}</p>
     <div class="exercise-timer" id="timer-${e.id}">
       <div class="timer-config">
@@ -997,9 +1027,9 @@ function exerciseCardFace(e) {
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${e.id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">
-        <button class="timer-btn timer-start" data-exercise="${e.id}">▶ Start</button>
-        <button class="timer-btn timer-pause" data-exercise="${e.id}" style="display:none">⏸ Pause</button>
-        <button class="timer-btn timer-stop" data-exercise="${e.id}" style="display:none">⏹ Stop</button>
+        <button class="timer-btn timer-start" data-exercise="${e.id}">Start</button>
+        <button class="timer-btn timer-pause" data-exercise="${e.id}" style="display:none">Pause</button>
+        <button class="timer-btn timer-stop" data-exercise="${e.id}" style="display:none">Stop</button>
       </div>
       <div class="timer-label" id="label-${e.id}">Ready</div>
     </div>
@@ -1009,11 +1039,11 @@ function exerciseCardFace(e) {
 function exerciseCardDetail(e) {
   return `
     <div class="exercise-detail-section">
-      <h5>🎯 Why This Exercise</h5>
+      <h5>Why This Exercise</h5>
       <p class="exercise-detail-text">${e.whyLongevity}</p>
     </div>
     <div class="exercise-detail-section">
-      <h5>📋 Step-by-Step</h5>
+      <h5>Step-by-Step</h5>
       <ol class="checklist">${e.instructions.map(i => `<li>${i}</li>`).join("")}</ol>
     </div>`;
 }
@@ -1029,5 +1059,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (workoutApp) safeRender(() => renderExercises('workout-app'), workoutApp);
   if (investmentsApp) safeRender(() => {
     investmentsApp.innerHTML = renderInvestments();
+    const combos = [...investmentsApp.querySelectorAll('[data-invest-combo]')];
+    if (window.matchMedia('(max-width: 767px)').matches) combos.forEach((combo, index) => { combo.open = index === 0; });
+    combos.forEach((combo) => combo.addEventListener('toggle', () => {
+      if (!combo.open || !window.matchMedia('(max-width: 767px)').matches) return;
+      combos.forEach((other) => { if (other !== combo) other.open = false; });
+    }));
   }, investmentsApp);
 });

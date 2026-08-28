@@ -12,17 +12,19 @@
     <meta property="og:url" content="https://macro-longevity.com/">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0a7e6f">
+    <meta name="theme-color" content="#ffffff">
     <title>Macro Longevity — Carnivore-First Longevity Protocol</title>
     <link rel="stylesheet" href="/css/variables.css">
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/tooltip.css">
+    <link rel="expect" href="#view-transition-anchor" blocking="render">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <span class="nav-logo-icon" aria-hidden="true"></span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
@@ -30,138 +32,163 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link active" aria-current="page">Home</a>
-                <a href="/pages/stack.html" class="nav-link">Daily Stack</a>
-                <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
-                <a href="/pages/protocol.html" class="nav-link">Blueprint</a>
-                <a href="/pages/workout.html" class="nav-link">Workout</a>
+                <a href="/pages/stack.html" class="nav-link">Nutrition</a>
+                <a href="/pages/blood.html" class="nav-link">Health</a>
+                <a href="/pages/workout.html" class="nav-link">Training</a>
                 <a href="/pages/finance.html" class="nav-link">Finance</a>
-                <a href="/pages/avoid.html" class="nav-link">Avoid</a>
             </div>
         </div>
     </nav>
 
     <main id="main">
-        <section class="hero">
-            <div class="hero-bg"></div>
-            <div class="hero-content">
-                <h1 class="hero-title">Longevity, <span class="gradient-text">Without the Hype</span></h1>
-                <p class="hero-subtitle">
-                    The few things that matter — a daily protocol, an annual blood panel,
-                    and the ingredients to avoid. No mechanism marketing. Just what works.
-                </p>
-                <div class="carnivore-banner">
-                    🥩 <strong>Author's note:</strong> I've eaten a strict carnivore diet for years.
-                    This site is built around that lens — every supplement, test and food is graded
-                    for what a meat-and-eggs eater actually needs.
+        <section id="view-transition-anchor" class="hero split-screen-hero">
+            <div class="hero-bg" aria-hidden="true"></div>
+            <div class="section-inner split-screen-hero-shell">
+                <div class="split-screen-hero-content">
+                    <div class="split-screen-hero-kicker">
+                        <p class="section-eyebrow">A calmer protocol</p>
+                        <span class="home-split-index">01 / 04 · Start here</span>
+                    </div>
+                    <h1 class="hero-title">Longevity, <span class="gradient-text">Without the Hype</span></h1>
+                    <p class="hero-subtitle">
+                        The few things that matter — a daily protocol, an annual blood panel,
+                        and the ingredients to avoid. No mechanism marketing. Just what works.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="/pages/stack.html" class="btn btn-primary">Build a daily plan</a>
+                        <a href="/pages/protocol.html" class="btn btn-secondary">See the 80/20 blueprint</a>
+                    </div>
                 </div>
-                <div class="hero-actions">
-                    <a href="/pages/stack.html" class="btn btn-primary">See the Daily Stack</a>
-                    <a href="/pages/blood.html" class="btn btn-secondary">Plan Your Blood Tests</a>
-                </div>
+                <nav class="split-screen-hero-visual" aria-label="Protocol pillars">
+                    <div class="split-screen-hero-visual-head">
+                        <p class="split-screen-hero-visual-kicker">Protocol map</p>
+                        <span class="split-screen-hero-visual-meta">04 pillars · 01 system</span>
+                    </div>
+                    <div id="hero-pillar-map" class="hero-pillar-map"></div>
+                </nav>
             </div>
         </section>
 
         <section class="section">
-            <div class="section-inner">
-                <p class="section-eyebrow">The master model</p>
-                <h2 class="section-title">Four pillars hold up a long healthspan</h2>
-                <p class="lede">
-                    One hierarchy that contains longevity, anti-cancer prevention, mitochondrial health and functional reserve without duplication. Pillars 1–3 are outcomes; Pillar 4 is the everyday intervention layer that drives them.
-                </p>
-                <div id="pillars-app" class="pillar-grid"></div>
-                <div id="decision-rule-app"></div>
-                <div id="evidence-legend-app" class="evidence-legend"></div>
+            <div class="section-inner home-split">
+                <div class="home-split-meta">
+                    <p class="section-eyebrow">The master model</p>
+                    <span class="home-split-index">02 / 04 · Orient</span>
+                </div>
+                <div class="home-split-content">
+                    <h2 class="section-title">Four pillars hold up a long healthspan</h2>
+                    <p class="lede">
+                        One hierarchy that contains longevity, anti-cancer prevention, mitochondrial health and functional reserve without duplication. Pillars 1–3 are outcomes; Pillar 4 is the everyday intervention layer that drives them.
+                    </p>
+                    <div id="pillars-app" class="pillar-grid"></div>
+                    <details class="progressive-section home-method">
+                        <summary><span class="progressive-section-heading"><span class="section-title">How recommendations are graded</span><span class="blood-tier-desc">Decision rules and evidence levels used across the app.</span></span></summary>
+                        <div class="progressive-section-body"><div id="decision-rule-app"></div><div id="evidence-legend-app" class="evidence-legend"></div></div>
+                    </details>
+                </div>
             </div>
         </section>
 
         <section class="section section-alt">
-            <div class="section-inner">
-                <p class="section-eyebrow">If you read only three pages</p>
-                <h2 class="section-title">The Longevity 101</h2>
-                <p class="lede">
-                    The research converges on a simple conclusion: longevity is mostly not a shopping problem. The highest-return actions are ordinary.
-                </p>
-                <ol id="longevity101-app" class="longevity-101"></ol>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-inner">
-                <h2 class="section-title">The Core Protocol</h2>
-                <p class="section-text">
-                    Six outcome domains, a tiny core stack and targeted options only when they have a clear job. Full details and risks on the Daily Stack page.
-                </p>
-                <div id="stack-summary-app"></div>
-            </div>
-        </section>
-
-        <section class="section section-alt">
-            <div class="section-inner">
-                <div class="preview-grid">
-                    <a href="/pages/stack.html" class="preview-card">
-                        <div class="preview-icon">🍖</div>
-                        <h3 class="preview-title">Daily Stack</h3>
-                        <p class="preview-desc">
-                             Supplements, foods, extras — and the 21 things to skip.
-                        </p>
-                        <span class="preview-cta">View the protocol →</span>
-                    </a>
-                    <a href="/pages/blood.html" class="preview-card">
-                        <div class="preview-icon">🩸</div>
-                        <h3 class="preview-title">Blood Tests</h3>
-                        <p class="preview-desc">
-                            The annual panel that matters, the one-time tests that settle questions forever,
-                            and the low-value tests that only drain your wallet.
-                        </p>
-                        <span class="preview-cta">Plan your panel →</span>
-                    </a>
-                    <a href="/pages/workout.html" class="preview-card">
-                        <div class="preview-icon">🏋️</div>
-                        <h3 class="preview-title">Daily Workout</h3>
-                        <p class="preview-desc">
-                            Strength, mobility, aerobic base and interval timers with sound cues.
-                            Start with five minutes, then build toward the weekly training targets.
-                        </p>
-                        <span class="preview-cta">Start moving →</span>
-                    </a>
-                    <a href="/pages/finance.html" class="preview-card">
-                        <div class="preview-icon">💰</div>
-                        <h3 class="preview-title">Finance</h3>
-                        <p class="preview-desc">
-                            Investment combos and the FIRE calculator — because financial health
-                            is part of longevity, and stress about money shortens both.
-                        </p>
-                        <span class="preview-cta">Plan your money →</span>
-                    </a>
+            <div class="section-inner home-split">
+                <div class="home-split-meta">
+                    <p class="section-eyebrow">If you read only three pages</p>
+                    <span class="home-split-index">03 / 04 · Prioritize</span>
+                </div>
+                <div class="home-split-content">
+                    <h2 class="section-title">The Longevity 101</h2>
+                    <p class="lede">
+                        The research converges on a simple conclusion: longevity is mostly not a shopping problem. The highest-return actions are ordinary.
+                    </p>
+                    <ol id="longevity101-app" class="longevity-101"></ol>
+                    <button type="button" class="text-button longevity-toggle" data-longevity-toggle aria-controls="longevity101-app" aria-expanded="false">Show all 10 actions</button>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <div class="section-inner text-center">
-                <h2 class="section-title">The Philosophy</h2>
-                <div class="feature-grid">
+            <div class="section-inner home-split">
+                <div class="home-split-meta">
+                    <p class="section-eyebrow">Daily inputs</p>
+                    <span class="home-split-index">04 / 04 · Apply</span>
+                </div>
+                <div class="home-split-content">
+                    <h2 class="section-title">The Core Protocol</h2>
+                    <p class="section-text">
+                        Six outcome domains, a tiny core stack and targeted options only when they have a clear job. Full details and risks on the Daily Stack page.
+                    </p>
+                    <div id="stack-summary-app"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-alt">
+            <div class="section-inner home-split home-links-split">
+                <div class="home-split-meta">
+                    <p class="section-eyebrow">Go deeper</p>
+                    <span class="home-split-index">Explore · Four routes</span>
+                </div>
+                <div class="home-split-content">
+                    <div class="preview-grid">
+                        <a href="/pages/stack.html" class="preview-card">
+                            <h3 class="preview-title">Daily Stack</h3>
+                            <p class="preview-desc">
+                                 Supplements, foods, extras — and the 21 things to skip.
+                            </p>
+                            <span class="preview-cta">View the protocol →</span>
+                        </a>
+                        <a href="/pages/blood.html" class="preview-card">
+                            <h3 class="preview-title">Blood Tests</h3>
+                            <p class="preview-desc">
+                                The annual panel that matters, the one-time tests that settle questions forever,
+                                and the low-value tests that only drain your wallet.
+                            </p>
+                            <span class="preview-cta">Plan your panel →</span>
+                        </a>
+                        <a href="/pages/workout.html" class="preview-card">
+                            <h3 class="preview-title">Daily Workout</h3>
+                            <p class="preview-desc">
+                                Strength, mobility, aerobic base and interval timers with sound cues.
+                                Start with five minutes, then build toward the weekly training targets.
+                            </p>
+                            <span class="preview-cta">Start moving →</span>
+                        </a>
+                        <a href="/pages/finance.html" class="preview-card">
+                            <h3 class="preview-title">Finance</h3>
+                            <p class="preview-desc">
+                                Investment combos and the FIRE calculator — because financial health
+                                is part of longevity, and stress about money shortens both.
+                            </p>
+                            <span class="preview-cta">Plan your money →</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-inner">
+                <details class="progressive-section home-method">
+                    <summary><span class="progressive-section-heading"><span class="section-title">Principles behind the app</span><span class="blood-tier-desc">Why the protocol prioritizes fewer, higher-value actions.</span></span></summary>
+                    <div class="progressive-section-body feature-grid">
                     <div class="feature-item">
-                        <span class="feature-icon">🎯</span>
                         <h4>Less Is More</h4>
                         <p>Fewer supplements, fewer tests, fewer habits — each one earning its place across multiple health domains.</p>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">🔬</span>
                         <h4>Outcomes Over Mechanisms</h4>
                         <p>Evidence grades come from human outcome data — meta-analyses and RCTs — not from marketing words like "NAD+" or "autophagy".</p>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">💸</span>
                         <h4>Redundant Means Skip</h4>
                         <p>If your diet already covers it, the supplement gets a "probably redundant — skip" label. Your money stays yours.</p>
                     </div>
                     <div class="feature-item">
-                        <span class="feature-icon">🥩</span>
                         <h4>Carnivore-Honest</h4>
                         <p>Iron, B12 and zinc are covered — and iron is genuinely dangerous to add. What carnivores lack is stated plainly, with solutions.</p>
                     </div>
-                </div>
+                    </div>
+                </details>
             </div>
         </section>
     </main>
@@ -169,7 +196,6 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <span class="footer-logo" aria-hidden="true"></span>
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
@@ -182,10 +208,10 @@
         </div>
     </footer>
 
-    <script type="module" src="/js/stack.js"></script>
+    <script type="module" src="/js/stack-preview.js"></script>
     <script type="module" src="/js/home.js"></script>
-    <script type="module" src="/js/export.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item active"><span class="bottom-nav-icon">🏠</span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon">💊</span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon">🩸</span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏃</span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon">🚫</span><span class="bottom-nav-label">Avoid</span></a><a href="/pages/protocol.html" class="bottom-nav-item"><span class="bottom-nav-icon">📐</span><span class="bottom-nav-label">Blueprint</span></a></div></nav>
+    <script type="module" src="/js/site.js"></script>
+<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item active"><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-label">Nutrition</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
  <script src="/js/register-sw.js" defer></script>
 </body>
 </html>

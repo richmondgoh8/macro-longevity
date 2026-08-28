@@ -12,17 +12,19 @@
     <meta property="og:url" content="https://macro-longevity.com/pages/finance.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0F766E">
+    <meta name="theme-color" content="#ffffff">
     <title>Finance — Macro Longevity</title>
     <link rel="stylesheet" href="/css/variables.css">
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/tooltip.css">
+    <link rel="expect" href="#view-transition-anchor" blocking="render">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
             <a href="/" class="nav-logo">
-                <span class="nav-logo-icon" aria-hidden="true"></span>
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
@@ -30,18 +32,16 @@
             </button>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/pages/stack.html" class="nav-link">Daily Stack</a>
-                <a href="/pages/blood.html" class="nav-link">Blood Tests</a>
-                <a href="/pages/protocol.html" class="nav-link">Blueprint</a>
-                <a href="/pages/workout.html" class="nav-link">Workout</a>
+                <a href="/pages/stack.html" class="nav-link">Nutrition</a>
+                <a href="/pages/blood.html" class="nav-link">Health</a>
+                <a href="/pages/workout.html" class="nav-link">Training</a>
                 <a href="/pages/finance.html" class="nav-link active" aria-current="page">Finance</a>
-                <a href="/pages/avoid.html" class="nav-link">Avoid</a>
             </div>
         </div>
     </nav>
 
     <main id="main">
-        <section class="page-header">
+        <section id="view-transition-anchor" class="page-header">
             <div class="section-inner">
                 <h1 class="page-title">Finance &amp; FIRE</h1>
                 <p class="page-desc">Investment combos for Singapore, a FIRE calculator with 4% rule and CPF LIFE estimates, plus a passive income tracker.</p>
@@ -51,14 +51,10 @@
         <section class="section">
             <div class="section-inner">
                 <div class="meal-tabs" id="financeTabs" data-finance-tabs role="tablist" aria-label="Finance views">
-                    <button type="button" class="meal-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-selected="true" aria-controls="financeInvestments">Investment combos</button>
-                    <button type="button" class="meal-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-selected="false" aria-controls="financeFire">FIRE calculator</button>
+                    <button type="button" class="meal-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-label="Investment combos" aria-selected="true" aria-controls="financeInvestments"><span class="finance-tab-full">Investment combos</span><span class="finance-tab-short" aria-hidden="true">Combos</span></button>
+                    <button type="button" class="meal-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-label="FIRE calculator" aria-selected="false" aria-controls="financeFire"><span class="finance-tab-full">FIRE calculator</span><span class="finance-tab-short" aria-hidden="true">FIRE</span></button>
+                    <button type="button" class="meal-tab" id="finance-tab-income" data-finance-tab="income" role="tab" aria-label="Income tracker" aria-selected="false" aria-controls="financeIncome"><span class="finance-tab-full">Income tracker</span><span class="finance-tab-short" aria-hidden="true">Income</span></button>
                 </div>
-                <label class="sr-only" for="financeViewSelect">Finance view</label>
-                <select id="financeViewSelect" class="meal-tab-select" data-finance-select aria-label="Finance view">
-                    <option value="investments" selected>Investment combos</option>
-                    <option value="fire">FIRE calculator</option>
-                </select>
             </div>
         </section>
 
@@ -134,13 +130,6 @@
                 <div class="fire-results" id="fireResults" aria-live="polite" aria-atomic="false"></div>
                 <div class="fire-assumptions" id="fireAssumptions"></div>
 
-                <div class="pi-section" id="piSection">
-                    <h2>Passive income tracker</h2>
-                    <p class="pi-desc">Track dividend and interest income across holdings. Add an asset, enter the principal and annual rate, and monthly income calculates automatically.</p>
-                    <div id="piContent"></div>
-                    <div id="piStatus" class="pi-status" role="status" aria-live="polite"></div>
-                </div>
-
                 <div class="fire-chart-container">
                     <h3>Portfolio growth projection</h3>
                     <div class="fire-chart">
@@ -153,12 +142,23 @@
                 </div>
             </div>
         </section>
+
+        <section class="section" id="financeIncome" role="tabpanel" aria-labelledby="finance-tab-income" hidden>
+            <div class="section-inner pi-section" id="piSection">
+                <div class="ui-section-head">
+                    <p class="eyebrow">Cash flow</p>
+                    <h2>Passive income tracker</h2>
+                    <p>Track dividend and interest income across holdings. Enter principal and annual yield to calculate monthly income.</p>
+                </div>
+                <div id="piContent"></div>
+                <div id="piStatus" class="pi-status" role="status" aria-live="polite"></div>
+            </div>
+        </section>
     </main>
 
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <span class="footer-logo" aria-hidden="true"></span>
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">Not financial advice. This information is for educational purposes only. Consult a licensed financial adviser before making investment decisions.</p>
@@ -167,11 +167,11 @@
         </div>
     </footer>
 
-    <nav class="bottom-nav" aria-label="Mobile primary navigation"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Stack</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Blood</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Workout</span></a><a href="/pages/finance.html" class="bottom-nav-item active" aria-current="page"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Finance</span></a><a href="/pages/avoid.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Avoid</span></a><a href="/pages/protocol.html" class="bottom-nav-item"><span class="bottom-nav-icon" aria-hidden="true"></span><span class="bottom-nav-label">Blueprint</span></a></div></nav>
+    <nav class="bottom-nav" aria-label="Mobile primary navigation"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item"><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-label">Nutrition</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="/pages/finance.html" class="bottom-nav-item active" aria-current="page"><span class="bottom-nav-label">Finance</span></a></div></nav>
 
     <script type="module" src="/js/render.js"></script>
     <script type="module" src="/js/finance.js"></script>
-    <script type="module" src="/js/export.js"></script>
+    <script type="module" src="/js/site.js"></script>
     <script src="/js/register-sw.js" defer></script>
 </body>
 </html>
