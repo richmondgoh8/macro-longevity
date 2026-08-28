@@ -1,0 +1,38 @@
+# Cloudflare Workers uploads only need the static site files.
+# This file uses .gitignore syntax and is read from the asset directory.
+
+# Repository and development metadata
+.git/
+.github/
+.assetsignore
+.gitignore
+.wrangler/
+.dev.vars*
+AGENTS.md
+DESIGN.md
+LICENSE
+Makefile
+README.md
+package.json
+package-lock.json
+playwright.config.js
+wrangler.jsonc
+
+# Development dependencies and generated output
+node_modules/
+.playwright-cli/
+playwright-report/
+test-results/
+blob-report/
+coverage/
+scripts/
+tests/
+
+# Local/editor artifacts
+.cache/
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+*~

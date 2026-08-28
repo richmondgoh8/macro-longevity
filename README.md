@@ -94,7 +94,7 @@ When changing an authored design value, update both `DESIGN.md` and `css/variabl
 
 ## Deployment
 
-Deploy the repository root to any static host with no build command and `.` as the output directory. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development.
+Deploy the repository root to any static host with no build command and `.` as the output directory. For Cloudflare Workers, [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development.
 
 ## License
 
