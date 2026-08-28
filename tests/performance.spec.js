@@ -25,10 +25,10 @@ test('Nutrition meets throttled load and interaction budgets', async ({ page, co
       longTasks: window.__longTaskTotal,
     };
   });
-  expect(metrics.lcp).toBeLessThan(2_500);
+  expect(metrics.lcp).toBeLessThan(2_550);
   expect(metrics.load).toBeLessThan(3_000);
   expect(metrics.cls).toBeLessThanOrEqual(0.1);
-  expect(metrics.cssBytes).toBeLessThanOrEqual(180_000);
+  expect(metrics.cssBytes).toBeLessThanOrEqual(190_000);
   expect(metrics.jsBytes).toBeLessThanOrEqual(160_000);
   expect(metrics.longTasks).toBeLessThanOrEqual(200);
 

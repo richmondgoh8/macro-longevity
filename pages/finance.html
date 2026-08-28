@@ -49,16 +49,10 @@
         <section class="section">
             <div class="section-inner">
                 <div class="meal-tabs" id="financeTabs" data-finance-tabs role="tablist" aria-label="Finance views">
-                    <button type="button" class="meal-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-selected="true" aria-controls="financeInvestments">Investment combos</button>
-                    <button type="button" class="meal-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-selected="false" aria-controls="financeFire">FIRE calculator</button>
-                    <button type="button" class="meal-tab" id="finance-tab-income" data-finance-tab="income" role="tab" aria-selected="false" aria-controls="financeIncome">Income tracker</button>
+                    <button type="button" class="meal-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-label="Investment combos" aria-selected="true" aria-controls="financeInvestments"><span class="finance-tab-full">Investment combos</span><span class="finance-tab-short" aria-hidden="true">Combos</span></button>
+                    <button type="button" class="meal-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-label="FIRE calculator" aria-selected="false" aria-controls="financeFire"><span class="finance-tab-full">FIRE calculator</span><span class="finance-tab-short" aria-hidden="true">FIRE</span></button>
+                    <button type="button" class="meal-tab" id="finance-tab-income" data-finance-tab="income" role="tab" aria-label="Income tracker" aria-selected="false" aria-controls="financeIncome"><span class="finance-tab-full">Income tracker</span><span class="finance-tab-short" aria-hidden="true">Income</span></button>
                 </div>
-                <label class="sr-only" for="financeViewSelect">Finance view</label>
-                <select id="financeViewSelect" class="meal-tab-select" data-finance-select aria-label="Finance view">
-                    <option value="investments" selected>Investment combos</option>
-                    <option value="fire">FIRE calculator</option>
-                    <option value="income">Income tracker</option>
-                </select>
             </div>
         </section>
 

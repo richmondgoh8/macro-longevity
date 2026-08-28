@@ -54,6 +54,14 @@ function init() {
   renderLongevity101();
   renderDecisionRule();
   renderEvidenceLegend();
+  const toggle = document.querySelector('[data-longevity-toggle]');
+  toggle?.addEventListener('click', () => {
+    const list = document.getElementById('longevity101-app');
+    const expanded = !list?.classList.contains('is-expanded');
+    list?.classList.toggle('is-expanded', expanded);
+    toggle.setAttribute('aria-expanded', String(expanded));
+    toggle.textContent = expanded ? 'Show fewer actions' : 'Show all 10 actions';
+  });
 }
 
 if (document.readyState === 'loading') {

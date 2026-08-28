@@ -174,24 +174,23 @@ test('meal and Quick Add cards toggle from their content', async ({ page }) => {
   await expect(quickCard.locator('[data-quick-item]')).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('unselected serving actions explain that the item must be added first', async ({ page }) => {
+test('serving actions progressively appear after an item is selected', async ({ page }) => {
   await page.goto('/pages/stack.html');
 
   const mealCard = page.locator('.meal-library-grid .meal-card').nth(1);
   const mealServingToggle = mealCard.locator('[data-meal-serving-toggle]');
-  await expect(mealServingToggle).toBeDisabled();
-  await expect(mealServingToggle).toHaveText('Add to plan first');
-  await expect(mealServingToggle).toHaveAttribute('title', /Add this meal to the plan/);
-  await mealServingToggle.evaluate((node) => node.click());
-  await expect(mealCard.locator('[data-meal-toggle]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(mealServingToggle).toBeHidden();
+  await mealCard.locator('h3').click();
+  await expect(mealServingToggle).toBeVisible();
+  await expect(mealServingToggle).toHaveText('Adjust servings');
 
   await page.getByRole('tab', { name: /Quick add/ }).click();
   const quickCard = page.locator('.quick-item-grid .builder-item').first();
   const quickServingToggle = quickCard.locator('[data-quick-serving-toggle]');
-  await expect(quickServingToggle).toBeDisabled();
-  await expect(quickServingToggle).toHaveText('Add to plan first');
-  await quickServingToggle.evaluate((node) => node.click());
-  await expect(quickCard.locator('[data-quick-item]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(quickServingToggle).toBeHidden();
+  await quickCard.locator('strong').click();
+  await expect(quickServingToggle).toBeVisible();
+  await expect(quickServingToggle).toHaveText('Adjust servings');
 });
 
 test('meal ingredients have independent serving controls', async ({ page }) => {
@@ -237,17 +236,22 @@ test('coverage omits removed nutrient requirements', async ({ page }) => {
 
 test('Daily Plan progressively presents nutrient gaps', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  await expect(page.locator('.coverage-priority')).toBeVisible();
-  await expect(page.locator('.coverage-priority-item')).toHaveCount(3);
-  await expect(page.locator('.coverage-all')).not.toHaveAttribute('open', '');
-  await expect(page.locator('.coverage-all > summary')).toContainText('All nutrient coverage');
-  await expect(page.locator('.coverage-priority-item').first()).toContainText('Food-first:');
+  const mobile = page.viewportSize().width <= 767;
+  const coverage = mobile ? page.locator('[data-mobile-coverage-panel]') : page.locator('.plan-readout');
+  if (mobile) await coverage.locator('> summary').click();
+  await expect(coverage.locator('.coverage-priority')).toBeVisible();
+  await expect(coverage.locator('.coverage-priority-item')).toHaveCount(3);
+  await expect(coverage.locator('.coverage-all')).not.toHaveAttribute('open', '');
+  await expect(coverage.locator('.coverage-all > summary')).toContainText('All nutrient coverage');
+  await expect(coverage.locator('.coverage-priority-item').first()).toContainText('Food-first:');
 });
 
 test('Clear plan uses centered confirmation and a layout-independent toast', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pages/stack.html');
+  await page.locator('.meal-library-grid .meal-card').nth(1).locator('h3').click();
   const clear = page.locator('[data-clear-stack]');
+  await clear.scrollIntoViewIfNeeded();
   const before = await clear.boundingBox();
 
   await clear.click();
@@ -263,4 +267,50 @@ test('Clear plan uses centered confirmation and a layout-independent toast', asy
   await expect(toast).toHaveClass(/is-visible/);
   expect(await toast.evaluate((node) => !node.closest('.planner-controls'))).toBe(true);
   expect(await clear.boundingBox()).toEqual(before);
+});
+
+test('first-time Nutrition state identifies the example and can start blank', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  await expect(page.locator('[data-starter-example]')).toContainText('Starter example loaded');
+  await page.locator('[data-start-blank]').click();
+  await expect(page.locator('[data-starter-example]')).toHaveCount(0);
+  await expect(page.locator('[data-planner-meal-count]')).toHaveText('0');
+});
+
+test('mobile homepage progressively reveals Longevity 101', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('#longevity101-app li:visible')).toHaveCount(3);
+  await page.locator('[data-longevity-toggle]').click();
+  await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
+});
+
+test('mobile Health prep is scan-first and expandable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/pages/blood.html');
+  const prep = page.locator('[data-blood-prep]');
+  await expect(prep).not.toHaveAttribute('open', '');
+  await prep.locator('> summary').click();
+  await expect(prep).toHaveAttribute('open', '');
+});
+
+test('mobile Finance keeps visible tabs and one expanded combo', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/pages/finance.html');
+  await expect(page.locator('[data-finance-tab]:visible')).toHaveCount(3);
+  await expect(page.locator('[data-finance-select]')).toHaveCount(0);
+  await expect(page.locator('[data-invest-combo][open]')).toHaveCount(1);
+  await page.getByRole('tab', { name: 'FIRE calculator' }).click();
+  await expect(page.locator('#financeFire')).toBeVisible();
+});
+
+test('running workout exposes a mobile timer dock', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/pages/workout.html');
+  await page.getByRole('button', { name: 'Start session' }).first().click();
+  const dock = page.locator('[data-mobile-timer-dock]');
+  await expect(dock).toBeVisible();
+  await expect(dock.locator('[data-mobile-timer-time]')).toContainText(':');
+  await dock.getByRole('button', { name: 'Pause' }).click();
+  await expect(dock.locator('[data-mobile-timer-phase]')).toContainText('Paused');
 });

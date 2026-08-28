@@ -349,9 +349,6 @@ function selectFinanceTab(tab, { updateHash = false } = {}) {
     button.setAttribute('aria-selected', String(selected));
     button.tabIndex = selected ? 0 : -1;
   });
-  const select = document.querySelector('[data-finance-select]');
-  if (select) select.value = selectedView;
-
   document.getElementById('financeInvestments').hidden = selectedView !== 'investments';
   document.getElementById('financeFire').hidden = selectedView !== 'fire';
   document.getElementById('financeIncome').hidden = selectedView !== 'income';
@@ -404,9 +401,6 @@ function init() {
     selectFinanceTab(tabs[index].dataset.financeTab, { updateHash: true });
   });
   document.addEventListener('change', (event) => {
-    const select = event.target.closest('[data-finance-select]');
-    if (select) selectFinanceTab(select.value, { updateHash: true });
-
     const field = event.target.closest('[data-pi-field]');
     if (field) updatePiField(Number(field.dataset.index), field.dataset.piField, field.value);
   });

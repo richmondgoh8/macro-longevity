@@ -36,7 +36,10 @@ function renderAvoidPage() {
     </section>
     <p class="stack-intro">The high-ROI avoid list: added sugar, alcohol, processed meat as a staple, industrial trans fats, ultra-processed food and appetite-driving refined foods. This is a practical carnivore-first filter, not a claim that every food outside it is dangerous.</p>
     <div class="stack-grid stack-grid-single">
-      ${AVOID_INGREDIENTS.map((item) => `<article class="avoid-card"><div class="avoid-card-head"><h3 class="avoid-card-name">${escapeHTML(item.name)}</h3>${evidenceBadge(item.evidence)}</div><p class="avoid-where"><span class="stack-line-label">Where it hides</span> ${escapeHTML(item.where)}</p><p class="avoid-why"><span class="stack-line-label">Why</span> ${escapeHTML(item.why)}</p><p class="avoid-replace"><span class="stack-line-label">Replace with</span> ${escapeHTML(item.replace)}</p></article>`).join('')}
+      ${AVOID_INGREDIENTS.map((item) => {
+        const searchText = [item.name, item.where, item.why, item.replace].join(' ').toLowerCase();
+        return `<details class="avoid-card avoid-detail-card" data-avoid-detail-card data-search-text="${escapeHTML(searchText)}" open><summary class="avoid-card-head"><h3 class="avoid-card-name">${escapeHTML(item.name)}</h3>${evidenceBadge(item.evidence)}</summary><div class="avoid-detail-body"><p class="avoid-where"><span class="stack-line-label">Where it hides</span> ${escapeHTML(item.where)}</p><p class="avoid-why"><span class="stack-line-label">Why</span> ${escapeHTML(item.why)}</p><p class="avoid-replace"><span class="stack-line-label">Replace with</span> ${escapeHTML(item.replace)}</p></div></details>`;
+      }).join('')}
     </div>
     <details class="progressive-section upf-guide"><summary><span class="progressive-section-heading"><span class="eyebrow">Label literacy</span><span class="section-title">How to spot ultra-processed food</span><span class="blood-tier-desc">${escapeHTML(UPF_GUIDE.intro)}</span></span></summary><div class="progressive-section-body"><ol class="upf-steps">${UPF_GUIDE.steps.map((step) => `<li>${escapeHTML(step)}</li>`).join('')}</ol><div class="upf-guide-grid"><div class="upf-guide-box upf-guide-box-red"><h3>Red-flag markers</h3><ul>${UPF_GUIDE.redFlags.map((item) => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><div class="upf-guide-box upf-guide-box-green"><h3>Not automatically UPF</h3><ul>${UPF_GUIDE.notAutomatic.map((item) => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div></div></div></details>`;
 
@@ -45,6 +48,8 @@ function renderAvoidPage() {
   const count = container.querySelector('[data-avoid-count]');
   const empty = container.querySelector('[data-avoid-empty]');
   const cards = [...container.querySelectorAll('[data-avoid-label-card]')];
+  const details = [...container.querySelectorAll('[data-avoid-detail-card]')];
+  if (window.matchMedia('(max-width: 767px)').matches) details.forEach((card) => { card.open = false; });
   const filter = () => {
     const query = search.value.trim().toLowerCase();
     let matches = 0;
@@ -53,9 +58,17 @@ function renderAvoidPage() {
       card.hidden = !match;
       if (match) matches++;
     });
+    let detailMatches = 0;
+    details.forEach((card) => {
+      const match = !query || card.dataset.searchText.includes(query);
+      card.hidden = !match;
+      if (match) detailMatches++;
+      if (query && match) card.open = true;
+      else if (!query && window.matchMedia('(max-width: 767px)').matches) card.open = false;
+    });
     count.textContent = query ? `${matches} of ${total} screens match` : `Showing all ${total} screens`;
     reset.hidden = !query;
-    empty.hidden = matches > 0;
+    empty.hidden = matches > 0 || detailMatches > 0;
   };
   search.addEventListener('input', filter);
   reset.addEventListener('click', () => { search.value = ''; filter(); search.focus(); });

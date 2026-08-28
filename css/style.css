@@ -4652,3 +4652,139 @@ body { background: var(--color-bg); color: var(--color-text); }
     max-width: none;
   }
 }
+
+/* --- Journey refinement: scan-first mobile flows --- */
+.longevity-toggle { display: none; margin-top: var(--space-4); }
+
+.starter-example {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+}
+.starter-example > div { display: grid; gap: var(--space-1); }
+.starter-example strong { color: var(--color-text); font-size: var(--text-meta); }
+.starter-example span { color: var(--color-text-secondary); font-size: var(--text-label); }
+.starter-example .text-button { flex: none; min-height: 44px; }
+
+.mobile-coverage-summary { display: none; }
+.serving-editor-toggle[hidden],
+[data-avoid-detail-card][hidden] { display: none !important; }
+
+.blood-prep { padding: 0; overflow: clip; }
+.blood-prep > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 72px;
+  padding: var(--space-5);
+  cursor: pointer;
+  list-style: none;
+}
+.blood-prep > summary::-webkit-details-marker { display: none; }
+.blood-prep > summary::after { content: 'Show details'; color: var(--color-primary); font-size: var(--text-label); font-weight: var(--weight-semi); white-space: nowrap; }
+.blood-prep[open] > summary::after { content: 'Hide details'; }
+.blood-prep-title, .blood-prep-summary { display: block; margin: 0; }
+.blood-prep-summary { margin-top: var(--space-1); color: var(--color-text-secondary); font-size: var(--text-label); font-weight: var(--weight-normal); }
+.blood-prep-body { padding: 0 var(--space-5) var(--space-5); border-top: 1px solid var(--color-border-light); }
+.blood-prep-body .blood-prep-text:first-child { margin-top: var(--space-4); }
+
+.avoid-detail-card { padding: 0; overflow: clip; }
+.avoid-detail-card > summary { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); padding: var(--space-5); cursor: pointer; list-style: none; }
+.avoid-detail-card > summary::-webkit-details-marker { display: none; }
+.avoid-detail-card > summary::after { content: 'Show details'; color: var(--color-primary); font-size: var(--text-label); font-weight: var(--weight-semi); }
+.avoid-detail-card[open] > summary::after { content: 'Hide details'; }
+.avoid-detail-card .avoid-card-head::after { margin-left: auto; }
+.avoid-detail-body { padding: 0 var(--space-5) var(--space-5); border-top: 1px solid var(--color-border-light); }
+
+.finance-tab-short { display: none; }
+.invest-combo { padding: 0; overflow: clip; }
+.invest-combo-summary { display: grid; gap: var(--space-3); padding: var(--space-6); cursor: pointer; list-style: none; }
+.invest-combo-summary::-webkit-details-marker { display: none; }
+.invest-combo-summary::after { content: 'View allocation'; color: var(--color-primary); font-size: var(--text-label); font-weight: var(--weight-semi); }
+.invest-combo[open] .invest-combo-summary::after { content: 'Hide allocation'; }
+.invest-combo-summary .invest-card-top, .invest-combo-summary .invest-meta-bar { margin-bottom: 0; }
+.invest-combo-body { padding: 0 var(--space-6) var(--space-6); border-top: 1px solid var(--color-border-light); }
+.invest-combo-body > .invest-table { margin-top: var(--space-5); }
+
+.mobile-timer-dock { display: none; }
+
+@media (max-width: 767px) {
+  html, body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .bottom-nav-label { font-size: .75rem; }
+  :where(.meal-card-meta, .builder-serving, .coverage-summary-note, .coverage-label, .coverage-priority-head span, .coverage-priority-item p, .blood-card-freq, .invest-goal) { font-size: .75rem; }
+
+  .longevity-101:not(.is-expanded) li:nth-child(n + 4) { display: none; }
+  .longevity-toggle { display: inline-flex; min-height: 44px; align-items: center; }
+
+  .starter-example { align-items: flex-start; }
+  .meal-planner .planner-controls { position: static; }
+
+  .mobile-coverage-summary {
+    display: block;
+    margin-bottom: var(--space-5);
+    border: 1px solid #b9d2c4;
+    border-radius: var(--radius-md);
+    background: linear-gradient(160deg, #f4faf6, #e9f2ec);
+    box-shadow: var(--shadow-sm);
+    overflow: clip;
+  }
+  .mobile-coverage-summary > summary { display: grid; gap: var(--space-2); min-height: 72px; padding: var(--space-4); cursor: pointer; list-style: none; }
+  .mobile-coverage-summary > summary::-webkit-details-marker { display: none; }
+  .mobile-coverage-summary > summary > span:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+  .mobile-coverage-summary > summary .eyebrow { margin: 0; }
+  .mobile-coverage-summary > summary strong { color: var(--color-primary); font-size: 1rem; }
+  .mobile-coverage-summary > summary > span:last-child { color: var(--color-text-secondary); font-size: .75rem; }
+  .mobile-coverage-summary > summary::after { content: 'Show full coverage'; color: var(--color-primary); font-size: .75rem; font-weight: var(--weight-semi); }
+  .mobile-coverage-summary[open] > summary::after { content: 'Hide full coverage'; }
+  .mobile-coverage-body { padding: var(--space-4); border-top: 1px solid var(--color-border); }
+  .meal-planner.is-meals .plan-readout,
+  .meal-planner.is-quick-add .plan-readout { display: none !important; }
+
+  .serving-editor-toggle[hidden] { display: none; }
+
+  .blood-prep > summary { min-height: 64px; padding: var(--space-4); }
+  .blood-prep-body { padding: 0 var(--space-4) var(--space-4); }
+
+  .avoid-detail-card > summary { padding: var(--space-4); }
+  .avoid-detail-body { padding: 0 var(--space-4) var(--space-4); }
+  .avoid-detail-card > summary::after { flex: none; }
+
+  [data-finance-tabs] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); width: 100%; }
+  [data-finance-tabs] .meal-tab { display: flex; min-width: 0; min-height: 48px; padding: var(--space-2); align-items: center; justify-content: center; }
+  .finance-tab-full { display: none; }
+  .finance-tab-short { display: inline; }
+  .invest-combo-summary { padding: var(--space-5); }
+  .invest-combo-summary::after { justify-self: start; }
+  .invest-combo-body { padding: 0 var(--space-5) var(--space-5); }
+  .invest-meta-bar { flex-direction: row; flex-wrap: wrap; }
+
+  .mobile-timer-dock:not([hidden]) {
+    position: fixed;
+    right: 12px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    left: 12px;
+    z-index: calc(var(--z-bottom-nav) - 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    background: rgb(255 255 255 / 96%);
+    box-shadow: var(--shadow-lg);
+  }
+  .mobile-timer-dock > div:first-child { display: grid; min-width: 0; }
+  .mobile-timer-dock [data-mobile-timer-phase] { overflow: hidden; color: var(--color-text-secondary); font-size: .75rem; text-overflow: ellipsis; white-space: nowrap; }
+  .mobile-timer-dock [data-mobile-timer-time] { color: var(--color-primary); font-family: var(--font-mono); font-size: 1.25rem; line-height: 1.1; }
+  .mobile-timer-dock .timer-controls { flex-wrap: nowrap; min-height: 44px; }
+  .mobile-timer-dock .timer-btn { min-height: 40px; padding: 7px 10px; }
+}

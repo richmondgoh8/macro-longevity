@@ -46,8 +46,9 @@ export function renderBlood() {
   if (!container) return;
 
   const preparation = `
-    <div class="blood-prep">
-      <h3 class="blood-prep-title">Before You Draw</h3>
+    <details class="blood-prep" data-blood-prep open>
+      <summary><span><span class="blood-prep-title">Before You Draw</span><span class="blood-prep-summary">Fasting, hydration and timing guidance for comparable results.</span></span></summary>
+      <div class="blood-prep-body">
       <p class="blood-prep-text">
         Follow the lab's fasting instructions · arrive normally hydrated · keep the timing and
         training conditions consistent when you trend results. A hard workout can transiently
@@ -58,7 +59,8 @@ export function renderBlood() {
         For the real panel, a private clinic is ~S$250–450 — explicitly request ApoB, fasting insulin,
         ferritin + iron studies, Lp(a), hs-CRP and uric acid, which standard packages skip.
       </p>
-    </div>`;
+      </div>
+    </details>`;
 
   container.innerHTML = `
     ${preparation}
@@ -116,6 +118,11 @@ export function renderBlood() {
         `).join("")}
       </div>
     `})}`;
+
+  if (window.matchMedia('(max-width: 767px)').matches) {
+    const prep = container.querySelector('[data-blood-prep]');
+    if (prep) prep.open = false;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

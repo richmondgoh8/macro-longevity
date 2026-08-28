@@ -40,6 +40,7 @@ let expandedMealServings = new Set();
 let activeQuickCategory = "all";
 let plannerSearchQuery = "";
 let plannerMode = "meals";
+let starterExampleActive = true;
 let mealComposerMode = null;
 let mealComposerMealId = null;
 let mealComposerSource = null;
@@ -54,6 +55,7 @@ function restoreCurrentDay() {
   try {
     const current = JSON.parse(localStorage.getItem(CURRENT_DAY_STORAGE_KEY) || "null");
     if (!current || typeof current !== "object") return;
+    starterExampleActive = false;
     if (Array.isArray(current.quickItemIds)) quickSelectedItemIds = [...new Set(current.quickItemIds.filter((id) => BUILDER_ITEMS.some((item) => item.id === id)))];
     if (Array.isArray(current.mealIds)) selectedMealIds = [...new Set(current.mealIds.filter((id) => mealLibrary().some((meal) => meal.id === id)))];
     if (current.quickItemQuantities && typeof current.quickItemQuantities === "object") quickItemQuantities = current.quickItemQuantities;
@@ -692,7 +694,22 @@ function priorityGapHTML(target, totals, compounds) {
   return `<article class="coverage-priority-item coverage-row-${state}"><div class="coverage-priority-head"><strong>${escapeHTML(target.name)}</strong><span>${formatAmount(amount, target.unit)} <small>/ ${target.dynamic === "protein" ? `${goal} g` : target.shortTarget}</small></span></div><div class="coverage-track"><span class="coverage-fill coverage-${state}" style="width:${Math.max(3, percent)}%"></span></div><p>Food-first: ${escapeHTML(coverageSourceNames(target))}</p></article>`;
 }
 
-function coverageHTMLV2() {
+function coverageSummaryData() {
+  const ids = activeDailyItemIds();
+  const totals = dailyTotals(ids);
+  const compounds = dailyCompoundTotals(ids);
+  const tracked = NUTRIENT_TARGETS.filter((target) => target.track !== false);
+  const gaps = tracked.filter((target) => coverageAmount(target, totals, compounds) < targetGoal(target) * .8);
+  const covered = tracked.length - gaps.length;
+  return { covered, total: tracked.length, topGap: gaps[0]?.name || 'No priority gaps' };
+}
+
+function mobileCoverageHTML() {
+  const summary = coverageSummaryData();
+  return `<details class="mobile-coverage-summary" data-mobile-coverage-panel><summary><span><span class="eyebrow">Plan review</span><strong data-mobile-coverage-score>${summary.covered}/${summary.total} covered</strong></span><span data-mobile-top-gap>${summary.topGap === 'No priority gaps' ? summary.topGap : `Top gap · ${escapeHTML(summary.topGap)}`}</span></summary><div class="mobile-coverage-body" data-mobile-coverage>${coverageHTMLV2('mobile-coverage')}</div></details>`;
+}
+
+function coverageHTMLV2(idPrefix = 'coverage') {
   const ids = activeDailyItemIds();
   const totals = dailyTotals(ids);
   const compounds = dailyCompoundTotals(ids);
@@ -714,7 +731,7 @@ function coverageHTMLV2() {
     ...warnings.excesses.map(([id, rule]) => `${rule[1]}: ${formatAmount((id === "magnesium" ? amountsForWarnings(ids).magnesium : totals[id]) || 0, rule[2])}`),
     ...warnings.watchedItems.map((name) => `${name} has a safety note`),
   ];
-  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Planning estimate · ${bodyWeightKg} kg protein reference</p></div><div class="coverage-highlights" aria-label="Daily nutrient highlights"><div class="coverage-highlight"><span>Protein</span><strong>${formatAmount(totals.protein || 0, "g")} <small>/ ${proteinTarget} g</small></strong></div><div class="coverage-highlight"><span>Fiber</span><strong>${formatAmount(totals.fiber || 0, "g")} <small>/ 38 g</small></strong></div><div class="coverage-highlight"><span>EPA + DHA</span><strong>${formatAmount(epaFood + epaSupplement, "g")} <small>${epaSupplement ? `(${formatAmount(epaFood, "g")} food + ${formatAmount(epaSupplement, "g")} supplement)` : "food"}</small></strong></div></div><section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="coverage-priority-title"><div class="coverage-block-head"><strong id="coverage-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><details class="coverage-all"><summary><span>All nutrient coverage</span><strong>${covered}/${tracked.length} covered${gaps.length > priorityGaps.length ? ` · ${gaps.length - priorityGaps.length} more gaps` : ""}</strong></summary><div class="coverage-groups">${groupSummaries}</div></details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
+  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Planning estimate · ${bodyWeightKg} kg protein reference</p></div><div class="coverage-highlights" aria-label="Daily nutrient highlights"><div class="coverage-highlight"><span>Protein</span><strong>${formatAmount(totals.protein || 0, "g")} <small>/ ${proteinTarget} g</small></strong></div><div class="coverage-highlight"><span>Fiber</span><strong>${formatAmount(totals.fiber || 0, "g")} <small>/ 38 g</small></strong></div><div class="coverage-highlight"><span>EPA + DHA</span><strong>${formatAmount(epaFood + epaSupplement, "g")} <small>${epaSupplement ? `(${formatAmount(epaFood, "g")} food + ${formatAmount(epaSupplement, "g")} supplement)` : "food"}</small></strong></div></div><section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="${idPrefix}-priority-title"><div class="coverage-block-head"><strong id="${idPrefix}-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><details class="coverage-all"><summary><span>All nutrient coverage</span><strong>${covered}/${tracked.length} covered${gaps.length > priorityGaps.length ? ` · ${gaps.length - priorityGaps.length} more gaps` : ""}</strong></summary><div class="coverage-groups">${groupSummaries}</div></details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
 }
 
 function amountsForWarnings(ids) {
@@ -725,7 +742,7 @@ function mealCardHTML(meal, selected = selectedMealIds.includes(meal.id)) {
   const items = meal.items.map((id) => quickItem(id)).filter(Boolean);
   const servingsOpen = selected && expandedMealServings.has(meal.id);
   const actions = `<div class="meal-card-actions" role="group" aria-label="${escapeHTML(meal.name)} actions">${iconButton({ iconName: selected ? 'check' : 'add', label: `${selected ? 'Remove' : 'Add'} ${meal.name} ${selected ? 'from' : 'to'} plan`, pressed: selected, tooltip: selected ? 'Remove from plan' : 'Add to plan', data: { 'meal-toggle': meal.id } })}${iconButton({ iconName: 'edit', label: `Edit ${meal.name}`, tooltip: 'Edit meal', data: { 'meal-edit': meal.id } })}${iconButton({ iconName: 'delete', label: `Delete ${meal.name}`, tone: 'danger', tooltip: 'Delete meal', data: { 'meal-delete': meal.id } })}</div>`;
-  const servingToggle = `<button type="button" class="text-button serving-editor-toggle" data-meal-serving-toggle="${escapeHTML(meal.id)}" aria-label="${selected ? "Adjust serving sizes" : "Add meal to plan before adjusting serving sizes"}" aria-expanded="${servingsOpen}" aria-controls="meal-serving-${escapeHTML(meal.id)}"${selected ? "" : " disabled title=\"Add this meal to the plan before adjusting serving sizes\""}>${selected ? (servingsOpen ? "Hide serving controls" : "Adjust servings") : "Add to plan first"}</button>`;
+  const servingToggle = `<button type="button" class="text-button serving-editor-toggle" data-meal-serving-toggle="${escapeHTML(meal.id)}" aria-label="Adjust serving sizes" aria-expanded="${servingsOpen}" aria-controls="meal-serving-${escapeHTML(meal.id)}"${selected ? "" : " hidden disabled"}>${servingsOpen ? "Hide serving controls" : "Adjust servings"}</button>`;
   return `<article class="meal-card ${selected ? "is-selected" : ""}" data-meal-card="${meal.id}"><div class="meal-card-head"><div><h3>${escapeHTML(meal.name)}</h3><p class="meal-card-meta">${items.length} ingredient${items.length === 1 ? "" : "s"}</p></div>${actions}</div><ul class="meal-ingredients ${servingsOpen ? "has-ingredient-portions" : ""}" id="meal-serving-${escapeHTML(meal.id)}" aria-label="Ingredients">${items.map((item) => `<li title="${escapeHTML(item.serving)}"><span class="meal-ingredient-name">${escapeHTML(item.name)}</span>${portionControlHTML("meal-item", item.id, mealItemPortion(meal.id, item.id), servingsOpen, "Serving", `data-portion-meal-id="${escapeHTML(meal.id)}"`)}</li>`).join("")}</ul>${servingToggle}${portionControlHTML("meal", meal.id, mealPortion(meal.id), servingsOpen, "Meal portions")}</article>`;
 }
 
@@ -748,7 +765,7 @@ function quickItemHTML(item) {
   const portion = mealComposerMode === "edit" ? "" : portionControlHTML("quick", item.id, itemPortion(item.id), servingsOpen, "Serving", `id="quick-serving-${escapeHTML(item.id)}"`);
   const target = mealComposerMode === 'edit' ? 'meal' : 'plan';
   const toggle = iconButton({ iconName: selected ? 'check' : 'add', label: `${selected ? 'Remove' : 'Add'} ${item.name} ${selected ? 'from' : 'to'} ${target}`, pressed: selected, tooltip: selected ? `Remove from ${target}` : `Add to ${target}`, data: { 'quick-item': item.id } });
-  const servingToggle = mealComposerMode === "edit" ? "" : `<button type="button" class="text-button serving-editor-toggle" data-quick-serving-toggle="${escapeHTML(item.id)}" aria-label="${selected ? "Adjust serving sizes" : "Add item to plan before adjusting serving sizes"}" aria-expanded="${servingsOpen}" aria-controls="quick-serving-${escapeHTML(item.id)}"${selected ? "" : " disabled title=\"Add this item to the plan before adjusting serving sizes\""}>${selected ? (servingsOpen ? "Hide serving controls" : "Adjust servings") : "Add to plan first"}</button>`;
+  const servingToggle = mealComposerMode === "edit" ? "" : `<button type="button" class="text-button serving-editor-toggle" data-quick-serving-toggle="${escapeHTML(item.id)}" aria-label="Adjust serving sizes" aria-expanded="${servingsOpen}" aria-controls="quick-serving-${escapeHTML(item.id)}"${selected ? "" : " hidden disabled"}>${servingsOpen ? "Hide serving controls" : "Adjust servings"}</button>`;
   return `<article class="builder-item ${selected ? "selected" : ""}" data-quick-card="${item.id}"><span class="builder-item-top">${toggle}</span><strong>${escapeHTML(item.name)}</strong><span class="builder-serving">${escapeHTML(item.serving)}</span><small>${escapeHTML(item.note || "")}${item.watch ? " · safety note" : ""}</small>${servingToggle}${portion}</article>`;
 }
 
@@ -780,10 +797,10 @@ function updateQuickAddUI(root) {
     const servingToggle = card?.querySelector('[data-quick-serving-toggle]');
     if (servingToggle) {
       servingToggle.disabled = !active;
+      servingToggle.hidden = !active;
       servingToggle.setAttribute('aria-expanded', String(servingsOpen));
-      servingToggle.setAttribute('aria-label', active ? 'Adjust serving sizes' : 'Add item to plan before adjusting serving sizes');
-      servingToggle.title = active ? '' : 'Add this item to the plan before adjusting serving sizes';
-      servingToggle.textContent = active ? (servingsOpen ? 'Hide serving controls' : 'Adjust servings') : 'Add to plan first';
+      servingToggle.setAttribute('aria-label', 'Adjust serving sizes');
+      servingToggle.textContent = servingsOpen ? 'Hide serving controls' : 'Adjust servings';
     }
     const portion = card?.querySelector("[data-portion-control]");
     if (portion) { portion.classList.toggle("is-hidden", !servingsOpen); portion.setAttribute("aria-hidden", String(!servingsOpen)); }
@@ -873,8 +890,10 @@ function plannerHTML() {
   const plannerClass = plannerMode === "quick-add" ? "is-quick-add" : "is-meals";
   return `<section class="stack-builder meal-planner ${plannerClass}" aria-labelledby="planner-title">
     <div class="builder-head"><div><p class="eyebrow">Daily Stack</p><h2 id="planner-title">Build a nutrition plan from reusable meals</h2><p>Select meals, adjust portions, then use the nutrient readout to solve meaningful gaps.</p></div></div>
+    ${starterExampleActive ? `<div class="starter-example" data-starter-example><div><strong>Starter example loaded</strong><span>Chia protein oatmeal is selected to demonstrate how coverage changes.</span></div><button type="button" class="text-button" data-start-blank>Start blank</button></div>` : ''}
     ${plannerControlsHTML()}
     <div class="planner-search-row">${plannerSearchHTML()}</div>
+    ${window.matchMedia('(max-width: 767px)').matches ? mobileCoverageHTML() : ''}
     <div class="planner-workspace">
       <div class="planner-main">
         ${plannerContent}
@@ -906,15 +925,26 @@ function renderPlannerMode(root) {
     button.setAttribute('aria-selected', String(active));
     button.tabIndex = active ? 0 : -1;
   });
-  updateMealPlannerUI();
+  updateMealPlannerUI({ customized: false });
 }
 
-function updateMealPlannerUI() {
+function updateMealPlannerUI({ customized = true } = {}) {
   const root = document.getElementById("stack-app");
   if (!root) return;
-  persistCurrentDay();
+  if (customized) {
+    starterExampleActive = false;
+    root.querySelector('[data-starter-example]')?.remove();
+  }
+  if (!starterExampleActive) persistCurrentDay();
   const coverage = root.querySelector("[data-coverage]");
   if (coverage) coverage.innerHTML = coverageHTMLV2();
+  const mobileCoverage = root.querySelector("[data-mobile-coverage]");
+  if (mobileCoverage) mobileCoverage.innerHTML = coverageHTMLV2('mobile-coverage');
+  const mobileSummary = coverageSummaryData();
+  const mobileScore = root.querySelector('[data-mobile-coverage-score]');
+  const mobileGap = root.querySelector('[data-mobile-top-gap]');
+  if (mobileScore) mobileScore.textContent = `${mobileSummary.covered}/${mobileSummary.total} covered`;
+  if (mobileGap) mobileGap.textContent = mobileSummary.topGap === 'No priority gaps' ? mobileSummary.topGap : `Top gap · ${mobileSummary.topGap}`;
   updateQuickAddUI(root);
   root.querySelectorAll("[data-meal-toggle]").forEach((button) => {
     const selected = selectedMealIds.includes(button.dataset.mealToggle);
@@ -927,10 +957,10 @@ function updateMealPlannerUI() {
     const servingToggle = mealCard?.querySelector('[data-meal-serving-toggle]');
     if (servingToggle) {
       servingToggle.disabled = !selected;
+      servingToggle.hidden = !selected;
       servingToggle.setAttribute('aria-expanded', String(servingsOpen));
-      servingToggle.setAttribute('aria-label', selected ? 'Adjust serving sizes' : 'Add meal to plan before adjusting serving sizes');
-      servingToggle.title = selected ? '' : 'Add this meal to the plan before adjusting serving sizes';
-      servingToggle.textContent = selected ? (servingsOpen ? 'Hide serving controls' : 'Adjust servings') : 'Add to plan first';
+      servingToggle.setAttribute('aria-label', 'Adjust serving sizes');
+      servingToggle.textContent = servingsOpen ? 'Hide serving controls' : 'Adjust servings';
     }
     const portion = mealCard?.querySelector('[data-portion-scope="meal"]');
     if (portion) {
@@ -1172,6 +1202,19 @@ document.addEventListener('click', async (event) => {
   if (event.target.closest('[data-meal-dialog-cancel]')) {
     closeMealComposer(root);
     if (mealComposerMode === "create") resetMealComposer();
+    return;
+  }
+
+  if (event.target.closest('[data-start-blank]')) {
+    selectedMealIds = [];
+    quickSelectedItemIds = [];
+    selectedMealQuantities = {};
+    selectedMealItemQuantities = {};
+    quickItemQuantities = {};
+    expandedMealServings.clear();
+    expandedQuickServings.clear();
+    updateMealPlannerUI();
+    setPlannerStatus('[data-planner-status]', 'Started a blank plan');
     return;
   }
 

@@ -35,6 +35,9 @@ test('Ingredient guide filtering preserves five-screen context and resets', asyn
   await page.locator('[data-avoid-reset]').click();
   await expect(page.locator('[data-avoid-count]')).toHaveText('Showing all 5 screens');
   await expect(page.locator('[data-avoid-label-card]:visible')).toHaveCount(5);
+  await page.locator('[data-avoid-search]').fill('alcohol');
+  await expect(page.locator('[data-avoid-detail-card]:visible')).toHaveCount(1);
+  await expect(page.locator('[data-avoid-detail-card]:visible')).toHaveAttribute('open', '');
 });
 
 test('Planner mode switching is stable and keyboard operable', async ({ page }) => {

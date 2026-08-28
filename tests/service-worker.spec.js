@@ -7,8 +7,8 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v17');
-  expect(cacheKeys.some((key) => /offline-v(?:13|14|15)$/.test(key))).toBe(false);
+  expect(cacheKeys).toContain('macro-longevity-offline-v18');
+  expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
 
   await context.setOffline(true);
   const started = Date.now();

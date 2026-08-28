@@ -59,7 +59,8 @@ function renderInvestments() {
       </div>
 
       ${INVESTMENTS.map(c => `
-        <article class="invest-card" id="inv-${c.id}">
+        <details class="invest-card invest-combo" id="inv-${c.id}" data-invest-combo open>
+          <summary class="invest-combo-summary">
           <div class="invest-card-top">
             <div>
               <h2 class="invest-name">${c.name}</h2>
@@ -70,6 +71,8 @@ function renderInvestments() {
             <span>${c.totalReturn}</span>
             <span>${c.riskLevel}</span>
           </div>
+          </summary>
+          <div class="invest-combo-body">
           <div class="invest-table ${budgetInvestments > 0 ? '' : 'invest-table-hide-mo'}">
             <div class="invest-table-header"><span>Asset</span><span>Allocation</span><span>Monthly</span><span>Why</span></div>
             ${c.portfolio.map(a => {
@@ -98,7 +101,8 @@ function renderInvestments() {
               ${c.tips.map(t => `<li>${t}</li>`).join("")}
             </ul>
           </details>
-        </article>
+          </div>
+        </details>
       `).join("")}
     </div>
   </div>`;
@@ -431,6 +435,23 @@ function initExerciseSounds() {
    ============================ */
 const timerState = {};
 
+function updateMobileTimerDock(id, state) {
+  const dock = document.querySelector('[data-mobile-timer-dock]');
+  const timer = timerState[id];
+  if (!dock || !timer) return;
+  const visible = state === 'running' || state === 'paused';
+  dock.hidden = !visible;
+  if (!visible) return;
+  dock.dataset.activeTimer = id;
+  const phase = dock.querySelector('[data-mobile-timer-phase]');
+  const time = dock.querySelector('[data-mobile-timer-time]');
+  const sourcePhase = timer._el?.phase?.textContent || timer._el?.label?.textContent || 'Active session';
+  const sourceTime = timer._el?.time?.textContent || '00:00';
+  if (phase) phase.textContent = state === 'paused' ? `Paused · ${sourcePhase}` : sourcePhase;
+  if (time) time.textContent = sourceTime;
+  dock.querySelectorAll('[data-exercise]').forEach((button) => { button.dataset.exercise = id; });
+}
+
 function timerTick(id, config) {
   const s = timerState[id];
   if (!s || s.status === "idle" || s.status === "paused") return;
@@ -451,6 +472,13 @@ function timerTick(id, config) {
   if (el.time && el.time.offsetParent === null) { s._el = timerEls(id); el = s._el; }
   if (el.time) el.time.textContent = timeText;
   if (el.bar) el.bar.style.transform = `scaleX(${pct / 100})`;
+  const dock = document.querySelector('[data-mobile-timer-dock]');
+  if (dock?.dataset.activeTimer === id) {
+    const dockTime = dock.querySelector('[data-mobile-timer-time]');
+    const dockPhase = dock.querySelector('[data-mobile-timer-phase]');
+    if (dockTime) dockTime.textContent = timeText;
+    if (dockPhase && s._el?.phase) dockPhase.textContent = s._el.phase.textContent;
+  }
 
   // Sound milestones
   const timeLeft = s.timeRemaining;
@@ -615,6 +643,7 @@ function updateTimerControls(id, state) {
     else if (state === "paused") { start.style.display = ""; start.textContent = "Resume"; pause.style.display = "none"; stop.style.display = ""; }
     else if (state === "done") { start.style.display = ""; start.textContent = "Restart"; pause.style.display = "none"; stop.style.display = "none"; }
   });
+  updateMobileTimerDock(id, state);
 }
 
 function updateSetIndicators(id, current, total) {
@@ -647,6 +676,7 @@ function handleTimerAction(id, action) {
     if (s.status === "done") { initTimerState(id); s = timerState[id]; }
     s.status = "running";
     s.lastTick = Date.now();
+    updateMobileTimerDock(id, "running");
     updateTimerControls(id, "running");
     if (s._el.label) s._el.label.textContent = s.type === "countdown" ? "ACTIVE · CONVERSATIONAL PACE" : s.type === "intervals" ? "WARM-UP" : `WORK · SET ${s.currentSet}/${s.totalSets}`;
     playStartWhistle();
@@ -656,12 +686,14 @@ function handleTimerAction(id, action) {
     s.status = "paused";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
     stopMusic();
+    updateMobileTimerDock(id, "paused");
     updateTimerControls(id, "paused");
     if (s._el.label) s._el.label.textContent = "PAUSED";
   } else if (action === "stop") {
     s.status = "idle";
     if (s._raf) { cancelAnimationFrame(s._raf); s._raf = null; }
     stopMusic();
+    updateMobileTimerDock(id, "idle");
     initTimerState(id);
     const el2 = timerState[id]._el;
     updateTimerControls(id, "idle");
@@ -937,7 +969,7 @@ function renderPillars(targetId) {
       </section>`;
   }).join("");
 
-  container.innerHTML = intro + `<div class="pillars-container">${pillarHTML}</div>`;
+  container.innerHTML = intro + `<div class="pillars-container">${pillarHTML}</div><div class="mobile-timer-dock" data-mobile-timer-dock hidden><div><span data-mobile-timer-phase>Active session</span><strong data-mobile-timer-time>00:00</strong></div><div class="timer-controls"><button class="timer-btn timer-start" data-exercise="">Resume</button><button class="timer-btn timer-pause" data-exercise="">Pause</button><button class="timer-btn timer-stop" data-exercise="">Reset</button></div></div>`;
 
   // Create timer states for each pillar
   const zone2 = PILLARS.find(p => p.id === "zone2");
@@ -1027,5 +1059,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (workoutApp) safeRender(() => renderExercises('workout-app'), workoutApp);
   if (investmentsApp) safeRender(() => {
     investmentsApp.innerHTML = renderInvestments();
+    const combos = [...investmentsApp.querySelectorAll('[data-invest-combo]')];
+    if (window.matchMedia('(max-width: 767px)').matches) combos.forEach((combo, index) => { combo.open = index === 0; });
+    combos.forEach((combo) => combo.addEventListener('toggle', () => {
+      if (!combo.open || !window.matchMedia('(max-width: 767px)').matches) return;
+      combos.forEach((other) => { if (other !== combo) other.open = false; });
+    }));
   }, investmentsApp);
 });
