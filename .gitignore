@@ -18,6 +18,9 @@ test-results/
 blob-report/
 coverage/
 
+# Visual regression snapshots
+tests/**/*.png
+
 # Editor and OS metadata
 .idea/
 .vscode/

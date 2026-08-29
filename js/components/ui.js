@@ -25,6 +25,7 @@ const ICON_PATHS = {
   delete: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/>',
   close: '<path d="m6 6 12 12M18 6 6 18"/>',
   minus: '<path d="M5 12h14"/>',
+  pin: '<path d="M12 17v5M5 3h14l-2 6 3 3v2H4v-2l3-3-2-6Z"/>',
 };
 
 export function icon(name) {

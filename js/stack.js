@@ -11,6 +11,7 @@ import { CORE_OUTCOMES } from './data/core.js';
 import {
   NUTRIENT_TARGETS,
   NUTRIENT_GROUPS,
+  NUTRIENT_REF_URL,
   BUILDER_ITEMS,
   MEAL_PLANS,
   HIGH_ROI_FOODS,
@@ -349,8 +350,8 @@ function coverageHTML() {
   const totals = builderTotals();
   const selected = BUILDER_ITEMS.filter((item) => selectedBuilderItems.includes(item.id));
   const trackedTargets = NUTRIENT_TARGETS.filter((target) => target.track !== false);
-  const covered = trackedTargets.filter((target) => (totals[target.id] || 0) >= targetGoal(target) * 0.8).length;
-  const gaps = trackedTargets.filter((target) => (totals[target.id] || 0) < targetGoal(target) * 0.8);
+  const covered = trackedTargets.filter((target) => (totals[target.id] || 0) >= targetGoal(target) * .795).length;
+  const gaps = trackedTargets.filter((target) => (totals[target.id] || 0) < targetGoal(target) * .795);
   const excessRules = { vitaminD: { limit: 100, label: "vitamin D" }, iodine: { limit: 1100, label: "iodine" }, magnesium: { limit: 350, label: "supplemental magnesium" }, zinc: { limit: 40, label: "zinc" }, vitaminA: { limit: 3000, label: "preformed vitamin A" } };
   const excessAmounts = { ...totals, magnesium: selectedSupplementTotal("magnesium") };
   const excesses = Object.entries(excessRules).filter(([nutrient, rule]) => (excessAmounts[nutrient] || 0) > rule.limit);
@@ -437,19 +438,6 @@ function nutrientChecklistHTML() {
   </section>`;
 }
 
-function nutritionContentHTML() {
-  return `
-    ${builderHTML()}
-    ${nutrientChecklistHTML()}
-    <section class="mitochondrial-section" aria-labelledby="mitochondrial-title"><div class="nutrition-section-head"><div><p class="eyebrow">Mitochondrial machinery</p><h2 id="mitochondrial-title">Know the cofactors before buying the pill</h2><p>Energy metabolism depends on ordinary nutrients and training signals. The “mitochondrial” label is not itself evidence that a supplement improves outcomes.</p></div></div><div class="mitochondrial-grid">${MITOCHONDRIAL_SUPPORT.map((item) => `<article class="mitochondrial-card"><h3>${item.name}</h3><strong>${item.items}</strong><p>${item.text}</p></article>`).join("")}</div></section>
-    <section class="high-roi-section" aria-labelledby="roi-title"><div class="nutrition-section-head"><div><p class="eyebrow">High-ROI foods</p><h2 id="roi-title">Small staples that earn their shelf space</h2></div></div><div class="roi-grid">${HIGH_ROI_FOODS.map((food) => `<article class="roi-card"><div><h3>${food.name}</h3><span class="roi-amount">${food.amount}</span><p>${food.benefit}</p></div></article>`).join("")}</div></section>
-    <section class="efficiency-section" aria-labelledby="efficiency-title"><div class="nutrition-section-head"><div><p class="eyebrow">Cellular &amp; cardiovascular efficiency</p><h2 id="efficiency-title">Make the system work better</h2><p>Mitochondria respond to repeated demand. The practical levers are fitness, muscle, sleep, food quality and recovery — not a shelf of “mitochondrial” pills.</p></div></div><div class="practice-grid">${EFFICIENCY_PRACTICES.map((practice) => `<article class="practice-card"><div><h3>${practice.title}</h3><strong>${practice.dose}</strong><p>${practice.body}</p></div></article>`).join("")}</div></section>
-    <section class="breathing-section" aria-labelledby="breathing-title"><div class="nutrition-section-head"><div><p class="eyebrow">Breathing &amp; recovery</p><h2 id="breathing-title">Use the exhale as a brake</h2><p>Slow, comfortable breathing can shift attention and autonomic balance toward calm. It is a recovery tool, not a treatment for disease. Stop if light-headed.</p></div></div><div class="breathing-grid">${BREATHING_PROTOCOLS.map((protocol) => `<article class="breathing-card"><span class="breathing-orb" aria-hidden="true"></span><h3>${protocol.name}</h3><strong>${protocol.dose}</strong><p>${protocol.how}</p><small>${protocol.use}</small></article>`).join("")}</div></section>
-    <section class="supplement-section" aria-labelledby="supplement-title"><div class="nutrition-section-head"><div><p class="eyebrow">Supplement guidance</p><h2 id="supplement-title">A defined job before a daily dose</h2><p>Food is the default. A supplement earns a place when the food substitution is impractical, a measurement shows a gap, or a short trial has a clear outcome.</p></div></div><div class="supplement-guidance-grid">${SUPPLEMENT_GUIDANCE.map((item) => `<article class="supplement-guidance-card"><div class="supplement-guidance-head"><div><h3>${item.name}</h3><span class="guidance-label">${item.label}</span></div></div><p><strong>Use</strong> ${item.dose}</p><p><strong>Why</strong> ${item.benefit}</p><p class="guidance-safety"><strong>Safety</strong> ${item.safety}</p></article>`).join("")}</div></section>
-    <section class="traps-section" aria-labelledby="traps-title"><div class="nutrition-section-head"><div><p class="eyebrow">Food traps</p><h2 id="traps-title">“Sugar-free” still needs a label check</h2></div></div><div class="traps-grid">${FOOD_TRAPS.map((trap) => `<article class="trap-card"><h3>${trap.title}</h3><p>${trap.body}</p></article>`).join("")}</div></section>
-    <section class="sources-section"><p><strong>Planning note:</strong> Estimates are rounded. Speak with a clinician for medical conditions, pregnancy, medication use or persistent symptoms.</p></section>`;
-}
-
 function updateBuilderUI() {
   const container = document.getElementById("stack-app");
   if (!container) return;
@@ -505,12 +493,13 @@ function getMealLibraryState() {
     return {
       overrides: state && typeof state.overrides === "object" && !Array.isArray(state.overrides) ? state.overrides : {},
       hidden: Array.isArray(state?.hidden) ? [...new Set(state.hidden.filter((id) => typeof id === "string"))] : [],
+      pinned: Array.isArray(state?.pinned) ? [...new Set(state.pinned.filter((id) => typeof id === "string"))] : [],
     };
-  } catch { return { overrides: {}, hidden: [] }; }
+  } catch { return { overrides: {}, hidden: [], pinned: [] }; }
 }
 
 function setMealLibraryState(state) {
-  try { localStorage.setItem(MEAL_LIBRARY_STORAGE_KEY, JSON.stringify({ overrides: state.overrides || {}, hidden: state.hidden || [] })); } catch {}
+  try { localStorage.setItem(MEAL_LIBRARY_STORAGE_KEY, JSON.stringify({ overrides: state.overrides || {}, hidden: state.hidden || [], pinned: state.pinned || [] })); } catch {}
 }
 
 function mealLibrary() {
@@ -519,10 +508,12 @@ function mealLibrary() {
     .filter((meal) => !state.hidden.includes(meal.id))
     .map((meal) => ({ ...meal, ...(state.overrides[meal.id] || {}), source: "preset", presetId: meal.id }));
   const saved = getSavedMeals().map((meal) => ({ ...meal, source: "saved" }));
+  const pinned = new Set([...state.pinned, ...saved.filter((meal) => meal.pinned === true).map((meal) => meal.id)]);
   return [...presets, ...saved].map((meal) => ({
     ...meal,
+    pinned: pinned.has(meal.id),
     items: meal.items.filter((id) => BUILDER_ITEMS.some((item) => item.id === id)),
-  }));
+  })).sort((a, b) => (b.pinned == true) - (a.pinned == true));
 }
 
 function resetMealComposer() {
@@ -699,7 +690,7 @@ function coverageSummaryData() {
   const totals = dailyTotals(ids);
   const compounds = dailyCompoundTotals(ids);
   const tracked = NUTRIENT_TARGETS.filter((target) => target.track !== false);
-  const gaps = tracked.filter((target) => coverageAmount(target, totals, compounds) < targetGoal(target) * .8);
+  const gaps = tracked.filter((target) => coverageAmount(target, totals, compounds) < targetGoal(target) * .795);
   const covered = tracked.length - gaps.length;
   return { covered, total: tracked.length, topGap: gaps[0]?.name || 'No priority gaps' };
 }
@@ -714,15 +705,15 @@ function coverageHTMLV2(idPrefix = 'coverage') {
   const totals = dailyTotals(ids);
   const compounds = dailyCompoundTotals(ids);
   const tracked = NUTRIENT_TARGETS.filter((target) => target.track !== false);
-  const covered = tracked.filter((target) => coverageAmount(target, totals, compounds) >= targetGoal(target) * .8).length;
-  const gaps = tracked.filter((target) => coverageAmount(target, totals, compounds) < targetGoal(target) * .8);
+  const covered = tracked.filter((target) => coverageAmount(target, totals, compounds) >= targetGoal(target) * .795).length;
+  const gaps = tracked.filter((target) => coverageAmount(target, totals, compounds) < targetGoal(target) * .795);
   const proteinTarget = targetGoal(NUTRIENT_TARGETS.find((target) => target.id === "protein"));
   const epaFood = totals.epaDha || 0;
   const epaSupplement = compounds.epaDha || 0;
   const warnings = coverageWarnings(ids, totals);
   const groupSummaries = NUTRIENT_GROUPS.map((group) => {
     const groupTargets = tracked.filter((target) => target.group === group.id);
-    const groupCovered = groupTargets.filter((target) => coverageAmount(target, totals, compounds) >= targetGoal(target) * .8).length;
+    const groupCovered = groupTargets.filter((target) => coverageAmount(target, totals, compounds) >= targetGoal(target) * .795).length;
     const rows = groupTargets.map((target) => coverageRowHTML(target, totals, compounds)).join("");
     return `<details class="coverage-group"><summary><span>${escapeHTML(group.label)}</span><strong>${groupCovered}/${groupTargets.length} covered</strong></summary><div class="coverage-group-rows">${rows}</div></details>`;
   }).join("");
@@ -731,7 +722,7 @@ function coverageHTMLV2(idPrefix = 'coverage') {
     ...warnings.excesses.map(([id, rule]) => `${rule[1]}: ${formatAmount((id === "magnesium" ? amountsForWarnings(ids).magnesium : totals[id]) || 0, rule[2])}`),
     ...warnings.watchedItems.map((name) => `${name} has a safety note`),
   ];
-  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Planning estimate · ${bodyWeightKg} kg protein reference</p></div><div class="coverage-highlights" aria-label="Daily nutrient highlights"><div class="coverage-highlight"><span>Protein</span><strong>${formatAmount(totals.protein || 0, "g")} <small>/ ${proteinTarget} g</small></strong></div><div class="coverage-highlight"><span>Fiber</span><strong>${formatAmount(totals.fiber || 0, "g")} <small>/ 38 g</small></strong></div><div class="coverage-highlight"><span>EPA + DHA</span><strong>${formatAmount(epaFood + epaSupplement, "g")} <small>${epaSupplement ? `(${formatAmount(epaFood, "g")} food + ${formatAmount(epaSupplement, "g")} supplement)` : "food"}</small></strong></div></div><section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="${idPrefix}-priority-title"><div class="coverage-block-head"><strong id="${idPrefix}-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><details class="coverage-all"><summary><span>All nutrient coverage</span><strong>${covered}/${tracked.length} covered${gaps.length > priorityGaps.length ? ` · ${gaps.length - priorityGaps.length} more gaps` : ""}</strong></summary><div class="coverage-groups">${groupSummaries}</div></details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
+  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Singapore · <a href="${NUTRIENT_REF_URL}">HealthHub RDA</a> where available · DRI/AI or planning targets · ${bodyWeightKg} kg protein ref</p></div><div class="coverage-highlights" aria-label="Daily nutrient highlights"><div class="coverage-highlight"><span>Protein</span><strong>${formatAmount(totals.protein || 0, "g")} <small>/ ${proteinTarget} g</small></strong></div><div class="coverage-highlight"><span>Fiber</span><strong>${formatAmount(totals.fiber || 0, "g")} <small>/ 38 g</small></strong></div><div class="coverage-highlight"><span>EPA + DHA</span><strong>${formatAmount(epaFood + epaSupplement, "g")} <small>${epaSupplement ? `(${formatAmount(epaFood, "g")} food + ${formatAmount(epaSupplement, "g")} supplement)` : "food"}</small></strong></div></div><section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="${idPrefix}-priority-title"><div class="coverage-block-head"><strong id="${idPrefix}-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><details class="coverage-all"><summary><span>All nutrient coverage</span><strong>${covered}/${tracked.length} covered${gaps.length > priorityGaps.length ? ` · ${gaps.length - priorityGaps.length} more gaps` : ""}</strong></summary><div class="coverage-groups">${groupSummaries}</div></details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
 }
 
 function amountsForWarnings(ids) {
@@ -741,9 +732,9 @@ function amountsForWarnings(ids) {
 function mealCardHTML(meal, selected = selectedMealIds.includes(meal.id)) {
   const items = meal.items.map((id) => quickItem(id)).filter(Boolean);
   const servingsOpen = selected && expandedMealServings.has(meal.id);
-  const actions = `<div class="meal-card-actions" role="group" aria-label="${escapeHTML(meal.name)} actions">${iconButton({ iconName: selected ? 'check' : 'add', label: `${selected ? 'Remove' : 'Add'} ${meal.name} ${selected ? 'from' : 'to'} plan`, pressed: selected, tooltip: selected ? 'Remove from plan' : 'Add to plan', data: { 'meal-toggle': meal.id } })}${iconButton({ iconName: 'edit', label: `Edit ${meal.name}`, tooltip: 'Edit meal', data: { 'meal-edit': meal.id } })}${iconButton({ iconName: 'delete', label: `Delete ${meal.name}`, tone: 'danger', tooltip: 'Delete meal', data: { 'meal-delete': meal.id } })}</div>`;
+  const actions = `<div class="meal-card-actions" role="group" aria-label="${escapeHTML(meal.name)} actions">${iconButton({ iconName: selected ? 'check' : 'add', label: `${selected ? 'Remove' : 'Add'} ${meal.name} ${selected ? 'from' : 'to'} plan`, pressed: selected, tooltip: selected ? 'Remove from plan' : 'Add to plan', data: { 'meal-toggle': meal.id } })}${iconButton({ iconName: 'pin', label: `${meal.pinned ? 'Unpin' : 'Pin'} ${meal.name}`, pressed: meal.pinned, tooltip: meal.pinned ? 'Unpin meal' : 'Pin meal', data: { 'meal-pin': meal.id } })}${iconButton({ iconName: 'edit', label: `Edit ${meal.name}`, tooltip: 'Edit meal', data: { 'meal-edit': meal.id } })}${iconButton({ iconName: 'delete', label: `Delete ${meal.name}`, tone: 'danger', tooltip: 'Delete meal', data: { 'meal-delete': meal.id } })}</div>`;
   const servingToggle = `<button type="button" class="text-button serving-editor-toggle" data-meal-serving-toggle="${escapeHTML(meal.id)}" aria-label="Adjust serving sizes" aria-expanded="${servingsOpen}" aria-controls="meal-serving-${escapeHTML(meal.id)}"${selected ? "" : " hidden disabled"}>${servingsOpen ? "Hide serving controls" : "Adjust servings"}</button>`;
-  return `<article class="meal-card ${selected ? "is-selected" : ""}" data-meal-card="${meal.id}"><div class="meal-card-head"><div><h3>${escapeHTML(meal.name)}</h3><p class="meal-card-meta">${items.length} ingredient${items.length === 1 ? "" : "s"}</p></div>${actions}</div><ul class="meal-ingredients ${servingsOpen ? "has-ingredient-portions" : ""}" id="meal-serving-${escapeHTML(meal.id)}" aria-label="Ingredients">${items.map((item) => `<li title="${escapeHTML(item.serving)}"><span class="meal-ingredient-name">${escapeHTML(item.name)}</span>${portionControlHTML("meal-item", item.id, mealItemPortion(meal.id, item.id), servingsOpen, "Serving", `data-portion-meal-id="${escapeHTML(meal.id)}"`)}</li>`).join("")}</ul>${servingToggle}${portionControlHTML("meal", meal.id, mealPortion(meal.id), servingsOpen, "Meal portions")}</article>`;
+  return `<article class="meal-card ${selected ? "is-selected" : ""}" data-meal-card="${meal.id}">${actions}<div class="meal-card-head"><div><h3>${escapeHTML(meal.name)}</h3><p class="meal-card-meta">${items.length} ingredient${items.length === 1 ? "" : "s"}</p></div></div><ul class="meal-ingredients ${servingsOpen ? "has-ingredient-portions" : ""}" id="meal-serving-${escapeHTML(meal.id)}" aria-label="Ingredients">${items.map((item) => `<li title="${escapeHTML(item.serving)}"><span class="meal-ingredient-name">${escapeHTML(item.name)}</span>${portionControlHTML("meal-item", item.id, mealItemPortion(meal.id, item.id), servingsOpen, "Serving", `data-portion-meal-id="${escapeHTML(meal.id)}"`)}</li>`).join("")}</ul>${servingToggle}${portionControlHTML("meal", meal.id, mealPortion(meal.id), servingsOpen, "Meal portions")}</article>`;
 }
 
 function plannerControlsHTML() {
@@ -851,7 +842,7 @@ async function saveMealComposer(root, values = {}) {
   const saved = getSavedMeals();
   const existing = mealComposerMode === "edit" ? mealLibrary().find((meal) => meal.id === mealComposerMealId) : null;
   const id = existing?.id || `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "meal"}-${Date.now()}`;
-  const meal = { id, name, items, createdAt: existing?.createdAt || now, updatedAt: now, tags: existing?.tags || ["saved"] };
+  const meal = { ...existing, id, name, items, createdAt: existing?.createdAt || now, updatedAt: now, tags: existing?.tags || ["saved"] };
   if (existing?.source === "preset" || mealComposerSource === "preset") {
     const state = getMealLibraryState();
     setMealLibraryState({ ...state, overrides: { ...state.overrides, [id]: meal } });
@@ -1152,6 +1143,23 @@ document.addEventListener('click', async (event) => {
     resetMealComposer();
     plannerMode = "quick-add";
     renderStack();
+    return;
+  }
+
+  const mealPin = event.target.closest('[data-meal-pin]');
+  if (mealPin) {
+    const id = mealPin.dataset.mealPin;
+    const meal = mealLibrary().find((candidate) => candidate.id === id);
+    if (!meal) return;
+    const pinned = !meal.pinned;
+    const state = getMealLibraryState();
+    const pinnedIds = new Set(state.pinned);
+    if (pinned) pinnedIds.add(id);
+    else pinnedIds.delete(id);
+    if (meal.source === "saved") setSavedMeals(getSavedMeals().map((candidate) => candidate.id === id ? { ...candidate, pinned } : candidate));
+    setMealLibraryState({ ...state, pinned: [...pinnedIds] });
+    renderStack();
+    root.querySelector(`[data-meal-pin="${id}"]`)?.focus();
     return;
   }
 

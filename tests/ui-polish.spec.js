@@ -352,7 +352,7 @@ test('Quick-add quantity controls and hover tips stay inside their bounds', asyn
     await card.locator('[data-quick-serving-toggle]').click();
     await toggle.hover();
     const canHover = await page.evaluate(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches);
-    if (canHover) await page.waitForTimeout(350);
+    if (canHover) await expect(card.locator('.ui-tooltip')).toHaveAttribute('data-tooltip-open', 'true');
     const bounds = await page.evaluate(() => {
       const grid = document.querySelector('.quick-item-grid');
       const card = grid.querySelector('.builder-item');
@@ -442,7 +442,52 @@ test('planner food selection is compact and fuzzy-searchable', async ({ page }) 
   await expect(page.locator('.meal-library-grid .meal-card').first()).toContainText('Salmon, greens & potato');
 });
 
-test('meal titles keep a readable row above fixed-size actions', async ({ page }) => {
+test('all meals can be pinned without invading card content', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await page.goto('/pages/stack.html');
+    await page.evaluate(() => {
+      localStorage.removeItem('ml-daily-meal-library');
+      localStorage.setItem('ml-daily-meals', JSON.stringify([{
+        id: 'weekday-bowl',
+        name: 'Weekday bowl',
+        items: ['eggs'],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        tags: ['saved'],
+      }]));
+    });
+    await page.reload();
+
+    await expect(page.locator('.meal-library-grid .meal-card')).toHaveCount(7);
+    await expect(page.locator('.meal-library-grid [data-meal-pin]')).toHaveCount(7);
+    const preset = page.locator('[data-meal-card="chia-protein-oatmeal"]');
+    const presetPin = preset.locator('[data-meal-pin]');
+    await expect(presetPin).toHaveAttribute('aria-label', 'Pin Chia protein oatmeal');
+    await expect(presetPin.locator('.ui-icon')).toHaveCount(1);
+    await expect(preset.locator(':scope > .meal-card-head > .meal-card-actions')).toHaveCount(0);
+    await expect(preset.locator(':scope > .meal-card-actions')).toHaveCount(1);
+    await expect(preset.locator(':scope > .meal-card-actions + .meal-card-head')).toHaveCount(1);
+
+    await presetPin.click();
+    await expect(page.locator('.meal-library-grid .meal-card').first()).toHaveAttribute('data-meal-card', 'chia-protein-oatmeal');
+    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toHaveAttribute('aria-label', 'Unpin Chia protein oatmeal');
+    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toBeFocused();
+    await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ml-daily-meal-library')).pinned.includes('chia-protein-oatmeal'))).toBe(true);
+
+    const madeMealPin = page.locator('[data-meal-card="weekday-bowl"] [data-meal-pin]');
+    await madeMealPin.click();
+    await expect(page.locator('[data-meal-card="weekday-bowl"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ml-daily-meals'))[0].pinned)).toBe(true);
+
+    await page.reload();
+    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-meal-card="weekday-bowl"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
+  }
+});
+
+test('meal actions stay above a readable title row', async ({ page }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
     await page.goto('/pages/stack.html');
@@ -451,7 +496,7 @@ test('meal titles keep a readable row above fixed-size actions', async ({ page }
       const header = card.querySelector('.meal-card-head');
       const title = header.querySelector('h3');
       const titleGroup = title.parentElement;
-      const actions = header.querySelector('.meal-card-actions');
+      const actions = card.querySelector('.meal-card-actions');
       const headerRect = header.getBoundingClientRect();
       const titleRect = titleGroup.getBoundingClientRect();
       const actionsRect = actions.getBoundingClientRect();
@@ -460,7 +505,7 @@ test('meal titles keep a readable row above fixed-size actions', async ({ page }
       return {
         titleWidthDelta: Math.abs(headerRect.width - titleRect.width),
         titleLines: range.getClientRects().length,
-        actionsBelowTitle: actionsRect.top >= titleRect.bottom,
+        actionsAboveTitle: actionsRect.bottom <= headerRect.top,
         controlSizes: [...actions.querySelectorAll('button')].map((button) => {
           const rect = button.getBoundingClientRect();
           return { width: rect.width, height: rect.height };
@@ -473,7 +518,7 @@ test('meal titles keep a readable row above fixed-size actions', async ({ page }
     layouts.forEach((layout) => {
       expect(layout.titleWidthDelta).toBeLessThanOrEqual(2);
       expect(layout.titleLines).toBeLessThanOrEqual(2);
-      expect(layout.actionsBelowTitle).toBe(true);
+      expect(layout.actionsAboveTitle).toBe(true);
       expect(layout.overflow).toBeLessThanOrEqual(1);
       layout.controlSizes.forEach((control) => {
         expect(control.width).toBeGreaterThanOrEqual(44);
@@ -498,16 +543,16 @@ test('meal titles keep a readable row above fixed-size actions', async ({ page }
   const longNameLayout = await page.locator('[data-meal-card="long-name-layout-test"]').evaluate((card) => {
     const header = card.querySelector('.meal-card-head');
     const titleGroup = header.querySelector('h3').parentElement;
-    const actions = header.querySelector('.meal-card-actions');
+    const actions = card.querySelector('.meal-card-actions');
     return {
       titleWidthDelta: Math.abs(header.getBoundingClientRect().width - titleGroup.getBoundingClientRect().width),
-      actionsBelowTitle: actions.getBoundingClientRect().top >= titleGroup.getBoundingClientRect().bottom,
+      actionsAboveTitle: actions.getBoundingClientRect().bottom <= header.getBoundingClientRect().top,
       cardOverflow: card.scrollWidth - card.clientWidth,
       pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
   expect(longNameLayout.titleWidthDelta).toBeLessThanOrEqual(2);
-  expect(longNameLayout.actionsBelowTitle).toBe(true);
+  expect(longNameLayout.actionsAboveTitle).toBe(true);
   expect(longNameLayout.cardOverflow).toBeLessThanOrEqual(1);
   expect(longNameLayout.pageOverflow).toBeLessThanOrEqual(1);
 });
@@ -652,6 +697,38 @@ test('coverage omits removed nutrient requirements', async ({ page }) => {
   for (const nutrient of ['Linoleic acid', 'Copper', 'Phosphorus', 'Manganese', 'Molybdenum', 'Chloride', 'Sodium', 'Vitamin B6', 'Vitamin E', 'Vitamin K', 'Riboflavin (B2)', 'Niacin (B3)', 'Pantothenic acid (B5)', 'Biotin (B7)']) {
     await expect(coverage).not.toContainText(nutrient);
   }
+});
+
+test('nutrition coverage identifies Singapore references separately from planning targets', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  const mobile = page.viewportSize().width <= 767;
+  const coverage = mobile ? page.locator('[data-mobile-coverage-panel]') : page.locator('.plan-readout');
+  if (mobile) await coverage.locator('> summary').click();
+  await expect(coverage.locator('.coverage-summary-note')).toContainText('HealthHub RDA');
+  await expect(coverage.locator('.coverage-summary-note')).toContainText('DRI/AI or planning targets');
+  await expect(coverage.locator('.coverage-row').filter({ hasText: 'Vitamin D' }).locator('.coverage-label')).toContainText('/ 2.5 mcg');
+  await expect(coverage.locator('.coverage-row').filter({ hasText: 'Calcium' }).locator('.coverage-label')).toContainText('/ 800 mg');
+  await expect(coverage.locator('.coverage-summary-note a')).toHaveAttribute('href', 'https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/recommended_dietary_allowances');
+});
+
+test('nutrition coverage treats a rounded 80% as covered', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  await page.evaluate(() => localStorage.setItem('ml-daily-current', JSON.stringify({
+    mealIds: [],
+    quickItemIds: ['eggs', 'milk'],
+    mealQuantities: {},
+    mealItemQuantities: {},
+    quickItemQuantities: { eggs: 1.25, milk: 1.75 },
+    bodyWeightKg: 75,
+  })));
+  await page.reload();
+  const mobile = page.viewportSize().width <= 767;
+  const coverage = mobile ? page.locator('[data-mobile-coverage-panel]') : page.locator('.plan-readout');
+  if (mobile) await coverage.locator('> summary').click();
+  const choline = coverage.locator('.coverage-row').filter({ hasText: 'Choline' });
+  await expect(choline.locator('.coverage-fill')).toHaveAttribute('style', /width:80%/);
+  await expect(choline).toHaveClass(/coverage-row-covered/);
+  await expect(coverage.locator('.coverage-priority-item').filter({ hasText: 'Choline' })).toHaveCount(0);
 });
 
 test('Daily Plan progressively presents nutrient gaps', async ({ page }) => {

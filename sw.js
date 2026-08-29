@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v27-readable-card-headers';
+const CACHE_NAME = 'macro-longevity-offline-v29-rounded-coverage-threshold';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
