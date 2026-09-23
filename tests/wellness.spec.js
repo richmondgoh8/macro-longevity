@@ -3,16 +3,19 @@ import { calculateNutrients } from '../js/components/nutrition-totals.js';
 import { BUILDER_ITEMS } from '../js/data/nutrition.js';
 
 test('pure nutrient arithmetic preserves fractions, duplicates, zeros and missing data', () => {
-  const item = { id: 'fixture', nutrients: { protein: 12, carbs: 0, fat: 4 } };
+  const item = { id: 'fixture', nutrients: { protein: 12, carbs: 0, fat: 4, fiber: 2 } };
   const result = calculateNutrients([{ item, multiplier: .5 }, { item, multiplier: 2 }]);
-  expect(result).toEqual({ totals: { protein: 30, carbs: 0, fat: 10 }, missing: [] });
-  expect(calculateNutrients([{ item: { id: 'unknown', nutrients: { protein: 0 } }, multiplier: 1 }]).missing).toEqual(['unknown:carbs', 'unknown:fat']);
+  expect(result).toEqual({ totals: { protein: 30, carbs: 0, fat: 10, fiber: 5 }, missing: [] });
+  expect(calculateNutrients([{ item: { id: 'unknown', nutrients: { protein: 0 } }, multiplier: 1 }]).missing).toEqual(['unknown:carbs', 'unknown:fat', 'unknown:fiber']);
   for (const food of BUILDER_ITEMS) {
     for (const macro of ['protein', 'carbs', 'fat']) {
       expect(Number.isFinite(food.nutrients[macro]), `${food.id}: ${macro}`).toBe(true);
       expect(food.nutrients[macro]).toBeGreaterThanOrEqual(0);
     }
+    if (food.nutrients.fiber != null) expect(Number.isFinite(food.nutrients.fiber), `${food.id}: fiber`).toBe(true);
   }
+  expect(BUILDER_ITEMS.find((food) => food.id === 'chia').nutrients.fiber).toBe(7);
+  expect(BUILDER_ITEMS.find((food) => food.id === 'chicken').nutrients.fiber).toBeUndefined();
 });
 
 test('horizontal coverage stays below the header through maximum scroll and resize', async ({ page }) => {
@@ -53,21 +56,35 @@ test('coverage gaps drill down and return without nested dialogs', async ({ page
 test('meal grams save in the editor, update macros, persist and cancel without mutation', async ({ page }) => {
   await page.goto('/pages/stack.html');
   const macro = page.locator('[data-coverage-bar] [data-macro="protein"] strong');
+  const fiberMacro = page.locator('[data-coverage-bar] [data-macro="fiber"] strong');
   const before = await macro.textContent();
+  const fiberBefore = await fiberMacro.textContent();
+  const mealSummary = page.locator('[data-meal-macros="chia-protein-oatmeal"]');
+  await expect(mealSummary).toContainText('Fiber');
+  await expect(mealSummary).toContainText('incomplete food data');
   await page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-edit]').click();
   const dialog = page.locator('[data-meal-dialog]');
-  const amount = dialog.locator('[data-meal-draft-amount]').first();
+  const preview = dialog.locator('[data-meal-preview]');
+  const previewBefore = await preview.textContent();
+  await expect(preview).toContainText('Fiber');
+  await expect(preview).toContainText('incomplete food data');
+  const amount = dialog.locator('[data-meal-draft-amount="oats"]');
   const initial = Number(await amount.inputValue());
   await amount.fill(String(initial * 2));
+  await expect(preview).not.toHaveText(previewBefore);
   await dialog.getByRole('button', { name: 'Save changes' }).click();
   await expect(dialog).toBeHidden();
   await expect(macro).not.toHaveText(before);
+  await expect(fiberMacro).not.toHaveText(fiberBefore);
   const saved = await macro.textContent();
+  const fiberSaved = await fiberMacro.textContent();
   await page.reload();
   await expect(macro).toHaveText(saved);
+  await expect(fiberMacro).toHaveText(fiberSaved);
   await page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-edit]').click();
-  await expect(amount).toHaveValue(String(initial * 2));
-  await amount.fill(String(initial));
+  const persistedAmount = page.locator('[data-meal-dialog] [data-meal-draft-amount="oats"]');
+  await expect(persistedAmount).toHaveValue(String(initial * 2));
+  await persistedAmount.fill(String(initial));
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
   const discard = dialog.getByRole('button', { name: 'Discard changes' });
   if (await discard.isVisible()) await discard.click();

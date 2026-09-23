@@ -702,7 +702,8 @@ test('compact coverage shows numeric macros at every width', async ({ page }) =>
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/pages/stack.html');
     const strip = page.locator('[data-coverage-bar] .macro-progress-strip');
-    await expect(strip.locator('[data-macro]')).toHaveCount(3);
+    await expect(strip.locator('[data-macro]')).toHaveCount(4);
+    await expect(strip.locator('[data-macro="fiber"]')).toContainText('Incomplete food data');
     for (const macro of await strip.locator('[data-macro] strong').all()) await expect(macro).toContainText(/\d+ g/);
     await expect(strip).not.toContainText('Source ready');
     const before = await strip.textContent();
@@ -749,6 +750,8 @@ test('Carbs and Fats remain numeric after clearing the plan', async ({ page }) =
   await expect(strip.locator('[data-macro="fat"] strong')).toContainText('0 g');
   await expect(strip.locator('[data-macro="carbs"]')).toHaveAttribute('data-macro-state', 'empty');
   await expect(strip.locator('[data-macro="fat"]')).toHaveAttribute('data-macro-state', 'empty');
+  await expect(strip.locator('[data-macro="fiber"] strong')).toContainText('0 g');
+  await expect(strip.locator('[data-macro="fiber"]')).toHaveAttribute('data-macro-state', 'empty');
 });
 
 test('every builder item has numeric core macro data', async ({ page }) => {
@@ -768,7 +771,14 @@ test('every builder item has numeric core macro data', async ({ page }) => {
   const detail = page.locator('[data-nutrition-detail-dialog]');
   await expect(detail).toContainText('Total carbohydrate');
   await expect(detail).toContainText('Total fat');
+  await expect(detail).toContainText('Fiber');
   await detail.locator('[data-nutrition-detail-close]').click();
+
+  await page.locator('[data-quick-card="chicken"] [data-nutrition-detail-open]').click();
+  const chickenDetail = page.locator('[data-nutrition-detail-dialog]');
+  await expect(chickenDetail).toContainText('Fiber');
+  await expect(chickenDetail).toContainText('Not measured');
+  await chickenDetail.locator('[data-nutrition-detail-close]').click();
 });
 
 test('coverage dialog stays inside the viewport and its close control is actionable', async ({ page }) => {

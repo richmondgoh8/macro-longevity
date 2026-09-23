@@ -5,7 +5,7 @@ export function calculateNutrients(occurrences) {
   const missing = new Set();
   for (const { item, multiplier } of occurrences) {
     if (!item || !Number.isFinite(multiplier) || multiplier < 0) continue;
-    for (const key of ['protein', 'carbs', 'fat']) {
+    for (const key of ['protein', 'carbs', 'fat', 'fiber']) {
       if (!Number.isFinite(item.nutrients?.[key])) missing.add(`${item.id}:${key}`);
     }
     for (const [key, value] of Object.entries(item.nutrients || {})) {

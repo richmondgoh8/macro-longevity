@@ -3,6 +3,7 @@
   "name": "macro-longevity",
   "compatibility_date": "2026-08-28",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "html_handling": "none"
   }
 }

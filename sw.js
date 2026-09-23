@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v37-calm-wellness';
+const CACHE_NAME = 'macro-longevity-offline-v38-calm-wellness';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

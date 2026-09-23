@@ -60,7 +60,8 @@ Do not make navigation wait for animation.
 
 ## Nutrition
 
-One compact macro surface displays protein, carbs, and fats horizontally.
+The daily macro strip displays protein, carbs, fats, and fiber horizontally; the
+coverage dialog uses two columns on mobile to keep values legible.
 Numeric grams, references, progress and text status are primary.
 Gaps, All nutrients, and Settings are secondary actions.
 

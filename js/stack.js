@@ -469,11 +469,11 @@ function activeDailyItemQuantities() {
   return quantities;
 }
 
-function dailyTotals(ids = activeDailyItemIds()) {
+function dailyNutrients(ids = activeDailyItemIds()) {
   const quantities = activeDailyItemQuantities();
   return calculateNutrients(BUILDER_ITEMS
     .filter((item) => ids.includes(item.id) && item.includeInDailyCoverage !== false)
-    .map((item) => ({ item, multiplier: quantities[item.id] ?? 0 }))).totals;
+    .map((item) => ({ item, multiplier: quantities[item.id] ?? 0 })));
 }
 
 function dailyCompoundTotals(ids = activeDailyItemIds()) {
@@ -487,6 +487,13 @@ function dailyCompoundTotals(ids = activeDailyItemIds()) {
 
 function quickItem(id) {
   return BUILDER_ITEMS.find((item) => item.id === id);
+}
+
+function hasIncompleteFiber(missing = []) {
+  const missingFiberIds = new Set(missing
+    .filter((entry) => entry.endsWith(":fiber"))
+    .map((entry) => entry.slice(0, -6)));
+  return BUILDER_ITEMS.some((item) => missingFiberIds.has(item.id) && item.category !== "supplement");
 }
 
 function normalizeSearchText(value) {
@@ -616,7 +623,7 @@ function priorityGapHTML(target, totals, compounds) {
 
 function coverageSummaryData() {
   const ids = activeDailyItemIds();
-  const totals = dailyTotals(ids);
+  const { totals } = dailyNutrients(ids);
   const compounds = dailyCompoundTotals(ids);
   const tracked = NUTRIENT_TARGETS.filter((target) => target.track !== false);
   const gaps = tracked.filter((target) => coverageAmount(target, totals, compounds) < targetGoal(target) * .795);
@@ -624,16 +631,16 @@ function coverageSummaryData() {
   return { covered, total: tracked.length, topGap: gaps[0]?.name || 'No priority gaps' };
 }
 
-function macroCardHTML(key, label, value, reference, lower, upper) {
+function macroCardHTML(key, label, value, reference, lower, upper, incomplete = false) {
   const state = value ? value < lower ? "gap" : value > upper ? "over" : "ready" : "empty";
-  const status = { gap: "Below reference", over: "Above reference", ready: "Reference reached", empty: "Not started" }[state];
+  const status = incomplete ? "Incomplete food data" : { gap: "Below reference", over: "Above reference", ready: "Reference reached", empty: "Not started" }[state];
   return `<div class="macro-card is-${state}" data-macro="${key}" data-macro-state="${state}"><span>${label}</span><strong>${formatAmount(value, "g")} <small>${reference}</small></strong><div class="macro-meter" aria-hidden="true"><span style="width:${Math.min(100, value / lower * 100)}%"></span></div><span class="macro-status">${status}</span></div>`;
 }
-function macroHTML(totals) { const proteinGoal = Math.round(bodyWeightKg * 1.2); return `<div class="macro-progress-strip" aria-label="Core macro totals">${macroCardHTML("protein", "Protein", totals.protein || 0, `/ ${proteinGoal} g`, proteinGoal, Infinity)}${macroCardHTML("carbs", "Carbs", totals.carbs || 0, "225–325 g", 225, 325)}${macroCardHTML("fat", "Fats", totals.fat || 0, "44–78 g", 44, 78)}</div>`; }
+function macroHTML(totals, fiberIncomplete = false) { const proteinGoal = Math.round(bodyWeightKg * 1.2); return `<div class="macro-progress-strip" aria-label="Core macro totals">${macroCardHTML("protein", "Protein", totals.protein || 0, `/ ${proteinGoal} g`, proteinGoal, Infinity)}${macroCardHTML("carbs", "Carbs", totals.carbs || 0, "225–325 g", 225, 325)}${macroCardHTML("fat", "Fats", totals.fat || 0, "44–78 g", 44, 78)}${macroCardHTML("fiber", "Fiber", totals.fiber || 0, "/ 38 g", 38, Infinity, fiberIncomplete)}</div>`; }
 
 function coverageHTMLV2(idPrefix = 'coverage', includeAll = false) {
   const ids = activeDailyItemIds();
-  const totals = dailyTotals(ids);
+  const { totals, missing } = dailyNutrients(ids);
   const compounds = dailyCompoundTotals(ids);
   const tracked = NUTRIENT_TARGETS.filter((target) => target.track !== false);
   const covered = tracked.filter((target) => coverageAmount(target, totals, compounds) >= targetGoal(target) * .795).length;
@@ -651,7 +658,7 @@ function coverageHTMLV2(idPrefix = 'coverage', includeAll = false) {
     ...warnings.watchedItems.map((name) => `${name} has a safety note`),
   ];
   const allSummary = `<summary><span>All nutrient coverage</span><strong>${covered}/${tracked.length} covered${gaps.length > priorityGaps.length ? ` · ${gaps.length - priorityGaps.length} more gaps` : ""}</strong></summary>`;
-  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Singapore · <a href="${NUTRIENT_REF_URL}">HealthHub RDA</a> where available · DRI/AI or planning targets · ${bodyWeightKg} kg · 1.2 g/kg protein floor</p></div>${macroHTML(totals)}<section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="${idPrefix}-priority-title"><div class="coverage-block-head"><strong id="${idPrefix}-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><button type="button" class="coverage-action" data-coverage-open="all">View all nutrients</button><details class="coverage-all"${includeAll ? " open" : ""}>${allSummary}${includeAll ? `<div class="coverage-groups">${groupSummaries}</div>` : ""}</details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
+  return `<div class="coverage-summary"><div class="coverage-score"><strong>${covered}/${tracked.length}</strong><span>covered</span></div><p class="coverage-summary-note">Singapore · <a href="${NUTRIENT_REF_URL}">HealthHub RDA</a> where available · DRI/AI or planning targets · ${bodyWeightKg} kg · 1.2 g/kg protein floor</p></div>${macroHTML(totals, hasIncompleteFiber(missing))}<section class="coverage-priority ${gaps.length ? "is-gap" : "is-good"}" aria-labelledby="${idPrefix}-priority-title"><div class="coverage-block-head"><strong id="${idPrefix}-priority-title">${gaps.length ? "Priority gaps" : "Foundation covered"}</strong><span>${gaps.length ? `${gaps.length} unresolved` : "All reference targets are covered"}</span></div>${gaps.length ? `<div class="coverage-priority-list">${priorityGaps.map((gap) => priorityGapHTML(gap, totals, compounds)).join("")}</div>` : `<p class="coverage-priority-empty">Most reference targets are covered. Check portions and your actual diet.</p>`}</section><button type="button" class="coverage-action" data-coverage-open="all">View all nutrients</button><details class="coverage-all"${includeAll ? " open" : ""}>${allSummary}${includeAll ? `<div class="coverage-groups">${groupSummaries}</div>` : ""}</details>${warningText.length ? `<div class="coverage-callouts"><div class="coverage-callout is-watch"><strong>Overlap &amp; safety warnings</strong><span>${warningText.join(" · ")}</span></div></div>` : ""}`;
 }
 
 function amountsForWarnings(ids) {
@@ -662,13 +669,18 @@ function mealPreviewIngredients(items) { return escapeHTML(items.slice(0, 2).map
 
 function mealMacroSummary(meal) {
   const selected = selectedMealIds.includes(meal.id);
-  const { totals } = calculateNutrients(meal.items.map((id) => {
+  const result = calculateNutrients(meal.items.map((id) => {
     const item = quickItem(id);
     if (!item) return { item: null, multiplier: 0 };
     const amount = selected ? mealItemAmount(meal.id, id) : itemUsesGrams(item) ? (meal.ingredientGrams?.[id] || item.servingGrams) : (meal.ingredientServings?.[id] || 1);
     return { item, multiplier: itemMultiplier(item, amount) };
   }));
-  return `Protein ${formatAmount(totals.protein || 0, "g")} · Carbs ${formatAmount(totals.carbs || 0, "g")} · Fats ${formatAmount(totals.fat || 0, "g")}`;
+  return macroSummaryText(result);
+}
+
+function macroSummaryText({ totals, missing }) {
+  const fiberStatus = hasIncompleteFiber(missing) ? " · incomplete food data" : "";
+  return `Protein ${formatAmount(totals.protein || 0, "g")} · Carbs ${formatAmount(totals.carbs || 0, "g")} · Fats ${formatAmount(totals.fat || 0, "g")} · Fiber ${formatAmount(totals.fiber || 0, "g")}${fiberStatus}`;
 }
 
 function mealCardHTML(meal, selected = selectedMealIds.includes(meal.id)) {
@@ -712,8 +724,8 @@ function quickItemHTML(item) {
 function detailNutrientsHTML(item, amount) {
   const scale = itemMultiplier(item, amount);
   const n = item.nutrients || {};
-  const rows = [["Protein", n.protein, "g"], ["Total carbohydrate", n.carbs, "g"], ["Total fat", n.fat, "g"], ...NUTRIENT_TARGETS.filter((target) => target.track !== false && n[target.id] != null && !["protein", "carbs", "fat"].includes(target.id)).map((target) => [target.name, n[target.id], target.unit])]
-    .map(([name, value, unit]) => `<div><dt>${escapeHTML(name)}</dt><dd>${formatAmount(Number(value || 0) * scale, unit)}</dd></div>`).join("");
+  const rows = [["Protein", n.protein, "g"], ["Total carbohydrate", n.carbs, "g"], ["Total fat", n.fat, "g"], ["Fiber", n.fiber, "g"], ...NUTRIENT_TARGETS.filter((target) => target.track !== false && n[target.id] != null && !["protein", "carbs", "fat", "fiber"].includes(target.id)).map((target) => [target.name, n[target.id], target.unit])]
+    .map(([name, value, unit]) => `<div><dt>${escapeHTML(name)}</dt><dd>${name === "Fiber" && value == null ? "Not measured" : formatAmount(Number(value || 0) * scale, unit)}</dd></div>`).join("");
   const heading = itemUsesGrams(item) ? `Nutrition at ${formatGrams(amount, item.servingGrams)} g` : "Nutrition per serving";
   return `<section class="nutrition-detail-section"><h3>${heading}</h3><dl class="nutrition-detail-nutrients">${rows}</dl></section>`;
 }
@@ -959,7 +971,8 @@ function deleteMeal(meal) {
 
 function compactCoverageHTML() {
   const summary = coverageSummaryData();
-  return `<div class="coverage-compact-content">${macroHTML(dailyTotals())}<div class="coverage-summary-actions"><button type="button" data-coverage-open="gaps">Gaps · ${summary.total - summary.covered}</button><button type="button" data-coverage-open="all">All nutrients</button><button type="button" data-coverage-open="settings">Settings</button><button type="button" class="coverage-compact-open" data-coverage-open="all">Coverage</button></div></div>`;
+  const { totals, missing } = dailyNutrients();
+  return `<div class="coverage-compact-content">${macroHTML(totals, hasIncompleteFiber(missing))}<div class="coverage-summary-actions"><button type="button" data-coverage-open="gaps">Gaps · ${summary.total - summary.covered}</button><button type="button" data-coverage-open="all">All nutrients</button><button type="button" data-coverage-open="settings">Settings</button><button type="button" class="coverage-compact-open" data-coverage-open="all">Coverage</button></div></div>`;
 }
 
 function coverageDockHTML() {
@@ -1490,12 +1503,12 @@ document.addEventListener('submit', async (event) => {
 });
 
 function updateMealDraftPreview(dialog) {
-  const { totals } = calculateNutrients(mealComposerItems.map((id) => {
+  const result = calculateNutrients(mealComposerItems.map((id) => {
     const item = quickItem(id);
     return { item, multiplier: itemMultiplier(item, mealComposerAmounts[id] ?? (itemUsesGrams(item) ? item.servingGrams : 1)) };
   }));
   const preview = dialog?.querySelector("[data-meal-preview]");
-  if (preview) preview.textContent = `Meal total · Protein ${formatAmount(totals.protein || 0, "g")} · Carbs ${formatAmount(totals.carbs || 0, "g")} · Fats ${formatAmount(totals.fat || 0, "g")}`;
+  if (preview) preview.textContent = `Meal total · ${macroSummaryText(result)}`;
 }
 document.addEventListener("input", (event) => {
   const id = event.target.dataset.mealDraftAmount;

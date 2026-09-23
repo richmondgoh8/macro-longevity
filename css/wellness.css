@@ -101,7 +101,7 @@ dialog.ui-modal::backdrop { background: rgb(24 37 31 / 40%); backdrop-filter: no
 .coverage-summary-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .coverage-summary-actions button { min-height: 44px; padding: 8px 12px; border-radius: 10px; background: var(--color-bg-alt); color: var(--color-primary); border: 1px solid var(--color-border); font: 600 14px var(--font-body); }
 .coverage-summary-actions .coverage-compact-open { display: none; }
-.nutrition-page-layout .coverage-gap-dock .macro-progress-strip, .macro-progress-strip { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 0; margin: 0; border: 0; box-shadow: none; }
+.nutrition-page-layout .coverage-gap-dock .macro-progress-strip, .macro-progress-strip { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; padding: 0; margin: 0; border: 0; box-shadow: none; }
 .nutrition-page-layout .macro-card, .macro-card { min-width: 0; min-height: 0; padding: 0 12px; border: 0; border-left: 3px solid #D4DDD3; border-radius: 0; background: white; }
 .macro-card > span { display: block; font: 500 14px/1.5 var(--font-body); text-transform: none; letter-spacing: 0; }
 .nutrition-page-layout .coverage-gap-dock .macro-card > strong, .macro-card > strong { display: block; font: 600 24px/1.3 var(--font-body); font-variant-numeric: tabular-nums; }
@@ -172,6 +172,7 @@ dialog.ui-modal::backdrop { background: rgb(24 37 31 / 40%); backdrop-filter: no
   .nutrition-page-layout .coverage-gap-dock .macro-progress-strip { gap: 4px; }
   .nutrition-page-layout .macro-card { padding: 0 6px; min-height: 0; }
   .nutrition-page-layout .coverage-gap-dock .macro-card > strong { font-size: 20px; }
+  .coverage-dialog-form .macro-progress-strip { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
   .macro-card > span { font-size: 12px; }
   .coverage-summary-actions { gap: 4px; }
   .coverage-summary-actions button { padding: 8px; font-size: 12px; }
