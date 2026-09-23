@@ -4,8 +4,8 @@
   "description": "Carnivore-first longevity protocol — daily stack, annual blood panel, daily movement, FIRE finance.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f5f4",
-  "theme_color": "#ffffff",
+  "background_color": "#F7F8F3",
+  "theme_color": "#F7F8F3",
   "orientation": "any",
   "icons": [
     {

@@ -1,7 +1,6 @@
 // home.js — renders the 4-Pillar spine, Longevity 101, decision rule and evidence legend
 // on the home page. Data-driven from js/data/pillars.js.
 import { PILLARS, LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS } from './data/pillars.js';
-import { initSpotlightCards } from './components/spotlight.js';
 
 function renderHeroPillarMap() {
   const mount = document.getElementById('hero-pillar-map');
@@ -68,7 +67,6 @@ function renderEvidenceLegend() {
 
 function init() {
   renderHeroPillarMap();
-  initSpotlightCards();
   renderPillars();
   renderLongevity101();
   renderDecisionRule();

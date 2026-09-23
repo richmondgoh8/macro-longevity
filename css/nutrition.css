@@ -1,0 +1,15 @@
+/* Nutrition detail surfaces. Layout primitives live in wellness.css. */
+.coverage-dialog-form { display: grid; gap: 16px; }
+.coverage-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px; background: var(--color-bg-alt); border-radius: 10px; font-size: 14px; }
+.coverage-status-covered { color: var(--color-primary); }
+.coverage-status-partial, .coverage-status-gap { color: #8A5600; }
+.coverage-status-empty { color: var(--color-text-secondary); }
+.coverage-all-modal { display: block; margin: 0; border: 0; }
+.coverage-all-modal > summary { display: none; }
+.coverage-dialog-form .coverage-priority-list { display: grid; gap: 12px; }
+.coverage-dialog-form .coverage-priority-item { display: grid; gap: 8px; padding: 16px; border: 1px solid var(--color-border); border-radius: 12px; }
+.coverage-priority-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.coverage-dialog-form .coverage-priority-item p { font-size: 14px; }
+.meal-dialog-ingredients { min-width: 0; padding: 0; border: 0; }
+.meal-dialog-help, .meal-dialog-empty { font-size: 14px; color: var(--color-text-secondary); margin-block: 16px; }
+.meal-dialog-ingredients legend { font-weight: 600; }

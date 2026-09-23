@@ -10,6 +10,7 @@ function evidenceBadge(level) {
 function renderAvoidPage() {
   const container = document.getElementById('avoid-app');
   if (!container) return;
+  const priorSearch = container.querySelector('[data-avoid-search]')?.value || '';
   const total = AVOID_LABEL_GUIDE.length;
   container.innerHTML = `
     <section class="avoid-label-guide" id="avoid-label-guide" aria-labelledby="avoid-label-title" data-avoid-guide>
@@ -72,6 +73,7 @@ function renderAvoidPage() {
   };
   search.addEventListener('input', filter);
   reset.addEventListener('click', () => { search.value = ''; filter(); search.focus(); });
+  if (priorSearch) { search.value = priorSearch; filter(); search.focus(); }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderAvoidPage);

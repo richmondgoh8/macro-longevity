@@ -45,16 +45,17 @@ test('same-origin route navigation is view-transition ready', async ({ page }) =
   await page.goto('/');
   await page.getByRole('link', { name: 'Nutrition' }).first().click();
   await expect(page).toHaveURL(/pages\/stack\.html$/);
-  await expect(page.getByRole('heading', { name: 'Build your Daily Stack' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your daily nutrition' })).toBeVisible();
 });
 
 test('Nutrition context navigation owns the Ingredient guide', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  await expect(page.getByRole('navigation', { name: 'Nutrition' }).getByRole('link')).toHaveCount(2);
-  await page.getByRole('link', { name: 'Ingredient guide' }).click();
+  const context = page.getByRole('navigation', { name: 'Nutrition' });
+  await expect(context.getByRole('link')).toHaveCount(3);
+  await context.getByRole('link', { name: 'Ingredient guide' }).click();
   await expect(page).toHaveURL(/avoid\.html$/);
   await expect(page.locator('.nav-links .nav-link.active')).toHaveText('Nutrition');
-  await expect(page.getByRole('link', { name: 'Ingredient guide' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('navigation', { name: 'Nutrition' }).getByRole('link', { name: 'Ingredient guide' })).toHaveAttribute('aria-current', 'page');
 });
 
 test('Ingredient guide filtering preserves five-screen context and resets', async ({ page }) => {
@@ -75,11 +76,22 @@ test('Planner mode switching is stable and keyboard operable', async ({ page }) 
   await page.goto('/pages/stack.html');
   const planner = page.locator('.meal-planner');
   const marker = await planner.evaluate((node) => { node.dataset.testIdentity = 'stable'; return node.dataset.testIdentity; });
-  await page.getByRole('button', { name: /Quick add/ }).click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
   await expect(page.getByRole('heading', { name: 'Choose foods and supplements' })).toBeVisible();
   expect(await planner.getAttribute('data-test-identity')).toBe(marker);
-  await page.getByRole('button', { name: /Quick add/ }).press('ArrowLeft');
-  await expect(page.getByRole('button', { name: /Meals/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('tab', { name: /Quick add/ }).press('ArrowLeft');
+  await expect(page.getByRole('tab', { name: /Meals/ })).toHaveAttribute('aria-selected', 'true');
+});
+
+test('primary navigation prefetches a destination on intent', async ({ page }) => {
+  await page.goto('/');
+  const nutrition = page.getByRole('link', { name: 'Nutrition' }).first();
+  await page.mouse.move(1, 1);
+  await nutrition.hover();
+  await expect(page.locator('link[rel="prefetch"][href$="/pages/stack.html"]')).toHaveCount(1);
+  await nutrition.focus();
+  await expect(page.locator('link[rel="prefetch"][href$="/pages/stack.html"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="prefetch"][href$="/"]')).toHaveCount(0);
 });
 
 test('key pages have no automatically detectable serious accessibility violations', async ({ page }) => {

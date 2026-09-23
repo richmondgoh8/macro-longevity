@@ -1,5 +1,5 @@
 // finance.js — FIRE calculator and passive-income tracker.
-import { confirmAction, iconButton } from './components/ui.js';
+import { confirmAction, emptyState, iconButton } from './components/ui.js';
 
 const PI_KEY = 'passiveIncome';
 
@@ -291,8 +291,12 @@ function renderPiTable() {
   let totalMonthly = 0;
 
   if (data.length === 0) {
-    container.innerHTML = `<div class="pi-empty">No assets yet. Add your first dividend stock, bond, or CPF account to see your monthly passive income.</div>
-      <button type="button" class="pi-btn pi-btn-primary" data-pi-action="add">Add asset</button>`;
+    container.innerHTML = emptyState({
+      title: 'No assets yet',
+      description: 'Add your first dividend stock, bond, or CPF account to see your monthly passive income.',
+      actionLabel: 'Add asset',
+      actionData: { 'pi-action': 'add' },
+    });
     return;
   }
 
@@ -301,11 +305,11 @@ function renderPiTable() {
     totalPrincipal += row.principal;
     totalMonthly += monthly;
     return `<tr>
-      <td><label class="sr-only" for="pi-name-${index}">Asset name, row ${index + 1}</label><input id="pi-name-${index}" type="text" value="${escapeHTML(row.name)}" placeholder="e.g. DBS Stock" data-pi-field="name" data-index="${index}"></td>
-      <td><label class="sr-only" for="pi-principal-${index}">Principal in SGD, row ${index + 1}</label><input id="pi-principal-${index}" type="number" value="${row.principal || ''}" min="0" placeholder="0" data-pi-field="principal" data-index="${index}"></td>
-      <td><label class="sr-only" for="pi-rate-${index}">Annual rate in percent, row ${index + 1}</label><input id="pi-rate-${index}" type="number" value="${row.rate || ''}" min="0" max="100" step="0.1" placeholder="0" data-pi-field="rate" data-index="${index}"></td>
-      <td class="pi-monthly">SGD ${Math.round(monthly).toLocaleString()}/mo</td>
-      <td>${iconButton({ iconName: 'delete', label: `Delete ${row.name || `asset ${index + 1}`}`, tone: 'danger', tooltip: 'Delete asset', data: { 'pi-action': 'delete', index } })}</td>
+      <td data-label="Asset"><label class="sr-only" for="pi-name-${index}">Asset name, row ${index + 1}</label><input id="pi-name-${index}" type="text" value="${escapeHTML(row.name)}" placeholder="e.g. DBS Stock" data-pi-field="name" data-index="${index}"></td>
+      <td data-label="Principal (SGD)"><label class="sr-only" for="pi-principal-${index}">Principal in SGD, row ${index + 1}</label><input id="pi-principal-${index}" type="number" value="${row.principal || ''}" min="0" placeholder="0" data-pi-field="principal" data-index="${index}"></td>
+      <td data-label="Annual rate (%)"><label class="sr-only" for="pi-rate-${index}">Annual rate in percent, row ${index + 1}</label><input id="pi-rate-${index}" type="number" value="${row.rate || ''}" min="0" max="100" step="0.1" placeholder="0" data-pi-field="rate" data-index="${index}"></td>
+      <td class="pi-monthly" data-label="Monthly income">SGD ${Math.round(monthly).toLocaleString()}/mo</td>
+      <td data-label="Actions">${iconButton({ iconName: 'delete', label: `Delete ${row.name || `asset ${index + 1}`}`, tone: 'danger', tooltip: 'Delete asset', data: { 'pi-action': 'delete', index } })}</td>
     </tr>`;
   }).join('');
 
@@ -323,10 +327,10 @@ function renderPiTable() {
         </tr></thead>
         <tbody>${rows}
           <tr class="pi-total-row">
-            <td><strong>Total</strong></td>
-            <td><strong>SGD ${Math.round(totalPrincipal).toLocaleString()}</strong></td>
-            <td><strong>${totalPrincipal > 0 ? (annualTotal / totalPrincipal * 100).toFixed(1) : 0}%</strong></td>
-            <td class="pi-monthly"><strong>SGD ${Math.round(totalMonthly).toLocaleString()}/mo</strong></td>
+            <td data-label="Summary"><strong>Total</strong></td>
+            <td data-label="Total principal"><strong>SGD ${Math.round(totalPrincipal).toLocaleString()}</strong></td>
+            <td data-label="Blended yield"><strong>${totalPrincipal > 0 ? (annualTotal / totalPrincipal * 100).toFixed(1) : 0}%</strong></td>
+            <td class="pi-monthly" data-label="Monthly income"><strong>SGD ${Math.round(totalMonthly).toLocaleString()}/mo</strong></td>
             <td></td>
           </tr>
         </tbody>
@@ -338,7 +342,7 @@ function renderPiTable() {
       <div class="pi-stat"><div class="pi-stat-label">Annual passive income</div><div class="pi-stat-value">SGD ${Math.round(annualTotal).toLocaleString()}</div></div>
       <div class="pi-stat"><div class="pi-stat-label">Blended yield</div><div class="pi-stat-value">${totalPrincipal > 0 ? (annualTotal / totalPrincipal * 100).toFixed(1) : 0}%</div></div>
     </div>
-    <div style="margin-top:12px"><button type="button" class="pi-btn pi-btn-primary" data-pi-action="add">Add asset</button></div>`;
+    <div class="ui-actions"><button type="button" class="button button-primary" data-pi-action="add">Add asset</button></div>`;
 }
 
 function selectFinanceTab(tab, { updateHash = false } = {}) {

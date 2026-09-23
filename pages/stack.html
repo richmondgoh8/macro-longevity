@@ -12,19 +12,17 @@
     <meta property="og:url" content="https://macro-longevity.com/pages/stack.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#F7F8F3">
     <title>Daily Stack — Macro Longevity</title>
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="modulepreload" href="/js/stack.js">
-    <link rel="modulepreload" href="/js/site.js">
-    <link rel="modulepreload" href="/js/data/stack.js">
-    <link rel="modulepreload" href="/js/data/core.js">
-    <link rel="modulepreload" href="/js/data/nutrition.js">
-    <link rel="modulepreload" href="/js/components/ui.js">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/nutrition-layout.css">
     <link rel="stylesheet" href="/css/tooltip.css">
+    <link rel="stylesheet" href="/css/nutrition.css">
+
     <link rel="expect" href="#view-transition-anchor" blocking="render">
+    <link rel="stylesheet" href="/css/wellness.css">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -49,16 +47,17 @@
     <main id="main">
         <section id="view-transition-anchor" class="page-header">
             <div class="section-inner">
-                <h1 class="page-title">Build your Daily Stack</h1>
+                <h1 class="page-title">Your daily nutrition</h1>
                 <p class="page-desc">
                     A simple food-first system for covering the basics, building repeatable meals and using supplements only when they have a defined job.
                 </p>
             </div>
         </section>
+        <nav class="context-nav" aria-label="Nutrition"><div class="section-inner context-nav-inner"><div><a href="/pages/stack.html" class="context-nav-link is-active" data-context-link data-context-planner-mode="meals" aria-current="page">Daily plan</a><a href="/pages/avoid.html" class="context-nav-link" data-context-link>Ingredient guide</a><a href="/pages/stack.html#deep-library" class="context-nav-link" data-context-link data-context-planner-mode="library">Deep library</a></div></div></nav>
 
         <section class="section section-compact">
             <div class="section-inner">
-                <div id="stack-app"></div>
+                <div id="stack-app" aria-busy="true"><p class="planner-loading" role="status">Loading your daily plan…</p></div>
             </div>
         </section>
     </main>

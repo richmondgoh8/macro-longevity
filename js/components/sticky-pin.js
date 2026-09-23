@@ -3,9 +3,9 @@
 const PAGE_CONFIG = {
   '/pages/stack.html': {
     entries: [
-      { label: 'Daily plan', href: '#planner-title' },
+      { label: 'Daily plan', source: '[data-context-planner-mode="meals"]', target: '#planner-title' },
       { label: 'Coverage & gaps', href: '#planner-coverage' },
-      { label: 'Deep library', href: '#stack-library' },
+      { label: 'Deep library', source: '[data-context-planner-mode="library"]', target: '#planner-input-panel' },
     ],
   },
   '/pages/avoid.html': {
@@ -44,19 +44,11 @@ const PAGE_CONFIG = {
       { label: 'Mobility', source: '[data-pillar-tab="mobility"]', target: '#section-mobility' },
     ],
   },
-  '/pages/finance.html': {
-    entries: [
-      { label: 'Investments', source: '[data-finance-tab="investments"]', target: '#financeInvestments' },
-      { label: 'FIRE calculator', source: '[data-finance-tab="fire"]', target: '#financeFire' },
-      { label: 'Income tracker', source: '[data-finance-tab="income"]', target: '#financeIncome' },
-    ],
-  },
 };
 
 const TARGET_FALLBACKS = {
   '/pages/stack.html': {
     'planner-coverage': '.plan-readout',
-    'stack-library': '.stack-library',
   },
   '/pages/avoid.html': {
     'avoid-label-guide': '.avoid-label-guide',
@@ -90,7 +82,7 @@ function setAnchorActive(rail, key) {
 function syncControlState(rail, root) {
   rail.querySelectorAll('[data-sticky-pin-control]').forEach((button) => {
     const source = root.querySelector(button.dataset.stickyPinSource);
-    const active = source?.getAttribute('aria-selected') === 'true';
+    const active = source?.getAttribute('aria-selected') === 'true' || source?.classList.contains('is-active');
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', String(active));
   });
@@ -155,7 +147,8 @@ function ensureTargets(pathname, root) {
 }
 
 function wrapMainContent(main, root) {
-  if (main.querySelector(':scope > [data-sticky-pin-layout]')) return null;
+  const existing = main.querySelector(':scope > [data-sticky-pin-layout]');
+  if (existing) return { layout: existing, content: existing.querySelector('.sticky-pin-content') };
 
   const reserved = new Set([...main.children].filter((node) =>
     node.classList.contains('page-header') || node.classList.contains('context-nav')));
@@ -186,15 +179,30 @@ function observeAnchors(rail, entries, root) {
     .filter(({ target }) => target);
   if (!anchorEntries.length || typeof IntersectionObserver === 'undefined') return;
 
-  const observer = new IntersectionObserver((records) => {
-    const current = records
-      .filter((record) => record.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-    const match = current && anchorEntries.find(({ target }) => target === current.target);
-    if (match) setAnchorActive(rail, match.entry.href);
-  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  const syncFromViewport = () => {
+    const marker = (root.querySelector('.nav')?.getBoundingClientRect().bottom || 64) + 32;
+    const visible = anchorEntries
+      .filter(({ target }) => {
+        const rect = target.getBoundingClientRect();
+        return rect.top <= marker && rect.bottom > 0;
+      })
+      .at(-1);
+    if (visible) setAnchorActive(rail, visible.entry.href);
+  };
 
-  anchorEntries.forEach(({ target }) => observer.observe(target));
+  let observer;
+  const observe = () => {
+    observer?.disconnect();
+    const marker = (root.querySelector('.nav')?.getBoundingClientRect().height || 64) + 32;
+    observer = new IntersectionObserver(syncFromViewport, {
+      rootMargin: `-${marker}px 0px -${Math.max(0, window.innerHeight - marker - 1)}px 0px`,
+      threshold: 0,
+    });
+    anchorEntries.forEach(({ target }) => observer.observe(target));
+    syncFromViewport();
+  };
+  window.addEventListener('resize', observe, { passive: true });
+  observe();
 }
 
 function wireControls(rail, config, root) {
@@ -221,7 +229,7 @@ function wireControls(rail, config, root) {
   const observer = typeof MutationObserver === 'undefined' ? null : new MutationObserver(sync);
   controls.forEach((entry) => {
     const source = root.querySelector(entry.source);
-    if (source && observer) observer.observe(source, { attributes: true, attributeFilter: ['aria-selected'] });
+    if (source && observer) observer.observe(source, { attributes: true, attributeFilter: ['aria-selected', 'aria-current', 'class'] });
   });
   sync();
 }
@@ -230,7 +238,7 @@ export function initStickyPin({ documentRoot = document } = {}) {
   const pathname = window.location.pathname;
   const config = PAGE_CONFIG[pathname];
   const main = documentRoot.querySelector('main#main');
-  if (!config || !main || main.querySelector('[data-sticky-pin-layout]')) return;
+  if (!config || !main || main.querySelector('[data-sticky-pin-rail]')) return;
 
   ensureTargets(pathname, documentRoot);
   const ready = config.entries.every((entry) =>
@@ -241,13 +249,24 @@ export function initStickyPin({ documentRoot = document } = {}) {
       setTimeout(() => {
         delete main.dataset.stickyPinPending;
         initStickyPin({ documentRoot });
-      }, 0);
+      }, 100);
     }
     return;
   }
 
+  if (documentRoot.querySelector('dialog[open]')
+    || documentRoot.activeElement?.matches?.('[data-tooltip-trigger]')
+    || documentRoot.querySelector('[data-tooltip-trigger]:hover')) {
+    setTimeout(() => initStickyPin({ documentRoot }), 250);
+    return;
+  }
+
+  const activeElement = documentRoot.activeElement;
   const wrapped = wrapMainContent(main, documentRoot);
   if (!wrapped) return;
+  if (activeElement && activeElement !== documentRoot.body && typeof activeElement.focus === 'function') {
+    activeElement.focus({ preventScroll: true });
+  }
 
   const rail = makeRail(config, documentRoot);
   wrapped.layout.insertBefore(rail, wrapped.content);

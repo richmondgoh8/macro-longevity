@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v29-rounded-coverage-threshold';
+const CACHE_NAME = 'macro-longevity-offline-v37-calm-wellness';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -10,6 +10,14 @@ const STATIC_ASSETS = [
   '/pages/avoid.html',
   '/css/variables.css',
   '/css/style.css',
+  '/css/nutrition-layout.css',
+  '/css/training-layout.css',
+  '/css/finance-layout.css',
+  '/css/home-layout.css',
+  '/css/health-layout.css',
+  '/css/ingredients-layout.css',
+  '/css/nutrition.css',
+  '/css/wellness.css',
   '/css/tooltip.css',
   '/css/toast.css',
   '/js/register-sw.js',
@@ -19,6 +27,8 @@ const STATIC_ASSETS = [
   '/js/home.js',
   '/js/stack-preview.js',
   '/js/stack.js',
+  '/js/components/coverage-pin.js',
+  '/js/components/nutrition-totals.js',
   '/js/avoid.js',
   '/js/blood.js',
   '/js/protocol.js',
@@ -30,6 +40,7 @@ const STATIC_ASSETS = [
   '/js/components/ui.js',
   '/js/components/toast.js',
   '/js/components/modal.js',
+  '/js/components/coverage-dialog.js',
   '/js/components/confirm.js',
   '/js/data/core.js',
   '/js/data/stack.js',
@@ -90,14 +101,20 @@ self.addEventListener('fetch', (event) => {
 
   if (isNavigation) {
     event.respondWith((async () => {
+      const refresh = () => Promise.race([
+        event.preloadResponse.then((preloaded) => preloaded || fetchWithTimeout(event.request)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('navigation timeout')), 1300)),
+      ]).then((response) => cacheResponse(event.request, response)).catch(() => null);
+      const cached = await caches.match(event.request);
+      if (cached) {
+        event.waitUntil(refresh());
+        return cached;
+      }
       try {
-        const response = await Promise.race([
-          event.preloadResponse.then((preloaded) => preloaded || fetchWithTimeout(event.request)),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('navigation timeout')), 1300)),
-        ]);
-        return cacheResponse(event.request, response);
+        const response = await refresh();
+        return response || (await caches.match('/offline.html'));
       } catch {
-        return (await caches.match(event.request)) || (await caches.match('/offline.html'));
+        return (await caches.match('/offline.html'));
       }
     })());
   } else if (isImmutable) {

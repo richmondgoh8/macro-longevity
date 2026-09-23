@@ -7,13 +7,13 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v29-rounded-coverage-threshold');
+  expect(cacheKeys).toContain('macro-longevity-offline-v37-calm-wellness');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
 
   await context.setOffline(true);
   const started = Date.now();
   await page.goto(`${baseURL}/pages/avoid.html`, { waitUntil: 'domcontentloaded' });
-  expect(Date.now() - started).toBeLessThan(1_500);
+  expect(Date.now() - started).toBeLessThan(500);
   await expect(page.getByRole('heading', { name: 'Ingredients to Avoid' })).toBeVisible();
   await context.close();
 });

@@ -20,6 +20,7 @@ coverage/
 
 # Visual regression snapshots
 tests/**/*.png
+!tests/visual.spec.js-snapshots/*.png
 
 # Editor and OS metadata
 .idea/

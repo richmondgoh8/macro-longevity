@@ -100,6 +100,57 @@ export const BUILDER_ITEMS = [
   { id: "taurine-supplement", category: "supplement", icon: "⚙️", name: "Taurine", serving: "1–2 g", note: "Optional optimization trial", nutrients: {}, compounds: { taurine: 1.5 }, conditional: true, watch: "No universal RDA; review medications, pregnancy and medical conditions before using." },
 ];
 
+// Two half-gram bytes per BUILDER_ITEMS entry, in item order: carbs, fat.
+// These are compact rounded planning estimates, not label-level precision.
+const MACRO_ESTIMATES = atob("AAcAGQAXADIALAAOAhMQAhgQBgQKAwkFBARRCBEMBggRABUBBAAIARIDCAAkAh0CDAEUAWUBGiw+ABMADAEGEggdDB8MHg4gCCcBBxIaABsZCQAAAAANAQEAAAAAAAAAAAAAAAAAAAAAAA==");
+const PROTEIN_ESTIMATES = {
+  liver: 13,
+  "broccoli-sprouts": 1.5,
+  spinach: 3,
+  kale: 2.5,
+  asparagus: 2.2,
+  raspberries: 1.8,
+  guava: 2.6,
+  "red-pepper": 1,
+  kiwi: 1.1,
+  avocado: 3,
+  "sweet-potato": 2.4,
+  carrot: .9,
+  tomato: 1.4,
+  cocoa: 5.8,
+  shiitake: 2.3,
+  "bone-broth": 6,
+  collagen: 9,
+};
+BUILDER_ITEMS.forEach((item, index) => {
+  const offset = index * 2;
+  const existingProtein = Number(item.nutrients?.protein);
+  const protein = Number.isFinite(existingProtein) ? existingProtein : (PROTEIN_ESTIMATES[item.id] || 0);
+  item.nutrients = { ...(item.nutrients || {}), protein, carbs: MACRO_ESTIMATES.charCodeAt(offset) / 2, fat: MACRO_ESTIMATES.charCodeAt(offset + 1) / 2 };
+});
+
+// Food controls use grams so the amount a person enters is unambiguous. These
+// reference weights keep the existing rounded nutrient estimates meaningful
+// while still allowing a user to choose a smaller or larger amount. Volume
+// measures use their familiar kitchen equivalent; ranges use the midpoint.
+const FOOD_REFERENCE_GRAMS = {
+  chicken: 100, salmon: 100, sardines: 100, mackerel: 100, beef: 150, pork: 100,
+  eggs: 100, "greek-yogurt": 200, milk: 250, whey: 30, clams: 100, oysters: 100,
+  liver: 50, oats: 60, chia: 20, flax: 10, psyllium: 10, broccoli: 150,
+  "broccoli-sprouts": 40, spinach: 100, kale: 100, asparagus: 100, raspberries: 150,
+  guava: 100, "red-pepper": 100, kiwi: 75, potato: 250, avocado: 150,
+  "sweet-potato": 150, carrot: 100, tomato: 150, tofu: 150, "pumpkin-seeds": 30,
+  "sunflower-seeds": 30, almonds: 30, "natural-smooth-peanut-butter": 32,
+  walnuts: 30, "brazil-nut": 5, cashews: 30, evoo: 14, cocoa: 30, coffee: 240,
+  "green-tea": 240, shiitake: 100, "bone-broth": 240, collagen: 10,
+};
+
+BUILDER_ITEMS.forEach((item) => {
+  const servingGrams = FOOD_REFERENCE_GRAMS[item.id];
+  item.quantityMode = Number.isFinite(servingGrams) ? "grams" : "servings";
+  if (Number.isFinite(servingGrams)) item.servingGrams = servingGrams;
+});
+
 export const FOUNDATION_STACK = {
   name: "Nutrient-dense foundation",
   items: ["eggs", "salmon", "chicken", "oats", "chia", "broccoli", "kiwi", "greek-yogurt", "almonds", "potato", "evoo"],

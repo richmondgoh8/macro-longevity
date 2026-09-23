@@ -15,6 +15,16 @@ export function badge(label, tone = 'neutral') {
   return `<span class="ui-badge ui-badge-${escapeHTML(tone)}">${escapeHTML(label)}</span>`;
 }
 
+export function emptyState({ title, description, actionLabel = '', actionData = {} } = {}) {
+  const dataAttributes = Object.entries(actionData)
+    .map(([key, value]) => ` data-${escapeHTML(key)}="${escapeHTML(value)}"`)
+    .join('');
+  const action = actionLabel
+    ? `<div class="ui-actions"><button type="button" class="button button-primary"${dataAttributes}>${escapeHTML(actionLabel)}</button></div>`
+    : '';
+  return `<div class="ui-empty-state"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p>${action}</div>`;
+}
+
 const ICON_PATHS = {
   add: '<path d="M12 5v14M5 12h14"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
@@ -39,7 +49,8 @@ export function iconButton({ iconName, label, tone = 'neutral', pressed, tooltip
     .map(([key, value]) => ` data-${escapeHTML(key)}="${escapeHTML(value)}"`)
     .join('');
   const pressedAttribute = typeof pressed === 'boolean' ? ` aria-pressed="${pressed}"` : '';
-  return `<button type="button" class="ui-icon-button ui-icon-button-${escapeHTML(tone)}" aria-label="${escapeHTML(label)}" data-tooltip-trigger${pressedAttribute}${dataAttributes}>${icon(iconName)}<span class="ui-tooltip" role="tooltip">${escapeHTML(tooltip)}</span></button>`;
+  const tooltipMarkup = tooltip ? `<span class="ui-tooltip" role="tooltip">${escapeHTML(tooltip)}</span>` : '';
+  return `<button type="button" class="ui-icon-button ui-icon-button-${escapeHTML(tone)}" aria-label="${escapeHTML(label)}"${tooltipMarkup ? ' data-tooltip-trigger' : ''}${pressedAttribute}${dataAttributes}>${icon(iconName)}${tooltipMarkup}</button>`;
 }
 
 let modalControllerPromise;

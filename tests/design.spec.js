@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const routes = ['/', '/pages/stack.html', '/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html', '/pages/finance.html'];
 
 for (const route of routes) {
-  test(`${route} uses the local Warm Canvas contract`, async ({ page }) => {
+  test(`${route} uses the local Calm Wellness contract`, async ({ page }) => {
     await page.goto(route);
     const contract = await page.evaluate(() => {
       const root = getComputedStyle(document.documentElement);
@@ -35,27 +35,21 @@ for (const route of routes) {
         },
       };
     });
-    expect(contract.primary).toBe('#0075de');
-    expect(contract.text).toContain('rgba(0, 0, 0, 0.95)');
-    expect(contract.radius).toBe('12px');
+    expect(contract.primary).toBe('#246B4B');
+    expect(contract.text).toBe('#18251F');
+    expect(contract.radius).toBe('16px');
     expect(contract.bodyFont).toContain('Inter');
     expect(contract.renderedEmoji).toBe(false);
     expect(contract.externalFontOrIcon).toBe(false);
     expect(contract.overflow).toBeLessThanOrEqual(1);
-    expect(contract.blueprintStyle.position).toBe('fixed');
-    expect(contract.blueprintStyle.pointerEvents).toBe('none');
-    expect(contract.blueprintStyle.gridLines).toBe(2);
-    expect(contract.blueprintStyle.gridSize.split(', ')).toEqual(['32px 32px', '32px 32px']);
-    expect(contract.blueprintStyle.mask).toContain('radial-gradient');
-    expect(contract.blueprintStyle.animation).toBe('none');
-    expect(contract.blueprintStyle.layer).toBeGreaterThan(400);
+    expect(contract.blueprintStyle.gridLines).toBe(0);
     if (contract.primaryStyle) {
       expect(contract.primaryStyle.padding).toBe('8px 16px');
-      expect(contract.primaryStyle.radius).toBe('4px');
-      expect(contract.primaryStyle.background).toBe('rgb(0, 117, 222)');
+      expect(contract.primaryStyle.radius).toBe('10px');
+      expect(contract.primaryStyle.background).toBe('rgb(36, 107, 75)');
     }
     if (contract.cardStyle) {
-      expect(contract.cardStyle.radius).toBe('12px');
+      expect(contract.cardStyle.radius).toBe('16px');
       expect(contract.cardStyle.shadow).not.toBe('none');
     }
   });
@@ -74,7 +68,7 @@ test('Blueprint grid yields to alternate contrast and print modes', async ({ pag
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.body, '::before').display)).toBe('none');
 });
 
-test('Native modals keep the Warm Canvas contract and reduce motion safely', async ({ page }) => {
+test('Native modals keep the Calm Wellness contract and reduce motion safely', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/pages/stack.html');
   await page.locator('[data-clear-stack]').click();
@@ -93,8 +87,8 @@ test('Native modals keep the Warm Canvas contract and reduce motion safely', asy
       described: dialog.getAttribute('aria-describedby'),
     };
   });
-  expect(contract.width).toBeLessThanOrEqual(520);
-  expect(contract.radius).toBe('12px');
+  expect(contract.width).toBeLessThanOrEqual(720);
+  expect(contract.radius).toBe('20px');
   expect(contract.shadow).not.toBe('none');
   expect(contract.transform).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
   expect(contract.transitionMs).toBeLessThanOrEqual(10);
@@ -103,7 +97,7 @@ test('Native modals keep the Warm Canvas contract and reduce motion safely', asy
   expect(contract.described).toBe('confirm-dialog-summary');
 });
 
-test('Toast notifications follow the Warm Canvas contract', async ({ page }) => {
+test('Toast notifications follow the Calm Wellness contract', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await page.evaluate(async () => {
@@ -132,7 +126,7 @@ test('Toast notifications follow the Warm Canvas contract', async ({ page }) => 
   expect(contract.live).toBe('polite');
   expect(contract.type).toBe('success');
   expect(contract.surface).toBe('rgb(255, 255, 255)');
-  expect(contract.radius).toBe('12px');
+  expect(contract.radius).toBe('16px');
   expect(contract.shadow).not.toBe('none');
   expect(contract.accentWidth).toBe('4px');
   expect(contract.transitionMs).toBeLessThanOrEqual(10);
@@ -140,7 +134,7 @@ test('Toast notifications follow the Warm Canvas contract', async ({ page }) => 
   expect(contract.overflow).toBeLessThanOrEqual(1);
 });
 
-test('Tooltips follow the Warm Canvas accessible contract', async ({ page }) => {
+test('Tooltips follow the Calm Wellness accessible contract', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/pages/stack.html');
   const trigger = page.locator('.meal-library-grid .meal-card').first().locator('[data-meal-toggle]');
@@ -164,42 +158,23 @@ test('Tooltips follow the Warm Canvas accessible contract', async ({ page }) => 
   expect(contract.open).toBe('true');
   expect(contract.background).toBe('rgb(49, 48, 46)');
   expect(contract.color).toBe('rgb(255, 255, 255)');
-  expect(contract.radius).toBe('4px');
+  expect(contract.radius).toBe('10px');
   expect(contract.maxWidth).toBeLessThanOrEqual(180);
   expect(contract.pointerEvents).toBe('none');
   expect(contract.transitionMs).toBeLessThanOrEqual(10);
   expect(contract.overflow).toBeLessThanOrEqual(1);
 });
 
-test('Planner mode follows the Warm Canvas segmented-control contract', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.setViewportSize({ width: 390, height: 844 });
+test('Planner mode uses one green underline and accessible targets', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  const control = page.locator('[data-segmented-control]');
-  const contract = await control.evaluate((node) => {
-    const style = getComputedStyle(node);
-    const indicator = getComputedStyle(node, '::before');
-    const options = [...node.querySelectorAll('[data-planner-mode]')];
-    return {
-      radius: style.borderRadius,
-      track: style.backgroundColor,
-      indicatorSurface: indicator.backgroundColor,
-      indicatorShadow: indicator.boxShadow,
-      transitionMs: parseFloat(indicator.transitionDuration) * 1000,
-      optionHeights: options.map((option) => option.getBoundingClientRect().height),
-      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    };
-  });
-  expect(contract.radius).toBe('9999px');
-  expect(contract.track).not.toBe('rgba(0, 0, 0, 0)');
-  expect(contract.indicatorSurface).not.toBe('rgba(0, 0, 0, 0)');
-  expect(contract.indicatorShadow).not.toBe('none');
-  expect(contract.transitionMs).toBeLessThanOrEqual(10);
-  contract.optionHeights.forEach((height) => expect(height).toBeGreaterThanOrEqual(44));
-  expect(contract.overflow).toBeLessThanOrEqual(1);
+  const tabs = page.getByRole('tablist', { name: 'Planner input mode' });
+  const active = tabs.locator('[aria-selected="true"]');
+  expect(await active.evaluate(n => getComputedStyle(n).boxShadow)).toContain('0px -2px');
+  expect(await active.evaluate(n => getComputedStyle(n, '::after').display)).toBe('none');
+  for (const tab of await tabs.getByRole('tab').all()) expect((await tab.boundingBox()).height).toBeGreaterThanOrEqual(44);
 });
 
-test('Homepage split-screen hero follows the Warm Canvas protocol-map contract', async ({ page }) => {
+test('Homepage split-screen hero follows the Calm Wellness protocol-map contract', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   const desktop = await page.locator('.split-screen-hero-shell').evaluate((shell) => {
@@ -216,9 +191,9 @@ test('Homepage split-screen hero follows the Warm Canvas protocol-map contract',
     };
   });
   expect(desktop.columns).toBe(2);
-  expect(desktop.visualSurface).toBe('rgb(49, 48, 46)');
-  expect(desktop.visualRadius).toBe('12px');
-  expect(desktop.visualShadow).not.toBe('none');
+  expect(desktop.visualSurface).toBe('rgb(237, 243, 236)');
+  expect(desktop.visualRadius).toBe('16px');
+  expect(desktop.visualShadow).toBe('none');
   expect(desktop.cardHeights).toHaveLength(4);
   desktop.cardHeights.forEach((height) => expect(height).toBeGreaterThanOrEqual(44));
   expect(desktop.links).toEqual(['/pages/blood.html', '/pages/protocol.html#biology', '/pages/workout.html', '/pages/stack.html']);
@@ -235,46 +210,15 @@ test('Homepage split-screen hero follows the Warm Canvas protocol-map contract',
   expect(mobile.overflow).toBeLessThanOrEqual(1);
 });
 
-test('Spotlight cards keep the dark-surface and progressive-enhancement contract', async ({ page }, testInfo) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('Destination cards use calm surfaces without pointer effects', async ({ page }) => {
   await page.goto('/');
-  const desktop = await page.locator('[data-spotlight-card]').evaluateAll((cards) => cards.map((card) => {
-    const style = getComputedStyle(card);
-    const before = getComputedStyle(card, '::before');
-    return {
-      border: style.borderTopColor,
-      minHeight: card.getBoundingClientRect().height,
-      pointerEvents: before.pointerEvents,
-      glow: before.backgroundImage,
-      transition: before.transitionProperty,
-    };
-  }));
-  expect(desktop).toHaveLength(4);
-  desktop.forEach((card) => {
-    expect(card.border).toBe('rgba(255, 255, 255, 0.1)');
-    expect(card.minHeight).toBeGreaterThanOrEqual(44);
-    expect(card.pointerEvents).toBe('none');
-    expect(card.glow).toContain('radial-gradient');
-    expect(card.transition).toContain('opacity');
-  });
-
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect.poll(() => page.locator('[data-spotlight-card]').first().evaluate((card) => parseFloat(getComputedStyle(card, '::before').transitionDuration) * 1000)).toBeLessThanOrEqual(10);
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  const mobile = await page.locator('[data-spotlight-card]').evaluateAll((cards) => cards.map((card) => ({
-    overlayDisplay: getComputedStyle(card, '::before').display,
-    height: card.getBoundingClientRect().height,
-  })));
-  mobile.forEach((card) => {
-    expect(card.overlayDisplay).toBe(testInfo.project.name === 'mobile-chromium' ? 'none' : 'block');
-    expect(card.height).toBeGreaterThanOrEqual(44);
-  });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  const cards = page.locator('.hero-pillar-card');
+  await expect(cards).toHaveCount(4);
+  expect(await cards.first().evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
+  expect(await cards.first().evaluate(n => getComputedStyle(n, '::before').display)).toBe('none');
 });
 
-test('Sticky pin rail follows the Warm Canvas contract', async ({ page }) => {
+test('Sticky pin rail follows the Calm Wellness contract', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pages/protocol.html');
   const desktop = await page.locator('.sticky-pin-rail').evaluate((rail) => {
@@ -297,10 +241,10 @@ test('Sticky pin rail follows the Warm Canvas contract', async ({ page }) => {
   expect(desktop.widthToken).toBe('12rem');
   expect(desktop.position).toBe('sticky');
   expect(desktop.navSurface).toBe('rgb(255, 255, 255)');
-  expect(desktop.navRadius).toBe('12px');
+  expect(desktop.navRadius).toBe('16px');
   expect(desktop.navShadow).not.toBe('none');
   expect(desktop.linkHeight).toBeGreaterThanOrEqual(44);
-  expect(desktop.activeIndicator).toBe('rgb(0, 117, 222)');
+  expect(desktop.activeIndicator).toBe('rgb(36, 107, 75)');
   expect(desktop.label).toBe('On this page');
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -320,7 +264,7 @@ test('Sticky pin rail follows the Warm Canvas contract', async ({ page }) => {
   expect(mobile.pageOverflow).toBeLessThanOrEqual(1);
 });
 
-test('Finance chart uses the Warm Canvas stepped treatment', async ({ page }) => {
+test('Finance chart uses the Calm Wellness stepped treatment', async ({ page }) => {
   await page.goto('/pages/finance.html');
   await page.getByRole('tab', { name: 'FIRE calculator' }).click();
   await expect(page.locator('#fireChart')).toBeVisible();

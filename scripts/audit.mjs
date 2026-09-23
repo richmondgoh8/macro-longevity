@@ -53,7 +53,7 @@ check(sw.includes('/fonts/inter-latin.woff2') && sw.includes('/fonts/jetbrains-m
 check(!sw.includes('geist-'), 'sw.js: legacy Geist font remains precached');
 
 const variables = read('css/variables.css');
-check(variables.includes('--color-primary: #0075de'), 'css/variables.css: Warm Canvas primary token missing');
+check(variables.includes('--color-primary: #246B4B'), 'css/variables.css: Warm Canvas primary token missing');
 check(variables.includes("font-family: 'Inter'"), 'css/variables.css: Inter font face missing');
 check(variables.includes("font-family: 'JetBrains Mono'"), 'css/variables.css: JetBrains Mono font face missing');
 check(!variables.includes('Geist'), 'css/variables.css: legacy Geist token remains');
@@ -64,9 +64,9 @@ check(styles.includes('navigation: none') && styles.includes('prefers-reduced-mo
 check(styles.includes('macro-page-view-transition-out') && styles.includes('macro-page-view-transition-in'), 'css/style.css: view-transition animations missing');
 
 const manifest = read('manifest.json');
-check(manifest.includes('"theme_color": "#ffffff"'), 'manifest.json: Warm Canvas theme color missing');
-check(manifest.includes('"background_color": "#f6f5f4"'), 'manifest.json: Warm Canvas background color missing');
-check(read('favicon.svg').includes('fill="#0075de"'), 'favicon.svg: Warm Canvas primary fill missing');
+check(manifest.includes('"theme_color": "#F7F8F3"'), 'manifest.json: Warm Canvas theme color missing');
+check(manifest.includes('"background_color": "#F7F8F3"'), 'manifest.json: Warm Canvas background color missing');
+check(read('favicon.svg').includes('fill="#246B4B"'), 'favicon.svg: Warm Canvas primary fill missing');
 ['fonts/geist-sans.woff2', 'fonts/geist-mono.woff2', 'fonts/dm-sans-latin.woff2'].forEach((file) => {
   check(!fs.existsSync(path.join(root, file)), `${file}: retired font asset remains`);
 });
@@ -96,7 +96,7 @@ const javascriptFiles = [
   'js/blood.js', 'js/render.js', 'js/export.js', 'js/home.js', 'js/protocol.js',
   'js/finance.js', 'js/register-sw.js', 'sw.js',
   'js/site.js', 'js/avoid.js', 'js/stack-preview.js', 'js/components/card-swipe.js',
-  'js/components/modal.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
+  'js/components/coverage-pin.js', 'js/components/nutrition-totals.js', 'js/components/modal.js', 'js/components/coverage-dialog.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
   'js/components/toast.js', 'js/components/tooltip.js',
 ];
 javascriptFiles.forEach((file) => {

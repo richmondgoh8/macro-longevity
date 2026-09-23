@@ -7,12 +7,25 @@ function supportsDialogClosedBy() {
 }
 
 function focusDialogTarget(target) {
-  if (!target || typeof target.focus !== 'function') return;
+  if (!target?.isConnected || typeof target.focus !== 'function') {
+    target = document.querySelector('#meal-library-title, main h1');
+    if (!target) return;
+    target.setAttribute('tabindex', '-1');
+  }
   target.focus({ preventScroll: true });
+}
+
+function clearClose(dialog, state) {
+  if (state.closeTimer) window.clearTimeout(state.closeTimer);
+  if (state.transitionEnd) dialog.removeEventListener('transitionend', state.transitionEnd);
+  state.closeTimer = null;
+  state.transitionEnd = null;
 }
 
 function finishModalClose(dialog, returnValue) {
   if (!dialog.open) return;
+  const state = modalStates.get(dialog);
+  if (state) clearClose(dialog, state);
   dialog.classList.remove('is-open', 'is-closing');
   dialog.close(returnValue);
 }
@@ -21,7 +34,7 @@ function ensureModalDialog(dialog) {
   let state = modalStates.get(dialog);
   if (state) return state;
 
-  state = { returnFocus: null, scrollPosition: { x: 0, y: 0 }, lightDismiss: false, closePromise: null };
+  state = { returnFocus: null, scrollPosition: { x: 0, y: 0 }, lightDismiss: false, closePromise: null, closeTimer: null, transitionEnd: null };
   modalStates.set(dialog, state);
 
   dialog.addEventListener('cancel', (event) => {
@@ -39,6 +52,7 @@ function ensureModalDialog(dialog) {
   });
 
   dialog.addEventListener('close', () => {
+    clearClose(dialog, state);
     dialog.classList.remove('is-open', 'is-closing');
     const returnFocus = state.returnFocus;
     const scrollPosition = state.scrollPosition;
@@ -55,6 +69,11 @@ function ensureModalDialog(dialog) {
 export function openModalDialog(dialog, { initialFocus = null, returnFocus = document.activeElement, lightDismiss = false } = {}) {
   if (!dialog) return;
   const state = ensureModalDialog(dialog);
+  clearClose(dialog, state);
+  if (state.closePromise) {
+    state.closePromise.resolve?.();
+    state.closePromise = null;
+  }
   state.returnFocus = returnFocus;
   state.scrollPosition = { x: window.scrollX, y: window.scrollY };
   state.lightDismiss = lightDismiss;
@@ -82,13 +101,15 @@ export function closeModalDialog(dialog, returnValue = 'cancel') {
   if (reducedMotion) {
     finish();
   } else {
-    const timer = window.setTimeout(finish, 160);
-    dialog.addEventListener('transitionend', (event) => {
+    state.closeTimer = window.setTimeout(finish, 160);
+    state.transitionEnd = (event) => {
       if (event.propertyName === 'opacity') {
-        window.clearTimeout(timer);
+        window.clearTimeout(state.closeTimer);
+        state.closeTimer = null;
         finish();
       }
-    }, { once: true });
+    };
+    dialog.addEventListener('transitionend', state.transitionEnd);
   }
   return state.closePromise.promise;
 }

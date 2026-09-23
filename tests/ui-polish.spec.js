@@ -94,58 +94,12 @@ test('homepage uses a split-screen hero with a linked protocol map', async ({ pa
   expect(mobile.overflow).toBeLessThanOrEqual(1);
 });
 
-test('dark protocol cards use a pointer-only spotlight enhancement', async ({ page }, testInfo) => {
-  if (testInfo.project.name === 'mobile-chromium') {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/');
-    const mobileCards = page.locator('[data-spotlight-card]');
-    await expect(mobileCards).toHaveCount(4);
-    const mobile = await mobileCards.first().evaluate((card) => ({
-      overlayDisplay: getComputedStyle(card, '::before').display,
-      active: card.dataset.spotlightActive || null,
-      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    }));
-    expect(mobile.overlayDisplay).toBe('none');
-    expect(mobile.active).toBeNull();
-    expect(mobile.overflow).toBeLessThanOrEqual(1);
-    return;
-  }
-
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('protocol destination cards retain links without decorative pointer effects', async ({ page }) => {
   await page.goto('/');
-  const cards = page.locator('[data-spotlight-card]');
+  const cards = page.locator('.hero-pillar-card');
   await expect(cards).toHaveCount(4);
-
-  const resting = await cards.first().evaluate((card) => {
-    const before = getComputedStyle(card, '::before');
-    return {
-      border: getComputedStyle(card).borderTopColor,
-      pointerEvents: before.pointerEvents,
-      opacity: Number(before.opacity),
-    };
-  });
-  expect(resting.border).toBe('rgba(255, 255, 255, 0.1)');
-  expect(resting.pointerEvents).toBe('none');
-  expect(resting.opacity).toBe(0);
-
-  await cards.first().hover({ position: { x: 20, y: 20 } });
-  await page.waitForTimeout(300);
-  const active = await cards.first().evaluate((card) => {
-    const before = getComputedStyle(card, '::before');
-    return {
-      active: card.dataset.spotlightActive,
-      x: card.style.getPropertyValue('--spotlight-x'),
-      y: card.style.getPropertyValue('--spotlight-y'),
-      opacity: Number(before.opacity),
-    };
-  });
-  expect(active.active).toBe('true');
-  expect(active.x).toMatch(/%$/);
-  expect(active.y).toMatch(/%$/);
-  expect(active.opacity).toBeGreaterThan(0);
-
-  await page.mouse.move(1, 1);
-  await expect.poll(() => cards.first().getAttribute('data-spotlight-active')).toBe('false');
+  for (const card of await cards.all()) await expect(card).toHaveAttribute('href', /^\/pages\//);
+  expect(await cards.first().evaluate(n => getComputedStyle(n, '::before').display)).toBe('none');
 });
 
 test('active primary navigation uses one selected treatment', async ({ page }) => {
@@ -164,9 +118,9 @@ test('active primary navigation uses one selected treatment', async ({ page }) =
         afterContent: afterStyle.content,
       };
     });
-    expect(state.navBorderBottomColor).toBe('rgba(0, 0, 0, 0.1)');
-    expect(state.activeBackground).toBe('rgb(242, 249, 255)');
-    expect(state.activeShadow).toBe('none');
+    expect(state.navBorderBottomColor).toBe('rgb(212, 221, 211)');
+    expect(state.activeBackground).toBe('rgba(0, 0, 0, 0)');
+    expect(state.activeShadow).toContain('0px -2px');
     expect(state.afterContent).toBe('none');
   }
 
@@ -177,19 +131,17 @@ test('active primary navigation uses one selected treatment', async ({ page }) =
       const style = getComputedStyle(active);
       return { background: style.backgroundColor, shadow: style.boxShadow };
     });
-    expect(state.background).toBe('rgb(242, 249, 255)');
+    expect(state.background).toBe('rgb(237, 243, 236)');
     expect(state.shadow).toBe('none');
   }
 });
 
 test('long routes expose one sticky section rail with stable targets', async ({ page }) => {
   const routes = [
-    ['/pages/stack.html', 3],
     ['/pages/avoid.html', 3],
     ['/pages/blood.html', 7],
     ['/pages/protocol.html', 6],
     ['/pages/workout.html', 4],
-    ['/pages/finance.html', 3],
   ];
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -221,14 +173,14 @@ test('long routes expose one sticky section rail with stable targets', async ({ 
 test('sticky rail tracks section anchors and preserves keyboard navigation', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pages/protocol.html');
-  await page.locator('#protocol-screening').scrollIntoViewIfNeeded();
+  await page.locator('#protocol-screening').evaluate(node => node.scrollIntoView({ block: 'start' }));
   await expect(page.getByRole('link', { name: 'Screening' })).toHaveAttribute('aria-current', 'location');
   await page.getByRole('link', { name: 'Biology' }).click();
   await expect(page).toHaveURL(/#biology$/);
   await expect(page.getByRole('link', { name: 'Biology' })).toHaveAttribute('aria-current', 'location');
 });
 
-test('sticky rail controls mirror Training and Finance views', async ({ page }) => {
+test('sticky rail controls mirror Training views', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pages/workout.html');
   await page.locator('.sticky-pin-link', { hasText: 'Strength' }).click();
@@ -236,17 +188,11 @@ test('sticky rail controls mirror Training and Finance views', async ({ page }) 
   await expect(page.locator('#section-strength')).toBeVisible();
   await expect(page.locator('.sticky-pin-link', { hasText: 'Strength' })).toHaveAttribute('aria-pressed', 'true');
 
-  await page.goto('/pages/finance.html');
-  await page.locator('.sticky-pin-link', { hasText: 'FIRE calculator' }).click();
-  await expect(page.locator('[data-finance-tab="fire"]')).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('#financeFire')).toBeVisible();
-  await expect(page).toHaveURL(/#fire$/);
-  await expect(page.locator('.sticky-pin-link', { hasText: 'FIRE calculator' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('sticky rail becomes a wrapped static list on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const route of ['/pages/stack.html', '/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html', '/pages/finance.html']) {
+  for (const route of ['/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html']) {
     await page.goto(route);
     const state = await page.locator('.sticky-pin-rail').evaluate((node) => ({
       position: getComputedStyle(node).position,
@@ -258,6 +204,50 @@ test('sticky rail becomes a wrapped static list on mobile', async ({ page }) => 
     expect(state.overflow).toBe('visible');
     state.widths.forEach((width) => expect(width).toBeGreaterThanOrEqual(140));
     expect(state.pageOverflow).toBeLessThanOrEqual(1);
+  }
+});
+
+test('Finance uses one padded tab system and a contained empty state', async ({ page }) => {
+  for (const width of [390, 907, 1440]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await page.goto('/pages/finance.html');
+    await page.evaluate(() => localStorage.removeItem('passiveIncome'));
+    await page.getByRole('tab', { name: 'Income tracker' }).click();
+    await expect(page.locator('[data-sticky-pin-rail]')).toHaveCount(0);
+    const layout = await page.evaluate(() => {
+      const panel = document.querySelector('#piSection');
+      const empty = panel.querySelector('.ui-empty-state');
+      const tabs = document.querySelector('.ui-tabs');
+      const button = empty.querySelector('[data-pi-action="add"]');
+      const panelRect = panel.getBoundingClientRect();
+      const emptyRect = empty.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      const panelStyle = getComputedStyle(panel);
+      return {
+        panelPadding: parseFloat(panelStyle.paddingLeft),
+        tabGap: parseFloat(getComputedStyle(tabs).gap),
+        emptyInside: emptyRect.left >= panelRect.left && emptyRect.right <= panelRect.right,
+        buttonInside: buttonRect.left >= emptyRect.left && buttonRect.right <= emptyRect.right,
+        buttonAboveBottomNav: innerWidth >= 1100 || buttonRect.bottom + 8 <= document.querySelector('.bottom-nav').getBoundingClientRect().top,
+        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
+    });
+    expect(layout.panelPadding).toBeGreaterThanOrEqual(24);
+    expect(layout.tabGap).toBeGreaterThanOrEqual(8);
+    expect(layout.emptyInside).toBe(true);
+    expect(layout.buttonInside).toBe(true);
+    expect(layout.buttonAboveBottomNav).toBe(true);
+    expect(layout.pageOverflow).toBeLessThanOrEqual(1);
+
+    await page.getByRole('button', { name: 'Add asset' }).click();
+    await expect(page.locator('.pi-table tbody tr')).toHaveCount(2);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+    for (const input of await page.locator('.pi-table input').all()) {
+      expect(await input.evaluate((node) => {
+        const rect = node.getBoundingClientRect();
+        return rect.left >= 0 && rect.right <= innerWidth;
+      })).toBe(true);
+    }
   }
 });
 
@@ -303,6 +293,49 @@ test('active workout tabs render one visible indicator bar', async ({ page }) =>
   }
 });
 
+test('training metrics keep Zone 2 range and labels inside their cells', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 900 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/pages/workout.html');
+    const metrics = page.locator('.workout-metrics');
+    await expect(metrics).toContainText('150–300');
+    await expect(metrics).toContainText('Zone 2 min / week');
+    const layout = await metrics.evaluate((node) => {
+      const parent = node.getBoundingClientRect();
+      return {
+        overflow: node.scrollWidth - node.clientWidth,
+        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        cells: [...node.children].map((cell) => {
+          const cellRect = cell.getBoundingClientRect();
+          const range = document.createRange();
+          range.selectNodeContents(cell);
+          const textRect = range.getBoundingClientRect();
+          return {
+            inside: textRect.left >= cellRect.left - 1 && textRect.right <= cellRect.right + 1
+              && textRect.top >= cellRect.top - 1 && textRect.bottom <= cellRect.bottom + 1,
+            alignment: getComputedStyle(cell).alignItems,
+            valueAlignment: getComputedStyle(cell.querySelector('strong')).textAlign,
+            labelAlignment: getComputedStyle(cell.querySelector('span')).textAlign,
+            width: cellRect.width,
+            height: cellRect.height,
+          };
+        }),
+        parentHeight: parent.height,
+      };
+    });
+    expect(layout.overflow).toBeLessThanOrEqual(1);
+    expect(layout.pageOverflow).toBeLessThanOrEqual(1);
+    layout.cells.forEach((cell) => {
+      expect(cell.inside).toBe(true);
+      expect(cell.alignment).toBe('center');
+      expect(cell.valueAlignment).toBe(cell.labelAlignment);
+      expect(cell.width).toBeGreaterThanOrEqual(64);
+      expect(cell.height).toBeGreaterThanOrEqual(44);
+    });
+    expect(layout.parentHeight).toBeGreaterThanOrEqual(64);
+  }
+});
+
 test('blood cards use intrinsic columns and responsive flow', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pages/blood.html');
@@ -333,56 +366,66 @@ test('blood cards use intrinsic columns and responsive flow', async ({ page }) =
 });
 
 test('ApoB follow-up keeps the comparison table without numbered steps', async ({ page }) => {
-  await page.goto('/pages/blood.html');
-  const section = page.locator('.progressive-section').filter({ hasText: 'ApoB elevated? Options' });
-  await section.locator('summary').click();
-  await expect(section.locator('.apob-steps')).toHaveCount(0);
-  await expect(section.locator('.apob-table')).toBeVisible();
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/pages/blood.html');
+    const section = page.locator('.progressive-section').filter({ hasText: 'ApoB elevated? Options' });
+    await section.locator('summary').click();
+    await expect(section.locator('.apob-steps')).toHaveCount(0);
+    await expect(section.locator('table.apob-table')).toBeVisible();
+    await expect(section.locator('thead th')).toHaveCount(3);
+    await expect(section.locator('tbody tr')).toHaveCount(8);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  }
 });
 
 test('Quick-add quantity controls and hover tips stay inside their bounds', async ({ page }) => {
   for (const width of [1440, 1024, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/pages/stack.html');
-    await page.getByRole('button', { name: /Quick add/ }).click();
+    await page.evaluate(() => localStorage.removeItem('ml-daily-current'));
+    await page.reload();
+    await page.getByRole('tab', { name: /Quick add/ }).click();
     const card = page.locator('.quick-item-grid .builder-item').first();
     const toggle = card.locator('[data-quick-item]');
     if (await toggle.getAttribute('aria-pressed') !== 'true') await toggle.click();
-    await expect(card.locator('[data-quick-serving-toggle]')).toHaveText('Adjust servings');
-    await card.locator('[data-quick-serving-toggle]').click();
     await toggle.hover();
     const canHover = await page.evaluate(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches);
     if (canHover) await expect(card.locator('.ui-tooltip')).toHaveAttribute('data-tooltip-open', 'true');
+    await card.locator('[data-nutrition-detail-open]').click();
+    const dialog = page.locator('[data-nutrition-detail-dialog]');
+    await expect(dialog).toBeVisible();
     const bounds = await page.evaluate(() => {
-      const grid = document.querySelector('.quick-item-grid');
-      const card = grid.querySelector('.builder-item');
-      const control = card.querySelector('.portion-control');
-      const minus = card.querySelector('[data-portion-action="decrease"]');
-      const plus = card.querySelector('[data-portion-action="increase"]');
-      const tooltip = card.querySelector('.ui-tooltip');
+      const dialog = document.querySelector('[data-nutrition-detail-dialog]');
+      const control = dialog.querySelector('.gram-control, .portion-control');
+      const gram = Boolean(control?.matches('.gram-control'));
+      const minus = control.querySelector(gram ? '[data-gram-action="decrease"]' : '[data-portion-action="decrease"]');
+      const plus = control.querySelector(gram ? '[data-gram-action="increase"]' : '[data-portion-action="increase"]');
       const rect = (node) => node.getBoundingClientRect();
-      const gridRect = rect(grid);
-      const cardRect = rect(card);
+      const dialogRect = rect(dialog);
       const controlRect = rect(control);
       const minusRect = rect(minus);
       const plusRect = rect(plus);
-      const tooltipRect = rect(tooltip);
       return {
-        controlsInsideCard: controlRect.left >= cardRect.left && controlRect.right <= cardRect.right
-          && minusRect.left >= cardRect.left && plusRect.right <= cardRect.right,
-        tooltipOpen: tooltip.dataset.tooltipOpen === 'true',
-        tooltipInsideGrid: tooltipRect.top >= gridRect.top && tooltipRect.right <= gridRect.right,
-        transform: getComputedStyle(card).transform,
+        controlsInsideDialog: controlRect.left >= dialogRect.left && controlRect.right <= dialogRect.right
+          && minusRect.left >= dialogRect.left && plusRect.right <= dialogRect.right,
+        dialogInsideViewport: dialogRect.left >= 0 && dialogRect.right <= window.innerWidth,
+        gram,
+        cardHeights: [...document.querySelectorAll('.quick-item-grid .builder-item')].slice(0, 12).map((node) => Math.round(node.getBoundingClientRect().height)),
       };
     });
-    expect(bounds.controlsInsideCard).toBe(true);
-    if (canHover) {
-      expect(bounds.tooltipOpen).toBe(true);
-      expect(bounds.tooltipInsideGrid).toBe(true);
+    expect(bounds.controlsInsideDialog).toBe(true);
+    expect(bounds.dialogInsideViewport).toBe(true);
+    expect(new Set(bounds.cardHeights).size).toBe(1);
+    if (bounds.gram) {
+      const beforeGrams = Number(await dialog.locator('[data-gram-input]').inputValue());
+      await dialog.locator('[data-gram-action="increase"]').click();
+      await expect(dialog.locator('[data-gram-input]')).toHaveValue(String(beforeGrams + 5));
     } else {
-      expect(bounds.tooltipOpen).toBe(false);
+      const beforePortion = Number(await dialog.locator('[data-portion-input]').inputValue());
+      await dialog.locator('[data-portion-action="increase"]').click();
+      await expect(dialog.locator('[data-portion-input]')).toHaveValue(String(beforePortion + 0.25));
     }
-    expect(bounds.transform).toBe('none');
   }
 });
 
@@ -422,19 +465,22 @@ test('planner food selection is compact and fuzzy-searchable', async ({ page }) 
   await expect(search).toBeVisible();
   await expect(page.getByText('Fast find', { exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: /Quick add/ }).click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
   await search.fill('sardn');
   const quickResults = page.locator('.quick-item-grid .builder-item');
   await expect(quickResults).toHaveCount(1);
   await expect(quickResults.first()).toContainText('Sardines with bones');
   const quickGrid = await page.locator('.quick-item-grid').evaluate((node) => ({
-    maxHeight: parseFloat(getComputedStyle(node).maxHeight),
+    maxHeight: getComputedStyle(node).maxHeight,
+    height: node.getBoundingClientRect().height,
+    scrollHeight: node.scrollHeight,
     cardPadding: parseFloat(getComputedStyle(node.querySelector('.builder-item')).paddingTop),
   }));
-  expect(quickGrid.maxHeight).toBeGreaterThanOrEqual(560);
-  expect(quickGrid.cardPadding).toBeLessThanOrEqual(12);
+  expect(quickGrid.maxHeight).toBe('none');
+  expect(quickGrid.scrollHeight).toBeLessThanOrEqual(quickGrid.height + 1);
+  expect(quickGrid.cardPadding).toBeLessThanOrEqual(24);
 
-  await page.getByRole('button', { name: /Meals/ }).click();
+  await page.getByRole('tab', { name: /Meals/ }).click();
   await expect(search).toHaveValue('');
   await expect(page.locator('.meal-library-grid .meal-card')).toHaveCount(6);
   await search.fill('salmon');
@@ -442,7 +488,7 @@ test('planner food selection is compact and fuzzy-searchable', async ({ page }) 
   await expect(page.locator('.meal-library-grid .meal-card').first()).toContainText('Salmon, greens & potato');
 });
 
-test('all meals can be pinned without invading card content', async ({ page }) => {
+test('meal management actions stay in the detail dialog', async ({ page }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
     await page.goto('/pages/stack.html');
@@ -460,65 +506,72 @@ test('all meals can be pinned without invading card content', async ({ page }) =
     await page.reload();
 
     await expect(page.locator('.meal-library-grid .meal-card')).toHaveCount(7);
-    await expect(page.locator('.meal-library-grid [data-meal-pin]')).toHaveCount(7);
+    await expect(page.locator('.meal-library-grid [data-meal-pin]')).toHaveCount(0);
     const preset = page.locator('[data-meal-card="chia-protein-oatmeal"]');
-    const presetPin = preset.locator('[data-meal-pin]');
-    await expect(presetPin).toHaveAttribute('aria-label', 'Pin Chia protein oatmeal');
-    await expect(presetPin.locator('.ui-icon')).toHaveCount(1);
-    await expect(preset.locator(':scope > .meal-card-head > .meal-card-actions')).toHaveCount(0);
-    await expect(preset.locator(':scope > .meal-card-actions')).toHaveCount(1);
-    await expect(preset.locator(':scope > .meal-card-actions + .meal-card-head')).toHaveCount(1);
+    await expect(preset.locator('.meal-card-actions [data-meal-toggle]')).toHaveCount(1);
+    await expect(preset.locator('.meal-card-body-detail')).toHaveAttribute('role', 'button');
 
+    await preset.locator('.meal-card-body-detail').click();
+    const dialog = page.locator('[data-nutrition-detail-dialog]');
+    await expect(dialog).toBeVisible();
+    const presetPin = dialog.locator('[data-meal-pin]');
+    await expect(presetPin).toHaveText('Pin meal');
     await presetPin.click();
-    await expect(page.locator('.meal-library-grid .meal-card').first()).toHaveAttribute('data-meal-card', 'chia-protein-oatmeal');
-    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toHaveAttribute('aria-label', 'Unpin Chia protein oatmeal');
-    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toBeFocused();
+    await expect(dialog.locator('[data-meal-pin]')).toHaveText('Unpin meal');
+    await expect(dialog.locator('[data-meal-pin]')).toBeFocused();
     await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ml-daily-meal-library')).pinned.includes('chia-protein-oatmeal'))).toBe(true);
+    await dialog.locator('[data-nutrition-detail-close]').click();
+    await expect(dialog).not.toBeVisible();
 
-    const madeMealPin = page.locator('[data-meal-card="weekday-bowl"] [data-meal-pin]');
-    await madeMealPin.click();
-    await expect(page.locator('[data-meal-card="weekday-bowl"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
+    const madeMeal = page.locator('[data-meal-card="weekday-bowl"]');
+    await madeMeal.locator('.meal-card-body-detail').click();
+    await expect(dialog).toBeVisible();
+    await dialog.locator('[data-meal-pin]').click();
     await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ml-daily-meals'))[0].pinned)).toBe(true);
+    await dialog.locator('[data-nutrition-detail-close]').click();
+    await expect(dialog).not.toBeVisible();
 
     await page.reload();
-    await expect(page.locator('[data-meal-card="chia-protein-oatmeal"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('[data-meal-card="weekday-bowl"] [data-meal-pin]')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('[data-meal-card="chia-protein-oatmeal"] .meal-card-body-detail').click();
+    await expect(page.locator('[data-nutrition-detail-dialog] [data-meal-pin]')).toHaveText('Unpin meal');
+    await page.locator('[data-nutrition-detail-close]').click();
+    await expect(dialog).not.toBeVisible();
+    await page.locator('[data-meal-card="weekday-bowl"] .meal-card-body-detail').click();
+    await expect(page.locator('[data-nutrition-detail-dialog] [data-meal-pin]')).toHaveText('Unpin meal');
   }
 });
 
-test('meal actions stay above a readable title row', async ({ page }) => {
+test('nutrition planner cards keep equal-height readable summaries', async ({ page }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
     await page.goto('/pages/stack.html');
 
     const layouts = await page.locator('.meal-library-grid .meal-card').evaluateAll((cards) => cards.map((card) => {
-      const header = card.querySelector('.meal-card-head');
-      const title = header.querySelector('h3');
-      const titleGroup = title.parentElement;
+      const title = card.querySelector('h3');
       const actions = card.querySelector('.meal-card-actions');
-      const headerRect = header.getBoundingClientRect();
-      const titleRect = titleGroup.getBoundingClientRect();
-      const actionsRect = actions.getBoundingClientRect();
       const range = document.createRange();
       range.selectNodeContents(title);
       return {
-        titleWidthDelta: Math.abs(headerRect.width - titleRect.width),
         titleLines: range.getClientRects().length,
-        actionsAboveTitle: actionsRect.bottom <= headerRect.top,
         controlSizes: [...actions.querySelectorAll('button')].map((button) => {
           const rect = button.getBoundingClientRect();
           return { width: rect.width, height: rect.height };
         }),
+        bodyRole: card.querySelector('.meal-card-body-detail')?.getAttribute('role'),
         overflow: card.scrollWidth - card.clientWidth,
+        height: Math.round(card.getBoundingClientRect().height),
       };
     }));
 
     expect(layouts).toHaveLength(6);
+    // Equal height is a per-row requirement; mobile rows remain intrinsic.
+    if (width === 1440) {
+      expect(new Set(layouts.slice(0, 3).map(layout => layout.height)).size).toBe(1);
+      expect(new Set(layouts.slice(3, 6).map(layout => layout.height)).size).toBe(1);
+    }
     layouts.forEach((layout) => {
-      expect(layout.titleWidthDelta).toBeLessThanOrEqual(2);
       expect(layout.titleLines).toBeLessThanOrEqual(2);
-      expect(layout.actionsAboveTitle).toBe(true);
+      expect(layout.bodyRole).toBe('button');
       expect(layout.overflow).toBeLessThanOrEqual(1);
       layout.controlSizes.forEach((control) => {
         expect(control.width).toBeGreaterThanOrEqual(44);
@@ -543,16 +596,15 @@ test('meal actions stay above a readable title row', async ({ page }) => {
   const longNameLayout = await page.locator('[data-meal-card="long-name-layout-test"]').evaluate((card) => {
     const header = card.querySelector('.meal-card-head');
     const titleGroup = header.querySelector('h3').parentElement;
-    const actions = card.querySelector('.meal-card-actions');
     return {
       titleWidthDelta: Math.abs(header.getBoundingClientRect().width - titleGroup.getBoundingClientRect().width),
-      actionsAboveTitle: actions.getBoundingClientRect().bottom <= header.getBoundingClientRect().top,
+      bodyRole: card.querySelector('.meal-card-body-detail')?.getAttribute('role'),
       cardOverflow: card.scrollWidth - card.clientWidth,
       pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
   expect(longNameLayout.titleWidthDelta).toBeLessThanOrEqual(2);
-  expect(longNameLayout.actionsAboveTitle).toBe(true);
+  expect(longNameLayout.bodyRole).toBe('button');
   expect(longNameLayout.cardOverflow).toBeLessThanOrEqual(1);
   expect(longNameLayout.pageOverflow).toBeLessThanOrEqual(1);
 });
@@ -586,106 +638,233 @@ test('mobile evidence badges do not squeeze protocol card titles', async ({ page
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
 
-test('planner mode uses one equal-width segmented selection', async ({ page }) => {
+test('planner mode uses equal-width underlined tabs', async ({ page }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
     await page.goto('/pages/stack.html');
     const control = page.locator('[data-segmented-control]');
     const initial = await control.evaluate((node) => {
       const options = [...node.querySelectorAll('[data-planner-mode]')];
-      const pseudo = getComputedStyle(node, '::before');
+      const active = options.find((option) => option.getAttribute('aria-selected') === 'true');
+      const pseudo = getComputedStyle(active, '::after');
       return {
         active: node.dataset.segmentedActive,
         role: node.getAttribute('role'),
-        pressed: node.querySelectorAll('[aria-pressed="true"]').length,
+        selected: node.querySelectorAll('[aria-selected="true"]').length,
         widths: options.map((option) => option.getBoundingClientRect().width),
-        transform: pseudo.transform,
+        indicator: { background: pseudo.backgroundColor, height: pseudo.height },
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
     });
-    expect(initial.role).toBe('group');
+    expect(initial.role).toBe('tablist');
     expect(initial.active).toBe('meals');
-    expect(initial.pressed).toBe(1);
-    expect(initial.widths[0]).toBeCloseTo(initial.widths[1], 1);
+    expect(initial.selected).toBe(1);
+    expect(initial.indicator.background).toBe('rgb(36, 107, 75)');
+    expect(initial.indicator.height).toBe('3px');
+    expect(initial.widths).toHaveLength(2);
+    initial.widths.forEach((width) => expect(width).toBeCloseTo(initial.widths[0], 1));
     expect(initial.overflow).toBeLessThanOrEqual(1);
 
-    await control.getByRole('button', { name: /Quick add/ }).click();
+    await control.getByRole('tab', { name: /Quick add/ }).click();
     await expect(control).toHaveAttribute('data-segmented-active', 'quick-add');
-    await expect(control.getByRole('button', { name: /Quick add/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(control.locator('[aria-pressed="true"]')).toHaveCount(1);
-    const moved = await control.evaluate((node) => getComputedStyle(node, '::before').transform);
-    expect(moved).not.toBe(initial.transform);
+    await expect(control.getByRole('tab', { name: /Quick add/ })).toHaveAttribute('aria-selected', 'true');
+    await expect(control.locator('[aria-selected="true"]')).toHaveCount(1);
 
-    await control.getByRole('button', { name: /Quick add/ }).press('Home');
+    await control.getByRole('tab', { name: /Quick add/ }).press('Home');
     await expect(control).toHaveAttribute('data-segmented-active', 'meals');
-    await expect(control.getByRole('button', { name: /Meals/ })).toHaveAttribute('aria-pressed', 'true');
-    await control.getByRole('button', { name: /Meals/ }).press('End');
+    await expect(control.getByRole('tab', { name: /Meals/ })).toHaveAttribute('aria-selected', 'true');
+    await control.getByRole('tab', { name: /Meals/ }).press('End');
     await expect(control).toHaveAttribute('data-segmented-active', 'quick-add');
+    await expect(control.getByRole('tab', { name: /Quick add/ })).toHaveAttribute('aria-selected', 'true');
   }
 });
 
-test('meal and Quick Add cards toggle from their content', async ({ page }) => {
+test('Deep library is a separate context destination', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/pages/stack.html');
+  await page.getByRole('navigation', { name: 'Nutrition' }).getByRole('link', { name: 'Deep library' }).click();
+  await expect(page.locator('.deep-library-panel')).toBeVisible();
+  await expect(page.locator('.stack-library')).toHaveCount(0);
+  await expect(page.locator('[data-planner-mode]')).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: 'Nutrition' }).getByRole('link', { name: 'Deep library' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('[data-coverage-bar]')).toHaveCount(0);
+  await page.locator('.deep-library-panel').getByRole('tab', { name: 'Food & spices' }).click();
+  await expect(page.locator('.deep-library-panel [data-library-tab="food-spices"]')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('[data-library-content]')).toContainText('Beef Liver');
+  await page.locator('.context-nav').getByRole('link', { name: 'Daily plan' }).click();
+  await expect(page.locator('[data-planner-mode]')).toHaveCount(2);
+  await expect(page.locator('.deep-library-panel')).toHaveCount(0);
+  await expect(page.locator('[data-coverage-bar]')).toBeVisible();
+});
+
+test('compact coverage shows numeric macros at every width', async ({ page }) => {
+  for (const width of [1440, 1024, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/pages/stack.html');
+    const strip = page.locator('[data-coverage-bar] .macro-progress-strip');
+    await expect(strip.locator('[data-macro]')).toHaveCount(3);
+    for (const macro of await strip.locator('[data-macro] strong').all()) await expect(macro).toContainText(/\d+ g/);
+    await expect(strip).not.toContainText('Source ready');
+    const before = await strip.textContent();
+    await page.getByRole('tab', { name: /Quick add/ }).click();
+    await page.locator('[data-quick-card="chicken"] [data-quick-item]').click();
+    await expect(strip).not.toHaveText(before);
+  }
+});
+
+test('coverage rail stays visible through the middle of planner scrolling', async ({ page }) => {
+  for (const height of [900, 768, 700]) {
+    await page.setViewportSize({ width: 1440, height });
+    await page.goto('/pages/stack.html');
+    const dock = page.locator('.coverage-gap-dock');
+
+    await page.evaluate(() => window.scrollTo(0, 1000));
+    await expect.poll(() => dock.evaluate((node) => Math.round(node.getBoundingClientRect().top))).toBeGreaterThanOrEqual(64);
+    await expect.poll(() => dock.evaluate((node) => Math.round(node.getBoundingClientRect().bottom))).toBeLessThanOrEqual(height);
+  }
+});
+
+test('coverage rail remains available at the footer boundary', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 842 });
+  await page.goto('/pages/stack.html');
+  const dock = page.locator('.coverage-gap-dock');
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect.poll(() => dock.evaluate((node) => getComputedStyle(node).visibility)).toBe('visible');
+  await expect.poll(() => dock.evaluate((node) => node.hasAttribute('inert'))).toBe(false);
+  await expect(dock.getByRole('button', { name: /^Gaps/ })).toBeVisible();
+
+  await page.evaluate(() => window.scrollTo(0, 1000));
+  await expect.poll(() => dock.evaluate((node) => getComputedStyle(node).visibility)).toBe('visible');
+  await expect.poll(() => dock.evaluate((node) => node.hasAttribute('inert'))).toBe(false);
+});
+
+test('Carbs and Fats remain numeric after clearing the plan', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/pages/stack.html');
+  await page.locator('[data-clear-stack]').click();
+  await page.locator('.ui-confirm-dialog [data-confirm-submit]').click();
+  const strip = page.locator('.coverage-gap-dock .macro-progress-strip');
+  await expect(strip.locator('[data-macro="carbs"] strong')).toContainText('0 g');
+  await expect(strip.locator('[data-macro="fat"] strong')).toContainText('0 g');
+  await expect(strip.locator('[data-macro="carbs"]')).toHaveAttribute('data-macro-state', 'empty');
+  await expect(strip.locator('[data-macro="fat"]')).toHaveAttribute('data-macro-state', 'empty');
+});
+
+test('every builder item has numeric core macro data', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  const result = await page.evaluate(async () => {
+    const { BUILDER_ITEMS } = await import('/js/data/nutrition.js');
+    return {
+      count: BUILDER_ITEMS.length,
+      missing: BUILDER_ITEMS.filter((item) => ['protein', 'carbs', 'fat'].some((macro) => !Number.isFinite(item.nutrients?.[macro]))).map((item) => item.id),
+    };
+  });
+  expect(result.count).toBeGreaterThan(40);
+  expect(result.missing).toEqual([]);
+
+  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await page.locator('[data-quick-card="avocado"] [data-nutrition-detail-open]').click();
+  const detail = page.locator('[data-nutrition-detail-dialog]');
+  await expect(detail).toContainText('Total carbohydrate');
+  await expect(detail).toContainText('Total fat');
+  await detail.locator('[data-nutrition-detail-close]').click();
+});
+
+test('coverage dialog stays inside the viewport and its close control is actionable', async ({ page }) => {
+  for (const viewport of [{ width: 1440, height: 842 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/pages/stack.html');
+    const coverage = viewport.width <= 767 ? page.locator('.plan-readout') : page.locator('.coverage-gap-dock');
+    await coverage.getByRole('button', { name: 'All nutrients' }).click();
+    const dialog = page.locator('[data-coverage-dialog]');
+    await expect(dialog).toBeVisible();
+    const box = await dialog.boundingBox();
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+    expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+    await expect(dialog.locator('.ui-tooltip')).toHaveCount(0);
+    await expect(dialog.locator('[data-coverage-dialog-close]')).toBeVisible();
+    await dialog.locator('[data-coverage-dialog-close]').click();
+    await expect(dialog).not.toBeVisible();
+  }
+});
+
+test('meal and Quick Add cards open details with separate selection controls', async ({ page }) => {
   await page.goto('/pages/stack.html');
 
   const mealCard = page.locator('.meal-library-grid .meal-card').nth(1);
   await expect(mealCard.locator('[data-meal-toggle]')).toHaveAttribute('aria-pressed', 'false');
-  await mealCard.locator('h3').click();
+  await mealCard.locator('.meal-card-body-detail').click();
+  const dialog = page.locator('[data-nutrition-detail-dialog]');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('h2')).toContainText('Eggs, broccoli & potato');
+  await expect(mealCard.locator('[data-meal-toggle]')).toHaveAttribute('aria-pressed', 'false');
+  await dialog.locator('[data-nutrition-detail-close]').click();
+  await expect(dialog).not.toBeVisible();
+  await mealCard.locator('[data-meal-toggle]').click();
   await expect(mealCard.locator('[data-meal-toggle]')).toHaveAttribute('aria-pressed', 'true');
 
-  await page.getByRole('button', { name: /Quick add/ }).click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
   const quickCard = page.locator('.quick-item-grid .builder-item').first();
   await expect(quickCard.locator('[data-quick-item]')).toHaveAttribute('aria-pressed', 'false');
-  await quickCard.locator('strong').click();
+  await quickCard.locator('[data-nutrition-detail-open]').click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-detail-toggle="quick"]')).toHaveText('Add to plan');
+  await dialog.locator('[data-nutrition-detail-close]').click();
+  await expect(dialog).not.toBeVisible();
+  await quickCard.locator('[data-quick-item]').click();
   await expect(quickCard.locator('[data-quick-item]')).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('serving actions progressively appear after an item is selected', async ({ page }) => {
+test('gram controls progressively appear inside the detail dialog', async ({ page }) => {
   await page.goto('/pages/stack.html');
 
   const mealCard = page.locator('.meal-library-grid .meal-card').nth(1);
-  const mealServingToggle = mealCard.locator('[data-meal-serving-toggle]');
-  await expect(mealServingToggle).toBeHidden();
-  await mealCard.locator('h3').click();
-  await expect(mealServingToggle).toBeVisible();
-  await expect(mealServingToggle).toHaveText('Adjust servings');
+  await mealCard.locator('.meal-card-body-detail').click();
+  const dialog = page.locator('[data-nutrition-detail-dialog]');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-gram-control]')).toHaveCount(0);
+  await dialog.locator('[data-detail-toggle="meal"]').click();
+  await expect(dialog.locator('[data-gram-control]')).toHaveCount(3);
+  await expect(dialog.locator('[data-gram-input]').first()).toHaveValue('100');
+  await expect(dialog.locator('[data-detail-toggle="meal"]')).toHaveText('Remove from plan');
+  await dialog.locator('[data-nutrition-detail-close]').click();
+  await expect(dialog).not.toBeVisible();
 
-  await page.getByRole('button', { name: /Quick add/ }).click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
   const quickCard = page.locator('.quick-item-grid .builder-item').first();
-  const quickServingToggle = quickCard.locator('[data-quick-serving-toggle]');
-  await expect(quickServingToggle).toBeHidden();
-  await quickCard.locator('strong').click();
-  await expect(quickServingToggle).toBeVisible();
-  await expect(quickServingToggle).toHaveText('Adjust servings');
+  await quickCard.locator('[data-nutrition-detail-open]').click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-gram-control]')).toHaveCount(0);
+  await dialog.locator('[data-detail-toggle="quick"]').click();
+  await expect(dialog.locator('[data-gram-control]')).toBeVisible();
 });
 
-test('meal ingredients have independent serving controls', async ({ page }) => {
+test('meal ingredients have independent gram controls', async ({ page }) => {
   await page.goto('/pages/stack.html');
   const mealCard = page.locator('.meal-library-grid .meal-card').first();
-  const ingredientControls = mealCard.locator('[data-portion-scope="meal-item"]');
-  const mealControl = mealCard.locator('[data-portion-scope="meal"]');
+  await mealCard.locator('.meal-card-body-detail').click();
+  const dialog = page.locator('[data-nutrition-detail-dialog]');
+  await expect(dialog).toBeVisible();
+  const ingredientControls = dialog.locator('[data-gram-control]');
   await expect(ingredientControls).toHaveCount(4);
-  await expect(mealControl).toBeHidden();
-  await expect(mealCard.locator('[data-meal-serving-toggle]')).toHaveText('Adjust servings');
-  await mealCard.locator('[data-meal-serving-toggle]').click();
-  await expect(ingredientControls.first()).toBeVisible();
-  await expect(mealControl.locator('[data-portion-input]')).toHaveValue('1');
-
-  await mealControl.locator('[data-portion-action="increase"]').click();
-  await expect(mealControl.locator('[data-portion-input]')).toHaveValue('1.25');
-
-  const firstInput = ingredientControls.nth(0).locator('[data-portion-input]');
-  const secondInput = ingredientControls.nth(1).locator('[data-portion-input]');
-  await firstInput.fill('2');
-  await firstInput.blur();
-  await expect(firstInput).toHaveValue('2');
-  await expect(secondInput).toHaveValue('1');
+  const firstInput = ingredientControls.nth(0).locator('[data-gram-input]');
+  const secondInput = ingredientControls.nth(1).locator('[data-gram-input]');
+  await expect(firstInput).toHaveValue('30');
+  await expect(secondInput).toHaveValue('60');
+  await firstInput.fill('60');
+  await firstInput.press('Tab');
+  await expect(firstInput).toHaveValue('60');
+  await expect(secondInput).toHaveValue('60');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ml-daily-current')));
-  expect(saved.mealItemQuantities['chia-protein-oatmeal'].whey).toBe(2);
+  expect(saved.mealItemGrams['chia-protein-oatmeal'].whey).toBe(60);
 });
 
 test('Quick Add includes Natural Smooth Peanut Butter', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  await page.getByRole('button', { name: /Quick add/ }).click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
   await page.locator('[data-planner-search]').fill('peanut');
   await expect(page.locator('.quick-item-grid .builder-item')).toHaveCount(1);
   await expect(page.locator('.quick-item-grid .builder-item').first()).toContainText('Natural Smooth Peanut Butter');
@@ -702,13 +881,15 @@ test('coverage omits removed nutrient requirements', async ({ page }) => {
 test('nutrition coverage identifies Singapore references separately from planning targets', async ({ page }) => {
   await page.goto('/pages/stack.html');
   const mobile = page.viewportSize().width <= 767;
-  const coverage = mobile ? page.locator('[data-mobile-coverage-panel]') : page.locator('.plan-readout');
-  if (mobile) await coverage.locator('> summary').click();
-  await expect(coverage.locator('.coverage-summary-note')).toContainText('HealthHub RDA');
-  await expect(coverage.locator('.coverage-summary-note')).toContainText('DRI/AI or planning targets');
-  await expect(coverage.locator('.coverage-row').filter({ hasText: 'Vitamin D' }).locator('.coverage-label')).toContainText('/ 2.5 mcg');
-  await expect(coverage.locator('.coverage-row').filter({ hasText: 'Calcium' }).locator('.coverage-label')).toContainText('/ 800 mg');
-  await expect(coverage.locator('.coverage-summary-note a')).toHaveAttribute('href', 'https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/recommended_dietary_allowances');
+  const coverage = mobile ? page.locator('.plan-readout') : page.locator('.plan-readout');
+  await coverage.getByRole('button', { name: 'All nutrients' }).click();
+  const dialog = page.locator('[data-coverage-dialog]');
+  await expect(dialog.locator('.coverage-summary-note')).toContainText('HealthHub RDA');
+  await expect(dialog.locator('.coverage-summary-note')).toContainText('DRI/AI or planning targets');
+  await expect(dialog.locator('.coverage-summary-note a')).toHaveAttribute('href', 'https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/recommended_dietary_allowances');
+  await expect(dialog.locator('.coverage-row').filter({ hasText: 'Vitamin D' }).locator('.coverage-label')).toContainText('/ 2.5 mcg');
+  await expect(dialog.locator('.coverage-row').filter({ hasText: 'Calcium' }).locator('.coverage-label')).toContainText('/ 800 mg');
+  await dialog.locator('[data-coverage-dialog-close]').click();
 });
 
 test('nutrition coverage treats a rounded 80% as covered', async ({ page }) => {
@@ -723,30 +904,58 @@ test('nutrition coverage treats a rounded 80% as covered', async ({ page }) => {
   })));
   await page.reload();
   const mobile = page.viewportSize().width <= 767;
-  const coverage = mobile ? page.locator('[data-mobile-coverage-panel]') : page.locator('.plan-readout');
-  if (mobile) await coverage.locator('> summary').click();
-  const choline = coverage.locator('.coverage-row').filter({ hasText: 'Choline' });
+  const coverage = mobile ? page.locator('.plan-readout') : page.locator('.plan-readout');
+  await coverage.getByRole('button', { name: 'All nutrients' }).click();
+  const choline = page.locator('[data-coverage-dialog] .coverage-row').filter({ hasText: 'Choline' });
   await expect(choline.locator('.coverage-fill')).toHaveAttribute('style', /width:80%/);
   await expect(choline).toHaveClass(/coverage-row-covered/);
+  await page.locator('[data-coverage-dialog]').locator('[data-coverage-dialog-close]').click();
   await expect(coverage.locator('.coverage-priority-item').filter({ hasText: 'Choline' })).toHaveCount(0);
 });
 
-test('Daily Plan progressively presents nutrient gaps', async ({ page }) => {
+test('Daily Plan progressively presents nutrient gaps in a dialog', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  const mobile = page.viewportSize().width <= 767;
-  const coverage = mobile ? page.locator('[data-mobile-coverage-panel]') : page.locator('.plan-readout');
-  if (mobile) await coverage.locator('> summary').click();
-  await expect(coverage.locator('.coverage-priority')).toBeVisible();
-  await expect(coverage.locator('.coverage-priority-item')).toHaveCount(3);
-  await expect(coverage.locator('.coverage-all')).not.toHaveAttribute('open', '');
-  await expect(coverage.locator('.coverage-all > summary')).toContainText('All nutrient coverage');
-  await expect(coverage.locator('.coverage-priority-item').first()).toContainText('Food-first:');
+  await expect(page.locator('[data-coverage-bar] .coverage-priority')).toHaveCount(0);
+  await page.getByRole('button', { name: /^Gaps/ }).click();
+  const dialog = page.locator('[data-coverage-dialog]');
+  await expect(dialog.locator('.coverage-priority-item').first()).toContainText('Food-first:');
+  expect(await dialog.locator('.coverage-priority-item').count()).toBeGreaterThan(0);
+});
+
+test('coverage settings, unresolved gaps and all nutrients open in modals', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  const dock = page.viewportSize().width <= 767 ? page.locator('.plan-readout') : page.locator('.coverage-gap-dock');
+  const dialog = page.locator('[data-coverage-dialog]');
+
+  await dock.getByRole('button', { name: 'Settings' }).click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('h2')).toHaveText('Coverage settings');
+  await expect(dialog.locator('[data-body-weight]')).toHaveValue('75');
+  await dialog.locator('[data-coverage-dialog-close]').click();
+  await expect(dialog).not.toBeVisible();
+
+  await dock.getByRole("button", { name: /^Gaps/ }).click();
+  const gap = dialog.locator('[data-coverage-open="gap"]').first();
+  const gapName = await gap.locator('strong').innerText();
+  await gap.click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('h2')).toHaveText(gapName);
+  await expect(dialog.locator('.coverage-priority-item .coverage-fill')).toBeVisible();
+  await dialog.locator('[data-coverage-dialog-close]').click();
+  await expect(dialog).not.toBeVisible();
+
+  await dock.getByRole('button', { name: 'All nutrients' }).click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('h2')).toHaveText('All nutrients');
+  await expect(dialog.locator('.coverage-legend-item')).toHaveCount(4);
+  await expect(dialog.locator('.coverage-all-modal .coverage-row')).toHaveCount(18);
+  await dialog.locator('[data-coverage-dialog-close]').click();
+  await expect(dialog).not.toBeVisible();
 });
 
 test('Clear plan uses centered confirmation and a layout-independent toast', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pages/stack.html');
-  await page.locator('.meal-library-grid .meal-card').nth(1).locator('h3').click();
   const clear = page.locator('[data-clear-stack]');
   await clear.scrollIntoViewIfNeeded();
   const before = await clear.boundingBox();
@@ -755,8 +964,9 @@ test('Clear plan uses centered confirmation and a layout-independent toast', asy
   const dialog = page.locator('.ui-confirm-dialog');
   await expect(dialog).toBeVisible();
   const dialogBox = await dialog.boundingBox();
-  expect(Math.abs(dialogBox.x - (390 - dialogBox.width) / 2)).toBeLessThanOrEqual(1);
-  expect(Math.abs(dialogBox.y - (844 - dialogBox.height) / 2)).toBeLessThanOrEqual(1);
+  const viewport = await page.evaluate(() => ({ width: document.documentElement.clientWidth, height: document.documentElement.clientHeight }));
+  expect(Math.abs(dialogBox.x - (viewport.width - dialogBox.width) / 2)).toBeLessThanOrEqual(1);
+  expect(Math.abs(dialogBox.y - (viewport.height - dialogBox.height) / 2)).toBeLessThanOrEqual(1);
 
   await dialog.locator('[data-confirm-submit]').click();
   const toast = page.locator('[data-ui-toast]');
@@ -838,8 +1048,9 @@ test('destructive confirmation keeps focus and requires an explicit dismissal', 
   await expect(dialog.locator('h2')).toHaveAttribute('id', 'confirm-dialog-title');
   await expect(dialog.locator('[data-confirm-cancel]')).toBeFocused();
   const box = await dialog.boundingBox();
+  const viewport = await page.evaluate(() => ({ width: document.documentElement.clientWidth }));
   expect(box.width).toBeLessThanOrEqual(520);
-  expect(Math.abs(box.x - (390 - box.width) / 2)).toBeLessThanOrEqual(1);
+  expect(Math.abs(box.x - (viewport.width - box.width) / 2)).toBeLessThanOrEqual(1);
 
   await page.mouse.click(2, 2);
   await expect(dialog).toBeVisible();
@@ -848,24 +1059,27 @@ test('destructive confirmation keeps focus and requires an explicit dismissal', 
   await expect(clear).toBeFocused();
 });
 
-test('save-meal modal supports light dismiss and returns focus to its trigger', async ({ page }) => {
+test('save-meal modal prevents accidental dismissal and returns focus to its trigger', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pages/stack.html');
-  await page.getByRole('button', { name: /Quick add/ }).click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
   const quickCard = page.locator('.quick-item-grid .builder-item').first();
-  await quickCard.locator('strong').click();
+  await quickCard.locator('[data-quick-item]').click();
   const trigger = page.locator('[data-meal-compose-open]');
   await expect(trigger).toBeEnabled();
   await trigger.click();
 
   const dialog = page.locator('.meal-save-dialog');
-  await expect(dialog).toHaveAttribute('closedby', 'any');
+  await expect(dialog).toHaveAttribute('closedby', 'closerequest');
   await expect(dialog.locator('[data-meal-dialog-name]')).toBeFocused();
   const box = await dialog.boundingBox();
+  const viewport = await page.evaluate(() => ({ width: document.documentElement.clientWidth }));
   expect(box.width).toBeLessThanOrEqual(520);
-  expect(Math.abs(box.x - (390 - box.width) / 2)).toBeLessThanOrEqual(1);
+  expect(Math.abs(box.x - (viewport.width - box.width) / 2)).toBeLessThanOrEqual(1);
 
   await page.mouse.click(2, 2);
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
 });

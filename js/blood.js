@@ -74,15 +74,13 @@ export function renderBlood() {
       count: `${APOB_EFFECTS.length} interventions`,
       id: 'blood-apob',
       body: `
-      <div class="stack-table apob-table">
-        <div class="stack-table-row stack-table-header">
-          <span>Intervention</span><span>Also helps</span><span>Lowers ApoB?</span>
-        </div>
-        ${APOB_EFFECTS.map(r => `
-          <div class="stack-table-row">
-            <span>${r[0]}</span><span>${r[1]}</span><span>${r[2]}</span>
-          </div>
-        `).join("")}
+      <div class="apob-table-wrap">
+        <table class="apob-table">
+          <thead><tr><th scope="col">Intervention</th><th scope="col">Also helps</th><th scope="col">Lowers ApoB?</th></tr></thead>
+          <tbody>${APOB_EFFECTS.map(r => `
+            <tr><th scope="row" data-label="Intervention">${escapeHTML(r[0])}</th><td data-label="Also helps">${escapeHTML(r[1])}</td><td data-label="Lowers ApoB?">${escapeHTML(r[2])}</td></tr>
+          `).join("")}</tbody>
+        </table>
       </div>
     `})}
     ${disclosureSection({

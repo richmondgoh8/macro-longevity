@@ -87,6 +87,8 @@ export async function exportData() {
         mealPortions: currentDay.mealQuantities && typeof currentDay.mealQuantities === 'object' ? currentDay.mealQuantities : {},
         mealItemPortions: currentDay.mealItemQuantities && typeof currentDay.mealItemQuantities === 'object' ? currentDay.mealItemQuantities : {},
         quickItemPortions: currentDay.quickItemQuantities && typeof currentDay.quickItemQuantities === 'object' ? currentDay.quickItemQuantities : {},
+        mealItemGrams: currentDay.mealItemGrams && typeof currentDay.mealItemGrams === 'object' ? currentDay.mealItemGrams : {},
+        quickItemGrams: currentDay.quickItemGrams && typeof currentDay.quickItemGrams === 'object' ? currentDay.quickItemGrams : {},
         currentBodyWeightKg: currentDay.bodyWeightKg,
         highRoiFoods: HIGH_ROI_FOODS,
         mitochondrialSupport: MITOCHONDRIAL_SUPPORT,
@@ -114,7 +116,7 @@ export async function exportData() {
     if (data.savedMeals.length) data.savedMeals.forEach((meal) => { md += `- **${meal.name}:** ${meal.items.join(', ')}\n`; });
     else md += `No saved meals on this device.\n`;
     md += `\n### Current plan\n\n`;
-    md += `- **Meals:** ${data.selectedMealIds.join(', ') || 'None'}\n- **Quick additions:** ${data.quickAddedItems.join(', ') || 'None'}\n- **Meal portions:** ${JSON.stringify(data.mealPortions)}\n- **Meal ingredient portions:** ${JSON.stringify(data.mealItemPortions)}\n- **Quick-item portions:** ${JSON.stringify(data.quickItemPortions)}\n- **Body weight:** ${data.currentBodyWeightKg || 'Not set'} kg\n`;
+    md += `- **Meals:** ${data.selectedMealIds.join(', ') || 'None'}\n- **Quick additions:** ${data.quickAddedItems.join(', ') || 'None'}\n- **Meal ingredient grams:** ${JSON.stringify(data.mealItemGrams)}\n- **Quick food grams:** ${JSON.stringify(data.quickItemGrams)}\n- **Supplement servings:** ${JSON.stringify({ meals: data.mealItemPortions, quick: data.quickItemPortions })}\n- **Body weight:** ${data.currentBodyWeightKg || 'Not set'} kg\n`;
     md += `\n### Saved legacy stacks\n\n`;
     if (data.savedStacks.length) data.savedStacks.forEach((stack) => { md += `- **${stack.name}:** ${stack.items.join(', ')}\n`; });
     else md += `No saved stacks on this device.\n`;

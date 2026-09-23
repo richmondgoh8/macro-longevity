@@ -12,13 +12,15 @@
     <meta property="og:url" content="https://macro-longevity.com/pages/finance.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#F7F8F3">
     <title>Finance — Macro Longevity</title>
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/finance-layout.css">
     <link rel="stylesheet" href="/css/tooltip.css">
     <link rel="expect" href="#view-transition-anchor" blocking="render">
+    <link rel="stylesheet" href="/css/wellness.css">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -47,22 +49,23 @@
                 <p class="page-desc">Investment combos for Singapore, a FIRE calculator with 4% rule and CPF LIFE estimates, plus a passive income tracker.</p>
             </div>
         </section>
+        <div class="sticky-pin-layout" data-sticky-pin-layout><div class="sticky-pin-content">
 
-        <section class="section">
-            <div class="section-inner">
-                <div class="meal-tabs" id="financeTabs" data-finance-tabs role="tablist" aria-label="Finance views">
-                    <button type="button" class="meal-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-label="Investment combos" aria-selected="true" aria-controls="financeInvestments"><span class="finance-tab-full">Investment combos</span><span class="finance-tab-short" aria-hidden="true">Combos</span></button>
-                    <button type="button" class="meal-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-label="FIRE calculator" aria-selected="false" aria-controls="financeFire"><span class="finance-tab-full">FIRE calculator</span><span class="finance-tab-short" aria-hidden="true">FIRE</span></button>
-                    <button type="button" class="meal-tab" id="finance-tab-income" data-finance-tab="income" role="tab" aria-label="Income tracker" aria-selected="false" aria-controls="financeIncome"><span class="finance-tab-full">Income tracker</span><span class="finance-tab-short" aria-hidden="true">Income</span></button>
+        <section class="section ui-tabs-section">
+            <div class="section-inner ui-tabs-shell">
+                <div class="ui-tabs ui-tabs-equal" id="financeTabs" data-finance-tabs role="tablist" aria-label="Finance views">
+                    <button type="button" class="ui-tab active" id="finance-tab-investments" data-finance-tab="investments" role="tab" aria-label="Investment combos" aria-selected="true" aria-controls="financeInvestments"><span class="finance-tab-full">Investment combos</span><span class="finance-tab-short" aria-hidden="true">Combos</span></button>
+                    <button type="button" class="ui-tab" id="finance-tab-fire" data-finance-tab="fire" role="tab" aria-label="FIRE calculator" aria-selected="false" aria-controls="financeFire"><span class="finance-tab-full">FIRE calculator</span><span class="finance-tab-short" aria-hidden="true">FIRE</span></button>
+                    <button type="button" class="ui-tab" id="finance-tab-income" data-finance-tab="income" role="tab" aria-label="Income tracker" aria-selected="false" aria-controls="financeIncome"><span class="finance-tab-full">Income tracker</span><span class="finance-tab-short" aria-hidden="true">Income</span></button>
                 </div>
             </div>
         </section>
 
-        <section class="section" id="financeInvestments" role="tabpanel" aria-labelledby="finance-tab-investments">
+        <section class="section ui-tab-panel" id="financeInvestments" role="tabpanel" aria-labelledby="finance-tab-investments">
             <div class="section-inner" id="investments-app"></div>
         </section>
 
-        <section class="section" id="financeFire" role="tabpanel" aria-labelledby="finance-tab-fire" hidden>
+        <section class="section ui-tab-panel" id="financeFire" role="tabpanel" aria-labelledby="finance-tab-fire" hidden>
             <div class="section-inner fire-calc">
                 <div class="page-header fire-subheader">
                     <h2 class="page-title">Singapore FIRE Calculator</h2>
@@ -143,8 +146,8 @@
             </div>
         </section>
 
-        <section class="section" id="financeIncome" role="tabpanel" aria-labelledby="finance-tab-income" hidden>
-            <div class="section-inner pi-section" id="piSection">
+        <section class="section ui-tab-panel" id="financeIncome" role="tabpanel" aria-labelledby="finance-tab-income" hidden>
+            <div class="section-inner ui-panel pi-section" id="piSection">
                 <div class="ui-section-head">
                     <p class="eyebrow">Cash flow</p>
                     <h2>Passive income tracker</h2>
@@ -154,6 +157,7 @@
                 <div id="piStatus" class="pi-status" role="status" aria-live="polite"></div>
             </div>
         </section>
+        </div></div>
     </main>
 
     <footer class="footer">

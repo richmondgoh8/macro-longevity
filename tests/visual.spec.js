@@ -42,10 +42,26 @@ test('Ingredient guide filtered state visual baseline', async ({ page }) => {
   await expect(page.locator('[data-avoid-guide]')).toHaveScreenshot('ingredients-filtered.png');
 });
 
+test('Finance income tracker empty state visual baseline', async ({ page }) => {
+  await page.goto('/pages/finance.html');
+  await page.evaluate(() => localStorage.removeItem('passiveIncome'));
+  await page.getByRole('tab', { name: 'Income tracker' }).click();
+  await expect(page.locator('.ui-empty-state')).toBeVisible();
+  await expect(page).toHaveScreenshot('finance-income-empty.png', { fullPage: true });
+});
+
 test('planner quick-add state visual baseline', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  await page.getByRole('button', { name: /Quick add/ }).click();
-  await expect(page.locator('.meal-planner')).toHaveScreenshot('nutrition-quick-add.png');
+  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await expect(page.locator('#planner-quick-add')).toBeVisible();
+  // Capture the user's viewport, not a 53-card element taller than the browser's
+  // screenshot surface. Full-list behavior is covered by the interaction specs.
+  await page.locator('#planner-quick-add').evaluate(section => {
+    const header = document.querySelector('.nav').getBoundingClientRect().height;
+    const coverage = document.querySelector('[data-coverage-bar]').getBoundingClientRect().height;
+    scrollTo(0, section.getBoundingClientRect().top + scrollY - header - coverage - 24);
+  });
+  await expect(page).toHaveScreenshot('nutrition-quick-add.png');
 });
 
 test('destructive modal visual baseline', async ({ page }) => {
@@ -58,8 +74,8 @@ test('destructive modal visual baseline', async ({ page }) => {
 
 test('save-meal modal visual baseline', async ({ page }) => {
   await page.goto('/pages/stack.html');
-  await page.getByRole('button', { name: /Quick add/ }).click();
-  await page.locator('.quick-item-grid .builder-item').first().locator('strong').click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await page.locator('.quick-item-grid .builder-item').first().locator('[data-quick-item]').click();
   await page.locator('[data-meal-compose-open]').click();
   await expect(page).toHaveScreenshot('modal-save-meal.png');
 });
@@ -81,4 +97,19 @@ test('icon-control tooltip visual baseline', async ({ page }) => {
   await trigger.focus();
   await expect(trigger.locator('.ui-tooltip')).toHaveAttribute('data-tooltip-open', 'true');
   await expect(trigger.locator('.ui-tooltip')).toHaveScreenshot('tooltip-icon-control.png');
+});
+
+test('compact coverage at the footer visual baseline', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  await expect(page.locator('[data-planner-ready]')).toHaveAttribute('aria-busy', 'false');
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(page.locator('[data-coverage-bar]')).toHaveClass(/is-pinned/);
+  await expect(page).toHaveScreenshot('nutrition-pinned-footer.png');
+});
+
+test('all nutrient details visual baseline', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  await page.getByRole('button', { name: 'All nutrients', exact: true }).click();
+  await expect(page.locator('[data-coverage-dialog]')).toBeVisible();
+  await expect(page).toHaveScreenshot('nutrition-all-nutrients.png');
 });

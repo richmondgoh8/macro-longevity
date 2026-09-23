@@ -1,0 +1,43 @@
+@layer legacy {.blood-prep { max-width: 720px; margin: 0 auto var(--space-10); padding: var(--space-5); border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-alt); }
+.blood-prep-title { font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--color-text); margin-bottom: var(--space-3); }
+.blood-prep-text { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-normal); margin-bottom: var(--space-2); }
+.blood-tier { margin-bottom: var(--space-12); }
+.blood-tier-head { max-width: 720px; margin: 0 auto var(--space-5); }
+.blood-tier-title { font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--color-text); margin-bottom: var(--space-2); }
+.blood-tier-desc { font-size: var(--text-sm); color: var(--color-text-muted); line-height: var(--leading-normal); }
+.blood-grid { gap: var(--space-4); grid-template-columns: repeat(2, minmax(0px, 1fr)); max-width: 1080px; margin: 0px auto; display: grid; }
+.blood-card { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4)var(--space-5); gap: var(--space-2); flex-direction: column; min-width: 0px; display: flex; }
+.blood-card-head { justify-content: space-between; align-items: baseline; gap: var(--space-3); min-width: 0px; display: flex; }
+.blood-card-name { font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--color-text); min-width: 0px; }
+.blood-card-freq { font-size: var(--text-sm); color: var(--color-text-muted); text-align: right; flex-shrink: 1; }
+.blood-card-range { font-size: var(--text-sm); line-height: var(--leading-snug); color: var(--color-text-secondary); }
+.blood-range { font-family: var(--font-mono); font-weight: var(--weight-semi); color: var(--color-primary); }
+.blood-card-why { font-size: var(--text-sm); line-height: var(--leading-normal); color: var(--color-text-secondary); }
+.blood-card-low { background: var(--evidence-skip-bg); border-style: dashed; border-color: var(--color-border); }
+.apob-table { max-width: 720px; margin: 0px auto; }
+.blood-tier.progressive-section { padding: 0px; }
+.blood-tier.progressive-section .blood-grid { padding-top: var(--space-5); }
+.blood-test-row { padding: 0px; overflow: clip; }
+.blood-test-row > summary { gap: var(--space-2); min-height: 70px; padding: var(--space-4); cursor: pointer; grid-template-columns: minmax(0px, 1fr); align-items: start; list-style: none; display: grid; }
+.blood-test-row > summary::-webkit-details-marker { display: none; }
+.blood-test-row > summary > span:first-child { gap: var(--space-2); min-width: 0px; display: grid; }
+.blood-test-meta { justify-content: flex-start; align-items: center; gap: var(--space-2); flex-wrap: wrap; min-width: 0px; display: flex; }
+.blood-test-detail { padding: 0 var(--space-4)var(--space-4); border-top: 1px solid var(--color-border-light); }
+.blood-test-detail .blood-card-why { margin-top: var(--space-4); }
+@media (width <= 767px) {.blood-test-row > summary { grid-template-columns: minmax(0px, 1fr); }}
+.blood-grid { column-count: 2; column-gap: var(--space-4); display: block; }
+.blood-grid > .blood-card { width: 100%; margin: 0 0 var(--space-4); break-inside: avoid; display: flex; }
+.blood-card-range { gap: 4px; display: grid; }
+.blood-range { overflow-wrap: break-word; word-break: normal; display: block; }
+@media (width <= 767px) {.blood-grid { column-count: 1; }}
+.blood-prep { padding: 0px; overflow: clip; }
+.blood-prep > summary { justify-content: space-between; align-items: center; gap: var(--space-4); min-height: 72px; padding: var(--space-5); cursor: pointer; list-style: none; display: flex; }
+.blood-prep > summary::-webkit-details-marker { display: none; }
+.blood-prep > summary::after { content: "Show details"; color: var(--color-primary); font-size: var(--text-label); font-weight: var(--weight-semi); white-space: nowrap; }
+.blood-prep[open] > summary::after { content: "Hide details"; }
+.blood-prep-title, .blood-prep-summary { margin: 0px; display: block; }
+.blood-prep-summary { margin-top: var(--space-1); color: var(--color-text-secondary); font-size: var(--text-label); font-weight: var(--weight-normal); }
+.blood-prep-body { padding: 0 var(--space-5)var(--space-5); border-top: 1px solid var(--color-border-light); }
+.blood-prep-body .blood-prep-text:first-child { margin-top: var(--space-4); }
+@media (width <= 767px) {.blood-prep > summary { min-height: 64px; padding: var(--space-4); }
+.blood-prep-body { padding: 0 var(--space-4)var(--space-4); }}}

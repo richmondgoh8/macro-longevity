@@ -11,6 +11,9 @@ export default defineConfig({
   workers: 1,
   reporter: process.env.CI ? [['html', { open: 'never' }], ['github']] : 'list',
   use: {
+    // Use the same Chromium binary in headed and headless runs, including font metrics.
+    channel: 'chromium',
+    launchOptions: { ignoreDefaultArgs: ['--hide-scrollbars'] },
     baseURL: 'http://127.0.0.1:4173',
     serviceWorkers: 'block',
     trace: 'retain-on-failure',
