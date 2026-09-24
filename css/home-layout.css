@@ -76,3 +76,13 @@
 @media (forced-colors: active) {.split-screen-hero-visual { color: canvastext; background: canvas; border-color: canvastext; }
 .split-screen-hero-visual-kicker, .hero-pillar-card, .hero-pillar-copy strong, .split-screen-hero-visual-meta, .hero-pillar-number, .hero-pillar-copy span { color: canvastext; }
 .hero-pillar-card { background: canvas; border-color: canvastext; }}}
+
+.split-screen-hero .split-screen-hero-visual { align-self: center; gap: var(--space-5); }
+.split-screen-hero .split-screen-hero-visual-head { padding-bottom: var(--space-3); border-bottom: 2px solid var(--color-border); }
+.split-screen-hero .split-screen-hero-visual-kicker { color: var(--color-primary-dark); font-weight: var(--weight-bold); }
+.split-screen-hero .hero-pillar-card { min-height: 112px; padding: var(--space-4); border-left: 3px solid var(--color-primary); }
+.split-screen-hero .hero-pillar-card .hero-pillar-number { color: var(--color-primary-dark); font-weight: var(--weight-bold); }
+.split-screen-hero .hero-pillar-card .hero-pillar-copy strong { font-size: var(--text-sm); }
+@media (width <= 599px) {
+  .split-screen-hero .hero-pillar-card { min-height: 96px; justify-content: flex-start; gap: var(--space-2); }
+}

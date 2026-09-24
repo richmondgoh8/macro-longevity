@@ -704,7 +704,7 @@ function handleTimerAction(id, action) {
       if (el2.time) el2.time.textContent = `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
       if (el2.label) el2.label.textContent = "Ready";
     } else if (st.type === "intervals") {
-      if (el2.time) el2.time.textContent = "00:00";
+      if (el2.time) el2.time.textContent = `${String(Math.floor(st.config.warmup / 60)).padStart(2,"0")}:${String(st.config.warmup % 60).padStart(2,"0")}`;
       if (el2.label) el2.label.textContent = "Ready";
       if (el2.phase) el2.phase.textContent = "Norwegian 4×4";
       if (el2.bar) el2.bar.style.transform = "scaleX(1)";
@@ -843,7 +843,7 @@ function vo2TimerHTML(pillar) {
         <span class="timer-phase-label" id="phase-${id}">${pillar.protocol.name}</span>
       </div>
        <div class="timer-display">
-         <span class="timer-time" id="time-${id}" role="timer" aria-label="Time remaining" aria-live="off">00:00</span>
+         <span class="timer-time" id="time-${id}" role="timer" aria-label="Time remaining" aria-live="off">${String(Math.floor(t.warmup / 60)).padStart(2,"0")}:${String(t.warmup % 60).padStart(2,"0")}</span>
         <div class="timer-bar-track"><div class="timer-bar-fill" id="bar-${id}" style="width:100%"></div></div>
       </div>
       <div class="timer-controls">

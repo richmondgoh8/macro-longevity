@@ -60,6 +60,18 @@ const P='.nav-links a.nav-link,.bottom-nav-item,[data-context-link]',F=new Set;
 function prefetchNavigationPage(l){if(navigator.connection?.saveData||!l||l.target==='_blank')return;const u=new URL(l.href),h=u.pathname+u.search;if(u.origin!==location.origin||u.pathname===location.pathname||F.has(h))return;F.add(h);const p=document.createElement('link');p.rel='prefetch';p.href=u.href;document.head.append(p)}
 ['pointerover','focusin'].forEach(t=>document.addEventListener(t,e=>{const l=e.target.closest?.(P);if(l)prefetchNavigationPage(l)},true));
 
+if (location.pathname === '/') {
+  window.addEventListener('load', () => setTimeout(() => {
+    if (navigator.connection?.saveData || document.visibilityState !== 'visible') return;
+    ['/js/stack.js', '/js/data/nutrition.js', '/css/nutrition-layout.css'].forEach((href) => {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = href;
+      document.head.append(link);
+    });
+  }, 800), { once: true });
+}
+
 const LONG_PAGE_ROUTES = new Set(['/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html', '/pages/finance.html']);
 const initLongPageNavigation = () => {
   if (!LONG_PAGE_ROUTES.has(window.location.pathname)) return;

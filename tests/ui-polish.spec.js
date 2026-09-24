@@ -56,6 +56,7 @@ test('homepage uses a split-screen hero with a linked protocol map', async ({ pa
       visualLabel: visual.getAttribute('aria-label'),
       mapLinks: [...visual.querySelectorAll('.hero-pillar-card')].map((link) => new URL(link.href).pathname + new URL(link.href).hash),
       ctaInContent: Boolean(content.querySelector('.hero-actions')),
+      mapBottomSpace: visualBox.bottom - visual.querySelector('.hero-pillar-grid').getBoundingClientRect().bottom,
     };
   });
   expect(desktop.display).toBe('grid');
@@ -65,6 +66,7 @@ test('homepage uses a split-screen hero with a linked protocol map', async ({ pa
   expect(desktop.visualLabel).toBe('Protocol pillars');
   expect(desktop.mapLinks).toEqual(['/pages/blood.html', '/pages/protocol.html#biology', '/pages/workout.html', '/pages/stack.html']);
   expect(desktop.ctaInContent).toBe(true);
+  expect(desktop.mapBottomSpace).toBeLessThanOrEqual(32);
 
   await page.setViewportSize({ width: 900, height: 900 });
   await page.goto('/');
@@ -178,6 +180,30 @@ test('sticky rail tracks section anchors and preserves keyboard navigation', asy
   await page.getByRole('link', { name: 'Biology' }).click();
   await expect(page).toHaveURL(/#biology$/);
   await expect(page.getByRole('link', { name: 'Biology' })).toHaveAttribute('aria-current', 'location');
+});
+
+test('section rail underlines the active item and clears the context tabs', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/pages/blood.html');
+    await expect(page.locator('.sticky-pin-link')).toHaveCount(7);
+    const gap = await page.locator('.sticky-pin-layout').evaluate((node) => {
+      const nav = document.querySelector('.context-nav').getBoundingClientRect();
+      const rail = node.querySelector('.sticky-pin-rail').getBoundingClientRect();
+      return rail.top - nav.bottom;
+    });
+    expect(gap).toBeGreaterThanOrEqual(16);
+    const first = page.locator('.sticky-pin-link').first();
+    await first.click();
+    await expect(first).toHaveAttribute('aria-current', 'location');
+    const layout = await first.evaluate((active) => {
+      const style = getComputedStyle(active);
+      return { underline: style.borderBottomColor, leftBorder: style.borderInlineStartWidth, background: style.backgroundColor };
+    });
+    expect(layout.underline).toBe('rgb(36, 107, 75)');
+    expect(layout.leftBorder).toBe('0px');
+    expect(layout.background).toBe('rgba(0, 0, 0, 0)');
+  }
 });
 
 test('sticky rail controls mirror Training views', async ({ page }) => {
@@ -403,14 +429,21 @@ test('Quick-add quantity controls and hover tips stay inside their bounds', asyn
       const plus = control.querySelector(gram ? '[data-gram-action="increase"]' : '[data-portion-action="increase"]');
       const rect = (node) => node.getBoundingClientRect();
       const dialogRect = rect(dialog);
+      const contentRect = rect(dialog.querySelector('[data-nutrition-detail-content]'));
       const controlRect = rect(control);
       const minusRect = rect(minus);
       const plusRect = rect(plus);
+      const inputRect = rect(control.querySelector('input'));
       return {
         controlsInsideDialog: controlRect.left >= dialogRect.left && controlRect.right <= dialogRect.right
           && minusRect.left >= dialogRect.left && plusRect.right <= dialogRect.right,
         dialogInsideViewport: dialogRect.left >= 0 && dialogRect.right <= window.innerWidth,
         gram,
+        controlWidth: controlRect.width,
+        stepperGaps: [inputRect.left - minusRect.right, plusRect.left - inputRect.right],
+        controlCenterDelta: Math.abs((controlRect.left + controlRect.right - contentRect.left - contentRect.right) / 2),
+        repeatedUnits: control.querySelectorAll(':scope > span, :scope > small').length,
+        buttonWidths: [minus, plus].map((button) => parseFloat(getComputedStyle(button).width)),
         cardHeights: [...document.querySelectorAll('.quick-item-grid .builder-item')].slice(0, 12).map((node) => Math.round(node.getBoundingClientRect().height)),
       };
     });
@@ -418,9 +451,16 @@ test('Quick-add quantity controls and hover tips stay inside their bounds', asyn
     expect(bounds.dialogInsideViewport).toBe(true);
     expect(new Set(bounds.cardHeights).size).toBe(1);
     if (bounds.gram) {
+      expect(bounds.controlWidth).toBeLessThanOrEqual(192);
+      expect(bounds.stepperGaps[0]).toBeCloseTo(bounds.stepperGaps[1], 1);
+      expect(bounds.controlCenterDelta).toBeLessThanOrEqual(1);
+      expect(bounds.repeatedUnits).toBe(0);
+      expect(bounds.buttonWidths).toEqual([44, 44]);
       const beforeGrams = Number(await dialog.locator('[data-gram-input]').inputValue());
       await dialog.locator('[data-gram-action="increase"]').click();
       await expect(dialog.locator('[data-gram-input]')).toHaveValue(String(beforeGrams + 5));
+      await expect(dialog.locator('[data-gram-action="increase"]')).toBeFocused();
+      expect(await page.evaluate(() => getSelection()?.toString())).toBe('');
     } else {
       const beforePortion = Number(await dialog.locator('[data-portion-input]').inputValue());
       await dialog.locator('[data-portion-action="increase"]').click();
@@ -667,6 +707,7 @@ test('planner mode uses equal-width underlined tabs', async ({ page }) => {
 
     await control.getByRole('tab', { name: /Quick add/ }).click();
     await expect(control).toHaveAttribute('data-segmented-active', 'quick-add');
+    await expect(page.locator('#planner-quick-add')).toHaveClass(/planner-panel-enter/);
     await expect(control.getByRole('tab', { name: /Quick add/ })).toHaveAttribute('aria-selected', 'true');
     await expect(control.locator('[aria-selected="true"]')).toHaveCount(1);
 
@@ -677,6 +718,14 @@ test('planner mode uses equal-width underlined tabs', async ({ page }) => {
     await expect(control).toHaveAttribute('data-segmented-active', 'quick-add');
     await expect(control.getByRole('tab', { name: /Quick add/ })).toHaveAttribute('aria-selected', 'true');
   }
+});
+
+test('planner tab transition respects reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/pages/stack.html');
+  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await expect(page.locator('#planner-quick-add')).toBeVisible();
+  expect(await page.locator('#planner-quick-add').evaluate((node) => getComputedStyle(node).animationName)).toBe('none');
 });
 
 test('Deep library is a separate context destination', async ({ page }) => {
@@ -872,6 +921,75 @@ test('meal ingredients have independent gram controls', async ({ page }) => {
   expect(saved.mealItemGrams['chia-protein-oatmeal'].whey).toBe(60);
 });
 
+test('meal ingredient details are centered and gram inputs have no native spinner', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  await page.locator('.meal-library-grid .meal-card').first().locator('.meal-card-body-detail').click();
+  const ingredient = page.locator('.nutrition-detail-ingredients li').filter({ hasText: 'Chia seeds' });
+  await expect(ingredient).toBeVisible();
+  const layout = await ingredient.evaluate((row) => {
+    const center = (node) => { const rect = node.getBoundingClientRect(); return rect.left + rect.width / 2; };
+    const input = row.querySelector('[data-gram-input]');
+    return {
+      textAlign: getComputedStyle(row).textAlign,
+      offsets: [row.querySelector('strong'), row.querySelector('span'), row.querySelector('small'), row.querySelector('.gram-control')].map((node) => Math.abs(center(node) - center(row))),
+      appearance: getComputedStyle(input).appearance,
+    };
+  });
+  expect(layout.textAlign).toBe('center');
+  expect(Math.max(...layout.offsets)).toBeLessThan(2);
+  expect(layout.appearance).toBe('textfield');
+});
+
+test('training timers start at their actual duration and strength uses a full-width timer', async ({ page }) => {
+  await page.goto('/pages/workout.html');
+  await expect(page.locator('#time-vo2max')).toHaveText('10:00');
+  await expect(page.locator('.sticky-pin-rail .sticky-pin-link')).toHaveCount(4);
+  const railAlignment = await page.locator('.sticky-pin-rail').evaluate((rail) => ({
+    label: getComputedStyle(rail.querySelector('.sticky-pin-label')).textAlign,
+    links: [...rail.querySelectorAll('.sticky-pin-link')].map((link) => getComputedStyle(link).justifyContent),
+  }));
+  expect(railAlignment.label).toBe('center');
+  expect(railAlignment.links.every((value) => value === 'center')).toBe(true);
+  await page.getByRole('tab', { name: /VO₂ Max/ }).click();
+  await page.locator('#timer-vo2max .timer-start').click();
+  await page.locator('#timer-vo2max .timer-stop').click();
+  await expect(page.locator('#time-vo2max')).toHaveText('10:00');
+  await page.getByRole('tab', { name: /Strength/ }).click();
+  const card = page.locator('#ex-deadlifts');
+  const geometry = await card.evaluate((node) => {
+    const card = node.getBoundingClientRect();
+    const main = node.querySelector('.exercise-main').getBoundingClientRect();
+    const timer = node.querySelector('.exercise-timer').getBoundingClientRect();
+    return { timerBelow: timer.top >= main.bottom, timerCentered: Math.abs((timer.left + timer.right - card.left - card.right) / 2) < 2, timerWidth: timer.width / card.width };
+  });
+  expect(geometry.timerBelow).toBe(true);
+  expect(geometry.timerCentered).toBe(true);
+  expect(geometry.timerWidth).toBeGreaterThan(0.8);
+});
+
+test('typing grams in nutrition details keeps the input focused', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  await page.locator('.meal-library-grid .meal-card').first().locator('.meal-card-body-detail').click();
+  const dialog = page.locator('[data-nutrition-detail-dialog]');
+  const mealGrams = dialog.locator('[data-gram-input]').first();
+  await mealGrams.fill('');
+  await mealGrams.pressSequentially('125');
+  await expect(mealGrams).toHaveValue('125');
+  await expect(mealGrams).toBeFocused();
+  await dialog.locator('[data-nutrition-detail-close]').click();
+  await expect(dialog).toBeHidden();
+
+  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await page.locator('.quick-item-grid .builder-item').first().locator('[data-nutrition-detail-open]').click();
+  await dialog.locator('[data-detail-toggle="quick"]').click();
+  const quickGrams = dialog.locator('[data-gram-input]');
+  await quickGrams.fill('');
+  await quickGrams.pressSequentially('125');
+  await expect(quickGrams).toHaveValue('125');
+  await expect(quickGrams).toBeFocused();
+  await expect(dialog.locator('.nutrition-detail-section:has(.nutrition-detail-nutrients)')).toContainText('Nutrition at 125 g');
+});
+
 test('Quick Add includes Natural Smooth Peanut Butter', async ({ page }) => {
   await page.goto('/pages/stack.html');
   await page.getByRole('tab', { name: /Quick add/ }).click();
@@ -937,7 +1055,11 @@ test('coverage settings, unresolved gaps and all nutrients open in modals', asyn
   const dock = page.viewportSize().width <= 767 ? page.locator('.plan-readout') : page.locator('.coverage-gap-dock');
   const dialog = page.locator('[data-coverage-dialog]');
 
-  await dock.getByRole('button', { name: 'Settings' }).click();
+  const settings = dock.getByRole('button', { name: 'Settings' });
+  await expect(settings).toHaveText('');
+  expect(await settings.evaluate((button) => button.getBoundingClientRect().width)).toBe(44);
+
+  await settings.click();
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('h2')).toHaveText('Coverage settings');
   await expect(dialog.locator('[data-body-weight]')).toHaveValue('75');

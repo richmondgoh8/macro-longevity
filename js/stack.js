@@ -704,7 +704,7 @@ function portionControlHTML(scope, id, value, visible = true, label = "Portion",
 
 function gramControlHTML(scope, id, item, value, attributes = "") {
   const label = `${item.name} amount in grams`;
-  return `<div class="gram-control" data-gram-control data-gram-scope="${scope}" data-gram-id="${escapeHTML(id)}" ${attributes}><label for="gram-${scope}-${escapeHTML(id)}">Amount (g)</label><button type="button" data-gram-action="decrease" aria-label="Decrease ${escapeHTML(item.name)} amount">${icon('minus')}</button><input id="gram-${scope}-${escapeHTML(id)}" type="number" min="1" max="2000" step="1" inputmode="numeric" value="${formatGrams(value, item.servingGrams)}" required data-gram-input aria-label="${escapeHTML(label)}"><span aria-hidden="true">g</span><button type="button" data-gram-action="increase" aria-label="Increase ${escapeHTML(item.name)} amount">${icon('add')}</button><small>Reference: ${escapeHTML(item.serving)}</small></div>`;
+  return `<div class="gram-control" data-gram-control data-gram-scope="${scope}" data-gram-id="${escapeHTML(id)}" ${attributes}><label for="gram-${scope}-${escapeHTML(id)}">Amount (g)</label><button type="button" data-gram-action="decrease" aria-label="Decrease ${escapeHTML(item.name)} amount">${icon('minus')}</button><input id="gram-${scope}-${escapeHTML(id)}" type="number" min="1" max="2000" step="1" inputmode="numeric" value="${formatGrams(value, item.servingGrams)}" required data-gram-input aria-label="${escapeHTML(label)}"><button type="button" data-gram-action="increase" aria-label="Increase ${escapeHTML(item.name)} amount">${icon('add')}</button></div>`;
 }
 
 function itemQuantityControlHTML(scope, id, item, value, attributes = "") {
@@ -752,10 +752,18 @@ function quickDetailHTML(item) {
   return nutritionDetailShell("Quick add details", item.name, item.note || "A food or supplement available for quick planning.", "Close food details", body);
 }
 
-function refreshNutritionDetail() {
+function refreshNutritionDetail({ preserveControls = false } = {}) {
   const dialog = document.querySelector("[data-nutrition-detail-dialog]");
   const content = dialog?.querySelector("[data-nutrition-detail-content]");
   if (!dialog || !content || !nutritionDetailType || !nutritionDetailId) return;
+  if (preserveControls) {
+    if (nutritionDetailType === "quick") {
+      const item = quickItem(nutritionDetailId);
+      const nutrients = content.querySelector('.nutrition-detail-nutrients')?.closest('section');
+      if (item && nutrients) nutrients.outerHTML = detailNutrientsHTML(item, quickItemAmount(item.id));
+    }
+    return;
+  }
   const detail = nutritionDetailType === "meal"
     ? mealLibrary().find((meal) => meal.id === nutritionDetailId)
     : quickItem(nutritionDetailId);
@@ -972,7 +980,7 @@ function deleteMeal(meal) {
 function compactCoverageHTML() {
   const summary = coverageSummaryData();
   const { totals, missing } = dailyNutrients();
-  return `<div class="coverage-compact-content">${macroHTML(totals, hasIncompleteFiber(missing))}<div class="coverage-summary-actions"><button type="button" data-coverage-open="gaps">Gaps · ${summary.total - summary.covered}</button><button type="button" data-coverage-open="all">All nutrients</button><button type="button" data-coverage-open="settings">Settings</button><button type="button" class="coverage-compact-open" data-coverage-open="all">Coverage</button></div></div>`;
+  return `<div class="coverage-compact-content">${macroHTML(totals, hasIncompleteFiber(missing))}<div class="coverage-summary-actions"><button type="button" data-coverage-open="gaps">Gaps · ${summary.total - summary.covered}</button><button type="button" data-coverage-open="all">All nutrients</button><button type="button" class="coverage-compact-open" data-coverage-open="all">Coverage</button></div>${iconButton({ iconName: 'settings', label: 'Settings', tooltip: null, data: { 'coverage-open': 'settings' } })}</div>`;
 }
 
 function coverageDockHTML() {
@@ -1020,6 +1028,7 @@ function renderPlannerMode(root) {
   } else if (plannerMode === 'quick-add') {
     main.innerHTML = quickAddHTML();
   }
+  main.firstElementChild?.classList.add('planner-panel-enter');
   planner.classList.toggle('is-meals', plannerMode === 'meals');
   planner.classList.toggle('is-quick-add', plannerMode === 'quick-add');
   root.querySelector('[data-segmented-control]')?.setAttribute('data-segmented-active', plannerMode);
@@ -1093,7 +1102,7 @@ function setGramValue(input) {
   }
   input.value = String(value);
   updateMealPlannerUI();
-  refreshNutritionDetail();
+  refreshNutritionDetail({ preserveControls: true });
   return true;
 }
 
@@ -1217,12 +1226,14 @@ document.addEventListener('click', async (event) => {
       selectedMealItemGrams[mealId] ||= {};
       selectedMealItemGrams[mealId][id] = normalizeGrams(mealItemAmount(mealId, id) + delta, item.servingGrams);
       updateMealPlannerUI();
-      refreshNutritionDetail();
+      control.querySelector('[data-gram-input]').value = String(selectedMealItemGrams[mealId][id]);
+      refreshNutritionDetail({ preserveControls: true });
       return;
     }
     quickItemGrams[id] = normalizeGrams(quickItemAmount(id) + delta, item.servingGrams);
     updateMealPlannerUI();
-    refreshNutritionDetail();
+    control.querySelector('[data-gram-input]').value = String(quickItemGrams[id]);
+    refreshNutritionDetail({ preserveControls: true });
     return;
   }
 
@@ -1427,7 +1438,7 @@ document.addEventListener('input', (event) => {
         quickItemGrams[control.dataset.gramId] = Math.min(2000, Math.max(1, Math.round(next)));
       }
       updateMealPlannerUI();
-      refreshNutritionDetail();
+      refreshNutritionDetail({ preserveControls: true });
     }
     return;
   }

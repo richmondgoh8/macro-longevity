@@ -233,7 +233,7 @@ test('Sticky pin rail follows the Calm Wellness contract', async ({ page }) => {
       navRadius: getComputedStyle(nav).borderRadius,
       navShadow: getComputedStyle(nav).boxShadow,
       linkHeight: link.getBoundingClientRect().height,
-      activeIndicator: getComputedStyle(link).borderInlineStartColor,
+      activeIndicator: getComputedStyle(link).borderBottomColor,
       label: rail.querySelector('nav').getAttribute('aria-label'),
     };
   });

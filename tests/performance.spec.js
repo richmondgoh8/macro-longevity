@@ -1,5 +1,20 @@
 import { expect, test } from '@playwright/test';
 
+test('first Home to Nutrition navigation becomes usable promptly', async ({ page, context, browserName }, testInfo) => {
+  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'desktop-chromium', 'Chromium CDP budget');
+  const session = await context.newCDPSession(page);
+  await session.send('Network.enable');
+  await session.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 200_000, uploadThroughput: 75_000, connectionType: 'cellular4g' });
+  await session.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.goto('/');
+  await page.waitForFunction(() => ['/js/stack.js', '/js/data/nutrition.js', '/css/nutrition-layout.css'].every((path) =>
+    performance.getEntriesByType('resource').some((entry) => new URL(entry.name).pathname === path && entry.responseEnd > 0)), null, { timeout: 10000 });
+  const started = Date.now();
+  await page.getByRole('link', { name: 'Nutrition', exact: true }).first().click();
+  await expect(page.locator('#stack-app[data-planner-ready="true"]')).toHaveAttribute('aria-busy', 'false');
+  expect(Date.now() - started).toBeLessThan(1500);
+});
+
 test('Nutrition meets throttled usable-load and painted-interaction budgets', async ({ page, context, browserName }, testInfo) => {
   test.skip(browserName !== 'chromium' || testInfo.project.name !== 'desktop-chromium', 'Chromium CDP budget');
   test.setTimeout(60000);

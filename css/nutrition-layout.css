@@ -434,16 +434,14 @@
 .deep-library-panel .planner-section-head p:not(.eyebrow) { margin-top: var(--space-1); color: var(--color-text-secondary); font-size: var(--text-label); }
 .deep-library-panel .meal-tabs { margin-bottom: var(--space-4); }
 .deep-library-panel [data-library-content] { min-width: 0px; }
-.gram-control { gap: var(--space-2); min-width: 0px; padding-top: var(--space-2); border-top: 1px solid var(--color-border-light); grid-template-columns: 44px minmax(72px, 1fr) auto 44px; align-items: center; display: grid; }
+.gram-control { gap: var(--space-2); min-width: 0px; padding-top: var(--space-2); border-top: 1px solid var(--color-border-light); grid-template-columns: 44px minmax(72px, 1fr) 44px; align-items: center; display: grid; }
 .gram-control label { color: var(--color-text-secondary); font-size: var(--text-label); font-weight: var(--weight-semi); grid-column: 1 / -1; }
-.gram-control button { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-alt); width: 44px; min-width: 44px; min-height: 44px; color: var(--color-primary-dark); cursor: pointer; place-items: center; display: grid; }
+.gram-control button { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-alt); width: 44px; height: 44px; padding: 0; color: var(--color-primary-dark); cursor: pointer; place-items: center; display: grid; }
 .gram-control input { width: 100%; min-width: 0px; min-height: 44px; padding-inline: var(--space-2); text-align: center; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.gram-control > span { color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-label); }
-.gram-control small { color: var(--color-text-muted); grid-column: 1 / -1; font-size: 0.7rem; }
 .nutrition-detail-help { color: var(--color-text-secondary); font-size: var(--text-label); margin: 0px; }
 .meal-planner .portion-control { min-width: 0px; }
 @media (width <= 600px) {.meal-planner .planner-controls { grid-template-columns: minmax(0px, 1fr) auto; align-items: center; display: grid; }
 .meal-planner .planner-mode-tabs { grid-column: 1 / -1; width: 100%; }
 .meal-planner .planner-clear { flex: 0 0 auto; grid-column: 2; justify-self: end; }
-.gram-control { grid-template-columns: 44px minmax(72px, 1fr) auto 44px; }
-.gram-control label, .gram-control small { grid-column: 1 / -1; }}}
+.gram-control { grid-template-columns: 44px minmax(72px, 1fr) 44px; }
+.gram-control label { grid-column: 1 / -1; }}}
