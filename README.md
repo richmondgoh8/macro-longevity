@@ -22,13 +22,13 @@ The application itself only needs a local HTTP server:
 make serve
 ```
 
-Then open <http://localhost:8080>. Alternatively, run `python3 -m http.server 8080` from the repository root.
+Then open <http://127.0.0.1:8080>. Alternatively, run `python3 -m http.server 8080 --bind 127.0.0.1` from the repository root. If port 8080 is already in use, stop that server or choose another port; `make serve` will not terminate it.
 
 Opening HTML files directly with a `file://` URL is not supported because the app uses ES modules and a service worker.
 
 ## Routes
 
-The primary shell always contains Home, Nutrition, Health, Training, and Finance. Nutrition and Health each contain two contextual pages.
+The primary shell always contains Home, Nutrition, Health, Training, and Finance. Nutrition offers Daily plan, Ingredient guide, and an in-page Deep library; Health offers Blood tests and Blueprint.
 
 | Area | Route | Purpose |
 |------|-------|---------|
@@ -51,7 +51,7 @@ npx playwright install chromium
 
 | Command | Purpose |
 |---------|---------|
-| `make serve` | Serve the site at `http://localhost:8080` |
+| `make serve` | Serve the site at `http://127.0.0.1:8080` without stopping another process |
 | `make audit` or `npm run audit` | Check metadata, navigation wiring, safety guards, service-worker assets, and JavaScript syntax |
 | `npm run test:ui` | Run desktop and mobile browser, accessibility, interaction, service-worker, and visual tests |
 | `npm run test:ui:headed` | Run the browser suite interactively for diagnosis |
@@ -65,8 +65,11 @@ Run `node --check <file>` for every changed JavaScript module. For a normal UI c
 
 ```text
 index.html, pages/*.html    Semantic route shells
-css/variables.css          Executable Warm Canvas design tokens
-css/style.css              Shared and route-level presentation
+css/variables.css          Warm Canvas design tokens
+css/style.css              Shared legacy presentation
+css/wellness.css           Shared components and current visual layer
+css/*-layout.css           Route-specific presentation
+css/nutrition.css          Nutrition dialog and coverage details
 css/toast.css              Toast presentation
 css/tooltip.css            Tooltip presentation
 js/data/*.js               Factual content and planning data
@@ -82,11 +85,11 @@ Page-specific modules are loaded only by the routes that use them. Shared behavi
 
 ## Data and privacy
 
-There is no backend or account system. Planner state and finance entries are stored in the browser with `localStorage`; clearing site data removes them. The export action creates a Markdown file locally. The application does not include analytics, external fonts, or CDN-hosted runtime assets.
+There is no backend or account system. Planner state and finance entries are stored in the browser with `localStorage`; clearing site data removes them. The export action creates a Markdown file locally. The application does not include analytics or external fonts. Training music and sound cues are fetched from Freesound when a timer starts; those optional sounds require a connection and share the request with that provider. Timers remain usable without audio.
 
 ## Design system
 
-[DESIGN.md](DESIGN.md) defines the Warm Canvas visual contract and component recipes. [css/variables.css](css/variables.css) is its executable token implementation, while [css/style.css](css/style.css) contains shared and route-level rules.
+[DESIGN.md](DESIGN.md) defines the Calm Wellness visual contract. [css/variables.css](css/variables.css) implements its Warm Canvas tokens, [css/wellness.css](css/wellness.css) holds shared components, and the route stylesheets refine individual pages.
 
 The interface uses self-hosted Inter and JetBrains Mono fonts, a 4px base with an 8px primary spacing rhythm, warm light surfaces, visible focus states, and local SVG icons. Responsive acceptance widths are 390px and 1440px, with reduced-motion, forced-colors, print, keyboard, and 44px touch-target behavior covered by browser tests.
 
@@ -94,7 +97,7 @@ When changing an authored design value, update both `DESIGN.md` and `css/variabl
 
 ## Deployment
 
-Deploy the repository root to any static host with no build command and `.` as the output directory. For Cloudflare Workers, [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development.
+There is no build step. On static hosts other than Cloudflare, configure the published files so repository metadata, tests, and development dependencies are excluded. For Cloudflare Workers, install the development dependencies with `npm ci`, then deploy with `npx wrangler deploy` after authenticating. [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development. Training's optional remote audio is not available offline.
 
 ## License
 

@@ -12,9 +12,11 @@ test('all routes keep a readable editorial introduction without overflow', async
         const colors = await page.locator('.page-header').first().evaluate((node) => ({
           background: getComputedStyle(node).backgroundColor,
           title: getComputedStyle(node.querySelector('h1')).color,
+          page: getComputedStyle(document.body).backgroundColor,
         }));
-        expect(colors.background).toBe('rgb(20, 45, 35)');
-        expect(colors.title).toBe('rgb(255, 255, 255)');
+        expect(colors.background).toBe('rgba(0, 0, 0, 0)');
+        expect(colors.page).toBe('rgb(247, 248, 243)');
+        expect(colors.title).toBe('rgb(24, 37, 31)');
       }
     }
   }
@@ -30,52 +32,63 @@ test('the redesigned routes reflow at narrow and intermediate widths', async ({ 
   }
 });
 
-test('Home protocol is a styled summary with an accessible route to full details', async ({ page }) => {
+test('Home protocol gives a readable summary with a route to full details', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.home-protocol-list li')).toHaveCount(2);
-  await expect(page.locator('.home-protocol-preview')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  await expect(page.locator('#stack-summary-app .stack-table')).toHaveCount(0);
-  await expect(page.locator('#longevity101-app li:visible')).toHaveCount(3);
-  await page.locator('[data-longevity-toggle]').click();
-  await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
-  await page.getByRole('link', { name: 'Explore the Daily Stack' }).click();
+  const summary = page.locator('#stack-summary-app');
+  await expect(summary.locator('.stack-table-row').first()).toContainText('What');
+  expect(await summary.locator('.stack-table-row').count()).toBeGreaterThan(2);
+  if (page.viewportSize().width <= 767) {
+    await expect(page.locator('#longevity101-app li:visible')).toHaveCount(3);
+    await page.locator('[data-longevity-toggle]').click();
+    await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
+    await expect(page.locator('[data-longevity-toggle]')).toHaveAttribute('aria-expanded', 'true');
+  } else {
+    await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
+    await expect(page.locator('[data-longevity-toggle]')).toBeHidden();
+  }
+  await summary.getByRole('link', { name: 'Daily Stack' }).click();
   await expect(page).toHaveURL(/\/pages\/stack.html/);
 });
 
-test('dense guidance is summarized first and remains available on request', async ({ page }) => {
+test('guidance disclosures remain accessible and reversible', async ({ page }) => {
   await page.goto('/pages/blood.html');
   const annual = page.locator('#blood-annual');
-  await expect(annual).not.toHaveAttribute('open', '');
+  await expect(annual).toHaveAttribute('open', '');
+  await expect(annual.locator('.blood-test-row').first()).toBeVisible();
+  await annual.locator('> summary').click();
+  await expect(annual.locator('.blood-test-row').first()).not.toBeVisible();
   await annual.locator('> summary').click();
   await expect(annual.locator('.blood-test-row').first()).toBeVisible();
 
   await page.goto('/pages/finance.html');
-  const intro = page.locator('.investments-intro');
+  const intro = page.locator('#investments-app > .page-header');
   await expect(intro).toBeVisible();
   await expect(intro.locator('h2')).toHaveCSS('color', 'rgb(24, 37, 31)');
   expect(await intro.evaluate((node) => node.getBoundingClientRect().left)).toBeGreaterThanOrEqual(0);
   const combo = page.locator('[data-invest-combo]').first();
-  if (page.viewportSize().width >= 767) {
-    await expect(combo).not.toHaveAttribute('open', '');
-    await combo.locator('> summary').click();
-  }
+  if (await combo.getAttribute('open') !== null) await combo.locator('> summary').click();
+  await expect(combo.locator('.invest-combo-body')).not.toBeVisible();
+  await combo.locator('> summary').click();
   await expect(combo.locator('.invest-combo-body')).toBeVisible();
 
   await page.goto('/pages/avoid.html');
   await expect(page.locator('[data-avoid-label-card]')).toHaveCount(5);
   const detail = page.locator('[data-avoid-detail-card]').first();
-  await expect(detail).not.toHaveAttribute('open', '');
+  if (await detail.getAttribute('open') !== null) await detail.locator('> summary').click();
+  await expect(detail.locator('.avoid-detail-body')).not.toBeVisible();
   await detail.locator('> summary').click();
   await expect(detail.locator('.avoid-detail-body')).toBeVisible();
 });
 
-test('Nutrition shows concise meal cards while the detail view retains ingredients', async ({ page }) => {
+test('Nutrition previews meal ingredients and exposes full detail controls', async ({ page }) => {
   await page.goto('/pages/stack.html');
   await expect(page.locator('[data-planner-ready]')).toHaveAttribute('aria-busy', 'false');
   const meal = page.locator('[data-meal-card]').first();
-  await expect(meal.locator('.meal-ingredients')).toHaveCount(0);
+  await expect(meal.locator('.meal-ingredients')).toContainText('Protein powder (whey)');
   await meal.locator('[data-nutrition-detail-open]').first().click();
-  await expect(page.getByRole('dialog').getByRole('heading', { name: 'Ingredients' })).toBeVisible();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Ingredients' })).toBeVisible();
+  await expect(dialog.locator('.nutrition-detail-ingredients li').filter({ hasText: 'Chia seeds' }).locator('[data-gram-input]')).toBeVisible();
 });
 
 test('expanded guidance keeps readable insets and mobile macros stay on one row', async ({ page }) => {

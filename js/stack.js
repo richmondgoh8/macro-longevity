@@ -116,8 +116,18 @@ function normalizeGrams(value, fallback = 100) {
   return Math.min(2000, Math.max(1, Math.round(number)));
 }
 
-function formatGrams(value, fallback = 100) {
-  return String(normalizeGrams(value, fallback));
+function displayAmount(item, grams) {
+  const amount = normalizeGrams(grams, item.servingGrams);
+  return item.displayUnit ? Number((amount / item.displayUnit.grams).toFixed(2)) : amount;
+}
+
+function storedAmount(item, displayed) {
+  return normalizeGrams(Number(displayed) * (item.displayUnit?.grams || 1), item.servingGrams);
+}
+
+function amountUnit(item, amount) {
+  if (!item.displayUnit) return "g";
+  return Number(amount) === 1 ? item.displayUnit.singular : item.displayUnit.plural;
 }
 
 function formatPortion(value) {
@@ -703,8 +713,12 @@ function portionControlHTML(scope, id, value, visible = true, label = "Portion",
 }
 
 function gramControlHTML(scope, id, item, value, attributes = "") {
-  const label = `${item.name} amount in grams`;
-  return `<div class="gram-control" data-gram-control data-gram-scope="${scope}" data-gram-id="${escapeHTML(id)}" ${attributes}><label for="gram-${scope}-${escapeHTML(id)}">Amount (g)</label><button type="button" data-gram-action="decrease" aria-label="Decrease ${escapeHTML(item.name)} amount">${icon('minus')}</button><input id="gram-${scope}-${escapeHTML(id)}" type="number" min="1" max="2000" step="1" inputmode="numeric" value="${formatGrams(value, item.servingGrams)}" required data-gram-input aria-label="${escapeHTML(label)}"><button type="button" data-gram-action="increase" aria-label="Increase ${escapeHTML(item.name)} amount">${icon('add')}</button></div>`;
+  const amount = displayAmount(item, value);
+  const unit = item.displayUnit?.plural || "g";
+  const label = `${item.name} amount in ${unit}`;
+  const min = item.displayUnit ? .25 : 1;
+  const max = item.displayUnit ? Math.floor(2000 / item.displayUnit.grams) : 2000;
+  return `<div class="gram-control" data-gram-control data-gram-scope="${scope}" data-gram-id="${escapeHTML(id)}" ${attributes}><label for="gram-${scope}-${escapeHTML(id)}">Amount (${unit})</label><button type="button" data-gram-action="decrease" aria-label="Decrease ${escapeHTML(item.name)} amount">${icon('minus')}</button><input id="gram-${scope}-${escapeHTML(id)}" type="number" min="${min}" max="${max}" step="${item.displayUnit ? 'any' : 1}" inputmode="decimal" value="${amount}" required data-gram-input aria-label="${escapeHTML(label)}"><button type="button" data-gram-action="increase" aria-label="Increase ${escapeHTML(item.name)} amount">${icon('add')}</button></div>`;
 }
 
 function itemQuantityControlHTML(scope, id, item, value, attributes = "") {
@@ -726,7 +740,8 @@ function detailNutrientsHTML(item, amount) {
   const n = item.nutrients || {};
   const rows = [["Protein", n.protein, "g"], ["Total carbohydrate", n.carbs, "g"], ["Total fat", n.fat, "g"], ["Fiber", n.fiber, "g"], ...NUTRIENT_TARGETS.filter((target) => target.track !== false && n[target.id] != null && !["protein", "carbs", "fat", "fiber"].includes(target.id)).map((target) => [target.name, n[target.id], target.unit])]
     .map(([name, value, unit]) => `<div><dt>${escapeHTML(name)}</dt><dd>${name === "Fiber" && value == null ? "Not measured" : formatAmount(Number(value || 0) * scale, unit)}</dd></div>`).join("");
-  const heading = itemUsesGrams(item) ? `Nutrition at ${formatGrams(amount, item.servingGrams)} g` : "Nutrition per serving";
+  const shown = displayAmount(item, amount);
+  const heading = itemUsesGrams(item) ? `Nutrition at ${shown} ${amountUnit(item, shown)}` : "Nutrition per serving";
   return `<section class="nutrition-detail-section"><h3>${heading}</h3><dl class="nutrition-detail-nutrients">${rows}</dl></section>`;
 }
 
@@ -740,7 +755,7 @@ function mealDetailHTML(meal) {
   const id = escapeHTML(meal.id);
   const tags = (meal.tags || []).map((tag) => `<span class="planner-card-tag">${escapeHTML(tag)}</span>`).join("");
   const ingredients = items.map((item) => `<li><strong>${escapeHTML(item.name)}</strong><span>${escapeHTML(item.quantityMode === "grams" ? `${item.serving} reference` : item.serving)}</span><small>${escapeHTML(item.note || "")}</small>${selected ? itemQuantityControlHTML("meal-item", item.id, item, mealItemAmount(meal.id, item.id), `data-gram-meal-id="${id}" data-portion-meal-id="${id}"`) : ""}</li>`).join("");
-  const body = `${tags ? `<div>${tags}</div>` : ""}<section class="nutrition-detail-section"><h3>Ingredients</h3><ul class="nutrition-detail-ingredients">${ingredients || "<li>No ingredients available.</li>"}</ul></section>${selected ? `<p class="nutrition-detail-help">Set the grams for each food; supplements keep their serving unit.</p>` : ""}<div class="ui-modal-actions"><button type="button" class="button button-primary" data-detail-toggle="meal" data-detail-id="${id}">${selected ? "Remove from plan" : "Add to plan"}</button><button type="button" class="button button-secondary" data-meal-pin="${id}">${meal.pinned ? "Unpin meal" : "Pin meal"}</button><button type="button" class="button button-secondary" data-meal-edit="${id}">Edit meal</button><button type="button" class="button button-outline ui-button-danger" data-meal-delete="${id}">Delete meal</button></div>`;
+  const body = `${tags ? `<div>${tags}</div>` : ""}<section class="nutrition-detail-section"><h3>Ingredients</h3><ul class="nutrition-detail-ingredients">${ingredients || "<li>No ingredients available.</li>"}</ul></section>${selected ? `<p class="nutrition-detail-help">Set each ingredient in the unit shown; amounts update the nutrient estimate.</p>` : ""}<div class="ui-modal-actions"><button type="button" class="button button-primary" data-detail-toggle="meal" data-detail-id="${id}">${selected ? "Remove from plan" : "Add to plan"}</button><button type="button" class="button button-secondary" data-meal-pin="${id}">${meal.pinned ? "Unpin meal" : "Pin meal"}</button><button type="button" class="button button-secondary" data-meal-edit="${id}">Edit meal</button><button type="button" class="button button-outline ui-button-danger" data-meal-delete="${id}">Delete meal</button></div>`;
   return nutritionDetailShell("Meal details", meal.name, meal.description || "A repeatable meal built from the foods in your library.", "Close meal details", body);
 }
 
@@ -834,7 +849,7 @@ function quickAddHTML() {
   const quickItems = filteredQuickItems();
   const quickItemsCount = quickSelectedItemIds.length;
   const composerAction = `<div class="quick-add-save"><span><strong data-quick-selection-count>${quickItemsCount}</strong> item${quickItemsCount === 1 ? "" : "s"} selected</span><button type="button" class="button button-secondary" data-meal-compose-open ${quickSelectedItemIds.length ? "" : "disabled"}>Save to meals</button></div>`;
-  return `<section class="quick-add-panel" id="planner-quick-add" aria-labelledby="quick-add-title"><div class="planner-section-head"><div><p class="eyebrow">Quick add</p><h3 id="quick-add-title">Choose foods and supplements</h3><p>Choose foods, then set their amounts in grams.</p></div></div>${composerAction}<div class="builder-filters" aria-label="Filter quick-add items">${categories.map(([id, label]) => `<button type="button" class="builder-filter ${activeQuickCategory === id ? "active" : ""}" data-quick-category="${id}" aria-pressed="${activeQuickCategory === id}">${label}</button>`).join("")}</div><div class="builder-item-grid planner-card-grid quick-item-grid">${quickItems.length ? quickItems.map(quickItemHTML).join("") : quickSearchEmptyHTML()}</div></section>`;
+  return `<section class="quick-add-panel" id="planner-quick-add" aria-labelledby="quick-add-title"><div class="planner-section-head"><div><p class="eyebrow">Quick add</p><h3 id="quick-add-title">Choose foods and supplements</h3><p>Choose foods, then set each amount in the unit shown.</p></div></div>${composerAction}<div class="builder-filters" aria-label="Filter quick-add items">${categories.map(([id, label]) => `<button type="button" class="builder-filter ${activeQuickCategory === id ? "active" : ""}" data-quick-category="${id}" aria-pressed="${activeQuickCategory === id}">${label}</button>`).join("")}</div><div class="builder-item-grid planner-card-grid quick-item-grid">${quickItems.length ? quickItems.map(quickItemHTML).join("") : quickSearchEmptyHTML()}</div></section>`;
 }
 
 function updateQuickAddUI(root) {
@@ -872,7 +887,15 @@ function renderMealDialogItems(root) {
   if (count) count.textContent = `(${selected.length})`;
   if (selectedList) {
     selectedList.innerHTML = selected.length
-      ? `<ul class="meal-dialog-selected-list">${selected.map((item) => `<li><label for="draft-${escapeHTML(item.id)}">${escapeHTML(item.name)}<small>${itemUsesGrams(item) ? " · grams" : " · servings"}</small></label><input id="draft-${escapeHTML(item.id)}" aria-label="${escapeHTML(item.name)} ${itemUsesGrams(item) ? "grams" : "servings"}" type="number" min="${itemUsesGrams(item) ? 1 : .25}" max="${itemUsesGrams(item) ? 2000 : 20}" step="${itemUsesGrams(item) ? 1 : .25}" value="${mealComposerAmounts[item.id] ?? (itemUsesGrams(item) ? item.servingGrams : 1)}" required data-meal-draft-amount="${escapeHTML(item.id)}"><button type="button" class="meal-dialog-remove" data-meal-dialog-remove="${escapeHTML(item.id)}" aria-label="Remove ${escapeHTML(item.name)}">${icon('close')}</button></li>`).join('')}</ul>`
+      ? `<ul class="meal-dialog-selected-list">${selected.map((item) => {
+        const stored = mealComposerAmounts[item.id] ?? (itemUsesGrams(item) ? item.servingGrams : 1);
+        const shown = itemUsesGrams(item) ? displayAmount(item, stored) : stored;
+        const unit = itemUsesGrams(item) ? item.displayUnit?.plural || "g" : "servings";
+        const min = item.displayUnit ? .25 : itemUsesGrams(item) ? 1 : .25;
+        const max = item.displayUnit ? Math.floor(2000 / item.displayUnit.grams) : itemUsesGrams(item) ? 2000 : 20;
+        const step = item.displayUnit ? "any" : itemUsesGrams(item) ? 1 : .25;
+        return `<li><label for="draft-${escapeHTML(item.id)}">${escapeHTML(item.name)}<small> · ${unit}</small></label><input id="draft-${escapeHTML(item.id)}" aria-label="${escapeHTML(item.name)} ${unit}" type="number" min="${min}" max="${max}" step="${step}" value="${shown}" required data-meal-draft-amount="${escapeHTML(item.id)}"><button type="button" class="meal-dialog-remove" data-meal-dialog-remove="${escapeHTML(item.id)}" aria-label="Remove ${escapeHTML(item.name)}">${icon('close')}</button></li>`;
+      }).join('')}</ul>`
       : '<p class="meal-dialog-empty">No ingredients selected yet. Add at least one to save this meal.</p>';
   }
   updateMealDraftPreview(dialog);
@@ -996,7 +1019,7 @@ function plannerHTML() {
   const plannerContent = plannerMode === "quick-add" ? quickAddHTML() : mealContent;
   const plannerClass = plannerMode === "quick-add" ? "is-quick-add" : "is-meals";
   return `<section class="stack-builder meal-planner ${plannerClass}" aria-labelledby="planner-title">
-    <div class="builder-head"><div><p class="eyebrow">Daily Stack</p><h2 id="planner-title">Build a nutrition plan from reusable meals</h2><p>Select meals, set food amounts in grams, then use the nutrient readout to solve meaningful gaps.</p></div></div>
+    <div class="builder-head"><div><p class="eyebrow">Daily Stack</p><h2 id="planner-title">Build a nutrition plan from reusable meals</h2><p>Select meals, set food amounts in the units shown, then use the nutrient readout to solve meaningful gaps.</p></div></div>
     ${starterExampleActive ? `<div class="starter-example" data-starter-example><div><strong>Starter example loaded</strong><span>Chia protein oatmeal is selected to demonstrate how coverage changes.</span></div><button type="button" class="text-button" data-start-blank>Start blank</button></div>` : ''}
     ${plannerControlsHTML()}
     <div class="planner-search-row">${plannerSearchHTML()}</div>
@@ -1093,14 +1116,14 @@ function setGramValue(input) {
   if (!control || !id || !item || !itemUsesGrams(item)) return false;
   if (!input.value || !input.validity.valid) { input.setAttribute("aria-invalid", "true"); input.reportValidity(); return false; }
   input.removeAttribute("aria-invalid");
-  const value = Number(input.value);
+  const value = storedAmount(item, input.value);
   if (scope === 'meal-item' && mealId) {
     selectedMealItemGrams[mealId] ||= {};
     selectedMealItemGrams[mealId][id] = value;
   } else {
     quickItemGrams[id] = value;
   }
-  input.value = String(value);
+  input.value = String(displayAmount(item, value));
   updateMealPlannerUI();
   refreshNutritionDetail({ preserveControls: true });
   return true;
@@ -1221,18 +1244,18 @@ document.addEventListener('click', async (event) => {
     const mealId = control?.dataset.gramMealId;
     const item = quickItem(id);
     if (!item || !id) return;
-    const delta = gramAction.dataset.gramAction === 'increase' ? 5 : -5;
+    const delta = (gramAction.dataset.gramAction === 'increase' ? 1 : -1) * (item.displayUnit?.grams || 5) * (item.displayUnit?.step || 1);
     if (scope === 'meal-item' && mealId) {
       selectedMealItemGrams[mealId] ||= {};
       selectedMealItemGrams[mealId][id] = normalizeGrams(mealItemAmount(mealId, id) + delta, item.servingGrams);
       updateMealPlannerUI();
-      control.querySelector('[data-gram-input]').value = String(selectedMealItemGrams[mealId][id]);
+      control.querySelector('[data-gram-input]').value = String(displayAmount(item, selectedMealItemGrams[mealId][id]));
       refreshNutritionDetail({ preserveControls: true });
       return;
     }
     quickItemGrams[id] = normalizeGrams(quickItemAmount(id) + delta, item.servingGrams);
     updateMealPlannerUI();
-    control.querySelector('[data-gram-input]').value = String(quickItemGrams[id]);
+    control.querySelector('[data-gram-input]').value = String(displayAmount(item, quickItemGrams[id]));
     refreshNutritionDetail({ preserveControls: true });
     return;
   }
@@ -1433,9 +1456,9 @@ document.addEventListener('input', (event) => {
     if (item && gramInput.value && gramInput.validity.valid && Number.isFinite(next)) {
       if (control.dataset.gramScope === 'meal-item' && control.dataset.gramMealId) {
         selectedMealItemGrams[control.dataset.gramMealId] ||= {};
-        selectedMealItemGrams[control.dataset.gramMealId][control.dataset.gramId] = Math.min(2000, Math.max(1, Math.round(next)));
+        selectedMealItemGrams[control.dataset.gramMealId][control.dataset.gramId] = storedAmount(item, next);
       } else {
-        quickItemGrams[control.dataset.gramId] = Math.min(2000, Math.max(1, Math.round(next)));
+        quickItemGrams[control.dataset.gramId] = storedAmount(item, next);
       }
       updateMealPlannerUI();
       refreshNutritionDetail({ preserveControls: true });
@@ -1524,7 +1547,8 @@ function updateMealDraftPreview(dialog) {
 document.addEventListener("input", (event) => {
   const id = event.target.dataset.mealDraftAmount;
   if (!id || !event.target.validity.valid || !event.target.value) return;
-  mealComposerAmounts[id] = Number(event.target.value);
+  const item = quickItem(id);
+  mealComposerAmounts[id] = itemUsesGrams(item) ? storedAmount(item, event.target.value) : Number(event.target.value);
   updateMealDraftPreview(event.target.closest("dialog"));
 });
 window.addEventListener("popstate", async () => {

@@ -887,7 +887,8 @@ test('gram controls progressively appear inside the detail dialog', async ({ pag
   await expect(dialog.locator('[data-gram-control]')).toHaveCount(0);
   await dialog.locator('[data-detail-toggle="meal"]').click();
   await expect(dialog.locator('[data-gram-control]')).toHaveCount(3);
-  await expect(dialog.locator('[data-gram-input]').first()).toHaveValue('100');
+  await expect(dialog.locator('[data-gram-input]').first()).toHaveValue('2');
+  await expect(dialog.locator('[data-gram-control]').first()).toContainText('Amount (eggs)');
   await expect(dialog.locator('[data-detail-toggle="meal"]')).toHaveText('Remove from plan');
   await dialog.locator('[data-nutrition-detail-close]').click();
   await expect(dialog).not.toBeVisible();
@@ -901,7 +902,7 @@ test('gram controls progressively appear inside the detail dialog', async ({ pag
   await expect(dialog.locator('[data-gram-control]')).toBeVisible();
 });
 
-test('meal ingredients have independent gram controls', async ({ page }) => {
+test('meal ingredients have independent amount controls', async ({ page }) => {
   await page.goto('/pages/stack.html');
   const mealCard = page.locator('.meal-library-grid .meal-card').first();
   await mealCard.locator('.meal-card-body-detail').click();
@@ -911,11 +912,12 @@ test('meal ingredients have independent gram controls', async ({ page }) => {
   await expect(ingredientControls).toHaveCount(4);
   const firstInput = ingredientControls.nth(0).locator('[data-gram-input]');
   const secondInput = ingredientControls.nth(1).locator('[data-gram-input]');
-  await expect(firstInput).toHaveValue('30');
+  await expect(firstInput).toHaveValue('1');
+  await expect(ingredientControls.nth(0)).toContainText('Amount (scoops)');
   await expect(secondInput).toHaveValue('60');
-  await firstInput.fill('60');
+  await firstInput.fill('2');
   await firstInput.press('Tab');
-  await expect(firstInput).toHaveValue('60');
+  await expect(firstInput).toHaveValue('2');
   await expect(secondInput).toHaveValue('60');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ml-daily-current')));
   expect(saved.mealItemGrams['chia-protein-oatmeal'].whey).toBe(60);

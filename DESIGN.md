@@ -1,7 +1,7 @@
-# Calm Wellness design system
+# Calm Wellness design system (Warm Canvas tokens)
 
 Approved direction: warm ivory, forest-green actions, readable typography, calm surfaces.
-Updated: 2026-09-19.
+Updated: 2026-09-24.
 
 ## Architecture
 
@@ -12,7 +12,8 @@ Ingredient guide, Deep library; Health context links are Blood tests and Bluepri
 Shared tokens: css/variables.css. Shared component layer: css/wellness.css.
 Existing specialized styling is isolated in a lower-priority legacy cascade layer.
 css/style.css contains shared legacy rules; each route loads its own named
-*-layout.css file. Nutrition detail rules live in css/nutrition.css.
+*-layout.css file. Nutrition detail styles span css/nutrition-layout.css,
+css/nutrition.css, and shared dialog rules in css/wellness.css.
 These are explicit authored route boundaries, not runtime CSS-coverage extracts.
 Do not load CSS on clicks or only for the initial viewport.
 

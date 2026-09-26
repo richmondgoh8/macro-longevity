@@ -129,10 +129,9 @@ BUILDER_ITEMS.forEach((item, index) => {
   item.nutrients = { ...(item.nutrients || {}), protein, carbs: MACRO_ESTIMATES.charCodeAt(offset) / 2, fat: MACRO_ESTIMATES.charCodeAt(offset + 1) / 2 };
 });
 
-// Food controls use grams so the amount a person enters is unambiguous. These
-// reference weights keep the existing rounded nutrient estimates meaningful
-// while still allowing a user to choose a smaller or larger amount. Volume
-// measures use their familiar kitchen equivalent; ranges use the midpoint.
+// Keep gram-based nutrient estimates and saved plans, but show familiar units
+// when the reference serving already defines a count or kitchen measure.
+// Volume measures use their existing approximate gram equivalent.
 const FOOD_REFERENCE_GRAMS = {
   chicken: 100, salmon: 100, sardines: 100, mackerel: 100, beef: 150, pork: 100,
   eggs: 100, "greek-yogurt": 200, milk: 250, whey: 30, clams: 100, oysters: 100,
@@ -144,11 +143,22 @@ const FOOD_REFERENCE_GRAMS = {
   walnuts: 30, "brazil-nut": 5, cashews: 30, evoo: 14, cocoa: 30, coffee: 240,
   "green-tea": 240, shiitake: 100, "bone-broth": 240, collagen: 10,
 };
+const FOOD_DISPLAY_UNITS = {
+  eggs: { singular: "egg", plural: "eggs", grams: 50, step: 1 },
+  kiwi: { singular: "kiwi", plural: "kiwis", grams: 75, step: 1 },
+  "brazil-nut": { singular: "nut", plural: "nuts", grams: 5, step: 1 },
+  whey: { singular: "scoop", plural: "scoops", grams: 30, step: 1 },
+  milk: { singular: "ml", plural: "ml", grams: 1, step: 50 },
+  evoo: { singular: "tbsp", plural: "tbsp", grams: 14, step: 1 },
+  "bone-broth": { singular: "cup", plural: "cups", grams: 240, step: 1 },
+  "natural-smooth-peanut-butter": { singular: "tbsp", plural: "tbsp", grams: 16, step: 1 },
+};
 
 BUILDER_ITEMS.forEach((item) => {
   const servingGrams = FOOD_REFERENCE_GRAMS[item.id];
   item.quantityMode = Number.isFinite(servingGrams) ? "grams" : "servings";
   if (Number.isFinite(servingGrams)) item.servingGrams = servingGrams;
+  if (FOOD_DISPLAY_UNITS[item.id]) item.displayUnit = FOOD_DISPLAY_UNITS[item.id];
 });
 
 export const FOUNDATION_STACK = {
