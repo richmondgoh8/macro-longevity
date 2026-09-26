@@ -174,7 +174,7 @@
 .meal-dialog-head h2 { color: var(--color-text); font-size: var(--text-md); }
 .meal-dialog-head .text-button { min-width: 44px; min-height: 44px; font-size: 1.25rem; }
 .meal-save-dialog label { color: var(--color-text); font-size: 0.78rem; font-weight: var(--weight-semi); }
-.meal-save-dialog input { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg); width: 100%; min-height: 44px; color: var(--color-text); font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; padding: 8px 10px; font-size: 0.82rem; }
+.meal-save-dialog input { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg); width: 100%; min-height: 48px; color: var(--color-text); font: inherit; padding: 8px 10px; font-size: 0.82rem; }
 .meal-dialog-items { min-height: 38px; color: var(--color-text-secondary); font-size: 0.74rem; line-height: var(--leading-snug); overflow-wrap: anywhere; margin: 0px; }
 .meal-dialog-actions { justify-content: flex-end; gap: var(--space-2); display: flex; }
 .meal-dialog-actions .button { min-height: 44px; }
@@ -243,7 +243,6 @@
 .builder-item { min-width: 0px; }
 .builder-item strong, .builder-item small, .builder-serving { overflow-wrap: anywhere; }
 .meal-save-dialog-form { gap: var(--space-4); }
-.meal-save-dialog input { min-height: 48px; }
 .meal-card-meta { margin: var(--space-1)0 0; color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-label); }
 .meal-ingredients { gap: var(--space-1)var(--space-2); color: var(--color-text-secondary); font-size: var(--text-meta); flex-wrap: wrap; margin: 0px; padding: 0px; line-height: 1.45; list-style: none; display: flex; }
 .meal-ingredients li { display: inline; }

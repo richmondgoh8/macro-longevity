@@ -219,7 +219,8 @@ body:has(#stack-app) .section.section-compact { padding-inline: 0; }
 .meal-tab.active { border: 0; border-bottom: 1px solid var(--color-border); }
 .ui-modal .ui-modal-head { position: sticky; top: 0; background: white; z-index: 2; padding-block: 8px; }
 .meal-save-dialog-form { display: flex; flex-direction: column; height: min(800px, calc(100dvh - 32px)); max-height: calc(100dvh - 32px); overflow: hidden; gap: 0; }
-.meal-dialog-body { overflow-y: auto; min-height: 0; flex: 1; padding: 4px; }
+.meal-dialog-body { overflow-y: auto; min-height: 0; flex: 1; padding: 8px 4px 4px; }
+.meal-dialog-body > label { display:block; margin-bottom:8px; }
 .meal-save-dialog-form .ui-modal-actions { flex: none; margin-top: 16px; }
 .meal-dialog-add-list { max-height: none; overflow: visible; }
 .coverage-dialog-form { max-height: calc(100dvh - 32px); display: flex; flex-direction: column; overflow: hidden; }
@@ -256,9 +257,15 @@ dialog.coverage-detail-dialog, dialog.meal-save-dialog { overflow: hidden; }
 html { scroll-behavior: auto; }
 .meal-planner.stack-builder { max-width: none; margin: 0; }
 .meal-macros { font: 500 14px/1.5 var(--font-body); color: var(--color-primary); margin-block: 12px 0; }
-.meal-editor-options { margin-top: 16px; }
-.meal-editor-options summary { min-height: 44px; padding-block: 12px; color: var(--color-text-secondary); cursor: pointer; }
+.meal-editor-options { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; padding-top:16px; border-top:1px solid var(--color-border); }
+.meal-editor-options > div { flex-basis:100%; }
 .meal-editor-options[hidden], [data-meal-delete-confirm][hidden] { display: none; }
+.meal-detail-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.meal-detail-actions { position:sticky; bottom:0; z-index:1; padding:12px 0; border-top:1px solid var(--color-border); background:var(--color-bg-card); }
+@media (max-width: 599px) {
+  .meal-detail-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .meal-detail-actions .button { min-width:0; padding-inline:8px; }
+}
 .workout-metrics > div { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; }
 .workout-metrics strong, .workout-metrics span { flex-shrink: 0; max-width: 100%; text-align: center; }
 .workout-metrics span { width: auto; margin: 0; }

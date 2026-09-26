@@ -185,7 +185,8 @@ test('meal editor secondary actions pin and remove without stacking dialogs', as
   await page.goto('/pages/stack.html');
   await page.locator('[data-meal-edit]').first().click();
   const dialog = page.locator('[data-meal-dialog]');
-  await dialog.getByText('More actions', { exact: true }).click();
+  await expect(dialog.getByText('More actions', { exact: true })).toHaveCount(0);
+  await dialog.locator('.meal-dialog-body').evaluate((body) => { body.scrollTop = body.scrollHeight; });
   await dialog.getByRole('button', { name: 'Pin meal', exact: true }).click();
   await expect(dialog.getByRole('button', { name: 'Unpin meal', exact: true })).toBeVisible();
   await dialog.getByRole('button', { name: 'Remove preset', exact: true }).click();
@@ -193,4 +194,43 @@ test('meal editor secondary actions pin and remove without stacking dialogs', as
   await dialog.getByRole('button', { name: 'Confirm removal' }).click();
   await expect(page.locator('[data-meal-card="chia-protein-oatmeal"]')).toHaveCount(0);
   await expect(page.locator('[data-planner-meal-count]')).toHaveText('0');
+});
+
+test('meal detail actions stay visible and meal editor fields have space', async ({ page }) => {
+  await page.goto('/pages/stack.html');
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 500 });
+    await page.locator('[data-meal-card="chia-protein-oatmeal"] [data-nutrition-detail-open]').first().click();
+    const detail = page.locator('[data-nutrition-detail-dialog]');
+    await detail.locator('[data-detail-toggle="meal"]').click();
+    const layout = await detail.evaluate((dialog) => {
+      const tags = [...dialog.querySelectorAll('.meal-detail-tags .planner-card-tag')].map((tag) => tag.getBoundingClientRect());
+      const actions = [...dialog.querySelectorAll('.meal-detail-actions button')].map((button) => button.getBoundingClientRect());
+      const dialogBox = dialog.getBoundingClientRect();
+      return {
+        tagGap: tags[1].left - tags[0].right,
+        scrollable: dialog.scrollHeight > dialog.clientHeight,
+        actionsVisible: actions.every((box) => box.top >= dialogBox.top && box.bottom <= dialogBox.bottom && box.left >= dialogBox.left && box.right <= dialogBox.right),
+      };
+    });
+    expect(layout.tagGap).toBeGreaterThanOrEqual(7.5);
+    expect(layout.scrollable).toBe(true);
+    expect(layout.actionsVisible).toBe(true);
+    await detail.evaluate((dialog) => { dialog.scrollTop = dialog.scrollHeight / 2; });
+    await expect.poll(async () => detail.locator('.meal-detail-actions').evaluate((actions) => {
+      const box = actions.getBoundingClientRect();
+      const dialogBox = actions.closest('dialog').getBoundingClientRect();
+      return box.top >= dialogBox.top && box.bottom <= dialogBox.bottom;
+    })).toBe(true);
+    await detail.getByRole('button', { name: 'Edit meal' }).click();
+    const editor = page.locator('[data-meal-dialog]');
+    await expect(editor).toBeVisible();
+    const fieldGap = await editor.evaluate((dialog) => {
+      const label = dialog.querySelector('label[for="meal-dialog-name"]').getBoundingClientRect();
+      const input = dialog.querySelector('#meal-dialog-name').getBoundingClientRect();
+      return input.top - label.bottom;
+    });
+    expect(fieldGap).toBeGreaterThanOrEqual(7.5);
+    await editor.getByRole('button', { name: 'Cancel', exact: true }).click();
+  }
 });
