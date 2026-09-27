@@ -110,6 +110,50 @@ test('quick add accepts grams directly and ignores temporary blank input', async
   await expect(macro).not.toHaveText(before);
 });
 
+test('copy and print use the current meal and quick-add amounts on mobile and desktop', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (text) => { window.__copiedPlan = text; } } });
+    window.print = () => { window.__printCalls = (window.__printCalls || 0) + 1; };
+  });
+  await page.goto('/pages/stack.html');
+  await page.locator('[data-meal-card="chia-protein-oatmeal"] [data-nutrition-detail-open]').first().click();
+  const mealAmount = page.locator('[data-nutrition-detail-dialog] [data-gram-id="oats"] [data-gram-input]');
+  await mealAmount.fill('90');
+  await mealAmount.press('Tab');
+  await page.locator('[data-nutrition-detail-close]').click();
+  await page.getByRole('tab', { name: /Quick add/ }).click();
+  await page.locator('[data-quick-card="chicken"] [data-quick-item]').click();
+  await page.locator('[data-quick-card="chicken"] [data-gram-input]').fill('175');
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 844 });
+    const copy = page.getByRole('button', { name: "Copy today's plan" });
+    const print = page.getByRole('button', { name: "Print today's plan" });
+    await expect(copy).toBeVisible();
+    await expect(print).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await copy.click();
+    const copied = await page.evaluate(() => window.__copiedPlan);
+    expect(copied).toContain('Chia protein oatmeal');
+    expect(copied).toContain('Rolled oats — 90 g');
+    expect(copied).toContain('Chicken breast — 175 g');
+    await print.click();
+    expect(await page.evaluate(() => window.__printCalls)).toBe(width === 390 ? 1 : 2);
+    const sheet = page.locator('[data-plan-print]');
+    await expect(sheet).toContainText('Rolled oats — 90 g');
+    await expect(sheet).toContainText('Chicken breast — 175 g');
+    await page.emulateMedia({ media: 'print' });
+    await expect(sheet).toBeVisible();
+    await expect(page.locator('main')).toBeHidden();
+    await page.emulateMedia({ media: 'screen' });
+  }
+  await page.locator('[data-clear-stack]').click();
+  await page.locator('.ui-confirm-dialog [data-confirm-submit]').click();
+  await page.getByRole('button', { name: "Copy today's plan" }).click();
+  expect(await page.evaluate(() => window.__copiedPlan)).toContain('No meals or quick-add items selected.');
+  await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+  await expect(page.locator('[data-plan-print]')).toContainText('No meals or quick-add items selected.');
+});
+
 test('Deep library is a context destination with working history and no coverage bar', async ({ page }) => {
   await page.goto('/pages/stack.html');
   await page.locator('.context-nav').getByRole('link', { name: 'Deep library' }).click();

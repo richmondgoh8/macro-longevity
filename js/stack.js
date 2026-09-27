@@ -705,7 +705,44 @@ function plannerControlsHTML() {
     <button type="button" class="planner-mode-tab ${plannerMode === "quick-add" ? "active" : ""}" data-planner-mode="quick-add" role="tab" aria-selected="${plannerMode === "quick-add"}" tabindex="${plannerMode === "quick-add" ? "0" : "-1"}" aria-controls="planner-input-panel">Quick add <span data-planner-quick-count>${quickSelectedItemIds.length}</span></button>
     </div>
     <button class="button button-secondary planner-clear" type="button" data-clear-stack>Clear</button>
+  </div><div class="planner-export-actions" role="group" aria-label="Today's plan actions">
+    <button class="button button-secondary" type="button" data-copy-plan>Copy today's plan</button>
+    <button class="button button-secondary" type="button" data-print-plan>Print today's plan</button>
   </div>`;
+}
+
+function currentPlanSections() {
+  const amount = (item, value) => {
+    if (!itemUsesGrams(item)) return `${formatPortion(value)} × ${item.serving}`;
+    const displayed = displayAmount(item, value);
+    return `${displayed} ${amountUnit(item, displayed)}`;
+  };
+  const meals = mealLibrary();
+  return [
+    { title: 'Meals', entries: selectedMealIds.map((id) => meals.find((meal) => meal.id === id)).filter(Boolean).map((meal) => ({
+      name: meal.name,
+      items: meal.items.map(quickItem).filter(Boolean).map((item) => `${item.name} — ${amount(item, mealItemAmount(meal.id, item.id))}`),
+    })) },
+    { title: 'Quick add', entries: quickSelectedItemIds.map(quickItem).filter(Boolean).map((item) => ({
+      name: `${item.name} — ${amount(item, quickItemAmount(item.id))}`,
+      items: [],
+    })) },
+  ].filter((section) => section.entries.length);
+}
+
+function currentPlanText(sections) {
+  return [`Today's nutrition plan — ${new Date().toLocaleDateString()}`, ...(sections.length ? sections.flatMap((section) => [
+    '', section.title, ...section.entries.flatMap((entry) => [`• ${entry.name}`, ...entry.items.map((item) => `  - ${item}`)]),
+  ]) : ['', 'No meals or quick-add items selected.'])].join('\n');
+}
+
+function updatePrintPlan() {
+  const sheet = document.querySelector('[data-plan-print]');
+  if (!sheet) return;
+  const sections = currentPlanSections();
+  sheet.innerHTML = `<h1>Today's nutrition plan</h1><p>${escapeHTML(new Date().toLocaleDateString())}</p>${sections.length
+    ? sections.map((section) => `<section><h2>${section.title}</h2>${section.entries.map((entry) => `<div class="plan-print-entry"><h3>${escapeHTML(entry.name)}</h3>${entry.items.length ? `<ul>${entry.items.map((item) => `<li>${escapeHTML(item)}</li>`).join('')}</ul>` : ''}</div>`).join('')}</section>`).join('')
+    : '<p>No meals or quick-add items selected.</p>'}`;
 }
 
 function portionControlHTML(scope, id, value, visible = true, label = "Portion", attributes = "") {
@@ -1147,6 +1184,10 @@ async function initStackPage() {
     if (window.location.hash === '#deep-library') plannerMode = 'library';
     if (plannerMode === 'library') await ensureStackLibraryData();
     renderStack();
+    const sheet = document.createElement('article');
+    sheet.dataset.planPrint = '';
+    document.body.append(sheet);
+    window.addEventListener('beforeprint', updatePrintPlan);
   }
 }
 
@@ -1156,6 +1197,21 @@ else initStackPage();
 document.addEventListener('click', async (event) => {
   const root = document.getElementById('stack-app');
   if (!root) return;
+
+  if (event.target.closest('[data-copy-plan]')) {
+    try {
+      await navigator.clipboard.writeText(currentPlanText(currentPlanSections()));
+      showToast("Today's plan copied", { type: 'success' });
+    } catch {
+      showToast('Could not copy the plan. Check clipboard permissions or use Print.', { type: 'warning' });
+    }
+    return;
+  }
+  if (event.target.closest('[data-print-plan]')) {
+    updatePrintPlan();
+    window.print();
+    return;
+  }
 
   if (event.target.closest("[data-meal-editor-delete]")) { root.querySelector("[data-meal-delete-confirm]").hidden = false; root.querySelector("[data-meal-delete-cancel]").focus(); return; }
   if (event.target.closest("[data-meal-delete-cancel]")) { root.querySelector("[data-meal-delete-confirm]").hidden = true; return; }
