@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v39-singapore-baseline';
+const CACHE_NAME = 'macro-longevity-offline-v40-expanded-markers';
 const STATIC_ASSETS = [
   './',
   'index.html',

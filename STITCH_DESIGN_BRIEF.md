@@ -21,8 +21,8 @@ that risk-based targets and clinician advice can override generic guideposts.
 
 ## Screens to generate
 
-- Home: “Know your baseline. Take one next step.” with the five-marker local
-  workspace visible above the fold on desktop and in a compact vertical flow on
+- Home: “Know your baseline. Take one next step.” with the twelve-marker local
+  workspace grouped by common screening, ApoB/Lp(a), and kidney checks, in a vertical flow on
   mobile.
 - Health: the same shared baseline workspace followed by the deeper screening
   map: preparation, core panel, one-time checks, periodic checks, ApoB options,
@@ -60,8 +60,10 @@ that risk-based targets and clinician advice can override generic guideposts.
 ## Stitch prompt
 
 > Create a warm, flat-color, Singapore-focused health screening PWA for adults.
-> The primary screen is a baseline workspace with five cards: blood pressure,
-> waist circumference, BMI, fasting glucose, and LDL cholesterol. Each card
+> The primary screen is a baseline workspace with twelve cards: blood pressure,
+> waist circumference, BMI, fasting glucose, LDL cholesterol, triglycerides,
+> non-HDL cholesterol, HbA1c, ApoB, Lp(a), eGFR, and urine ACR. Group common
+> screening separately from advanced lipid and kidney checks. Each card
 > shows a plain-language reason, an input for the latest result, units, an
 > orientation target, a non-diagnostic status, and a collapsed three-step
 > “how to move toward this level” section. Place a blue “Priority first” strip

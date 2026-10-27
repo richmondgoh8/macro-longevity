@@ -9,6 +9,13 @@ information hierarchy intentionally progressive: summary → personal value → 
 context → next steps → source links. No third-party icon runtime or attribution is
 required for the workspace visuals.
 
+The workspace groups 12 markers into common screening, ApoB/Lp(a), and kidney
+checks. The kidney group is collapsed initially. Result counts are records,
+not a health score or a requirement to order all tests. Values retain their
+report units. Marker fields use one bordered wrapper with a borderless flexible
+input and a separate, non-shrinking unit suffix. Focus belongs to the wrapper;
+avoid a second input border or a divider immediately above each disclosure.
+
 ## Architecture
 
 Dependency-free multi-page HTML/CSS and native ES modules. Keep the five destinations:

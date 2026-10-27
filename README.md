@@ -8,7 +8,8 @@ A local-first Singapore health screening and longevity guide with optional nutri
 
 - A reusable-meal Daily Plan with portion controls and nutrient-gap estimates
 - A searchable, five-screen Ingredient guide
-- A Singapore baseline workspace for blood pressure, waist, BMI, glucose and LDL cholesterol
+- A Singapore baseline workspace with 12 markers: blood pressure, waist, BMI, fasting glucose, LDL-C, triglycerides, non-HDL-C, HbA1c, ApoB, Lp(a), eGFR and urine ACR
+- Grouped screening guidance with risk-based lipid targets and report-unit selection for ApoB, Lp(a) and urine ACR
 - Progressive “how to move toward this level” guidance for each marker
 - Singapore screening roadmap for cardiovascular, cervical, breast and colorectal checks
 - Blood-test references and an evidence-tiered healthspan Blueprint

@@ -1,6 +1,15 @@
 // Singapore screening data. Keep thresholds labelled as orientation points,
 // not diagnoses; personal targets depend on age, risk and existing conditions.
 
+const LIPID_SOURCE = 'https://www.acc.org/about-acc/press-releases/2026/03/13/18/01/accaha-issue-updated-guideline-for-managing-lipids-cholesterol';
+const KIDNEY_SOURCE = 'https://www.niddk.nih.gov/health-information/professionals/advanced-search/quick-reference-uacr-gfr';
+
+export const SG_MARKER_GROUPS = [
+  { id: 'routine', title: 'Common screening results', open: true, description: 'Start with blood pressure, body measurements, glucose and the full lipid panel. HbA1c may be offered as a glucose screening or monitoring test; ask which test fits your situation.', ids: ['bp', 'waist', 'bmi', 'glucose', 'ldl', 'tg', 'nonhdl', 'hba1c'] },
+  { id: 'lipids', title: 'Beyond LDL: ApoB and Lp(a)', open: true, description: 'Ask for ApoB when particle burden may be missed by LDL-C, especially with high triglycerides, diabetes or known cardiovascular disease. Discuss a one-time adult Lp(a) test for inherited risk. These may cost extra and are not automatically included in Healthier SG screening.', ids: ['apob', 'lpa'] },
+  { id: 'kidney', title: 'Kidney checks: add when your risk warrants', open: false, description: 'Particularly useful with diabetes, hypertension or suspected kidney disease. Check filtration and urine albumin together; a single abnormal result does not establish chronic kidney disease.', ids: ['egfr', 'uacr'] },
+];
+
 export const SG_MARKERS = [
   {
     id: 'bp',
@@ -99,6 +108,84 @@ export const SG_MARKERS = [
       ['Personalise the target', 'Family history, diabetes, blood pressure and smoking change the decision; ask a clinician whether ApoB or Lp(a) adds value.'],
     ],
     source: 'https://www.healthhub.sg/programmes/healthiersg-screening/screening-faq',
+  },
+  {
+    id: 'tg', label: 'Triglycerides', eyebrow: 'Full lipid panel', icon: 'heart',
+    inputLabel: 'Latest triglycerides', placeholder: 'e.g. 1.2', inputMode: 'decimal', suffix: 'mmol/L',
+    target: 'Fasting reference <1.7 mmol/L; interpret non-fasting results with your clinic',
+    why: 'High triglycerides can reveal metabolic risk and make LDL-C less informative about particle burden.',
+    steps: [
+      ['Check the sample', 'Record whether it was fasting. Alcohol, recent meals and illness can affect the result.'],
+      ['Work on the drivers', 'Reduce sugary drinks and excess alcohol, move regularly and address glucose or weight issues with support.'],
+      ['Follow up persistent elevation', 'Ask whether repeat testing, ApoB or treatment is appropriate. Very high values need prompt clinical advice.'],
+    ],
+    source: 'https://eas-society.org/wp-content/uploads/2022/05/2019_EAS-ESC_Guidelines_dyslipidaemia_ATH.pdf',
+  },
+  {
+    id: 'nonhdl', label: 'Non-HDL cholesterol', eyebrow: 'Full lipid panel', icon: 'heart',
+    inputLabel: 'Latest non-HDL-C', placeholder: 'e.g. 3.0', inputMode: 'decimal', suffix: 'mmol/L',
+    target: 'Total cholesterol minus HDL-C; your goal depends on cardiovascular risk',
+    why: 'Captures cholesterol in all atherogenic particles and adds context when triglycerides are elevated.',
+    steps: [
+      ['Use the full panel', 'Find total cholesterol and HDL-C on the same report; subtract HDL-C from total cholesterol in the same units.'],
+      ['Set a personal goal', 'Ask your clinician to interpret it alongside LDL-C, ApoB, family history and existing conditions.'],
+      ['Track the response', 'Use food changes, activity and prescribed treatment, then repeat at the interval agreed with your clinician.'],
+    ], source: LIPID_SOURCE,
+  },
+  {
+    id: 'hba1c', label: 'HbA1c', eyebrow: 'Glucose context', icon: 'drop',
+    inputLabel: 'Latest HbA1c', placeholder: 'e.g. 5.4', inputMode: 'decimal', suffix: '%',
+    target: 'Use your clinician’s reference or diabetes care goal; this guide does not diagnose from HbA1c',
+    why: 'Reflects glucose exposure over roughly three months. Screening interpretation differs from targets for people already treated for diabetes.',
+    steps: [
+      ['Check suitability', 'Anaemia, haemoglobin variants, pregnancy and kidney conditions can affect interpretation. Confirm the report uses percent.'],
+      ['Build consistent habits', 'Regular movement, balanced meals and sleep help glucose control; treatment goals should be individualised.'],
+      ['Confirm next steps', 'In Singapore, HbA1c alone is not used to diagnose prediabetes. Ask whether fasting glucose or an oral glucose tolerance test is needed.'],
+    ], source: 'https://www.ace-hta.gov.sg/healthcare-professionals/acg/managing-pre-diabetes----a-growing-health-concern-acg/',
+  },
+  {
+    id: 'apob', label: 'Apolipoprotein B (ApoB)', eyebrow: 'Particle burden', icon: 'heart',
+    inputLabel: 'Latest ApoB', placeholder: 'e.g. 0.85', inputMode: 'decimal', suffix: 'g/L', units: ['g/L', 'mg/dL'],
+    target: 'Risk-based secondary goals: <1.00 / <0.80 / <0.65 g/L for moderate / high / very-high risk',
+    why: 'Estimates the number of atherogenic particles. It can reveal residual risk even when LDL cholesterol looks reassuring.',
+    steps: [
+      ['Check package coverage', 'Ask explicitly for ApoB; it is often absent from a standard lipid panel. Match the report units: 1.00 g/L = 100 mg/dL.'],
+      ['Agree on your risk category', 'The listed ESC/EAS goals are treatment guideposts, not a universal target or a self-assigned risk category.'],
+      ['Reduce particle exposure', 'Discuss fibre-rich food, replacing saturated fats and whether lipid-lowering medication is appropriate; recheck after a clinician-led change.'],
+    ], source: 'https://eas-society.org/wp-content/uploads/2022/05/2019_EAS-ESC_Guidelines_dyslipidaemia_ATH.pdf',
+  },
+  {
+    id: 'lpa', label: 'Lipoprotein(a) — Lp(a)', eyebrow: 'Inherited risk · usually once', icon: 'heart',
+    inputLabel: 'Latest Lp(a)', placeholder: 'e.g. 40', inputMode: 'decimal', suffix: 'nmol/L', units: ['nmol/L', 'mg/dL'],
+    target: 'Risk-enhancing level: ≥125 nmol/L or ≥50 mg/dL; use the units on your report',
+    why: 'A largely inherited cardiovascular risk factor that a standard cholesterol panel does not measure.',
+    steps: [
+      ['Ask about a one-time test', 'The 2026 ACC/AHA guideline recommends measuring at least once in adulthood. Discuss availability and cost with your Singapore clinic.'],
+      ['Keep the original units', 'Do not use a fixed conversion between mg/dL and nmol/L. Selecting units here labels your value; it does not convert it.'],
+      ['Manage the risk around it', 'Lifestyle changes usually have little effect on Lp(a) itself. If elevated, discuss tighter LDL/ApoB and blood-pressure control and whether relatives should be tested.'],
+    ], source: LIPID_SOURCE,
+  },
+  {
+    id: 'egfr', label: 'Kidney filtration (eGFR)', eyebrow: 'Kidney function', icon: 'drop',
+    inputLabel: 'Latest eGFR', placeholder: 'e.g. 95', inputMode: 'decimal', suffix: 'mL/min/1.73m²',
+    target: 'Persistent eGFR <60 needs assessment; ≥60 alone does not rule out kidney disease',
+    why: 'Estimated from blood creatinine; interpret with urine albumin, age, medicines and prior results.',
+    steps: [
+      ['Use the trend', 'Bring the creatinine result, previous eGFR values and your medication/supplement list. Muscle mass can affect creatinine-based estimates.'],
+      ['Pair it with urine ACR', 'Filtration and albumin leakage show different aspects of kidney health. Ask for both when screening is indicated.'],
+      ['Confirm an abnormal result', 'Your clinician may repeat the test or use cystatin C. Chronic kidney disease generally requires evidence lasting more than three months.'],
+    ], source: KIDNEY_SOURCE,
+  },
+  {
+    id: 'uacr', label: 'Urine albumin / creatinine (ACR)', eyebrow: 'Kidney damage', icon: 'drop',
+    inputLabel: 'Latest urine ACR', placeholder: 'e.g. 1.2', inputMode: 'decimal', suffix: 'mg/mmol', units: ['mg/mmol', 'mg/g'],
+    target: 'Lower albumin category: <3 mg/mmol (or <30 mg/g); persistent elevation needs review',
+    why: 'Finds albumin leakage that may appear before filtration falls, especially with diabetes or high blood pressure.',
+    steps: [
+      ['Ask for the right urine test', 'Urine ACR is different from a routine dipstick. Follow the clinic’s collection instructions, often a first-morning sample.'],
+      ['Rule out temporary changes', 'Exercise, infection and menstruation can affect the result; repeat abnormal values as advised.'],
+      ['Protect kidney and heart health', 'Work with your clinician on blood pressure, glucose and indicated medicines; do not adjust treatment on your own.'],
+    ], source: 'https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf',
   },
 ];
 
