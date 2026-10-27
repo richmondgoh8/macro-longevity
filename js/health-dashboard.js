@@ -1,5 +1,5 @@
 // Shared local-first baseline workspace for the Home and Health routes.
-import { SG_MARKERS, SG_MARKER_GROUPS, SG_SCREENING_PATHS, SG_SOURCES } from './data/screening.js';
+import { SG_MARKERS, SG_MARKER_GROUPS, SG_SCREENING_PATHS, SG_SOURCES, SG_ACTION_SOURCES } from './data/screening.js';
 import { escapeHTML } from './components/ui.js';
 
 const STORAGE_KEY = 'sg-health-baseline-v1';
@@ -99,7 +99,7 @@ function markerCard(marker, state) {
     </div>
     ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(unit => `<option${markerUnit(marker, state) === unit ? ' selected' : ''}>${escapeHTML(unit)}</option>`).join('')}</select></div>` : ''}
     <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span>${escapeHTML(marker.target)}</p>
-    <details class="sg-marker-details"><summary>How to move toward this level</summary><ol>${marker.steps.map(([title, text]) => `<li><strong>${escapeHTML(title)}</strong><span>${escapeHTML(text)}</span></li>`).join('')}</ol><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a></p></details>
+    <details class="sg-marker-details"><summary>${['lpa', 'egfr'].includes(marker.id) ? 'Actions to protect your health' : 'How to move toward this level'}</summary><div data-marker-actions><p>Open to load practical actions.</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a></p></details>
   </article>`;
 }
 
@@ -158,12 +158,45 @@ export function mountHealthDashboard(mount, { compact = false } = {}) {
     <aside class="sg-priority-note" aria-label="High-value screening shortlist"><strong>Priority first</strong><span>Compare packages for blood pressure, BMI + waist, glucose and a full lipid panel (total cholesterol, HDL-C, LDL-C, triglycerides). Ask explicitly about ApoB for particle risk and a one-time Lp(a) test for inherited risk. Add kidney checks when indicated; more tests do not automatically mean better screening.</span></aside>
     <form class="sg-profile" data-profile-form><div><label for="sg-age">Age</label><input id="sg-age" data-profile-age type="number" min="18" max="120" inputmode="numeric" value="${escapeHTML(state.age)}" placeholder="e.g. 42"></div><div><label for="sg-sex">Sex for screening context</label><select id="sg-sex" data-profile-sex><option value="">Choose if useful</option><option value="female"${state.sex === 'female' ? ' selected' : ''}>Female</option><option value="male"${state.sex === 'male' ? ' selected' : ''}>Male</option></select></div><p data-profile-summary>${escapeHTML(profileSummary(state))}</p></form>
     <div class="sg-marker-groups">${SG_MARKER_GROUPS.map(group => `<details class="sg-marker-group" data-marker-group="${group.id}"${group.open ? ' open' : ''}><summary><h3>${escapeHTML(group.title)}</h3></summary><p class="sg-group-copy">${escapeHTML(group.description)}</p><div class="sg-marker-grid">${group.ids.map(id => markerCard(SG_MARKERS.find(marker => marker.id === id), state)).join('')}</div></details>`).join('')}</div>
+    <details class="sg-marker-group sg-library" data-biomarker-library><summary><h3>Full Blueprint biomarker library · 144 measurements</h3></summary><div data-library-mount><p>Open to search the published blood-and-urine panel and record your results.</p></div></details>
     <section class="sg-roadmap" aria-labelledby="sg-roadmap-title"><div class="sg-section-head"><div><p class="section-eyebrow">Screening roadmap</p><h2 id="sg-roadmap-title">Ask for the right checks at the right time.</h2></div><p>Eligibility can depend on age, sex, last screening date, diagnosis and risk. Use this as a conversation starter with a primary care clinic.</p></div><div class="sg-screening-grid">${SG_SCREENING_PATHS.map((path) => screeningCard(path, state)).join('')}</div></section>
     <p class="sg-source-note">Built from <a href="${SG_SOURCES[0].href}" target="_blank" rel="noreferrer">MOH’s 2026 screening review</a> and <a href="${SG_SOURCES[1].href}" target="_blank" rel="noreferrer">HealthHub guidance</a>. Guidance changes; confirm the current recommendation with your clinic.</p>
+    <p class="sg-source-note">Action references: ${SG_ACTION_SOURCES.map(source => `<a href="${source.href}" target="_blank" rel="noreferrer">${escapeHTML(source.label)}</a>`).join(' · ')}. Start gradually and adapt to your health and mobility; 7,000 steps is a practical goal, not a guarantee of reaching a lab target. If your kidney care team has set diet, fluid or exercise limits, follow those instead.</p>
     <p class="sg-source-note" data-baseline-storage role="status">Results are saved on this device.</p>
   </section>`;
 
   const form = mount.querySelector('[data-profile-form]');
+  mount.addEventListener('toggle', async event => {
+    const details = event.target;
+    if (!details.matches('.sg-marker-details') || !details.open || details.dataset.actionsLoaded) return;
+    details.dataset.actionsLoaded = 'loading';
+    const target = details.querySelector('[data-marker-actions]');
+    target.setAttribute('aria-busy', 'true');
+    try {
+      const { SG_MARKER_ACTIONS, SG_MARKER_CONTEXT } = await import('./data/screening-actions.js');
+      const id = details.closest('[data-marker-card]').dataset.markerCard;
+      target.innerHTML = `<ol>${SG_MARKER_ACTIONS[id].map(([title, text]) => `<li><strong>${escapeHTML(title)}</strong><span>${escapeHTML(text)}</span></li>`).join('')}</ol><p class="sg-marker-reference"><strong>Interpretation, separate from actions:</strong> ${escapeHTML(SG_MARKER_CONTEXT[id])}</p>`;
+      details.dataset.actionsLoaded = 'true';
+    } catch {
+      target.textContent = 'Actions could not load. Close and reopen to retry.';
+      delete details.dataset.actionsLoaded;
+    } finally { target.removeAttribute('aria-busy'); }
+  }, true);
+  const library = mount.querySelector('[data-biomarker-library]');
+  let libraryLoading = false;
+  library.addEventListener('toggle', async () => {
+    if (!library.open || libraryLoading) return;
+    libraryLoading = true;
+    const target = library.querySelector('[data-library-mount]');
+    target.setAttribute('aria-busy', 'true');
+    try {
+      const { mountBiomarkerLibrary } = await import('./biomarker-library.js');
+      mountBiomarkerLibrary(target);
+    } catch {
+      target.textContent = 'The library could not load. Close and reopen to retry; if offline, reconnect once to download it.';
+      libraryLoading = false;
+    } finally { target.removeAttribute('aria-busy'); }
+  });
   const persist = () => {
     state.age = mount.querySelector('[data-profile-age]').value;
     state.sex = mount.querySelector('[data-profile-sex]').value;

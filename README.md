@@ -11,6 +11,8 @@ A local-first Singapore health screening and longevity guide with optional nutri
 - A Singapore baseline workspace with 12 markers: blood pressure, waist, BMI, fasting glucose, LDL-C, triglycerides, non-HDL-C, HbA1c, ApoB, Lp(a), eGFR and urine ACR
 - Grouped screening guidance with risk-based lipid targets and report-unit selection for ApoB, Lp(a) and urine ACR
 - Progressive “how to move toward this level” guidance for each marker
+- A lazy-loaded, searchable Blueprint reference covering all 140 published baseline measurements, 3 male additions, 1 female addition and 86 matched follow-up entries; local result, unit, reference-interval and date logging
+- Concrete daily/weekly marker actions, with testing instructions and non-modifiable risks clearly separated
 - Singapore screening roadmap for cardiovascular, cervical, breast and colorectal checks
 - Blood-test references and an evidence-tiered healthspan Blueprint
 - A minimal-equipment training plan with timers and sound cues
@@ -92,6 +94,8 @@ Page-specific modules are loaded only by the routes that use them. Shared behavi
 
 There is no backend or account system. Planner state and finance entries are stored in the browser with `localStorage`; clearing site data removes them. The export action creates a Markdown file locally. The application does not include analytics or external fonts. Training music and sound cues are fetched from Freesound when a timer starts; those optional sounds require a connection and share the request with that provider. Timers remain usable without audio.
 
+Screening values use `sg-health-baseline-v1`; optional library results use `blueprint-marker-results-v1`. They are separate records, not automatically synced or included in the existing plan export. Library rows can be cleared individually. Results never leave the browser; avoid entering identifying information on shared devices. The reference list was checked against [the official published panel](https://immortals.com/pages/biomarkers) on 2026-10-27. It is not a claim about every private test Bryan Johnson has ever taken, nor a recommendation to order every listed test.
+
 ## Design system
 
 [DESIGN.md](DESIGN.md) defines the Calm Wellness visual contract. [css/variables.css](css/variables.css) implements its Warm Canvas tokens, [css/wellness.css](css/wellness.css) holds shared components, and the route stylesheets refine individual pages.
@@ -105,6 +109,8 @@ When changing an authored design value, update both `DESIGN.md` and `css/variabl
 ## Deployment
 
 Live site: <https://hazelah.me/macro-longevity/>. GitHub Pages inherits the account's custom domain; the `richmondgoh8.github.io/macro-longevity/` address redirects there.
+
+Quality runs desktop and mobile in parallel with one browser worker per runner, npm caching, superseded-run cancellation and documentation-only skips. Main pushes and PRs are checked; use the Quality workflow’s manual dispatch to recheck/redeploy current main. Pages deploys only after successful Quality, checks out the tested SHA and rejects a stale revision. Browser reports are uploaded separately on failure. No privileged deployment runs PR code.
 
 There is no build step. GitHub Pages can publish the repository root directly; `.nojekyll` keeps the static asset paths intact. Relative route resolution supports both a repository project URL such as `https://richmondgoh8.github.io/macro-longevity/` and the existing custom-domain root. Enable Pages under **Settings → Pages → GitHub Actions** and use the included workflow if your repository has Actions enabled. On static hosts other than Cloudflare, configure the published files so repository metadata, tests, and development dependencies are excluded. For Cloudflare Workers, install the development dependencies with `npm ci`, then deploy with `npx wrangler deploy` after authenticating. [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development. Training's optional remote audio is not available offline.
 

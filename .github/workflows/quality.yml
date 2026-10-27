@@ -2,11 +2,27 @@ name: Quality
 
 on:
   push:
+    branches: [main]
+    paths-ignore: ['**/*.md']
   pull_request:
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   browser-quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop-chromium, mobile-chromium]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,9 +32,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run audit
-      - run: npm run test:ui
+      - run: npm audit
+      - run: npm run test:ui -- --project=${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: playwright-report/

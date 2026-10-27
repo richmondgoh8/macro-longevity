@@ -1,9 +1,10 @@
 name: Deploy static PWA to GitHub Pages
 
 on:
-  push:
+  workflow_run:
+    workflows: [Quality]
     branches: [main]
-  workflow_dispatch:
+    types: [completed]
 
 permissions:
   contents: read
@@ -16,6 +17,8 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository
+    timeout-minutes: 5
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -23,6 +26,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Verify tested revision is still current
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          CURRENT_SHA=$(git ls-remote origin refs/heads/main | cut -f1)
+          test "$CURRENT_SHA" = "$TESTED_SHA" || { echo 'A newer revision exists; refusing stale deployment.'; exit 1; }
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Prepare website files

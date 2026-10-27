@@ -7,7 +7,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v40-expanded-markers');
+  expect(cacheKeys).toContain('macro-longevity-offline-v41-blueprint-library');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
 
   await context.setOffline(true);
@@ -15,5 +15,9 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.goto(`${baseURL}/pages/avoid.html`, { waitUntil: 'domcontentloaded' });
   expect(Date.now() - started).toBeLessThan(500);
   await expect(page.getByRole('heading', { name: 'Ingredients to Avoid' })).toBeVisible();
+  await page.goto(`${baseURL}/pages/blood.html`);
+  await page.locator('[data-biomarker-library] > summary').click();
+  await page.getByLabel('Search all biomarkers').fill('ApoB');
+  await expect(page.locator('[data-library-marker="apolipoproteinb"]')).toBeVisible();
   await context.close();
 });

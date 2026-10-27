@@ -148,6 +148,8 @@ test('copy and print use the current meal and quick-add amounts on mobile and de
   }
   await page.locator('[data-clear-stack]').click();
   await page.locator('.ui-confirm-dialog [data-confirm-submit]').click();
+  await expect(page.locator('.ui-confirm-dialog')).toBeHidden();
+  await expect(page.locator('[data-quick-card="chicken"] [data-gram-input]')).toHaveCount(0);
   await page.getByRole('button', { name: "Copy today's plan" }).click();
   expect(await page.evaluate(() => window.__copiedPlan)).toContain('No meals or quick-add items selected.');
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));

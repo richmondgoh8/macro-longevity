@@ -101,6 +101,8 @@ const javascriptFiles = [
   'js/finance.js', 'js/register-sw.js', 'sw.js',
   'js/site.js', 'js/avoid.js', 'js/stack-preview.js', 'js/components/card-swipe.js',
   'js/home-dashboard.js', 'js/health-dashboard.js', 'js/data/screening.js',
+  'js/biomarker-library.js', 'js/data/blueprint-markers.js',
+  'js/data/screening-actions.js',
   'js/components/coverage-pin.js', 'js/components/nutrition-totals.js', 'js/components/modal.js', 'js/components/coverage-dialog.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
   'js/components/toast.js', 'js/components/tooltip.js',
 ];
