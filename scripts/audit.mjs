@@ -19,13 +19,15 @@ required.forEach((file) => check(fs.existsSync(path.join(root, file)), `Missing 
 
 pages.forEach((file) => {
   const html = read(file);
+  const assetPrefix = file.startsWith('pages/') ? '../' : '';
   check(!/<(?:button|select|form)[^>]+\bon(?:click|change|submit)\s*=/i.test(html), `${file}: inline event handler found`);
   check(!/<script\s*>/i.test(html), `${file}: inline script block found`);
   check(/script-src 'self'(?:;|')/.test(html), `${file}: strict script CSP missing`);
   check(!/script-src 'self' 'unsafe-inline'/.test(html), `${file}: unsafe inline script CSP remains`);
   check(/rel="canonical"/.test(html), `${file}: canonical URL missing`);
-  check(/src="\/js\/register-sw\.js"/.test(html), `${file}: service-worker bootstrap missing`);
-  check(html.includes('/fonts/inter-latin.woff2'), `${file}: local Inter font preload missing`);
+  check(html.includes(`src="${assetPrefix}js/register-sw.js"`), `${file}: service-worker bootstrap missing`);
+  check(html.includes(`${assetPrefix}fonts/inter-latin.woff2`), `${file}: local Inter font preload missing`);
+  check(!/(?:href|src)="\/(?:css|js|pages|sw\.js|manifest\.json|favicon\.svg)/.test(html), `${file}: root-absolute project asset path breaks project Pages hosting`);
   check(!html.includes('geist-'), `${file}: legacy Geist font reference remains`);
   const primaryLabels = [...html.matchAll(/class="nav-link(?: active)?"[^>]*>([^<]+)<\/a>/g)].map((match) => match[1].trim());
   const bottomLabels = [...html.matchAll(/class="bottom-nav-label">([^<]+)<\/span>/g)].map((match) => match[1].trim());
@@ -47,12 +49,14 @@ check(!/onclick=|onchange=/.test(stack), 'js/stack.js: inline event handler foun
 check(stack.includes('role="tablist"'), 'js/stack.js: tablist semantics missing');
 
 const sw = read('sw.js');
-const assets = [...sw.matchAll(/'([^']+)'/g)].map((match) => match[1]).filter((asset) => asset.startsWith('/'));
-assets.forEach((asset) => check(fs.existsSync(path.join(root, asset.slice(1))), `sw.js: precached asset missing: ${asset}`));
-check(sw.includes('/fonts/inter-latin.woff2') && sw.includes('/fonts/jetbrains-mono-latin.woff2'), 'sw.js: Warm Canvas font assets missing from precache');
+const staticAssetBlock = sw.match(/const STATIC_ASSETS = \[(.*?)\];/s)?.[1] || '';
+const assets = [...staticAssetBlock.matchAll(/'([^']+)'/g)].map((match) => match[1]);
+assets.forEach((asset) => check(fs.existsSync(path.join(root, asset.replace(/^\.\//, ''))), `sw.js: precached asset missing: ${asset}`));
+check(sw.includes("'fonts/inter-latin.woff2'") && sw.includes("'fonts/jetbrains-mono-latin.woff2'"), 'sw.js: Warm Canvas font assets missing from precache');
 check(!sw.includes('geist-'), 'sw.js: legacy Geist font remains precached');
 
 const variables = read('css/variables.css');
+check(!/url\(\/(?:fonts|css|js|pages)\//.test(variables), 'css/variables.css: root-absolute asset path breaks project Pages hosting');
 check(variables.includes('--color-primary: #246B4B'), 'css/variables.css: Warm Canvas primary token missing');
 check(variables.includes("font-family: 'Inter'"), 'css/variables.css: Inter font face missing');
 check(variables.includes("font-family: 'JetBrains Mono'"), 'css/variables.css: JetBrains Mono font face missing');
@@ -92,10 +96,11 @@ check(nutritionData.includes('actions: { food:'), 'js/data/nutrition.js: target 
 
 const javascriptFiles = [
   'js/data/stack.js', 'js/data/blood.js', 'js/data/workout.js', 'js/data/finance.js',
-  'js/data/pillars.js', 'js/data/protocol.js', 'js/data/singapore.js', 'js/data/nutrition.js', 'js/stack.js',
+  'js/data/pillars.js', 'js/data/protocol.js', 'js/data/singapore.js', 'js/data/nutrition.js', 'js/paths.js', 'js/stack.js',
   'js/blood.js', 'js/render.js', 'js/export.js', 'js/home.js', 'js/protocol.js',
   'js/finance.js', 'js/register-sw.js', 'sw.js',
   'js/site.js', 'js/avoid.js', 'js/stack-preview.js', 'js/components/card-swipe.js',
+  'js/home-dashboard.js', 'js/health-dashboard.js', 'js/data/screening.js',
   'js/components/coverage-pin.js', 'js/components/nutrition-totals.js', 'js/components/modal.js', 'js/components/coverage-dialog.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
   'js/components/toast.js', 'js/components/tooltip.js',
 ];

@@ -3,41 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A carnivore-first longevity protocol — the daily stack, the annual blood panel, daily movement, and financial independence. Few things, done consistently, each justified.">
+    <meta name="description" content="A Singapore-focused health screening and longevity guide: know your baseline, prioritise high-value checks, and take one practical next step.">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; media-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
     <link rel="canonical" href="https://macro-longevity.com/">
-    <meta property="og:title" content="Macro Longevity — Carnivore-First Longevity Protocol">
-    <meta property="og:description" content="An evidence-informed longevity protocol covering daily habits, blood tests, training, and financial resilience.">
+    <meta property="og:title" content="Macro Longevity — Your Singapore Health Baseline">
+    <meta property="og:description" content="A calm, practical guide to Singapore screening markers, target ranges, and what to do next.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://macro-longevity.com/">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#F7F8F3">
-    <title>Macro Longevity — Carnivore-First Longevity Protocol</title>
-    <link rel="stylesheet" href="/css/variables.css">
-    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/home-layout.css">
-    <link rel="stylesheet" href="/css/tooltip.css">
+    <title>Macro Longevity — Your Singapore Health Baseline</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home-layout.css">
+    <link rel="stylesheet" href="css/singapore-health.css">
+    <link rel="stylesheet" href="css/tooltip.css">
     <link rel="expect" href="#view-transition-anchor" blocking="render">
-    <link rel="stylesheet" href="/css/wellness.css">
+    <link rel="stylesheet" href="css/wellness.css">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <nav class="nav" aria-label="Primary navigation">
         <div class="nav-inner">
-            <a href="/" class="nav-logo">
+            <a href="./" class="nav-logo">
                 <span class="nav-logo-text">MacroLongevity</span>
             </a>
             <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-links">
-                <a href="/" class="nav-link active" aria-current="page">Home</a>
-                <a href="/pages/stack.html" class="nav-link">Nutrition</a>
-                <a href="/pages/blood.html" class="nav-link">Health</a>
-                <a href="/pages/workout.html" class="nav-link">Training</a>
-                <a href="/pages/finance.html" class="nav-link">Finance</a>
+                <a href="./" class="nav-link active" aria-current="page">Home</a>
+                <a href="pages/stack.html" class="nav-link">Nutrition</a>
+                <a href="pages/blood.html" class="nav-link">Health</a>
+                <a href="pages/workout.html" class="nav-link">Training</a>
+                <a href="pages/finance.html" class="nav-link">Finance</a>
             </div>
         </div>
     </nav>
@@ -48,26 +49,32 @@
             <div class="section-inner split-screen-hero-shell">
                 <div class="split-screen-hero-content">
                     <div class="split-screen-hero-kicker">
-                        <p class="section-eyebrow">A calmer protocol</p>
+                        <p class="section-eyebrow">Singapore health screening, made legible</p>
                         <span class="home-split-index">01 / 04 · Start here</span>
                     </div>
-                    <h1 class="hero-title">Longevity, <span class="gradient-text">Without the Hype</span></h1>
+                    <h1 class="hero-title">Know your baseline. <span class="gradient-text">Take one next step.</span></h1>
                     <p class="hero-subtitle">
-                        The few things that matter — a daily protocol, an annual blood panel,
-                        and the ingredients to avoid. No mechanism marketing. Just what works.
+                        A practical guide to the common health markers in Singapore screening,
+                        the checks that matter most for long-term health, and how to move toward your next level.
                     </p>
                     <div class="hero-actions">
-                        <a href="/pages/stack.html" class="btn btn-primary">Build today’s plan</a>
-                        <a href="/pages/protocol.html" class="btn btn-secondary">See the 80/20 blueprint</a>
+                        <a href="#baseline" class="btn btn-primary">Build my baseline</a>
+                        <a href="pages/blood.html" class="btn btn-secondary">See the screening map</a>
                     </div>
                 </div>
                 <nav class="split-screen-hero-visual" aria-label="Protocol pillars">
                     <div class="split-screen-hero-visual-head">
-                        <p class="split-screen-hero-visual-kicker">Protocol map</p>
-                        <span class="split-screen-hero-visual-meta">04 pillars · 01 system</span>
+                        <p class="split-screen-hero-visual-kicker">Start with the signal</p>
+                        <span class="split-screen-hero-visual-meta">04 pathways · 01 baseline</span>
                     </div>
                     <div id="hero-pillar-map" class="hero-pillar-map"></div>
                 </nav>
+            </div>
+        </section>
+
+        <section id="baseline" class="section section-alt">
+            <div class="section-inner">
+                <div id="sg-home-dashboard"></div>
             </div>
         </section>
 
@@ -78,9 +85,9 @@
                     <span class="home-split-index">02 / 04 · Orient</span>
                 </div>
                 <div class="home-split-content">
-                    <h2 class="section-title">Four pillars hold up a long healthspan</h2>
+                    <h2 class="section-title">Five signals make the first conversation easier</h2>
                     <p class="lede">
-                        One hierarchy that contains longevity, anti-cancer prevention, mitochondrial health and functional reserve without duplication. Pillars 1–3 are outcomes; Pillar 4 is the everyday intervention layer that drives them.
+                        The baseline workspace turns a screening report into plain language. The Health page goes deeper on risk-based add-ons and the Singapore screening cadence.
                     </p>
                     <div id="pillars-app" class="pillar-grid"></div>
                     <details class="progressive-section home-method">
@@ -98,9 +105,9 @@
                     <span class="home-split-index">03 / 04 · Prioritize</span>
                 </div>
                 <div class="home-split-content">
-                    <h2 class="section-title">The Longevity 101</h2>
+                        <h2 class="section-title">The Longevity 101</h2>
                     <p class="lede">
-                        The research converges on a simple conclusion: longevity is mostly not a shopping problem. The highest-return actions are ordinary.
+                        Longevity is mostly not a shopping problem. The highest-return actions are ordinary: know your numbers, move regularly, sleep, eat a repeatable pattern, and follow up when a trend changes.
                     </p>
                     <ol id="longevity101-app" class="longevity-101"></ol>
                     <button type="button" class="text-button longevity-toggle" data-longevity-toggle aria-controls="longevity101-app" aria-expanded="false">Show all 10 actions</button>
@@ -117,7 +124,7 @@
                 <div class="home-split-content">
                     <h2 class="section-title">The Core Protocol</h2>
                     <p class="section-text">
-                        Six outcome domains, a tiny core stack and targeted options only when they have a clear job. Full details and risks on the Daily Stack page.
+                        Six outcome domains, a practical baseline and targeted options only when they have a clear job. Full detail on the Nutrition and Health pages.
                     </p>
                     <div id="stack-summary-app"></div>
                 </div>
@@ -132,22 +139,21 @@
                 </div>
                 <div class="home-split-content">
                     <div class="preview-grid">
-                        <a href="/pages/stack.html" class="preview-card">
+                        <a href="pages/stack.html" class="preview-card">
                             <h3 class="preview-title">Daily Stack</h3>
                             <p class="preview-desc">
-                                 Supplements, foods, extras — and the 21 things to skip.
+                                Food patterns and daily defaults that make your screening targets easier to reach.
                             </p>
                             <span class="preview-cta">View the protocol →</span>
                         </a>
-                        <a href="/pages/blood.html" class="preview-card">
+                        <a href="pages/blood.html" class="preview-card">
                             <h3 class="preview-title">Blood Tests</h3>
                             <p class="preview-desc">
-                                The annual panel that matters, the one-time tests that settle questions forever,
-                                and the low-value tests that only drain your wallet.
+                                Singapore screening recommendations, high-impact markers and the next step for each one.
                             </p>
                             <span class="preview-cta">Plan your panel →</span>
                         </a>
-                        <a href="/pages/workout.html" class="preview-card">
+                        <a href="pages/workout.html" class="preview-card">
                             <h3 class="preview-title">Daily Workout</h3>
                             <p class="preview-desc">
                                 Strength, mobility, aerobic base and interval timers with sound cues.
@@ -155,7 +161,7 @@
                             </p>
                             <span class="preview-cta">Start moving →</span>
                         </a>
-                        <a href="/pages/finance.html" class="preview-card">
+                        <a href="pages/finance.html" class="preview-card">
                             <h3 class="preview-title">Finance</h3>
                             <p class="preview-desc">
                                 Investment combos and the FIRE calculator — because financial health
@@ -201,19 +207,19 @@
                 <span>MacroLongevity</span>
             </div>
             <p class="footer-text">
-                Evidence-informed guidance for a carnivore-first longevity protocol.
-                Not medical advice. Consult your physician before starting any supplement
-                or dietary regimen.
+                Evidence-informed guidance for Singapore health screening and everyday longevity.
+                Not medical advice. Discuss results and personal targets with your doctor.
             </p>
             <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
-    <script type="module" src="/js/stack-preview.js"></script>
-    <script type="module" src="/js/home.js"></script>
-    <script type="module" src="/js/site.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="/" class="bottom-nav-item active"><span class="bottom-nav-label">Home</span></a><a href="/pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-label">Nutrition</span></a><a href="/pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="/pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="/pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
- <script src="/js/register-sw.js" defer></script>
+    <script type="module" src="js/stack-preview.js"></script>
+    <script type="module" src="js/home-dashboard.js"></script>
+    <script type="module" src="js/home.js"></script>
+    <script type="module" src="js/site.js"></script>
+<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="./" class="bottom-nav-item active"><span class="bottom-nav-label">Home</span></a><a href="pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-label">Nutrition</span></a><a href="pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
+ <script src="js/register-sw.js" defer></script>
 </body>
 </html>

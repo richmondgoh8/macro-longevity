@@ -18,6 +18,7 @@ import {
   SUPPLEMENT_GUIDANCE,
 } from './data/nutrition.js';
 import { closeModalDialog, confirmAction, escapeHTML, icon, iconButton, openModalDialog, showToast } from './components/ui.js';
+import { appPath } from './paths.js';
 
 let stackTab = "supplements";
 let DAILY_SUPPLEMENTS = [];
@@ -1131,7 +1132,7 @@ function updateMealPlannerUI({ customized = true } = {}) {
 }
 
 function syncNutritionContext(mode = plannerMode) {
-  if (window.location.pathname !== '/pages/stack.html') return;
+  if (appPath() !== '/pages/stack.html') return;
   const libraryActive = mode === 'library';
   document.querySelectorAll('[data-context-planner-mode]').forEach((link) => {
     const active = link.dataset.contextPlannerMode === (libraryActive ? 'library' : 'meals');
@@ -1228,13 +1229,13 @@ document.addEventListener('click', async (event) => {
   if (event.target.closest("[data-meal-discard-confirm]")) { await closeMealComposer(root, "discard"); return; }
 
   const contextMode = event.target.closest('[data-context-planner-mode]');
-  if (contextMode && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0 && window.location.pathname === '/pages/stack.html') {
+  if (contextMode && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0 && appPath() === '/pages/stack.html') {
     event.preventDefault();
     const nextMode = contextMode.dataset.contextPlannerMode === 'library' ? 'library' : 'meals';
     plannerMode = nextMode;
     plannerSearchQuery = '';
     if (nextMode === 'library') window.history.pushState(null, '', '#deep-library');
-    else window.history.pushState(null, '', window.location.pathname + window.location.search);
+    else window.history.pushState(null, '', `${window.location.pathname}${window.location.search}`);
     if (nextMode === 'library') await ensureStackLibraryData();
     renderStack();
     requestAnimationFrame(() => document.getElementById(nextMode === 'library' ? 'planner-library' : 'planner-title')?.scrollIntoView({ block: 'start', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));

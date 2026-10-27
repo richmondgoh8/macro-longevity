@@ -1,6 +1,7 @@
 // blood.js — Blood Tests rendering (annual panel, deficiency markers, low-value tests)
 import { ANNUAL_PANEL, BLOOD_TIERS, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_EFFECTS } from './data/blood.js';
 import { escapeHTML } from './components/ui.js';
+import { mountHealthDashboard } from './health-dashboard.js';
 
 function labelWithoutMarker(value) {
   return String(value ?? '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
@@ -15,7 +16,7 @@ function testCard(t) {
   return `
     <details class="blood-card blood-test-row">
       <summary><span><span class="blood-card-name" role="heading" aria-level="3">${t.name}</span><span class="blood-card-range"><span class="stack-line-label">Target</span> <span class="blood-range">${t.optimalRange}</span></span></span><span class="blood-test-meta"><span class="blood-card-freq">${t.frequency}</span>${t.evidence ? evidenceBadge(t.evidence) : ""}</span></summary>
-      <div class="blood-test-detail"><p class="blood-card-why">${t.why}</p>${t.carnivoreNote ? `<div class="carnivore-note">${t.carnivoreNote}</div>` : ""}</div>
+      <div class="blood-test-detail"><p class="blood-card-why">${t.why}</p>${t.carnivoreNote ? `<div class="carnivore-note"><span class="stack-line-label">Context</span> ${t.carnivoreNote}</div>` : ""}</div>
     </details>`;
 }
 
@@ -43,6 +44,7 @@ function tierSection(tier, open = false) {
 }
 
 export function renderBlood() {
+  mountHealthDashboard(document.getElementById('sg-health-dashboard'), { compact: true });
   const container = document.getElementById("blood-app");
   if (!container) return;
 
@@ -56,9 +58,9 @@ export function renderBlood() {
         change creatinine, AST and CRP, so avoid testing immediately after unusually hard training.
       </p>
       <p class="blood-prep-text">
-        In Singapore: Healthier SG screening covers the basics (BP, glucose, lipids) at polyclinics.
-        For the real panel, a private clinic is ~S$250–450 — explicitly request ApoB, fasting insulin,
-        ferritin + iron studies, Lp(a), hs-CRP and uric acid, which standard packages skip.
+        In Singapore, Healthier SG screening covers the core cardiovascular checks for eligible people:
+        blood pressure, glucose, lipids, BMI and waist. Ask your clinic which tests are included,
+        whether fasting is needed, and how follow-up will work before paying for a larger package.
       </p>
       </div>
     </details>`;

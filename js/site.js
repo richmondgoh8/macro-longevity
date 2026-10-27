@@ -1,3 +1,5 @@
+import { appPath, siteHref } from './paths.js';
+
 let tooltipImport;
 let pendingTooltip;
 const loadTooltips = (target, type = 'focus') => {
@@ -17,35 +19,37 @@ const CONTEXT_NAV = {
   '/pages/stack.html': {
     label: 'Nutrition',
     links: [
-      { href: '/pages/stack.html', label: 'Daily plan', mode: 'meals' },
-      { href: '/pages/avoid.html', label: 'Ingredient guide' },
-      { href: '/pages/stack.html#deep-library', label: 'Deep library', mode: 'library' },
+      { href: 'pages/stack.html', label: 'Daily plan', mode: 'meals' },
+      { href: 'pages/avoid.html', label: 'Ingredient guide' },
+      { href: 'pages/stack.html#deep-library', label: 'Deep library', mode: 'library' },
     ],
   },
   '/pages/avoid.html': {
     label: 'Nutrition',
     links: [
-      { href: '/pages/stack.html', label: 'Daily plan', mode: 'meals' },
-      { href: '/pages/avoid.html', label: 'Ingredient guide' },
-      { href: '/pages/stack.html#deep-library', label: 'Deep library', mode: 'library' },
+      { href: 'pages/stack.html', label: 'Daily plan', mode: 'meals' },
+      { href: 'pages/avoid.html', label: 'Ingredient guide' },
+      { href: 'pages/stack.html#deep-library', label: 'Deep library', mode: 'library' },
     ],
   },
-  '/pages/blood.html': { label: 'Health', links: [['/pages/blood.html', 'Blood tests'], ['/pages/protocol.html', 'Blueprint']] },
-  '/pages/protocol.html': { label: 'Health', links: [['/pages/blood.html', 'Blood tests'], ['/pages/protocol.html', 'Blueprint']] },
+  '/pages/blood.html': { label: 'Health', links: [['pages/blood.html', 'Blood tests'], ['pages/protocol.html', 'Blueprint']] },
+  '/pages/protocol.html': { label: 'Health', links: [['pages/blood.html', 'Blood tests'], ['pages/protocol.html', 'Blueprint']] },
 };
 
 function renderContextNavigation() {
-  const config = CONTEXT_NAV[window.location.pathname];
+  const pathname = appPath();
+  const config = CONTEXT_NAV[pathname];
   const anchor = document.querySelector('main > .page-header');
   if (!config || !anchor || document.querySelector('.context-nav')) return;
   const links = config.links.map((link) => {
     const { href, label, mode } = Array.isArray(link)
       ? { href: link[0], label: link[1] }
       : link;
-    const current = href === window.location.pathname;
+    const resolvedHref = siteHref(href);
+    const current = appPath(new URL(resolvedHref, window.location.origin).pathname) === pathname;
     const modeAttribute = mode ? ` data-context-planner-mode="${mode}"` : '';
     const isCurrent = current && mode !== 'library';
-    return `<a href="${href}" class="context-nav-link${isCurrent ? ' is-active' : ''}" data-context-link${modeAttribute}${isCurrent ? ' aria-current="page"' : ''}>${label}</a>`;
+    return `<a href="${resolvedHref}" class="context-nav-link${isCurrent ? ' is-active' : ''}" data-context-link${modeAttribute}${isCurrent ? ' aria-current="page"' : ''}>${label}</a>`;
   }).join('');
   anchor.insertAdjacentHTML('afterend', `<nav class="context-nav" aria-label="${config.label}"><div class="section-inner context-nav-inner"><span>${config.label}</span><div>${links}</div></div></nav>`);
 }
@@ -53,20 +57,20 @@ function renderContextNavigation() {
 renderContextNavigation();
 document.querySelectorAll('.bottom-nav').forEach((nav) => nav.setAttribute('aria-label', 'Mobile primary navigation'));
 document.querySelectorAll('.bottom-nav-item.active').forEach((item) => {
-  if (!item.hasAttribute('aria-current')) item.setAttribute('aria-current', new URL(item.href).pathname === window.location.pathname ? 'page' : 'location');
+  if (!item.hasAttribute('aria-current')) item.setAttribute('aria-current', appPath(new URL(item.href).pathname) === appPath() ? 'page' : 'location');
 });
 
 const P='.nav-links a.nav-link,.bottom-nav-item,[data-context-link]',F=new Set;
 function prefetchNavigationPage(l){if(navigator.connection?.saveData||!l||l.target==='_blank')return;const u=new URL(l.href),h=u.pathname+u.search;if(u.origin!==location.origin||u.pathname===location.pathname||F.has(h))return;F.add(h);const p=document.createElement('link');p.rel='prefetch';p.href=u.href;document.head.append(p)}
 ['pointerover','focusin'].forEach(t=>document.addEventListener(t,e=>{const l=e.target.closest?.(P);if(l)prefetchNavigationPage(l)},true));
 
-if (location.pathname === '/') {
+if (appPath() === '/') {
   window.addEventListener('load', () => setTimeout(() => {
     if (navigator.connection?.saveData || document.visibilityState !== 'visible') return;
-    ['/js/stack.js', '/js/data/nutrition.js', '/css/nutrition-layout.css'].forEach((href) => {
+    ['js/stack.js', 'js/data/nutrition.js', 'css/nutrition-layout.css'].forEach((href) => {
       const link = document.createElement('link');
       link.rel = 'prefetch';
-      link.href = href;
+      link.href = siteHref(href);
       document.head.append(link);
     });
   }, 800), { once: true });
@@ -74,7 +78,7 @@ if (location.pathname === '/') {
 
 const LONG_PAGE_ROUTES = new Set(['/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html', '/pages/finance.html']);
 const initLongPageNavigation = () => {
-  if (!LONG_PAGE_ROUTES.has(window.location.pathname)) return;
+  if (!LONG_PAGE_ROUTES.has(appPath())) return;
   const loadStickyPin = () => import('./components/sticky-pin.js').then(({ initStickyPin }) => queueMicrotask(() => initStickyPin()));
   if (document.readyState === 'complete') setTimeout(loadStickyPin, 0);
   else window.addEventListener('load', () => setTimeout(loadStickyPin, 0), { once: true });

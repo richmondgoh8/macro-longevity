@@ -10,7 +10,7 @@ export const PILLARS = [
     icon: "shield",
     desc: "Reduce premature death and disability — the fastest way to improve expected longevity is to cut the risks that actually cause disease.",
     tags: ["CVD", "Cancer", "Diabetes", "Dementia", "CKD", "Infection", "Frailty"],
-    href: "/pages/blood.html",
+    href: "pages/blood.html",
     cta: "Biomarkers & screening",
   },
   {
@@ -20,7 +20,7 @@ export const PILLARS = [
     icon: "dna",
     desc: "Maintain cellular repair and resilience. Use the Hallmarks of Aging as a map of biology — not twelve separate consumer protocols.",
     tags: ["12 Hallmarks", "Mitochondria", "Autophagy", "Senescence", "Inflammation"],
-    href: "/pages/protocol.html#biology",
+    href: "pages/protocol.html#biology",
     cta: "Biology & frontier",
   },
   {
@@ -30,7 +30,7 @@ export const PILLARS = [
     icon: "dumbbell",
     desc: "Keep capacity to survive aging, illness and inactivity. Arrive older with enough to stay independent.",
     tags: ["VO₂max", "Muscle", "Strength", "Power", "Bone", "Balance", "Cognition"],
-    href: "/pages/workout.html",
+    href: "pages/workout.html",
     cta: "Training protocol",
   },
   {
@@ -40,7 +40,7 @@ export const PILLARS = [
     icon: "leaf",
     desc: "Control the everyday inputs that drive all three outcome pillars — the practical intervention layer.",
     tags: ["Exercise", "Diet", "Sleep", "Body comp", "BP / lipids / glucose", "Environment"],
-    href: "/pages/stack.html",
+    href: "pages/stack.html",
     cta: "Daily stack",
   },
 ];

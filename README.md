@@ -1,6 +1,6 @@
 # Macro Longevity
 
-A local-first wellness reference and planning toolkit for nutrition, health, training, and personal finance. The deployed application uses semantic HTML, shared CSS, and browser-native ES modules—no framework, backend, runtime packages, or build step.
+A local-first Singapore health screening and longevity guide with optional nutrition, training, and finance tools. The deployed application uses semantic HTML, shared CSS, and browser-native ES modules—no framework, backend, runtime packages, or build step.
 
 > This project is educational. It does not replace individualized medical, nutritional, or financial advice.
 
@@ -8,6 +8,9 @@ A local-first wellness reference and planning toolkit for nutrition, health, tra
 
 - A reusable-meal Daily Plan with portion controls and nutrient-gap estimates
 - A searchable, five-screen Ingredient guide
+- A Singapore baseline workspace for blood pressure, waist, BMI, glucose and LDL cholesterol
+- Progressive “how to move toward this level” guidance for each marker
+- Singapore screening roadmap for cardiovascular, cervical, breast and colorectal checks
 - Blood-test references and an evidence-tiered healthspan Blueprint
 - A minimal-equipment training plan with timers and sound cues
 - FIRE and passive-income planning tools
@@ -75,6 +78,7 @@ css/tooltip.css            Tooltip presentation
 js/data/*.js               Factual content and planning data
 js/components/*.js         Shared UI behavior and primitives
 js/site.js                 Navigation, shared initialization, and lazy export
+js/paths.js                Domain-root and GitHub Pages project-path resolution
 js/export.js               Local Markdown export
 js/<route>.js              Route-owned rendering and interactions
 tests/*.spec.js            Browser, accessibility, visual, and performance checks
@@ -91,13 +95,15 @@ There is no backend or account system. Planner state and finance entries are sto
 
 [DESIGN.md](DESIGN.md) defines the Calm Wellness visual contract. [css/variables.css](css/variables.css) implements its Warm Canvas tokens, [css/wellness.css](css/wellness.css) holds shared components, and the route stylesheets refine individual pages.
 
-The interface uses self-hosted Inter and JetBrains Mono fonts, a 4px base with an 8px primary spacing rhythm, warm light surfaces, visible focus states, and local SVG icons. Responsive acceptance widths are 390px and 1440px, with reduced-motion, forced-colors, print, keyboard, and 44px touch-target behavior covered by browser tests.
+The interface uses self-hosted Inter and JetBrains Mono fonts, a 4px base with an 8px primary spacing rhythm, warm light surfaces, visible focus states, flat-color icon tiles made from original inline SVG paths, and no third-party icon runtime. Responsive acceptance widths are 390px and 1440px, with reduced-motion, forced-colors, print, keyboard, and 44px touch-target behavior covered by browser tests.
+
+[STITCH_DESIGN_BRIEF.md](STITCH_DESIGN_BRIEF.md) preserves the screen prompts, flat-color palette, and no-attribution asset constraints for Google Stitch handoff.
 
 When changing an authored design value, update both `DESIGN.md` and `css/variables.css`. Update visual baselines only after reviewing the rendered differences.
 
 ## Deployment
 
-There is no build step. On static hosts other than Cloudflare, configure the published files so repository metadata, tests, and development dependencies are excluded. For Cloudflare Workers, install the development dependencies with `npm ci`, then deploy with `npx wrangler deploy` after authenticating. [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development. Training's optional remote audio is not available offline.
+There is no build step. GitHub Pages can publish the repository root directly; `.nojekyll` keeps the static asset paths intact. Relative route resolution supports both a repository project URL such as `https://richmondgoh8.github.io/macro-longevity/` and the existing custom-domain root. Enable Pages under **Settings → Pages → GitHub Actions** and use the included workflow if your repository has Actions enabled. On static hosts other than Cloudflare, configure the published files so repository metadata, tests, and development dependencies are excluded. For Cloudflare Workers, install the development dependencies with `npm ci`, then deploy with `npx wrangler deploy` after authenticating. [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development. Training's optional remote audio is not available offline.
 
 ## License
 

@@ -3,6 +3,12 @@
 Approved direction: warm ivory, forest-green actions, readable typography, calm surfaces.
 Updated: 2026-09-24.
 
+The Singapore baseline workspace extends this contract with flat-color marker tiles
+(teal, yellow, lilac, blue and coral) and original inline SVG icons. It keeps the
+information hierarchy intentionally progressive: summary → personal value → target
+context → next steps → source links. No third-party icon runtime or attribution is
+required for the workspace visuals.
+
 ## Architecture
 
 Dependency-free multi-page HTML/CSS and native ES modules. Keep the five destinations:

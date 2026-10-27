@@ -1,4 +1,5 @@
 import { icon } from './ui.js';
+import { siteHref } from '../paths.js';
 
 const TOAST_TYPES = new Set(['success', 'info', 'warning', 'error']);
 const TOAST_ICON_NAMES = { success: 'check', info: 'info', warning: 'warning', error: 'error' };
@@ -27,7 +28,7 @@ function ensureToastStyles() {
   toastStylesPromise ||= new Promise((resolve) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = '/css/toast.css';
+    link.href = siteHref('css/toast.css');
     link.dataset.uiToastStyles = '';
     link.addEventListener('load', resolve, { once: true });
     link.addEventListener('error', resolve, { once: true });

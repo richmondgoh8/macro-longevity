@@ -196,7 +196,7 @@ test('Homepage split-screen hero follows the Calm Wellness protocol-map contract
   expect(desktop.visualShadow).toBe('none');
   expect(desktop.cardHeights).toHaveLength(4);
   desktop.cardHeights.forEach((height) => expect(height).toBeGreaterThanOrEqual(44));
-  expect(desktop.links).toEqual(['/pages/blood.html', '/pages/protocol.html#biology', '/pages/workout.html', '/pages/stack.html']);
+  expect(desktop.links).toEqual(['pages/blood.html', 'pages/protocol.html#biology', 'pages/workout.html', 'pages/stack.html']);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

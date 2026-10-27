@@ -100,7 +100,7 @@ test('protocol destination cards retain links without decorative pointer effects
   await page.goto('/');
   const cards = page.locator('.hero-pillar-card');
   await expect(cards).toHaveCount(4);
-  for (const card of await cards.all()) await expect(card).toHaveAttribute('href', /^\/pages\//);
+  for (const card of await cards.all()) await expect(card).toHaveAttribute('href', /^pages\//);
   expect(await cards.first().evaluate(n => getComputedStyle(n, '::before').display)).toBe('none');
 });
 

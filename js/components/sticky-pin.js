@@ -1,4 +1,5 @@
 // sticky-pin.js — shared section rail for long-form routes.
+import { appPath } from '../paths.js';
 
 const PAGE_CONFIG = {
   '/pages/stack.html': {
@@ -235,7 +236,7 @@ function wireControls(rail, config, root) {
 }
 
 export function initStickyPin({ documentRoot = document } = {}) {
-  const pathname = window.location.pathname;
+  const pathname = appPath();
   const config = PAGE_CONFIG[pathname];
   const main = documentRoot.querySelector('main#main');
   if (!config || !main || main.querySelector('[data-sticky-pin-rail]')) return;
