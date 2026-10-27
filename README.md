@@ -103,6 +103,8 @@ When changing an authored design value, update both `DESIGN.md` and `css/variabl
 
 ## Deployment
 
+Live site: <https://hazelah.me/macro-longevity/>. GitHub Pages inherits the account's custom domain; the `richmondgoh8.github.io/macro-longevity/` address redirects there.
+
 There is no build step. GitHub Pages can publish the repository root directly; `.nojekyll` keeps the static asset paths intact. Relative route resolution supports both a repository project URL such as `https://richmondgoh8.github.io/macro-longevity/` and the existing custom-domain root. Enable Pages under **Settings → Pages → GitHub Actions** and use the included workflow if your repository has Actions enabled. On static hosts other than Cloudflare, configure the published files so repository metadata, tests, and development dependencies are excluded. For Cloudflare Workers, install the development dependencies with `npm ci`, then deploy with `npx wrangler deploy` after authenticating. [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development. Training's optional remote audio is not available offline.
 
 ## License

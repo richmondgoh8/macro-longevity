@@ -40,7 +40,7 @@ export async function exportData() {
 
     const data = {
         exportedAt: new Date().toISOString(),
-        source: "macro-longevity.com",
+        source: "https://hazelah.me/macro-longevity/",
         supplements: DAILY_SUPPLEMENTS,
         foodSpices: FOOD_SPICES,
         extras: EXTRAS,
