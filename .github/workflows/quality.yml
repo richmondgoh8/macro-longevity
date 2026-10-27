@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   browser-quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     strategy:
       fail-fast: false
@@ -30,6 +30,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Use Ubuntu HTTPS mirror for browser dependencies
+        run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
       - run: npx playwright install --with-deps --no-shell chromium
       - run: npm run audit
       - run: npm audit
