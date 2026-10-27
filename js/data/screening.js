@@ -21,6 +21,7 @@ export const SG_MARKER_GROUPS = [
 export const SG_MARKERS = [
   {
     id: 'bp',
+    suffix: 'mmHg',
     label: 'Blood pressure',
     eyebrow: 'Cardiovascular',
     icon: 'gauge',
@@ -67,6 +68,9 @@ export const SG_MARKERS = [
   },
   {
     id: 'glucose',
+    units: ['mmol/L', 'mg/dL'],
+    conventionalToSI: 0.0555,
+    alternatePlaceholder: 'e.g. 94',
     label: 'Fasting glucose',
     eyebrow: 'Blood test',
     icon: 'drop',
@@ -83,6 +87,9 @@ export const SG_MARKERS = [
   },
   {
     id: 'ldl',
+    units: ['mmol/L', 'mg/dL'],
+    conventionalToSI: 0.0259,
+    alternatePlaceholder: 'e.g. 93',
     label: 'LDL cholesterol',
     eyebrow: 'Blood test',
     icon: 'heart',
@@ -99,6 +106,7 @@ export const SG_MARKERS = [
   },
   {
     id: 'tg', label: 'Triglycerides', eyebrow: 'Full lipid panel', icon: 'heart',
+    units: ['mmol/L', 'mg/dL'], conventionalToSI: 0.01129, alternatePlaceholder: 'e.g. 106',
     inputLabel: 'Latest triglycerides', placeholder: 'e.g. 1.2', inputMode: 'decimal', suffix: 'mmol/L',
     target: 'Fasting reference <1.7 mmol/L; interpret non-fasting results with your clinic',
     why: 'High triglycerides can reveal metabolic risk and make LDL-C less informative about particle burden.',
@@ -107,6 +115,7 @@ export const SG_MARKERS = [
   },
   {
     id: 'nonhdl', label: 'Non-HDL cholesterol', eyebrow: 'Full lipid panel', icon: 'heart',
+    units: ['mmol/L', 'mg/dL'], conventionalToSI: 0.0259, alternatePlaceholder: 'e.g. 116',
     inputLabel: 'Latest non-HDL-C', placeholder: 'e.g. 3.0', inputMode: 'decimal', suffix: 'mmol/L',
     target: 'Total cholesterol minus HDL-C; your goal depends on cardiovascular risk',
     why: 'Captures cholesterol in all atherogenic particles and adds context when triglycerides are elevated.',
@@ -114,6 +123,7 @@ export const SG_MARKERS = [
   },
   {
     id: 'hba1c', label: 'HbA1c', eyebrow: 'Glucose context', icon: 'drop',
+    units: ['%', 'mmol/mol'], alternatePlaceholder: 'e.g. 36',
     inputLabel: 'Latest HbA1c', placeholder: 'e.g. 5.4', inputMode: 'decimal', suffix: '%',
     target: 'Use your clinician’s reference or diabetes care goal; this guide does not diagnose from HbA1c',
     why: 'Reflects glucose exposure over roughly three months. Screening interpretation differs from targets for people already treated for diabetes.',

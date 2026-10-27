@@ -59,13 +59,16 @@ npx playwright install chromium
 |---------|---------|
 | `make serve` | Serve the site at `http://127.0.0.1:8080` without stopping another process |
 | `make audit` or `npm run audit` | Check metadata, navigation wiring, safety guards, service-worker assets, and JavaScript syntax |
+| `npm run test:quick` | Fast routine checks: core routes, unit choices, saved results and offline behavior |
 | `npm run test:ui` | Run desktop and mobile browser, accessibility, interaction, service-worker, and visual tests |
 | `npm run test:ui:headed` | Run the browser suite interactively for diagnosis |
 | `npm run test:visual` | Run screenshot comparisons only |
 | `npm run test:visual:update` | Intentionally replace reviewed screenshot baselines |
 | `npm run test:perf` | Run throttled loading and interaction budgets |
 
-Run `node --check <file>` for every changed JavaScript module. For a normal UI change, the handoff baseline is `make audit` followed by `npm run test:ui`; add `npm run test:perf` when loading or interaction cost may change.
+For a small change, run `npm run audit` and `npm run test:quick`. Use `npm run test:ui` for broad changes; add `npm run test:perf` when loading or interaction cost changes. Keep changes focused; no new framework or test service is needed.
+
+Glucose and lipid entries default to mmol/L, ApoB to g/L, Lp(a) to nmol/L, HbA1c to %, and urine ACR to mg/mmol. Alternate report units can be selected and are saved. Selection does not convert the entered number; glucose/lipid status checks account for mg/dL internally. The library suggests Singapore-style units for established quantitative tests and allows any report unit; specialty/qualitative units remain report-specific. Existing saved units are preserved.
 
 ## Architecture
 
@@ -110,7 +113,7 @@ When changing an authored design value, update both `DESIGN.md` and `css/variabl
 
 Live site: <https://hazelah.me/macro-longevity/>. GitHub Pages inherits the account's custom domain; the `richmondgoh8.github.io/macro-longevity/` address redirects there.
 
-Quality runs desktop and mobile in parallel with one browser worker per runner, npm caching, superseded-run cancellation and documentation-only skips. Main pushes and PRs are checked; use the Quality workflow’s manual dispatch to recheck/redeploy current main. Pages deploys only after successful Quality, checks out the tested SHA and rejects a stale revision. Browser reports are uploaded separately on failure. No privileged deployment runs PR code.
+Quality runs the fast suite on desktop and mobile in parallel, with npm caching, superseded-run cancellation and documentation-only skips. The full visual/performance suite runs weekly; choose `full_suite` in Quality’s manual dispatch to run it sooner. Main pushes and PRs are checked. Pages deploys only after successful Quality, checks out the tested SHA and rejects a stale revision. Browser reports are uploaded separately on failure. No privileged deployment runs PR code.
 
 There is no build step. GitHub Pages can publish the repository root directly; `.nojekyll` keeps the static asset paths intact. Relative route resolution supports both a repository project URL such as `https://richmondgoh8.github.io/macro-longevity/` and the existing custom-domain root. Enable Pages under **Settings → Pages → GitHub Actions** and use the included workflow if your repository has Actions enabled. On static hosts other than Cloudflare, configure the published files so repository metadata, tests, and development dependencies are excluded. For Cloudflare Workers, install the development dependencies with `npm ci`, then deploy with `npx wrangler deploy` after authenticating. [wrangler.jsonc](wrangler.jsonc) serves the root static site and [.assetsignore](.assetsignore) keeps development dependencies, tests, and repository metadata out of the Workers asset upload. `_headers` contains the production security headers used by compatible hosts. Offline installation requires HTTPS in production; localhost is allowed during development. Training's optional remote audio is not available offline.
 

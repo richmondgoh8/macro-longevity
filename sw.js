@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v41-blueprint-library';
+const CACHE_NAME = 'macro-longevity-offline-v42-singapore-units';
 const STATIC_ASSETS = [
   './',
   'index.html',

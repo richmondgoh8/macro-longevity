@@ -95,11 +95,14 @@ Before handing off a change, run the narrowest relevant checks and record anythi
 
 - JavaScript syntax checks for every changed module (`node --check <file>`).
 - `make audit` for metadata, tab wiring, service-worker assets, safety guards, and syntax.
-- `npm run test:ui` for navigation, accessibility, interaction, visual, and service-worker coverage.
+- `npm run test:quick` for routine, low-risk changes: core routes, units, result storage and offline behavior.
+- `npm run test:ui` for broader changes or full validation; it also runs weekly and through Quality → Run workflow → full_suite.
 - `npm run test:perf` for throttled load, LCP/CLS, transfer-size, long-task, and interaction budgets when performance-sensitive code changes.
 - `npm run test:ui:headed` when diagnosing visual or timing issues; only use `npm run test:visual:update` after intentionally reviewing the screenshot diff.
 
 Tests should exercise real user flows, map each new assertion to an acceptance criterion or regression, prefer stable semantic/`data-*` selectors for new hooks, and cover both mobile and desktop behavior for layout changes.
+
+Keep routine work small and resumable: inspect `git status` first, use the focused checks above, and avoid unrelated refactors or new testing infrastructure. Screening units default to Singapore conventions. Unit selection labels the entered value; it must never silently convert or reinterpret saved report values. Glucose/lipid status checks normalize supported mg/dL values internally. Lp(a) has no fixed mass-to-molar conversion.
 
 ## 9. Change boundaries
 

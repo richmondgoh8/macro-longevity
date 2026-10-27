@@ -7,6 +7,13 @@ on:
   pull_request:
     paths-ignore: ['**/*.md']
   workflow_dispatch:
+    inputs:
+      full_suite:
+        description: Run the full visual and performance suite
+        type: boolean
+        default: false
+  schedule:
+    - cron: '17 19 * * 0'
 
 permissions:
   contents: read
@@ -35,7 +42,12 @@ jobs:
       - run: npx playwright install --with-deps --no-shell chromium
       - run: npm run audit
       - run: npm audit
-      - run: npm run test:ui -- --project=${{ matrix.project }}
+      - name: Fast regression checks
+        if: github.event_name != 'schedule' && inputs.full_suite != true
+        run: npm run test:quick -- --project=${{ matrix.project }}
+      - name: Full regression checks
+        if: github.event_name == 'schedule' || inputs.full_suite == true
+        run: npm run test:ui -- --project=${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

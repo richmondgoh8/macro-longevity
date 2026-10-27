@@ -244,6 +244,47 @@ export const BLUEPRINT_REFERENCE = {
 };
 
 export const normalizeTestName = name => name.toLowerCase().replace(/%/g, 'percent').replace(/\s*\(blood\)/g, '').replace(/[^a-z0-9]/g, '');
+
+// Singapore-style defaults for established quantitative tests. Specialty assays,
+// qualitative findings and urine microscopy remain report-specific: never guess.
+// Sources: NUH test catalogue and Parkway Laboratory Services guide.
+// https://nuhsingapore.testcatalog.org/ https://www.parkwaylabs.com.sg/
+const UNIT_GROUPS = [
+  [['mmol/L', 'mg/dL'], 'Glucose (Blood)|Cholesterol, Total|Hdl Cholesterol|Ldl Cholesterol|Non Hdl Cholesterol|Triglycerides|Calcium|Magnesium|Urea Nitrogen (Bun)'],
+  [['mmol/L'], 'Sodium|Potassium|Chloride|Carbon Dioxide'],
+  [['μmol/L', 'mg/dL'], 'Creatinine|Bilirubin, Total (Blood)|Uric Acid (Blood)'],
+  [['μmol/L', 'μg/dL'], 'Iron|Iron Binding Capacity|Zinc'],
+  [['g/L', 'g/dL'], 'Albumin|Globulin|Protein, Total (Blood)'],
+  [['g/L', 'mg/dL'], 'Apolipoprotein B'],
+  [['nmol/L', 'mg/dL'], 'Lipoprotein (A)'],
+  [['U/L'], 'Alanine Transaminase|Alkaline Phosphatase|Amylase|Aspartate Aminotransferase|Gamma Glutamyl Transferase|Lipase'],
+  [['%', 'mmol/mol'], 'Hemoglobin A1C'],
+  [['μg/L', 'ng/mL'], 'Ferritin'],
+  [['mg/L', 'mg/dL'], 'High-Sensitivity C-Reactive Protein'],
+  [['μmol/L'], 'Homocysteine'],
+  [['nmol/L', 'ng/mL'], 'Vitamin D'],
+  [['nmol/L', 'μg/dL'], 'Cortisol'],
+  [['μmol/L', 'μg/dL'], 'Dhea Sulfate'],
+  [['pmol/L', 'pg/mL'], 'Estradiol|Testosterone, Free'],
+  [['nmol/L', 'ng/dL'], 'Testosterone, Total'],
+  [['nmol/L'], 'Sex Hormone Binding Globulin|Methylmalonic Acid'],
+  [['IU/L', 'mIU/mL'], 'Follicle Stimulating Hormone|Luteinizing Hormone'],
+  [['mIU/L', 'μIU/mL'], 'Thyroid Stimulating Hormone (TSH)'],
+  [['pmol/L', 'ng/dL'], 'Thyroxine (T4, Free)'],
+  [['pmol/L', 'pg/mL'], 'Triiodothyronine (T3, Free)'],
+  [['mL/min/1.73m²'], 'Estimated Glomerular Filtration Rate'],
+  [['g/dL', 'g/L'], 'Hemoglobin|Mean Corpuscular Hemoglobin Concentration'],
+  [['10^12/L', '10^6/μL'], 'Red Blood Cell Count (Blood)'],
+  [['10^9/L', 'cells/μL'], 'White Blood Cell Count (Blood)|Platelet Count|Absolute Band Neutrophils|Absolute Basophils|Absolute Blasts|Absolute Eosinophils|Absolute Lymphocytes|Absolute Metamyelocytes|Absolute Monocytes|Absolute Myelocytes|Absolute Neutrophils|Absolute Nucleated Rbc|Absolute Promyelocytes'],
+  [['fL'], 'Mean Corpuscular Volume|Mean Platelet Volume'],
+  [['pg'], 'Mean Corpuscular Hemoglobin'],
+  [['%'], 'Hematocrit|Red Cell Distribution Width|Iron % Saturation|Band Neutrophils|Basophils|Blasts|Eosinophils|Lymphocytes|Metamyelocytes|Monocytes|Myelocytes|Neutrophils|Promyelocytes|Reactive Lymphocytes|Prostate Specific Antigen (PSA) %, Free'],
+  [['μg/L', 'ng/mL'], 'Prostate Specific Antigen (PSA), Free|Prostate Specific Antigen (PSA), Total'],
+];
+
+export function biomarkerUnits(name) {
+  return UNIT_GROUPS.find(([, names]) => names.split('|').includes(name))?.[0] || [];
+}
 export const BLUEPRINT_MARKERS = ['baseline', 'male', 'female'].flatMap(panel =>
   BLUEPRINT_REFERENCE[panel].map(name => ({
     id: normalizeTestName(name), name, panel,

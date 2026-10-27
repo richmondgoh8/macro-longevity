@@ -42,9 +42,10 @@ function evaluate(marker, value, state) {
       ? { tone: 'on-track', label: 'Within the guide' }
       : { tone: 'review', label: 'Worth a closer look' };
   }
-  const number = toNumber(value);
+  let number = toNumber(value);
   if (number === null || !Number.isFinite(number) || (number === 0 && !['uacr', 'lpa'].includes(marker.id))) return { tone: 'attention', label: 'Check the value and units' };
   const unit = markerUnit(marker, state);
+  if (unit === 'mg/dL' && marker.conventionalToSI) number *= marker.conventionalToSI;
   if (marker.id === 'apob') return { tone: 'recorded', label: 'Review against your risk-based goal' };
   if (marker.id === 'lpa') return number >= (unit === 'mg/dL' ? 50 : 125)
     ? { tone: 'review', label: 'Risk-enhancing level — discuss' }
@@ -95,7 +96,7 @@ function markerCard(marker, state) {
     <p class="sg-marker-why">${escapeHTML(marker.why)}</p>
     <div class="sg-marker-input-row">
       <label for="sg-${marker.id}">${escapeHTML(marker.inputLabel)}</label>
-      <div class="sg-value-input"><input id="sg-${marker.id}" data-marker-input="${marker.id}" inputmode="${marker.inputMode}" value="${escapeHTML(value)}" placeholder="${escapeHTML(marker.placeholder)}" aria-describedby="sg-${marker.id}-target"><span data-marker-unit-label>${escapeHTML(markerUnit(marker, state) || '')}</span></div>
+      <div class="sg-value-input"><input id="sg-${marker.id}" data-marker-input="${marker.id}" inputmode="${marker.inputMode}" value="${escapeHTML(value)}" placeholder="${escapeHTML(markerUnit(marker, state) !== marker.suffix && marker.alternatePlaceholder ? marker.alternatePlaceholder : marker.placeholder)}" aria-describedby="sg-${marker.id}-target"><span data-marker-unit-label>${escapeHTML(markerUnit(marker, state) || '')}</span></div>
     </div>
     ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(unit => `<option${markerUnit(marker, state) === unit ? ' selected' : ''}>${escapeHTML(unit)}</option>`).join('')}</select></div>` : ''}
     <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span>${escapeHTML(marker.target)}</p>
@@ -137,6 +138,7 @@ function updateWorkspace(root, state) {
     statusNode.textContent = status.label;
     card.querySelector('[data-marker-input]').setAttribute('aria-invalid', String(status.tone === 'attention'));
     card.querySelector('[data-marker-unit-label]').textContent = markerUnit(marker, state) || '';
+    card.querySelector('[data-marker-input]').placeholder = markerUnit(marker, state) !== marker.suffix && marker.alternatePlaceholder ? marker.alternatePlaceholder : marker.placeholder;
   });
   const profile = root.querySelector('[data-profile-summary]');
   if (profile) profile.textContent = profileSummary(state);
