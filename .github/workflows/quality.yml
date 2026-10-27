@@ -30,7 +30,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps --no-shell chromium
       - run: npm run audit
       - run: npm audit
       - run: npm run test:ui -- --project=${{ matrix.project }}
