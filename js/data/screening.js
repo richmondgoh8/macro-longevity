@@ -15,10 +15,18 @@ export const SG_ACTION_SOURCES = [
 export const SG_MARKER_GROUPS = [
   { id: 'routine', title: 'Common screening results', open: true, description: 'Start with blood pressure, body measurements, glucose and the full lipid panel. HbA1c may be offered as a glucose screening or monitoring test; ask which test fits your situation.', ids: ['bp', 'waist', 'bmi', 'glucose', 'ldl', 'tg', 'nonhdl', 'hba1c'] },
   { id: 'lipids', title: 'Beyond LDL: ApoB and Lp(a)', open: true, description: 'Ask for ApoB when particle burden may be missed by LDL-C, especially with high triglycerides, diabetes or known cardiovascular disease. Discuss a one-time adult Lp(a) test for inherited risk. These may cost extra and are not automatically included in Healthier SG screening.', ids: ['apob', 'lpa'] },
+  { id: 'inflammation', title: 'Inflammation: hs-CRP', open: true, description: 'High-sensitivity C-reactive protein adds inflammatory context to cardiovascular risk. It is not the same as a routine CRP test and does not diagnose a disease on its own.', ids: ['hscrp'] },
   { id: 'kidney', title: 'Kidney checks: add when your risk warrants', open: false, description: 'Particularly useful with diabetes, hypertension or suspected kidney disease. Check filtration and urine albumin together; a single abnormal result does not establish chronic kidney disease.', ids: ['egfr', 'uacr'] },
 ];
 
 export const SG_MARKERS = [
+  {
+    id: 'hscrp', label: 'hs-CRP (high-sensitivity CRP)', eyebrow: 'Inflammation · cardiovascular context', icon: 'heart',
+    inputLabel: 'Latest hs-CRP', placeholder: 'e.g. 0.8', inputMode: 'decimal', suffix: 'mg/L', units: ['mg/L', 'mg/dL'], alternatePlaceholder: 'e.g. 0.08',
+    target: 'Lower relative-risk category <1 mg/L; ≥2 mg/L is risk-enhancing; >10 mg/L may reflect acute inflammation',
+    why: 'An inflammatory risk marker that can add context beyond cholesterol. Infection, injury and strenuous exercise can temporarily raise it.',
+    source: 'https://www.mayocliniclabs.com/test-catalog/overview/606909',
+  },
   {
     id: 'bp',
     suffix: 'mmHg',

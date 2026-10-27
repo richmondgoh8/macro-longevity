@@ -270,6 +270,7 @@ const UNIT_GROUPS = [
   [['nmol/L'], 'Sex Hormone Binding Globulin|Methylmalonic Acid'],
   [['IU/L', 'mIU/mL'], 'Follicle Stimulating Hormone|Luteinizing Hormone'],
   [['mIU/L', 'μIU/mL'], 'Thyroid Stimulating Hormone (TSH)'],
+  [['mIU/L', 'μIU/mL'], 'Insulin'],
   [['pmol/L', 'ng/dL'], 'Thyroxine (T4, Free)'],
   [['pmol/L', 'pg/mL'], 'Triiodothyronine (T3, Free)'],
   [['mL/min/1.73m²'], 'Estimated Glomerular Filtration Rate'],
@@ -293,7 +294,7 @@ export const BLUEPRINT_MARKERS = ['baseline', 'male', 'female'].flatMap(panel =>
     aliases: ({
       apolipoproteinb: 'ApoB',
       lipoproteina: 'Lp(a) LPA',
-      highsensitivitycreactiveprotein: 'hs-CRP inflammation',
+      highsensitivitycreactiveprotein: 'hs-CRP hsCRP hs CRP high sensitivity CRP inflammation hr-csp',
       hemoglobina1c: 'HbA1c A1c',
       estimatedglomerularfiltrationrate: 'eGFR kidney',
       alaninetransaminase: 'ALT liver',

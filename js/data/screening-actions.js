@@ -1,4 +1,5 @@
 export const SG_MARKER_CONTEXT = {
+  hscrp: 'Use the high-sensitivity assay for cardiovascular context, not a standard CRP result. Interpret when clinically stable: infection, injury or hard exercise can raise it. A result above 10 mg/L needs clinical assessment and often repeat testing after recovery, not just a lifestyle response. Do not self-start aspirin, anti-inflammatory drugs or supplements to chase the number.',
   bp: 'Use the correct cuff, rest five minutes and average two readings. Persistent readings at or above 140/90 need clinical review; very high readings or symptoms can need urgent care.',
   waist: 'Measure at the same level after a normal exhale. These cut-offs are risk guideposts, not a requirement for everyone to lose weight.',
   bmi: 'Pregnancy, muscularity and recent illness can make BMI less useful. Unintentional weight loss or being underweight needs assessment, not more restriction.',
@@ -14,6 +15,11 @@ export const SG_MARKER_CONTEXT = {
 };
 
 export const SG_MARKER_ACTIONS = {
+  hscrp: [
+    ['Move on most days', 'Build toward 150 minutes of moderate activity each week and two strength sessions. Add a 10-minute walk after meals to build the routine.'],
+    ['Make meals fibre-rich', 'Include vegetables, whole fruit, oats or other wholegrains, and beans or lentils regularly; build gradually toward 25–30 g fibre/day. If excess weight is present, replace sugary drinks and oversized portions with these foods.'],
+    ['Stay smoke-free and sleep regularly', 'Avoid smoking and vaping, and keep a consistent sleep schedule with 7–9 hours available. These habits support overall risk reduction; they do not guarantee a particular hs-CRP result.'],
+  ],
   "bp": [
     [
       "Keep sodium below 2,000 mg/day",

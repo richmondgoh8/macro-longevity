@@ -89,6 +89,7 @@
 .sg-screening-card a, .sg-source-note a { color: var(--sg-green); font-size: 13px; font-weight: 700; text-underline-offset: 3px; }
 .sg-source-note { margin: 0; padding-top: 4px; color: var(--sg-muted); font-size: 12px; line-height: 1.6; }
 .sg-workspace-compact { margin-top: 8px; }
+.sg-marker-grid > .sg-marker-card:only-child { grid-column: 1 / -1; }
 .sg-library [data-library-mount] { padding-top: 16px; font-size: 14px; line-height: 1.6; }
 .sg-library-controls, .sg-library-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
 .sg-library-controls label, .sg-library-fields label { display: block; font-weight: 600; margin-bottom: 6px; }

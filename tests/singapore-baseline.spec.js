@@ -6,7 +6,7 @@ test('Home baseline accepts screening values and explains the next move', async 
   await expect(workspace).toBeVisible();
   await expect(workspace.locator('[data-baseline-score]')).toHaveText('0');
   await expect(workspace.locator('.sg-priority-note')).toContainText('full lipid panel');
-  await expect(workspace.locator('.sg-marker-card')).toHaveCount(12);
+  await expect(workspace.locator('.sg-marker-card')).toHaveCount(13);
 
   await workspace.locator('[data-profile-age]').fill('42');
   await workspace.locator('[data-profile-sex]').selectOption('female');
@@ -26,7 +26,7 @@ test('Home baseline accepts screening values and explains the next move', async 
 test('Health route keeps deeper guidance progressively disclosed', async ({ page }) => {
   await page.goto('/pages/blood.html');
   const workspace = page.locator('#sg-health-dashboard .sg-workspace');
-  await expect(workspace.locator('.sg-marker-card')).toHaveCount(12);
+  await expect(workspace.locator('.sg-marker-card')).toHaveCount(13);
   const details = workspace.locator('.sg-marker-details').first();
   await expect(details).not.toHaveAttribute('open', '');
   await details.locator('summary').click();

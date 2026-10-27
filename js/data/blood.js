@@ -121,9 +121,9 @@ export const ANNUAL_PANEL = [
     name: "hs-CRP (Inflammation)",
     tier: "annual",
     frequency: "Annual",
-    optimalRange: "<0.5 mg/L target · <1.0 low risk · >2.0 risk-enhancing",
-    why: "Independently predicts cardiovascular risk and is the context for interpreting ferritin, B12 and zinc (all distorted by inflammation).",
-    carnivoreNote: "Usually excellent on carnivore (often 0.2–0.7). Don't test the day after leg day — hard training raises it for 48–72 h.",
+    optimalRange: "<1 mg/L lower relative risk · ≥2 mg/L risk-enhancing · >10 mg/L may reflect acute inflammation",
+    why: "High-sensitivity CRP adds inflammatory context to cardiovascular risk; it does not diagnose a disease or replace LDL/ApoB and other risk factors.",
+    carnivoreNote: "Do not infer a healthy result from your diet. Infection, injury and hard exercise can temporarily raise hs-CRP. Interpret when clinically stable; markedly elevated results need clinical review and may need repeat testing after recovery.",
   },
   {
     id: "bp",
@@ -286,7 +286,7 @@ export const LOW_VALUE_TESTS = [
   {
     id: "longevity-panels",
     name: "Mega 'Longevity' Panels (60+ markers, S$1,500–6,900)",
-    why: "Mostly non-actionable or redundant data. The 15 tests on this page capture ~95% of the actionability at a fraction of the cost.",
+    why: "A larger package is not automatically better screening. Match each test to a clinical question, your risk and a plan for acting on the result; avoid ordering every listed marker just because it is available.",
   },
   {
     id: "cgm",

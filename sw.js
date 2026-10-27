@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v42-singapore-units';
+const CACHE_NAME = 'macro-longevity-offline-v43-expanded-tracker';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -32,6 +32,7 @@ const STATIC_ASSETS = [
   'js/biomarker-library.js',
   'js/data/blueprint-markers.js',
   'js/data/screening-actions.js',
+  'js/data/additional-screening.js',
   'js/stack-preview.js',
   'js/stack.js',
   'js/components/coverage-pin.js',
