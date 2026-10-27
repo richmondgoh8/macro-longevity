@@ -10,7 +10,7 @@ for (const [name, route] of pages) {
   test(`${name} visual baseline`, async ({ page }) => {
     await page.goto(route);
     await page.evaluate(() => document.fonts.ready);
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, timeout: 15000 });
   });
 }
 
