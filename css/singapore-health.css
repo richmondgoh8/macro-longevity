@@ -27,8 +27,17 @@
 .sg-profile label, .sg-marker-input-row label { color: var(--sg-muted); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 .sg-profile input, .sg-profile select, .sg-value-input input { min-height: 44px; padding: 9px 12px; color: var(--sg-ink); background: #fff; border: 1px solid #a9bcb0; border-radius: 10px; font: inherit; }
 .sg-profile p { margin: 0; color: var(--sg-muted); font-size: 13px; line-height: 1.5; }
-.sg-marker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.sg-marker-card { display: grid; gap: 14px; min-width: 0; padding: 20px; background: #fff; border: 1px solid var(--sg-line); border-radius: 18px; }
+.sg-marker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.sg-marker-card { display: grid; gap: 14px; align-content: start; min-width: 0; padding: 20px; background: #fff; border: 1px solid var(--sg-line); border-radius: 18px; }
+.sg-marker-front { display: grid; gap: 14px; align-content: start; }
+.sg-marker-card:has(> .sg-marker-details[open]) > .sg-marker-front { display: none; }
+.sg-flip-close, .sg-marker-details[open] .sg-flip-open { display: none; }
+.sg-marker-details[open] .sg-flip-close { display: inline; }
+.sg-marker-card .sg-marker-back-title { margin: 16px 0 0; }
+.sg-marker-card[data-flipped="back"] { animation: sg-flip-back var(--duration-slow) ease-out; }
+.sg-marker-card[data-flipped="front"] { animation: sg-flip-front var(--duration-slow) ease-out; }
+@keyframes sg-flip-back { from { transform: perspective(1000px) rotateY(80deg); } to { transform: perspective(1000px) rotateY(0); } }
+@keyframes sg-flip-front { from { transform: perspective(1000px) rotateY(-80deg); } to { transform: perspective(1000px) rotateY(0); } }
 .sg-marker-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
 .sg-marker-icon { display: grid; width: 44px; height: 44px; place-items: center; color: var(--sg-ink); border-radius: 13px; }
 .sg-marker-icon-gauge { background: var(--sg-teal); }
@@ -66,7 +75,8 @@
 .sg-marker-target { display: grid; gap: 3px; margin: 0; color: var(--sg-ink); font-size: 13px; line-height: 1.45; }
 .sg-marker-target span { color: var(--sg-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .sg-marker-details { padding-top: 4px; }
-.sg-marker-details summary { min-height: 28px; color: var(--sg-green); cursor: pointer; font-size: 13px; font-weight: 700; }
+.sg-marker-details summary { display: flex; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--sg-line); border-radius: 10px; background: var(--sg-canvas); color: var(--sg-green); cursor: pointer; font-size: 13px; font-weight: 700; list-style: none; }
+.sg-marker-details summary::-webkit-details-marker { display: none; }
 .sg-marker-details ol { display: grid; gap: 12px; margin: 14px 0 0; padding-left: 20px; }
 .sg-marker-details li { padding-left: 3px; color: var(--sg-muted); font-size: 13px; line-height: 1.5; }
 .sg-marker-details li::marker { color: var(--sg-green); font-weight: 700; }
@@ -126,5 +136,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .sg-marker-card[data-flipped] { animation: none; }
   .sg-marker-card, .sg-screening-card { scroll-behavior: auto; }
 }

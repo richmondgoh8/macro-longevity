@@ -94,6 +94,7 @@ function markerCard(marker, state) {
   const value = state.values[marker.id] || '';
   const status = evaluate(marker, value, state);
   return `<article class="sg-marker-card" data-marker-card="${marker.id}">
+    <div class="sg-marker-front">
     <div class="sg-marker-head">
       <span class="sg-marker-icon sg-marker-icon-${marker.icon}">${icon(marker.icon)}</span>
       <div><p class="sg-marker-eyebrow">${escapeHTML(marker.eyebrow)}</p><h4>${escapeHTML(marker.label)}</h4></div>
@@ -106,7 +107,8 @@ function markerCard(marker, state) {
     </div>
     ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(unit => `<option${markerUnit(marker, state) === unit ? ' selected' : ''}>${escapeHTML(unit)}</option>`).join('')}</select></div>` : ''}
     <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span>${escapeHTML(marker.target)}</p>
-    <details class="sg-marker-details"><summary>${escapeHTML(marker.actionSummary || (['lpa', 'egfr', 'hscrp'].includes(marker.id) ? 'Actions to protect your health' : 'How to move toward this level'))}</summary><div data-marker-actions><p>Open to load practical actions.</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a></p></details>
+    </div>
+    <details class="sg-marker-details"><summary aria-label="View actions for ${escapeHTML(marker.label)}"><span class="sg-flip-open">View actions ↻</span><span class="sg-flip-close">← Back to result</span></summary><h4 class="sg-marker-back-title">${escapeHTML(marker.label)}</h4><div data-marker-actions><p>Loading practical actions…</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a></p></details>
   </article>`;
 }
 
@@ -178,15 +180,19 @@ export function mountHealthDashboard(mount, { compact = false } = {}) {
   const form = mount.querySelector('[data-profile-form]');
   mount.addEventListener('toggle', async event => {
     const details = event.target;
-    if (!details.matches('.sg-marker-details') || !details.open || details.dataset.actionsLoaded) return;
+    if (!details.matches('.sg-marker-details')) return;
+    const card = details.closest('[data-marker-card]');
+    const marker = markers.find(item => item.id === card.dataset.markerCard);
+    card.dataset.flipped = details.open ? 'back' : 'front';
+    details.querySelector('summary').setAttribute('aria-label', `${details.open ? 'Back to result' : 'View actions'} for ${marker.label}`);
+    details.querySelector('summary').scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    if (!details.open || details.dataset.actionsLoaded) return;
     details.dataset.actionsLoaded = 'loading';
     const target = details.querySelector('[data-marker-actions]');
     target.setAttribute('aria-busy', 'true');
     try {
       const { SG_MARKER_ACTIONS, SG_MARKER_CONTEXT } = await import('./data/screening-actions.js');
-      const id = details.closest('[data-marker-card]').dataset.markerCard;
-      const marker = markers.find(item => item.id === id);
-      const key = marker.actionKey || id;
+      const key = marker.actionKey || marker.id;
       const actions = marker.actions || SG_MARKER_ACTIONS[key];
       target.innerHTML = `<ol>${actions.map(([title, text]) => `<li><strong>${escapeHTML(title)}</strong><span>${escapeHTML(text)}</span></li>`).join('')}</ol><p class="sg-marker-reference"><strong>Interpretation, separate from actions:</strong> ${escapeHTML(marker.context || SG_MARKER_CONTEXT[key])}</p>`;
       details.dataset.actionsLoaded = 'true';

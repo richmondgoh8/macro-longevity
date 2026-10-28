@@ -87,3 +87,51 @@ test('ApoB, Lp(a) and kidney results retain their original units and context', a
   await workspace.locator('[data-marker-input="bp"]').fill('20/10');
   await expect(workspace.locator('[data-marker-card="bp"] [data-marker-status]')).not.toHaveText('Within the guide');
 });
+
+test('flipping one card leaves its two-column neighbour text and controls unchanged', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/pages/blood.html');
+  await page.evaluate(() => document.fonts.ready);
+  const card = page.locator('[data-marker-card="bmi"]');
+  const neighbour = page.locator('[data-marker-card="glucose"]');
+  const geometry = () => neighbour.evaluate(node => {
+    const outer = node.getBoundingClientRect();
+    return [outer.height, ...[...node.querySelectorAll('.sg-marker-why, .sg-marker-input-row, .sg-marker-target')].map(child => child.getBoundingClientRect().top - outer.top)];
+  });
+  const before = await geometry();
+  await expect(card.locator('summary')).toHaveAccessibleName('View actions for BMI');
+  await card.locator('summary').click();
+  await expect(card.locator('li')).toHaveCount(3);
+  await expect(card.locator('[data-marker-input]')).toBeHidden();
+  await expect(card.locator('summary')).toHaveAccessibleName('Back to result for BMI');
+  const after = await geometry();
+  after.forEach((value, index) => expect(Math.abs(value - before[index])).toBeLessThan(1));
+  await card.locator('summary').click();
+  await expect(card.locator('[data-marker-input]')).toBeVisible();
+  await expect(card.locator('[data-marker-actions]')).toBeHidden();
+});
+
+test('flip cards support keyboard, retained values and reduced motion without clipped guidance', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/pages/blood.html');
+  const card = page.locator('[data-marker-card="ldl"]');
+  await card.locator('[data-marker-input]').fill('2.4');
+  const flip = card.locator('summary');
+  await flip.focus();
+  await page.keyboard.press('Enter');
+  await expect(card.locator('li')).toHaveCount(3);
+  await expect(flip).toBeFocused();
+  await expect(card.locator('[data-marker-input]')).toBeHidden();
+  expect(await card.evaluate(node => getComputedStyle(node).animationName)).toBe('none');
+  await page.keyboard.press('Tab');
+  await expect(card.getByRole('link', { name: 'Guidance and reference' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(flip).toBeFocused();
+  expect(await card.locator('.sg-marker-details').evaluate(node => node.scrollHeight <= node.clientHeight + 1)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  await page.keyboard.press('Space');
+  await expect(card.locator('[data-marker-input]')).toBeVisible();
+  await expect(card.locator('[data-marker-input]')).toHaveValue('2.4');
+  await expect(flip).toBeFocused();
+});

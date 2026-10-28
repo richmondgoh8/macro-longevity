@@ -69,7 +69,7 @@ Nutrition has no redundant side rail.
 
 44px touch targets where practical; visible 3px focus outline.
 Native links preserve browser history and modifier-click behavior.
-Motion is restrained to short color/opacity transitions; reduced motion disables it.
+Motion is restrained to short color/opacity transitions. Marker cards also use a user-triggered front/back flip with the existing 200ms motion token; reduced motion disables the animation. Only the active face is visible and keyboard reachable, and paired cards never stretch each other's text.
 Do not make navigation wait for animation.
 
 ## Nutrition

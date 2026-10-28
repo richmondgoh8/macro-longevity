@@ -354,7 +354,7 @@ export const ADDITIONAL_MARKERS = FAMILIES.flatMap(family => family.rows.map(([i
     target: 'Use the reference interval on your own report and any personalised treatment goal; no universal longevity target.',
     why: 'Record ' + label + ' with your report’s reference interval. This result needs clinical context; it is not a standalone health score.', source: family.source, group: family.id,
     actionKey: id === 'insulin' ? 'glucose' : family.actionKey,
-    actions: family.actions, context: family.context, actionSummary: 'Health-supporting actions and interpretation',
+    actions: family.actions, context: family.context,
   };
 }));
 
