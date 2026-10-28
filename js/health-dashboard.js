@@ -32,6 +32,10 @@ function markerUnit(marker, state) {
   return marker.units?.includes(state.units[marker.id]) ? state.units[marker.id] : marker.suffix;
 }
 
+function markerTarget(marker, unit) {
+  return unit === marker.suffix ? marker.target : marker.unitTarget || marker.target;
+}
+
 function evaluate(marker, value, state) {
   if (!value) return { tone: 'pending', label: 'Add a result' };
   if (marker.id === 'bp') {
@@ -45,7 +49,6 @@ function evaluate(marker, value, state) {
   let number = toNumber(value);
   if (number === null || !Number.isFinite(number) || (number === 0 && !['uacr', 'lpa', 'hscrp'].includes(marker.id))) return { tone: 'attention', label: 'Check the value and units' };
   const unit = markerUnit(marker, state);
-  if (unit === 'mg/dL' && marker.conventionalToSI) number *= marker.conventionalToSI;
   if (marker.id === 'hscrp') {
     const mgL = unit === 'mg/dL' ? number * 10 : number;
     if (mgL > 10) return { tone: 'review', label: 'Possible acute inflammation — clinical review' };
@@ -63,7 +66,7 @@ function evaluate(marker, value, state) {
     ? { tone: 'review', label: 'Repeat and review with your clinic' }
     : { tone: 'recorded', label: 'Lower albumin category' };
   if (['hba1c', 'nonhdl'].includes(marker.id)) return { tone: 'recorded', label: 'Discuss your personal target' };
-  if (marker.id === 'tg') return number < 1.7
+  if (marker.id === 'tg') return number < (unit === 'mg/dL' ? 150 : 1.7)
     ? { tone: 'on-track', label: 'Within fasting reference' }
     : { tone: 'review', label: 'Interpret fasting status and risk' };
   if (marker.id === 'waist') {
@@ -74,8 +77,8 @@ function evaluate(marker, value, state) {
   if (marker.id === 'bmi') {
     return number >= 18.5 && number < 23 ? { tone: 'on-track', label: 'Lower-risk range' } : { tone: 'review', label: 'Use with other markers' };
   }
-  if (marker.id === 'glucose') return number < 3.9 ? { tone: 'review', label: 'Low reading — discuss promptly' } : number < 6.1 ? { tone: 'on-track', label: 'Within the reference' } : { tone: 'review', label: 'Ask about follow-up' };
-  if (marker.id === 'ldl') return number < 2.6 ? { tone: 'on-track', label: 'Below common care target' } : { tone: 'review', label: 'Target is risk-based' };
+  if (marker.id === 'glucose') return number < (unit === 'mg/dL' ? 70 : 3.9) ? { tone: 'review', label: 'Low reading — discuss promptly' } : number < (unit === 'mg/dL' ? 110 : 6.1) ? { tone: 'on-track', label: 'Within the reference' } : { tone: 'review', label: 'Ask about follow-up' };
+  if (marker.id === 'ldl') return number < (unit === 'mg/dL' ? 100 : 2.6) ? { tone: 'on-track', label: 'Below common care target' } : { tone: 'review', label: 'Target is risk-based' };
   return { tone: 'recorded', label: 'Recorded' };
 }
 
@@ -92,6 +95,7 @@ function icon(name) {
 
 function markerCard(marker, state) {
   const value = state.values[marker.id] || '';
+  const unit = markerUnit(marker, state);
   const status = evaluate(marker, value, state);
   return `<article class="sg-marker-card" data-marker-card="${marker.id}">
     <div class="sg-marker-front">
@@ -103,10 +107,10 @@ function markerCard(marker, state) {
     <p class="sg-marker-why">${escapeHTML(marker.why)}</p>
     <div class="sg-marker-input-row">
       <label for="sg-${marker.id}">${escapeHTML(marker.inputLabel)}</label>
-      <div class="sg-value-input"><input id="sg-${marker.id}" data-marker-input="${marker.id}" inputmode="${marker.inputMode}" value="${escapeHTML(value)}" placeholder="${escapeHTML(markerUnit(marker, state) !== marker.suffix && marker.alternatePlaceholder ? marker.alternatePlaceholder : marker.placeholder)}" aria-describedby="sg-${marker.id}-target"><span data-marker-unit-label>${escapeHTML(markerUnit(marker, state) || '')}</span></div>
+      <div class="sg-value-input"><input id="sg-${marker.id}" data-marker-input="${marker.id}" inputmode="${marker.inputMode}" value="${escapeHTML(value)}" placeholder="${escapeHTML((unit !== marker.suffix && marker.alternatePlaceholder) || marker.placeholder)}" aria-describedby="sg-${marker.id}-target"><span data-marker-unit-label>${escapeHTML(unit || '')}</span></div>
     </div>
-    ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(unit => `<option${markerUnit(marker, state) === unit ? ' selected' : ''}>${escapeHTML(unit)}</option>`).join('')}</select></div>` : ''}
-    <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span>${escapeHTML(marker.target)}</p>
+    ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(value => `<option${unit === value ? ' selected' : ''}>${escapeHTML(value)}</option>`).join('')}</select></div>` : ''}
+    <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span><span data-marker-target>${escapeHTML(markerTarget(marker, unit))}</span></p>
     </div>
     <details class="sg-marker-details"><summary aria-label="View actions for ${escapeHTML(marker.label)}"><span class="sg-flip-open">View actions ↻</span><span class="sg-flip-close">← Back to result</span></summary><h4 class="sg-marker-back-title">${escapeHTML(marker.label)}</h4><div data-marker-actions><p>Loading practical actions…</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a></p></details>
   </article>`;
@@ -142,11 +146,14 @@ function updateWorkspace(root, state, markers) {
     const marker = markers.find((item) => item.id === card.dataset.markerCard);
     const status = evaluate(marker, state.values[marker.id], state);
     const statusNode = card.querySelector('[data-marker-status]');
+    const unit = markerUnit(marker, state);
+    const input = card.querySelector('[data-marker-input]');
     statusNode.className = `sg-status sg-status-${status.tone}`;
     statusNode.textContent = status.label;
-    card.querySelector('[data-marker-input]').setAttribute('aria-invalid', String(status.tone === 'attention'));
-    card.querySelector('[data-marker-unit-label]').textContent = markerUnit(marker, state) || '';
-    card.querySelector('[data-marker-input]').placeholder = markerUnit(marker, state) !== marker.suffix && marker.alternatePlaceholder ? marker.alternatePlaceholder : marker.placeholder;
+    input.setAttribute('aria-invalid', String(status.tone === 'attention'));
+    card.querySelector('[data-marker-unit-label]').textContent = unit || '';
+    card.querySelector('[data-marker-target]').textContent = markerTarget(marker, unit);
+    input.placeholder = (unit !== marker.suffix && marker.alternatePlaceholder) || marker.placeholder;
   });
   const profile = root.querySelector('[data-profile-summary]');
   if (profile) profile.textContent = profileSummary(state);

@@ -73,7 +73,7 @@
 .sg-marker-reference { margin: 14px 0 0; font-size: 12px; }
 .sg-marker-reference a { color: var(--sg-green); text-underline-offset: 3px; }
 .sg-marker-target { display: grid; gap: 3px; margin: 0; color: var(--sg-ink); font-size: 13px; line-height: 1.45; }
-.sg-marker-target span { color: var(--sg-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.sg-marker-target > span:first-child { color: var(--sg-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .sg-marker-details { padding-top: 4px; }
 .sg-marker-details:not([open]) { margin-top: auto; }
 .sg-marker-details summary { display: flex; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--sg-line); border-radius: 10px; background: var(--sg-canvas); color: var(--sg-green); cursor: pointer; font-size: 13px; font-weight: 700; list-style: none; }

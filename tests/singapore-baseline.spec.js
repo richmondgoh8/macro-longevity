@@ -88,6 +88,40 @@ test('ApoB, Lp(a) and kidney results retain their original units and context', a
   await expect(workspace.locator('[data-marker-card="bp"] [data-marker-status]')).not.toHaveText('Within the guide');
 });
 
+test('reference targets follow selected units without converting saved results', async ({ page }) => {
+  await page.goto('/pages/blood.html');
+  for (const [id, value, target] of [
+    ['tg', '105', '<150 mg/dL'],
+    ['glucose', '94', '<110 mg/dL'],
+    ['ldl', '93', '<100 mg/dL'],
+    ['apob', '85', '<100 / <80 / <65 mg/dL'],
+    ['hscrp', '0.08', '<0.1 mg/dL; ≥0.2 mg/dL'],
+  ]) {
+    const card = page.locator(`[data-marker-card="${id}"]`);
+    const units = card.locator('[data-marker-unit]');
+    const originalUnit = await units.inputValue();
+    const originalTarget = await card.locator('[data-marker-target]').textContent();
+    await card.locator('[data-marker-input]').fill(value);
+    await units.selectOption('mg/dL');
+    await expect(card.locator('[data-marker-target]')).toContainText(target);
+    await expect(card.locator('[data-marker-input]')).toHaveValue(value);
+    await units.selectOption(originalUnit);
+    await expect(card.locator('[data-marker-target]')).toHaveText(originalTarget);
+    await units.selectOption('mg/dL');
+  }
+  for (const [id, boundary] of [['tg', '150'], ['ldl', '100'], ['glucose', '110']]) {
+    const card = page.locator(`[data-marker-card="${id}"]`);
+    await card.locator('[data-marker-input]').fill(boundary);
+    await expect(card.locator('[data-marker-status]')).toHaveClass(/sg-status-review/);
+    await card.locator('[data-marker-input]').fill(String(Number(boundary) - 1));
+    await expect(card.locator('[data-marker-status]')).toHaveClass(/sg-status-on-track/);
+  }
+  await page.reload();
+  await expect(page.locator('[data-marker-input="tg"]')).toHaveValue('149');
+  await expect(page.locator('[data-marker-card="tg"] [data-marker-target]')).toContainText('<150 mg/dL');
+  await expect(page.locator('[data-marker-card="hscrp"] [data-marker-target]')).toContainText('<0.1 mg/dL');
+});
+
 test('flipping one card leaves its two-column neighbour text and controls unchanged', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 1440, height: 1000 });
