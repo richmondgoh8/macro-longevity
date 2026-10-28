@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v46-unit-targets';
+const CACHE_NAME = 'macro-longevity-offline-v47-reference-home';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -59,6 +59,7 @@ const STATIC_ASSETS = [
   'js/data/protocol.js',
   'js/data/singapore.js',
   'js/data/screening.js',
+  'js/data/reference-ranges.js',
   'js/data/nutrition.js',
   'offline.html',
   'favicon.svg',

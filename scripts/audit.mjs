@@ -101,6 +101,7 @@ const javascriptFiles = [
   'js/finance.js', 'js/register-sw.js', 'sw.js',
   'js/site.js', 'js/avoid.js', 'js/stack-preview.js', 'js/components/card-swipe.js',
   'js/home-dashboard.js', 'js/health-dashboard.js', 'js/data/screening.js',
+  'js/data/reference-ranges.js',
   'js/biomarker-library.js', 'js/data/blueprint-markers.js',
   'js/data/screening-actions.js',
   'js/data/additional-screening.js',

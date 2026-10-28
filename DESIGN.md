@@ -72,6 +72,8 @@ Native links preserve browser history and modifier-click behavior.
 Motion is restrained to short color/opacity transitions. Marker cards also use a user-triggered front/back flip with the existing 200ms motion token; reduced motion disables the animation. Only the active face is visible and keyboard reachable. Paired cards share equal-height shells with bottom-aligned front actions, but never stretch each other's text.
 Do not make navigation wait for animation.
 
+Home is a read-only reference guide, not a result-entry form. Six cards are visible initially and seven more sit behind a native disclosure. Label every category and its numeric range; green/amber/red are redundant cues, not the only meaning. Equal-width segments are categorical, never a numeric ruler. Use established two-band categories where no middle band exists. Show units on every card and preserve risk-based, low-value and urgent-care caveats. Result storage and screening tools remain on Health.
+
 ## Nutrition
 
 The daily macro strip displays protein, carbs, fats, and fiber horizontally; the

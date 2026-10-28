@@ -8,6 +8,7 @@ A local-first Singapore health screening and longevity guide with optional nutri
 
 - A reusable-meal Daily Plan with portion controls and nutrient-gap estimates
 - A searchable, five-screen Ingredient guide
+- An input-free Home reference guide: six priority cards, seven more on demand, labelled concern scales, alternate units and practical actions; result logging stays on Health
 - A Singapore baseline workspace with 13 readily accessible markers, including hs-CRP, ApoB and Lp(a), plus 32 optional tracker fields for full lipids, insulin, liver, kidney, iron, thyroid, chemistry, blood count and vitamin D
 - Grouped screening guidance with risk-based lipid targets and report-unit selection for ApoB, Lp(a) and urine ACR
 - Flip-style marker cards: results on the front, actions on the back, equal-height pairs with bottom-aligned actions, keyboard controls and reduced-motion support

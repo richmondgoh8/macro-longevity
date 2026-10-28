@@ -7,7 +7,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v46-unit-targets');
+  expect(cacheKeys).toContain('macro-longevity-offline-v47-reference-home');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
 
   await context.setOffline(true);
@@ -21,5 +21,10 @@ test('service worker installs the current cache and serves fast offline navigati
   await expect(page.locator('[data-library-marker="apolipoproteinb"]')).toBeVisible();
   await page.locator('[data-additional-screening] > summary').click();
   await expect(page.locator('[data-marker-card="ferritin"]')).toHaveCount(1);
+  await page.goto(`${baseURL}/`);
+  const reference = page.locator('[data-reference-card="apob"]');
+  await reference.locator('summary').click();
+  await expect(reference.locator('li')).toHaveCount(3);
+  await expect(page.locator('#sg-home-dashboard input')).toHaveCount(0);
   await context.close();
 });

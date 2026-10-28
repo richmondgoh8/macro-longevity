@@ -70,7 +70,7 @@ test('library is lazy, searchable, paginated and saves qualitative and numeric r
 
 test('library handles unavailable storage and treats saved text as text', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('blueprint-marker-results-v1', JSON.stringify({ abogroup: { result: '<img src=x onerror=alert(1)>' } })));
-  await page.goto('/');
+  await page.goto('/pages/blood.html');
   const library = page.locator('[data-biomarker-library]');
   await library.locator('> summary').click();
   await library.getByLabel('Search all biomarkers').fill('ABO');
