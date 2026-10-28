@@ -10,7 +10,7 @@ A local-first Singapore health screening and longevity guide with optional nutri
 - A searchable, five-screen Ingredient guide
 - A Singapore baseline workspace with 13 readily accessible markers, including hs-CRP, ApoB and Lp(a), plus 32 optional tracker fields for full lipids, insulin, liver, kidney, iron, thyroid, chemistry, blood count and vitamin D
 - Grouped screening guidance with risk-based lipid targets and report-unit selection for ApoB, Lp(a) and urine ACR
-- Flip-style marker cards: results on the front, actions on the back, independent column heights, keyboard controls and reduced-motion support
+- Flip-style marker cards: results on the front, actions on the back, equal-height pairs with bottom-aligned actions, keyboard controls and reduced-motion support
 - A lazy-loaded, searchable Blueprint reference covering all 140 published baseline measurements, 3 male additions, 1 female addition and 86 matched follow-up entries; local result, unit, reference-interval and date logging
 - Concrete daily/weekly marker actions, with testing instructions and non-modifiable risks clearly separated
 - A coverage regression maps every existing core-panel reference to usable tracker fields; the complete differential and specialty assays remain searchable in the 144-measurement library

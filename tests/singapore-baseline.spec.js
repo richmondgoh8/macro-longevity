@@ -89,6 +89,7 @@ test('ApoB, Lp(a) and kidney results retain their original units and context', a
 });
 
 test('flipping one card leaves its two-column neighbour text and controls unchanged', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/pages/blood.html');
   await page.evaluate(() => document.fonts.ready);
@@ -96,8 +97,21 @@ test('flipping one card leaves its two-column neighbour text and controls unchan
   const neighbour = page.locator('[data-marker-card="glucose"]');
   const geometry = () => neighbour.evaluate(node => {
     const outer = node.getBoundingClientRect();
-    return [outer.height, ...[...node.querySelectorAll('.sg-marker-why, .sg-marker-input-row, .sg-marker-target')].map(child => child.getBoundingClientRect().top - outer.top)];
+    return [...node.querySelectorAll('.sg-marker-why, .sg-marker-input-row, .sg-marker-target')].map(child => child.getBoundingClientRect().top - outer.top);
   });
+  const expectAligned = async () => {
+    const first = await card.boundingBox();
+    const second = await neighbour.boundingBox();
+    expect(Math.abs(first.y - second.y)).toBeLessThan(1);
+    expect(Math.abs(first.height - second.height)).toBeLessThan(1);
+    const firstAction = await card.locator('summary').boundingBox();
+    const secondAction = await neighbour.locator('summary').boundingBox();
+    expect(Math.abs(firstAction.y - secondAction.y)).toBeLessThan(1);
+  };
+  for (const width of [1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expectAligned();
+  }
   const before = await geometry();
   await expect(card.locator('summary')).toHaveAccessibleName('View actions for BMI');
   await card.locator('summary').click();
@@ -109,6 +123,7 @@ test('flipping one card leaves its two-column neighbour text and controls unchan
   await card.locator('summary').click();
   await expect(card.locator('[data-marker-input]')).toBeVisible();
   await expect(card.locator('[data-marker-actions]')).toBeHidden();
+  await expectAligned();
 });
 
 test('flip cards support keyboard, retained values and reduced motion without clipped guidance', async ({ page }) => {

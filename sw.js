@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v44-flip-cards';
+const CACHE_NAME = 'macro-longevity-offline-v45-aligned-cards';
 const STATIC_ASSETS = [
   './',
   'index.html',
