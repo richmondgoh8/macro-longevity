@@ -32,22 +32,11 @@ test('the redesigned routes reflow at narrow and intermediate widths', async ({ 
   }
 });
 
-test('Home protocol gives a readable summary with a route to full details', async ({ page }) => {
+test('Home presents references and plans together without a result-recording CTA', async ({ page }) => {
   await page.goto('/');
-  const summary = page.locator('#stack-summary-app');
-  await expect(summary.locator('.stack-table-row').first()).toContainText('What');
-  expect(await summary.locator('.stack-table-row').count()).toBeGreaterThan(2);
-  if (page.viewportSize().width <= 767) {
-    await expect(page.locator('#longevity101-app li:visible')).toHaveCount(3);
-    await page.locator('[data-longevity-toggle]').click();
-    await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
-    await expect(page.locator('[data-longevity-toggle]')).toHaveAttribute('aria-expanded', 'true');
-  } else {
-    await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
-    await expect(page.locator('[data-longevity-toggle]')).toBeHidden();
-  }
-  await summary.getByRole('link', { name: 'Daily Stack' }).click();
-  await expect(page).toHaveURL(/\/pages\/stack.html/);
+  await expect(page.locator('[data-reference-card] .sg-card-action:visible')).toHaveCount(39);
+  await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Testing schedule: match the test to the question' })).toBeVisible();
 });
 
 test('guidance disclosures remain accessible and reversible', async ({ page }) => {

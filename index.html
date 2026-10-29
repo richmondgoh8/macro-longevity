@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="css/variables.css">
     <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/home-layout.css">
     <link rel="stylesheet" href="css/singapore-health.css">
     <link rel="stylesheet" href="css/tooltip.css">
     <link rel="expect" href="#view-transition-anchor" blocking="render">
@@ -44,159 +43,14 @@
     </nav>
 
     <main id="main">
-        <section id="view-transition-anchor" class="hero split-screen-hero">
-            <div class="hero-bg" aria-hidden="true"></div>
-            <div class="section-inner split-screen-hero-shell">
-                <div class="split-screen-hero-content">
-                    <div class="split-screen-hero-kicker">
-                        <p class="section-eyebrow">Singapore health screening, made legible</p>
-                        <span class="home-split-index">01 / 04 · Start here</span>
-                    </div>
-                    <h1 class="hero-title">Know your baseline. <span class="gradient-text">Take one next step.</span></h1>
-                    <p class="hero-subtitle">
-                        A practical guide to the common health markers in Singapore screening,
-                        the checks that matter most for long-term health, and how to move toward your next level.
-                    </p>
-                    <div class="hero-actions">
-                        <a href="#baseline" class="btn btn-primary">Check reference ranges</a>
-                        <a href="pages/blood.html" class="btn btn-secondary">See the screening map</a>
-                    </div>
-                </div>
-                <nav class="split-screen-hero-visual" aria-label="Protocol pillars">
-                    <div class="split-screen-hero-visual-head">
-                        <p class="split-screen-hero-visual-kicker">Start with the signal</p>
-                        <span class="split-screen-hero-visual-meta">04 pathways · 01 baseline</span>
-                    </div>
-                    <div id="hero-pillar-map" class="hero-pillar-map"></div>
-                </nav>
-            </div>
-        </section>
-
-        <section id="baseline" class="section section-alt">
+        <section id="view-transition-anchor" class="section section-alt sg-reference-page">
             <div class="section-inner">
-                <div id="sg-home-dashboard"></div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-inner home-split">
-                <div class="home-split-meta">
-                    <p class="section-eyebrow">The master model</p>
-                    <span class="home-split-index">02 / 04 · Orient</span>
-                </div>
-                <div class="home-split-content">
-                    <h2 class="section-title">Put the numbers into everyday practice</h2>
-                    <p class="lede">
-                        Use the reference cards to compare your report and choose an action. Record results, explore risk-based add-ons and plan Singapore screening on the Health page.
-                    </p>
-                    <div id="pillars-app" class="pillar-grid"></div>
-                    <details class="progressive-section home-method">
-                        <summary><span class="progressive-section-heading"><span class="section-title">How recommendations are graded</span><span class="blood-tier-desc">Decision rules and evidence levels used across the app.</span></span></summary>
-                        <div class="progressive-section-body"><div id="decision-rule-app"></div><div id="evidence-legend-app" class="evidence-legend"></div></div>
-                    </details>
-                </div>
-            </div>
-        </section>
-
-        <section class="section section-alt">
-            <div class="section-inner home-split">
-                <div class="home-split-meta">
-                    <p class="section-eyebrow">If you read only three pages</p>
-                    <span class="home-split-index">03 / 04 · Prioritize</span>
-                </div>
-                <div class="home-split-content">
-                        <h2 class="section-title">The Longevity 101</h2>
-                    <p class="lede">
-                        Longevity is mostly not a shopping problem. The highest-return actions are ordinary: know your numbers, move regularly, sleep, eat a repeatable pattern, and follow up when a trend changes.
-                    </p>
-                    <ol id="longevity101-app" class="longevity-101"></ol>
-                    <button type="button" class="text-button longevity-toggle" data-longevity-toggle aria-controls="longevity101-app" aria-expanded="false">Show all 10 actions</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-inner home-split">
-                <div class="home-split-meta">
-                    <p class="section-eyebrow">Daily inputs</p>
-                    <span class="home-split-index">04 / 04 · Apply</span>
-                </div>
-                <div class="home-split-content">
-                    <h2 class="section-title">The Core Protocol</h2>
-                    <p class="section-text">
-                        Six outcome domains, a practical baseline and targeted options only when they have a clear job. Full detail on the Nutrition and Health pages.
-                    </p>
-                    <div id="stack-summary-app"></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section section-alt">
-            <div class="section-inner home-split home-links-split">
-                <div class="home-split-meta">
-                    <p class="section-eyebrow">Go deeper</p>
-                    <span class="home-split-index">Explore · Four routes</span>
-                </div>
-                <div class="home-split-content">
-                    <div class="preview-grid">
-                        <a href="pages/stack.html" class="preview-card">
-                            <h3 class="preview-title">Daily Stack</h3>
-                            <p class="preview-desc">
-                                Food patterns and daily defaults that make your screening targets easier to reach.
-                            </p>
-                            <span class="preview-cta">View the protocol →</span>
-                        </a>
-                        <a href="pages/blood.html" class="preview-card">
-                            <h3 class="preview-title">Blood Tests</h3>
-                            <p class="preview-desc">
-                                Singapore screening recommendations, high-impact markers and the next step for each one.
-                            </p>
-                            <span class="preview-cta">Plan your panel →</span>
-                        </a>
-                        <a href="pages/workout.html" class="preview-card">
-                            <h3 class="preview-title">Daily Workout</h3>
-                            <p class="preview-desc">
-                                Strength, mobility, aerobic base and interval timers with sound cues.
-                                Start with five minutes, then build toward the weekly training targets.
-                            </p>
-                            <span class="preview-cta">Start moving →</span>
-                        </a>
-                        <a href="pages/finance.html" class="preview-card">
-                            <h3 class="preview-title">Finance</h3>
-                            <p class="preview-desc">
-                                Investment combos and the FIRE calculator — because financial health
-                                is part of longevity, and stress about money shortens both.
-                            </p>
-                            <span class="preview-cta">Plan your money →</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-inner">
-                <details class="progressive-section home-method">
-                    <summary><span class="progressive-section-heading"><span class="section-title">Principles behind the app</span><span class="blood-tier-desc">Why the protocol prioritizes fewer, higher-value actions.</span></span></summary>
-                    <div class="progressive-section-body feature-grid">
-                    <div class="feature-item">
-                        <h4>Less Is More</h4>
-                        <p>Fewer supplements, fewer tests, fewer habits — each one earning its place across multiple health domains.</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>Outcomes Over Mechanisms</h4>
-                        <p>Evidence grades come from human outcome data — meta-analyses and RCTs — not from marketing words like "NAD+" or "autophagy".</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>Redundant Means Skip</h4>
-                        <p>If your diet already covers it, the supplement gets a "probably redundant — skip" label. Your money stays yours.</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>Carnivore-Honest</h4>
-                        <p>Iron, B12 and zinc are covered — and iron is genuinely dangerous to add. What carnivores lack is stated plainly, with solutions.</p>
-                    </div>
-                    </div>
-                </details>
+                <header class="sg-reference-intro">
+                    <p class="section-eyebrow">Seven areas · reference ranges · practical actions</p>
+                    <h1>Health reference &amp; action plans</h1>
+                    <p>Grouped reference ranges with practical action plans. Match the units on your report.</p>
+                </header>
+                <div id="baseline"><div id="sg-home-dashboard"></div></div>
             </div>
         </section>
     </main>
@@ -210,14 +64,11 @@
                 Evidence-informed guidance for Singapore health screening and everyday longevity.
                 Not medical advice. Discuss results and personal targets with your doctor.
             </p>
-            <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
             <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
         </div>
     </footer>
 
-    <script type="module" src="js/stack-preview.js"></script>
     <script type="module" src="js/home-dashboard.js"></script>
-    <script type="module" src="js/home.js"></script>
     <script type="module" src="js/site.js"></script>
 <nav class="bottom-nav"><div class="bottom-nav-inner"><a href="./" class="bottom-nav-item active"><span class="bottom-nav-label">Home</span></a><a href="pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-label">Nutrition</span></a><a href="pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
  <script src="js/register-sw.js" defer></script>

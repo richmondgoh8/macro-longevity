@@ -1,17 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-test('homepage removes Diet context and keeps its actions clear', async ({ page }) => {
+test('homepage keeps only the grouped guide and main site shell', async ({ page }) => {
   await page.goto('/');
-  const spacing = await page.evaluate(() => {
-    const subtitle = document.querySelector('.hero-subtitle').getBoundingClientRect();
-    const actions = document.querySelector('.hero-actions').getBoundingClientRect();
-    return {
-      hasDietContext: Boolean(document.querySelector('.hero-context')),
-      gap: actions.top - subtitle.bottom,
-    };
-  });
-  expect(spacing.hasDietContext).toBe(false);
-  expect(spacing.gap).toBeGreaterThanOrEqual(24);
+  await expect(page.locator('main h1')).toHaveText('Health reference & action plans');
+  await expect(page.locator('.hero, #stack-summary-app, #longevity101-app, [data-export]')).toHaveCount(0);
+  await expect(page.locator('[data-reference-group]')).toHaveCount(7);
 });
 
 test('five navigation tabs center their labels vertically', async ({ page }) => {
@@ -39,69 +32,23 @@ test('five navigation tabs center their labels vertically', async ({ page }) => 
   mobile.forEach((tab) => expect(tab.centerDelta).toBeLessThanOrEqual(1));
 });
 
-test('homepage uses a split-screen hero with a linked protocol map', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('homepage group links work with the keyboard', async ({ page }) => {
   await page.goto('/');
-  const desktop = await page.locator('.split-screen-hero-shell').evaluate((shell) => {
-    const style = getComputedStyle(shell);
-    const content = shell.querySelector('.split-screen-hero-content');
-    const visual = shell.querySelector('.split-screen-hero-visual');
-    const contentBox = content.getBoundingClientRect();
-    const visualBox = visual.getBoundingClientRect();
-    return {
-      display: style.display,
-      columns: style.gridTemplateColumns.split(' ').length,
-      widthDelta: Math.abs(contentBox.width - visualBox.width),
-      contentFirst: shell.firstElementChild === content,
-      visualLabel: visual.getAttribute('aria-label'),
-      mapLinks: [...visual.querySelectorAll('.hero-pillar-card')].map((link) => new URL(link.href).pathname + new URL(link.href).hash),
-      ctaInContent: Boolean(content.querySelector('.hero-actions')),
-      mapBottomSpace: visualBox.bottom - visual.querySelector('.hero-pillar-grid').getBoundingClientRect().bottom,
-    };
-  });
-  expect(desktop.display).toBe('grid');
-  expect(desktop.columns).toBe(2);
-  expect(desktop.widthDelta).toBeLessThanOrEqual(1);
-  expect(desktop.contentFirst).toBe(true);
-  expect(desktop.visualLabel).toBe('Protocol pillars');
-  expect(desktop.mapLinks).toEqual(['/pages/blood.html', '/pages/protocol.html#biology', '/pages/workout.html', '/pages/stack.html']);
-  expect(desktop.ctaInContent).toBe(true);
-  expect(desktop.mapBottomSpace).toBeLessThanOrEqual(32);
-
-  await page.setViewportSize({ width: 900, height: 900 });
-  await page.goto('/');
-  const tablet = await page.locator('.split-screen-hero-shell').evaluate((shell) => ({
-    columns: getComputedStyle(shell).gridTemplateColumns.split(' ').length,
-  }));
-  expect(tablet.columns).toBe(1);
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  const mobile = await page.locator('.split-screen-hero-shell').evaluate((shell) => {
-    const content = shell.querySelector('.split-screen-hero-content').getBoundingClientRect();
-    const visual = shell.querySelector('.split-screen-hero-visual').getBoundingClientRect();
-    const cta = shell.querySelector('.hero-actions').getBoundingClientRect();
-    return {
-      columns: getComputedStyle(shell).gridTemplateColumns.split(' ').length,
-      contentBeforeVisual: content.bottom <= visual.top,
-      ctaBeforeVisual: cta.bottom <= visual.top,
-      visualVisible: visual.width > 0 && visual.height > 0,
-      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    };
-  });
-  expect(mobile.columns).toBe(1);
-  expect(mobile.contentBeforeVisual).toBe(true);
-  expect(mobile.ctaBeforeVisual).toBe(true);
-  expect(mobile.visualVisible).toBe(true);
-  expect(mobile.overflow).toBeLessThanOrEqual(1);
+  const link = page.getByRole('navigation', { name: 'Health reference groups' }).getByRole('link', { name: 'Cancer screening', exact: true });
+  await link.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#reference-cancer$/);
+  await expect(page.locator('#reference-cancer')).toBeVisible();
 });
 
-test('protocol destination cards retain links without decorative pointer effects', async ({ page }) => {
+test('reference action plans remain below their ranges', async ({ page }) => {
   await page.goto('/');
-  const cards = page.locator('.hero-pillar-card');
-  await expect(cards).toHaveCount(4);
-  for (const card of await cards.all()) await expect(card).toHaveAttribute('href', /^pages\//);
-  expect(await cards.first().evaluate(n => getComputedStyle(n, '::before').display)).toBe('none');
+  const card = page.locator('[data-reference-card="glucose"]');
+  const range = await card.locator('[data-reference-scale]').boundingBox();
+  const action = await card.locator('.sg-card-action').boundingBox();
+  expect(action.y).toBeGreaterThan(range.y + range.height);
+  await expect(card.locator('[data-reference-scale]')).toBeVisible();
+  await expect(card.locator('.sg-card-action')).toBeVisible();
 });
 
 test('active primary navigation uses one selected treatment', async ({ page }) => {
@@ -1226,12 +1173,12 @@ test('first-time Nutrition state identifies the example and can start blank', as
   await expect(page.locator('[data-planner-meal-count]')).toHaveText('0');
 });
 
-test('mobile homepage progressively reveals Longevity 101', async ({ page }) => {
+test('mobile homepage provides visible group plans and touch-sized jump links', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.locator('#longevity101-app li:visible')).toHaveCount(3);
-  await page.locator('[data-longevity-toggle]').click();
-  await expect(page.locator('#longevity101-app li:visible')).toHaveCount(10);
+  await expect(page.locator('.sg-group-plan:visible')).toHaveCount(7);
+  const links = page.getByRole('navigation', { name: 'Health reference groups' }).getByRole('link');
+  for (const link of await links.all()) expect((await link.boundingBox()).height).toBeGreaterThanOrEqual(44);
 });
 
 test('mobile Health prep is scan-first and expandable', async ({ page }) => {

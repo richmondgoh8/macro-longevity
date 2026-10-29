@@ -174,48 +174,26 @@ test('Planner mode uses one green underline and accessible targets', async ({ pa
   for (const tab of await tabs.getByRole('tab').all()) expect((await tab.boundingBox()).height).toBeGreaterThanOrEqual(44);
 });
 
-test('Homepage split-screen hero follows the Calm Wellness protocol-map contract', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
-  const desktop = await page.locator('.split-screen-hero-shell').evaluate((shell) => {
-    const visual = shell.querySelector('.split-screen-hero-visual');
-    const cards = [...shell.querySelectorAll('.hero-pillar-card')];
-    const visualStyle = getComputedStyle(visual);
-    return {
-      columns: getComputedStyle(shell).gridTemplateColumns.split(' ').length,
-      visualSurface: visualStyle.backgroundColor,
-      visualRadius: visualStyle.borderRadius,
-      visualShadow: visualStyle.boxShadow,
-      cardHeights: cards.map((card) => card.getBoundingClientRect().height),
-      links: cards.map((card) => card.getAttribute('href')),
-    };
-  });
-  expect(desktop.columns).toBe(2);
-  expect(desktop.visualSurface).toBe('rgb(237, 243, 236)');
-  expect(desktop.visualRadius).toBe('16px');
-  expect(desktop.visualShadow).toBe('none');
-  expect(desktop.cardHeights).toHaveLength(4);
-  desktop.cardHeights.forEach((height) => expect(height).toBeGreaterThanOrEqual(44));
-  expect(desktop.links).toEqual(['pages/blood.html', 'pages/protocol.html#biology', 'pages/workout.html', 'pages/stack.html']);
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  const mobile = await page.locator('.split-screen-hero-shell').evaluate((shell) => ({
-    columns: getComputedStyle(shell).gridTemplateColumns.split(' ').length,
-    visualVisible: shell.querySelector('.split-screen-hero-visual').getBoundingClientRect().height > 0,
-    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  }));
-  expect(mobile.columns).toBe(1);
-  expect(mobile.visualVisible).toBe(true);
-  expect(mobile.overflow).toBeLessThanOrEqual(1);
+test('Homepage groups have stable in-page targets on desktop and mobile', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    const links = page.getByRole('navigation', { name: 'Health reference groups' }).getByRole('link');
+    await expect(links).toHaveCount(7);
+    for (const link of await links.all()) {
+      const href = await link.getAttribute('href');
+      await expect(page.locator(href)).toBeVisible();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  }
 });
 
-test('Destination cards use calm surfaces without pointer effects', async ({ page }) => {
+test('Reference cards use calm surfaces and independent source links', async ({ page }) => {
   await page.goto('/');
-  const cards = page.locator('.hero-pillar-card');
-  await expect(cards).toHaveCount(4);
+  const cards = page.locator('[data-reference-card]');
+  await expect(cards).toHaveCount(39);
   expect(await cards.first().evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
-  expect(await cards.first().evaluate(n => getComputedStyle(n, '::before').display)).toBe('none');
+  await expect(cards.first().getByRole('link', { name: /^Reference source for / })).toHaveAttribute('href', /^https:\/\//);
 });
 
 test('Sticky pin rail follows the Calm Wellness contract', async ({ page }) => {

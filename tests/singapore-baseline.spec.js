@@ -1,48 +1,47 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { REFERENCE_RANGES } from '../js/data/reference-ranges.js';
-import { SG_MARKERS } from '../js/data/screening.js';
+import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS } from '../js/data/health-reference-groups.js';
 
-test('Home is an input-free reference guide with all core markers and actionable flips', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+test('Home contains the seven requested groups with visible references and action plans, without promotional extras', async ({ page }) => {
   await page.goto('/');
   const guide = page.locator('#sg-home-dashboard');
-  await expect(guide.getByRole('heading', { name: 'Know your range. Know what to do.' })).toBeVisible();
-  await expect(page.locator('input, select')).toHaveCount(0);
-  await expect(guide.locator('[data-reference-card]')).toHaveCount(13);
-  await expect(guide.locator('[data-reference-card]:visible')).toHaveCount(6);
-  await expect(guide).toContainText('Green: lower concern · Amber: watch · Red: review');
-  expect(REFERENCE_RANGES.map(item => item.id).sort()).toEqual(SG_MARKERS.map(item => item.id).sort());
-  expect(await page.evaluate(() => performance.getEntriesByType('resource').some(entry => /health-dashboard|screening-actions|blueprint-markers/.test(entry.name)))).toBe(false);
-  await guide.locator('.sg-reference-more > summary').click();
-  for (const reference of REFERENCE_RANGES) {
-    const card = guide.locator(`[data-reference-card="${reference.id}"]`);
-    await expect(card.locator('.sg-range-band')).toHaveCount(reference.id === 'waist' ? 2 : 3);
-    const flip = card.locator('summary');
-    await flip.focus();
-    await page.keyboard.press('Enter');
-    await expect(card.locator('li')).toHaveCount(3);
-    await expect(card.locator('.sg-marker-front')).toBeHidden();
-    await expect(flip).toBeFocused();
-    await expect(flip).toHaveAccessibleName(`Back to ranges for ${SG_MARKERS.find(marker => marker.id === reference.id).label}`);
-    await expect(card.getByRole('link', { name: 'Range source' })).toHaveAttribute('href', /^https:\/\//);
-    await page.keyboard.press('Space');
-    await expect(card.locator('.sg-marker-front')).toBeVisible();
-    await expect(card.locator('[data-reference-actions]')).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Health reference & action plans' })).toBeVisible();
+  await expect(page.locator('input, select, [data-export], #hero-pillar-map, #pillars-app, #stack-summary-app, #longevity101-app')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
+  await expect(guide.locator('[data-reference-group]')).toHaveCount(7);
+  await expect(guide.locator('[data-reference-card]:visible')).toHaveCount(39);
+  const ids = HEALTH_REFERENCE_GROUPS.flatMap(group => group.ids);
+  expect(new Set(ids).size).toBe(39);
+  expect(ids.slice().sort()).toEqual(HEALTH_REFERENCES.map(item => item.id).sort());
+  for (const group of HEALTH_REFERENCE_GROUPS) {
+    const section = guide.locator(`[data-reference-group="${group.id}"]`);
+    await expect(section.getByRole('heading', { name: group.title, exact: true })).toBeVisible();
+    await expect(section.locator('.sg-group-plan li')).toHaveCount(3);
+    for (const id of group.ids) {
+      const card = section.locator(`[data-reference-card="${id}"]`);
+      await expect(card.locator('[data-reference-scale]')).toBeVisible();
+      await expect(card.locator('.sg-card-action')).toBeVisible();
+      await expect(card.getByRole('link', { name: /^Reference source for / })).toHaveAttribute('href', /^https:\/\//);
+    }
   }
-  await expect(guide.locator('[data-reference-card="ldl"]')).toContainText('25–30 g');
-  await expect(guide.locator('[data-reference-card="bp"]')).toContainText('7,000 steps/day');
-  const accessibility = await new AxeBuilder({ page }).include('#sg-home-dashboard').analyze();
+  await expect(guide.locator('[data-reference-card="hscrp"]')).toContainText('not universal treatment goals');
+  await expect(guide.locator('[data-reference-card="vitd"]')).toContainText('40–60 ng/mL');
+  await expect(guide.locator('[data-reference-card="mced"]')).toContainText('No established routine testing frequency');
+  await expect(guide.locator('[data-reference-card="wholebodymri"]')).toContainText('No evidence-based routine interval');
+  await expect(guide.locator('.sg-testing-schedule')).toContainText('not a blanket annual panel');
+  await expect(guide.locator('.sg-testing-schedule')).toContainText('BRCA1/2, Lynch');
+  const accessibility = await new AxeBuilder({ page }).include('main').analyze();
   expect(accessibility.violations).toEqual([]);
 });
 
-test('Home reference units update every scale and leave stored Health values untouched', async ({ page }) => {
+test('Home reference units update all supported scales and leave stored Health values untouched', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('sg-health-baseline-v1', JSON.stringify({ values: { tg: '105' }, units: { tg: 'mg/dL' } })));
   await page.goto('/');
   const guide = page.locator('#sg-home-dashboard');
-  await guide.getByRole('button', { name: 'Alternative units' }).click();
-  await expect(guide.getByRole('button', { name: 'Alternative units' })).toHaveAttribute('aria-pressed', 'true');
-  await guide.locator('.sg-reference-more > summary').click();
+  const units = guide.getByRole('button', { name: 'Alternative units' });
+  await units.focus();
+  await page.keyboard.press('Enter');
+  await expect(units).toHaveAttribute('aria-pressed', 'true');
   for (const [id, unit, values] of [
     ['glucose', 'mg/dL', ['70–<110', '110–<126', '≥126']],
     ['ldl', 'mg/dL', ['<100', '100–<160', '≥160']],
@@ -52,6 +51,7 @@ test('Home reference units update every scale and leave stored Health values unt
     ['hscrp', 'mg/dL', ['<0.1', '0.1–0.3', '>0.3']],
     ['uacr', 'mg/g', ['<30', '30–300', '>300']],
     ['hba1c', 'mmol/mol', ['≤42', '43–52', '≥53']],
+    ['vitd', 'ng/mL', ['20–50', '12–<20', '<12']],
   ]) {
     const card = guide.locator(`[data-reference-card="${id}"]`);
     await expect(card.locator('.sg-reference-unit')).toHaveText(unit);
@@ -60,31 +60,32 @@ test('Home reference units update every scale and leave stored Health values unt
   await guide.getByRole('button', { name: 'Singapore units' }).click();
   await expect(guide.locator('[data-reference-card="tg"] dd')).toHaveText(['<1.7', '1.7–<2.3', '≥2.3']);
   await expect(guide.locator('[data-reference-card="lpa"]')).toContainText('No fixed conversion');
-  await guide.getByRole('link', { name: 'Record and review my results' }).click();
+  await page.goto('/pages/blood.html');
   await expect(page.locator('[data-marker-input="tg"]')).toHaveValue('105');
   await expect(page.locator('[data-marker-unit="tg"]')).toHaveValue('mg/dL');
 });
 
-test('Home reference cards remain aligned and readable across viewport widths and text zoom', async ({ page }) => {
+test('Home grouped references remain aligned and readable across viewport widths and text zoom', async ({ page }) => {
   await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
   const guide = page.locator('#sg-home-dashboard');
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    await expect(guide.locator('[data-reference-card="bp"]')).toBeVisible();
+    await expect(guide.locator('[data-reference-card="glucose"]')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     if (width >= 1024) {
-      const first = await guide.locator('[data-reference-card="bp"]').boundingBox();
-      const second = await guide.locator('[data-reference-card="bmi"]').boundingBox();
+      const first = await guide.locator('[data-reference-card="glucose"]').boundingBox();
+      const second = await guide.locator('[data-reference-card="insulin"]').boundingBox();
       expect(Math.abs(first.height - second.height)).toBeLessThan(1);
-      const a = await guide.locator('[data-reference-card="bp"] summary').boundingBox();
-      const b = await guide.locator('[data-reference-card="bmi"] summary').boundingBox();
+      const a = await guide.locator('[data-reference-card="glucose"] .sg-reference-source').boundingBox();
+      const b = await guide.locator('[data-reference-card="insulin"] .sg-reference-source').boundingBox();
       expect(Math.abs(a.y - b.y)).toBeLessThan(1);
     }
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => document.documentElement.style.fontSize = '200%');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-  const boxes = await guide.locator('.sg-range-band:visible').evaluateAll(nodes => nodes.map(node => node.scrollWidth <= node.clientWidth + 1));
+  const boxes = await guide.locator('.sg-range-band').evaluateAll(nodes => nodes.map(node => node.scrollWidth <= node.clientWidth + 1));
   expect(boxes.every(Boolean)).toBe(true);
 });
 

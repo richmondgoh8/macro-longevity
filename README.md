@@ -8,10 +8,10 @@ A local-first Singapore health screening and longevity guide with optional nutri
 
 - A reusable-meal Daily Plan with portion controls and nutrient-gap estimates
 - A searchable, five-screen Ingredient guide
-- An input-free Home reference guide: six priority cards, seven more on demand, labelled concern scales, alternate units and practical actions; result logging stays on Health
+- An input-free Home guide with seven health groups and 39 reference cards: labelled ranges or clinical context, alternate units, visible per-card actions, group plans and an indication-led testing schedule; no recording CTA or promotional homepage sections
 - A Singapore baseline workspace with 13 readily accessible markers, including hs-CRP, ApoB and Lp(a), plus 32 optional tracker fields for full lipids, insulin, liver, kidney, iron, thyroid, chemistry, blood count and vitamin D
 - Grouped screening guidance with risk-based lipid targets and report-unit selection for ApoB, Lp(a) and urine ACR
-- Flip-style marker cards: results on the front, actions on the back, equal-height pairs with bottom-aligned actions, keyboard controls and reduced-motion support
+- Health result cards use a flip: results on the front, actions on the back, equal-height pairs with bottom-aligned actions, keyboard controls and reduced-motion support; Home shows references and actions together
 - A lazy-loaded, searchable Blueprint reference covering all 140 published baseline measurements, 3 male additions, 1 female addition and 86 matched follow-up entries; local result, unit, reference-interval and date logging
 - Concrete daily/weekly marker actions, with testing instructions and non-modifiable risks clearly separated
 - A coverage regression maps every existing core-panel reference to usable tracker fields; the complete differential and specialty assays remain searchable in the 144-measurement library
@@ -40,7 +40,7 @@ The primary shell always contains Home, Nutrition, Health, Training, and Finance
 
 | Area | Route | Purpose |
 |------|-------|---------|
-| Home | `/` | Four-pillar overview and protocol preview |
+| Home | `/` | Grouped health references, screening criteria and action plans |
 | Nutrition | `/pages/stack.html` | Daily Plan, nutrient coverage, supplements, and recovery |
 | Nutrition | `/pages/avoid.html` | Five-screen Ingredient guide with search and filters |
 | Health | `/pages/blood.html` | Blood-test tiers, ranges, and follow-up context |

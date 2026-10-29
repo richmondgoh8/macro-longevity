@@ -24,8 +24,9 @@ Ingredient guide, Deep library; Health context links are Blood tests and Bluepri
 
 Shared tokens: css/variables.css. Shared component layer: css/wellness.css.
 Existing specialized styling is isolated in a lower-priority legacy cascade layer.
-css/style.css contains shared legacy rules; each route loads its own named
-*-layout.css file. Nutrition detail styles span css/nutrition-layout.css,
+css/style.css contains shared legacy rules; routes load their owning layout styles.
+Home and Health share css/singapore-health.css; Home no longer loads the removed
+promotional hero stylesheet. Nutrition detail styles span css/nutrition-layout.css,
 css/nutrition.css, and shared dialog rules in css/wellness.css.
 These are explicit authored route boundaries, not runtime CSS-coverage extracts.
 Do not load CSS on clicks or only for the initial viewport.
@@ -72,7 +73,7 @@ Native links preserve browser history and modifier-click behavior.
 Motion is restrained to short color/opacity transitions. Marker cards also use a user-triggered front/back flip with the existing 200ms motion token; reduced motion disables the animation. Only the active face is visible and keyboard reachable. Paired cards share equal-height shells with bottom-aligned front actions, but never stretch each other's text.
 Do not make navigation wait for animation.
 
-Home is a read-only reference guide, not a result-entry form. Six cards are visible initially and seven more sit behind a native disclosure. Label every category and its numeric range; green/amber/red are redundant cues, not the only meaning. Equal-width segments are categorical, never a numeric ruler. Use established two-band categories where no middle band exists. Show units on every card and preserve risk-based, low-value and urgent-care caveats. Result storage and screening tools remain on Health.
+Home is a read-only guide with seven health groups and 39 cards, not a result-entry form. All references and per-card action plans are visible together, with a concrete group plan below each grid. Neutral cards show assay-/age-/sex-dependent references or screening criteria rather than invented universal longevity thresholds. Label established numeric categories; green/amber/red are redundant cues, never the only meaning. Equal-width segments are categorical, not a numeric ruler. Preserve low-value, risk-based and urgent-care caveats. The recording CTA, promotional hero, protocol preview and export control are absent from Home; saved result tools remain on Health.
 
 ## Nutrition
 

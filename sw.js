@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v47-reference-home';
+const CACHE_NAME = 'macro-longevity-offline-v48-grouped-reference';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -13,7 +13,6 @@ const STATIC_ASSETS = [
   'css/nutrition-layout.css',
   'css/training-layout.css',
   'css/finance-layout.css',
-  'css/home-layout.css',
   'css/health-layout.css',
   'css/singapore-health.css',
   'css/ingredients-layout.css',
@@ -26,14 +25,12 @@ const STATIC_ASSETS = [
   'js/site.js',
   'js/components/tooltip.js',
   'js/export.js',
-  'js/home.js',
   'js/home-dashboard.js',
   'js/health-dashboard.js',
   'js/biomarker-library.js',
   'js/data/blueprint-markers.js',
   'js/data/screening-actions.js',
   'js/data/additional-screening.js',
-  'js/stack-preview.js',
   'js/stack.js',
   'js/components/coverage-pin.js',
   'js/components/nutrition-totals.js',
@@ -60,6 +57,7 @@ const STATIC_ASSETS = [
   'js/data/singapore.js',
   'js/data/screening.js',
   'js/data/reference-ranges.js',
+  'js/data/health-reference-groups.js',
   'js/data/nutrition.js',
   'offline.html',
   'favicon.svg',

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('finance explanations sit in a centered readable panel and home cards have even borders', async ({ page }) => {
   await page.goto('/');
-  const border = await page.locator('.hero-pillar-card').first().evaluate((card) => {
+  const border = await page.locator('[data-reference-card]').first().evaluate((card) => {
     const style = getComputedStyle(card);
     return [style.borderLeftWidth, style.borderRightWidth];
   });

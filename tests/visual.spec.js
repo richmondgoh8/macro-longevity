@@ -10,23 +10,20 @@ for (const [name, route] of pages) {
   test(`${name} visual baseline`, async ({ page }) => {
     await page.goto(route);
     await page.evaluate(() => document.fonts.ready);
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, timeout: 15000 });
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: name !== 'home', timeout: 15000 });
   });
 }
 
-test('split-screen hero visual baseline', async ({ page }) => {
+test('Home metabolic reference card visual baseline', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator('.split-screen-hero')).toHaveScreenshot('home-split-screen-hero.png');
+  await expect(page.locator('[data-reference-card="glucose"]')).toHaveScreenshot('home-glucose-reference.png');
 });
 
-test('spotlight card hover visual baseline', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop-chromium', 'Spotlight enhancement is disabled for coarse pointers.');
+test('Home cancer screening reference card visual baseline', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
-  await page.locator('[data-spotlight-card]').first().hover({ position: { x: 24, y: 24 } });
-  await page.waitForTimeout(300);
-  await expect(page.locator('.split-screen-hero')).toHaveScreenshot('home-spotlight-card-hover.png');
+  await expect(page.locator('[data-reference-card="colorectal"]')).toHaveScreenshot('home-cancer-reference.png');
 });
 
 test('sticky pin rail visual baseline', async ({ page }) => {
