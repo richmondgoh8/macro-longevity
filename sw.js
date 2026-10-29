@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v48-grouped-reference';
+const CACHE_NAME = 'macro-longevity-offline-v49-reference-navigation';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -26,6 +26,7 @@ const STATIC_ASSETS = [
   'js/components/tooltip.js',
   'js/export.js',
   'js/home-dashboard.js',
+  'js/components/reference-navigation.js',
   'js/health-dashboard.js',
   'js/biomarker-library.js',
   'js/data/blueprint-markers.js',

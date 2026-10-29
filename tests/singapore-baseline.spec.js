@@ -6,7 +6,7 @@ test('Home contains the seven requested groups with visible references and actio
   await page.goto('/');
   const guide = page.locator('#sg-home-dashboard');
   await expect(page.getByRole('heading', { name: 'Health reference & action plans' })).toBeVisible();
-  await expect(page.locator('input, select, [data-export], #hero-pillar-map, #pillars-app, #stack-summary-app, #longevity101-app')).toHaveCount(0);
+  await expect(page.locator('input:not([type="search"]), select, [data-export], #hero-pillar-map, #pillars-app, #stack-summary-app, #longevity101-app')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
   await expect(guide.locator('[data-reference-group]')).toHaveCount(7);
   await expect(guide.locator('[data-reference-card]:visible')).toHaveCount(39);

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "audit": "node scripts/audit.mjs",
-    "test:quick": "playwright test tests/quick.spec.js tests/singapore-baseline.spec.js tests/biomarker-library.spec.js tests/marker-coverage.spec.js tests/service-worker.spec.js",
+    "test:quick": "playwright test tests/quick.spec.js tests/singapore-baseline.spec.js tests/biomarker-library.spec.js tests/marker-coverage.spec.js tests/service-worker.spec.js tests/reference-navigation.spec.js",
     "test:ui": "playwright test",
     "test:ui:headed": "playwright test --headed",
     "test:visual": "playwright test tests/visual.spec.js",

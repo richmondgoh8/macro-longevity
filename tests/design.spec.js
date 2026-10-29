@@ -178,8 +178,9 @@ test('Homepage groups have stable in-page targets on desktop and mobile', async 
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
+    if (width < 1280) await page.locator('.sg-reference-picker > summary').click();
     const links = page.getByRole('navigation', { name: 'Health reference groups' }).getByRole('link');
-    await expect(links).toHaveCount(7);
+    await expect(links).toHaveCount(8);
     for (const link of await links.all()) {
       const href = await link.getAttribute('href');
       await expect(page.locator(href)).toBeVisible();

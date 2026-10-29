@@ -34,6 +34,7 @@ test('five navigation tabs center their labels vertically', async ({ page }) => 
 
 test('homepage group links work with the keyboard', async ({ page }) => {
   await page.goto('/');
+  if (page.viewportSize().width < 1280) await page.locator('.sg-reference-picker > summary').click();
   const link = page.getByRole('navigation', { name: 'Health reference groups' }).getByRole('link', { name: 'Cancer screening', exact: true });
   await link.focus();
   await page.keyboard.press('Enter');
@@ -1177,6 +1178,7 @@ test('mobile homepage provides visible group plans and touch-sized jump links', 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.locator('.sg-group-plan:visible')).toHaveCount(7);
+  await page.locator('.sg-reference-picker > summary').click();
   const links = page.getByRole('navigation', { name: 'Health reference groups' }).getByRole('link');
   for (const link of await links.all()) expect((await link.boundingBox()).height).toBeGreaterThanOrEqual(44);
 });

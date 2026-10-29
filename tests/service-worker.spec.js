@@ -7,7 +7,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v48-grouped-reference');
+  expect(cacheKeys).toContain('macro-longevity-offline-v49-reference-navigation');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
 
   await context.setOffline(true);
@@ -25,6 +25,11 @@ test('service worker installs the current cache and serves fast offline navigati
   const reference = page.locator('[data-reference-card="apob"]');
   await expect(reference.locator('.sg-card-action')).toContainText('unsaturated');
   await expect(page.locator('[data-reference-group]')).toHaveCount(7);
-  await expect(page.locator('#sg-home-dashboard input')).toHaveCount(0);
+  await expect(page.locator('#sg-home-dashboard input')).toHaveCount(1);
+  const picker = page.locator('.sg-reference-picker');
+  if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
+  await page.getByRole('searchbox', { name: 'Find a biomarker' }).fill('ApoB');
+  await page.locator('[data-reference-results] a').click();
+  await expect(page).toHaveURL(/#biomarker-apob$/);
   await context.close();
 });
