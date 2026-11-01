@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v49-reference-navigation';
+const CACHE_NAME = 'macro-longevity-offline-v50-install-icons';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -63,6 +63,9 @@ const STATIC_ASSETS = [
   'offline.html',
   'favicon.svg',
   'manifest.json',
+  'icons/app-192.png',
+  'icons/app-512.png',
+  'icons/apple-touch-icon.png',
   'fonts/inter-latin.woff2',
   'fonts/jetbrains-mono-latin.woff2',
 ];
@@ -79,7 +82,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith('macro-longevity-offline-') && k !== CACHE_NAME).map((k) => caches.delete(k)))
     ).then(async () => {
       if (self.registration.navigationPreload) await self.registration.navigationPreload.enable();
       await self.clients.claim();

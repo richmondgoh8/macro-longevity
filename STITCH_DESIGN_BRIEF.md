@@ -1,78 +1,59 @@
-# Stitch design brief — Macro Longevity Singapore baseline
+# Stitch design brief — Macro Longevity
+Updated 2026-11-01. The connector currently returns `Authentication required`;
+no screen generated in this pass should be implied by this brief.
 
-This brief is the handoff for generating or reviewing design assets in Google
-Stitch when the connector is authenticated. The live implementation remains a
-dependency-free static PWA in this repository.
+## Current product contract
 
-## Product direction
+A calm, local-first Singapore wellness PWA with exactly five primary destinations:
+Home, Nutrition, Health, Training, Finance. Preserve the working implementation
+and latest user decisions. No framework, backend, account, or icon runtime.
 
-Design a calm, practical Singapore health-screening companion for adults who
-want to understand their current baseline and choose one useful next action.
-The interface must be easy to scan before it becomes detailed:
+- Home is a reference guide, not a results-entry dashboard. Keep its seven groups,
+  39 cards, labelled ranges or clinical context, visible action plans, group plans,
+  and testing schedule. Do not bring back the promotional hero, the record-results
+  CTA, export controls, or duplicate destination cards.
+- The seven groups are Metabolic, Inflammation, Cardiovascular, Liver & kidneys,
+  Micronutrients, Cancer screening, and Fitness & body.
+- Use a sticky contents rail on sufficiently wide desktop screens. On mobile,
+  use a compact section picker with the active group and a Top link, separate
+  from the five-tab bottom navigation.
+- Search marker names and aliases; choosing a result jumps to its card without
+  hiding the other cards. Preserve copyable card links, previous/next section
+  links, browser Back behavior, and ordinary document scrolling.
+- Health owns personal result entry. Existing unit choices must never silently
+  convert saved values. Home keeps ranges and action plans visible together.
+- Nutrition prioritizes a usable daily meal plan and coverage; Training prioritizes
+  the current activity and timer; Finance keeps its calculator and tracker distinct.
+  Advanced details may be disclosed progressively, without hiding primary actions.
 
-1. Plain-language summary
-2. Personal value and status
-3. Orientation target with units and caveat
-4. Progressive three-step “how to move toward this level” disclosure
-5. Singapore source and primary-care follow-up link
+## Visual and interaction system
 
-Do not present orientation ranges as diagnoses or guarantees. Make it clear
-that risk-based targets and clinician advice can override generic guideposts.
+Warm ivory #F7F8F3, white cards, sage secondary surfaces, forest green #246B4B,
+ink #18251F, muted text #526158. Flat teal, yellow, lilac, blue and coral icon tiles.
+Self-hosted Inter, restrained borders, rounded surfaces, and 4px/8px spacing.
+No gradients, glass effects, stock-photo heroes, or attribution-required assets.
 
-## Screens to generate
+Verify at 390px and 1440px, with 320px, landscape, and 200% text-size stress checks.
+Keep aligned two-column desktop cards and one-column mobile cards. Avoid clipped
+fixed-height content and persistent controls covering text or keyboard focus.
+Use native semantics, visible focus, reduced-motion support, clear labels and
+44px touch targets where practical. No diagnosis claims or invented target ranges;
+factual content must come from the existing data files.
 
-- Home: “Know your baseline. Take one next step.” with the twelve-marker local
-  workspace grouped by common screening, ApoB/Lp(a), and kidney checks, in a vertical flow on
-  mobile.
-- Health: the same shared baseline workspace followed by the deeper screening
-  map: preparation, core panel, one-time checks, periodic checks, ApoB options,
-  beyond-panel checks, and low-value tests.
-- Screening package comparison state: a prominent “Priority first” shortlist
-  for blood pressure, BMI + waist, glucose, and a full lipid panel; show ApoB,
-  Lp(a), kidney function, and urine ACR as selective clinician-led add-ons.
+## First screen prompt after reconnecting
 
-## Visual system
+> Refine the existing MacroLongevity Home reference guide as a polished mobile PWA.
+> Preserve the five tabs Home, Nutrition, Health, Training, Finance, with Home active.
+> Use a warm ivory canvas, white rounded cards, forest-green controls, restrained
+> sage borders and Inter typography. Show the title Health reference & action plans,
+> a brief subtitle, Singapore/Alternative unit controls, a compact current-section
+> picker, biomarker search, and a readable reference card with its action plan
+> visible below the ranges. Use existing content placeholders rather than inventing
+> medical numbers. Include Copy link and previous/next section navigation.
+> No recording CTA, promotional hero, extra tabs, decorative charts, hidden action
+> plans, account flow or gamified score. Produce a mobile composition first, then
+> a corresponding wide-desktop composition with a persistent contents sidebar.
+> Prioritize legibility, minimal clutter, strong hierarchy and accessible controls.
 
-- Warm ivory canvas: `#F7F8F3`; white cards; sage secondary surfaces.
-- Forest-green action color: `#246B4B`; dark ink: `#18251F`; muted text:
-  `#526158`.
-- Flat-color marker tiles only: teal `#D9F1E7`, yellow `#FFF0BD`, lilac
-  `#E9E4FB`, blue `#DCE9F8`, coral `#FFE0D8`.
-- Inter for body and headings; JetBrains Mono for compact numeric metadata.
-- Rounded cards and inputs, restrained borders, generous whitespace, obvious
-  focus states, and no decorative gradients or glass effects.
-- Use simple original line icons inside flat-color tiles. Do not import an icon
-  font, third-party runtime, or an asset that requires attribution. Any newly
-  generated visual asset must be commercially usable without attribution.
-
-## Interaction constraints
-
-- Desktop content width around 1280px; responsive acceptance widths 390px and
-  1440px.
-- Keep the marker cards readable in one column on mobile and two columns on
-  desktop.
-- Use native disclosure patterns for progressive details.
-- Preserve local-first privacy: baseline values stay in browser storage and are
-  never uploaded by the interface.
-- Respect reduced motion, keyboard navigation, 44px touch targets, and visible
-  focus rings.
-
-## Stitch prompt
-
-> Create a warm, flat-color, Singapore-focused health screening PWA for adults.
-> The primary screen is a baseline workspace with twelve cards: blood pressure,
-> waist circumference, BMI, fasting glucose, LDL cholesterol, triglycerides,
-> non-HDL cholesterol, HbA1c, ApoB, Lp(a), eGFR, and urine ACR. Group common
-> screening separately from advanced lipid and kidney checks. Each card
-> shows a plain-language reason, an input for the latest result, units, an
-> orientation target, a non-diagnostic status, and a collapsed three-step
-> “how to move toward this level” section. Place a blue “Priority first” strip
-> above the cards explaining which checks to look for when comparing screening
-> packages: blood pressure, BMI plus waist, glucose, and a full lipid panel;
-> make ApoB, Lp(a), kidney function, and urine ACR clearly clinician-selected
-> add-ons. Follow with an age/sex-aware Singapore screening roadmap for
-> Healthier SG cardiovascular, cervical, breast, and colorectal screening.
-> Use warm ivory, forest green, sage, teal, yellow, lilac, blue, and coral flat
-> surfaces; original line icons; Inter typography; calm editorial hierarchy;
-> no gradients, no stock photography, no attribution-required icon library,
-> and no medical-diagnosis language. Produce desktop and mobile compositions.
+The built-in image-generated review concept and its exact prompt are saved under
+`docs/design/`. It is not an implemented screenshot or a source of medical facts.

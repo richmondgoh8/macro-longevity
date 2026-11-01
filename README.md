@@ -20,7 +20,19 @@ A local-first Singapore health screening and longevity guide with optional nutri
 - A minimal-equipment training plan with timers and sound cues
 - FIRE and passive-income planning tools
 - Browser-local saved plans, meals, and finance entries with Markdown export
-- Installable/offline support through a web app manifest and service worker
+- Offline support and standalone-app metadata, with 192px/512px PNG install icons,
+  a maskable icon, a stable app identity/scope and Apple touch icons on every route
+
+## Install on your device
+
+Open the live HTTPS site in your browser. On a supported Android browser, use its
+Install app / Add to Home screen command; on iPhone, use Safari's Share menu and
+Add to Home Screen. Desktop browsers that support installation expose an install
+command in their address bar or menu. Availability and wording vary by browser.
+No account is required. Visit online once before relying on cached pages offline;
+training audio still requires an internet connection. Device-level install and
+launch behavior must be checked on actual target devices, not inferred from the
+manifest alone.
 
 ## Run locally
 

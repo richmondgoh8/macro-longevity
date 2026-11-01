@@ -40,7 +40,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html offline.html sw.js manifest.json favicon.svg robots.txt sitemap.xml .nojekyll _site/
-          cp -R css js fonts pages _site/
+          cp -R css js fonts pages icons _site/
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
