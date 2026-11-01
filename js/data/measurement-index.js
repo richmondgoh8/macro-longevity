@@ -1,0 +1,39 @@
+// Shared vocabulary, not diagnostic thresholds. Preserve existing result/storage IDs.
+const IDENTITIES = [
+  ['hdl', 'hdlcholesterol', ['HDL', 'HDL-C', 'high density lipoprotein', 'high density lipoprotein cholesterol']],
+  ['nonhdl', 'nonhdlcholesterol', ['non HDL', 'non-HDL-C', 'nonhdl']],
+  ['totalchol', 'cholesteroltotal', ['total cholesterol', 'total chol', 'TC']],
+  ['ldl', 'ldlcholesterol', ['LDL', 'LDL-C', 'low density lipoprotein cholesterol']],
+  ['tg', 'triglycerides', ['triglycerides', 'TG']],
+  ['glucose', 'glucose', ['blood sugar', 'fasting blood glucose']],
+  ['hba1c', 'hemoglobina1c', ['A1c', 'HbA1c', 'glycated haemoglobin', 'glycated hemoglobin', 'blood sugar']],
+  ['apob', 'apolipoproteinb', ['ApoB', 'apolipoprotein B']],
+  ['lpa', 'lipoproteina', ['Lp(a)', 'LPA', 'lipoprotein A']],
+  ['hscrp', 'highsensitivitycreactiveprotein', ['hs-CRP', 'hs CRP', 'high sensitivity C reactive protein', 'inflammation', 'hr-csp']],
+  ['bp', '', ['blood pressure']],
+  ['vitd', 'vitamind', ['vitamin D', '25 hydroxy', '25-OH']],
+  ['b12', '', ['cobalamin', 'vitamin B12']],
+  ['egfr', 'estimatedglomerularfiltrationrate', ['eGFR', 'kidney filtration']],
+  ['uacr', '', ['urine albumin creatinine', 'kidney ACR']],
+  ['alt', 'alaninetransaminase', ['ALT', 'liver']],
+  ['ast', 'aspartateaminotransferase', ['AST', 'liver']],
+  ['bun', 'ureanitrogenbun', ['BUN', 'kidney']],
+  ['tsh', 'thyroidstimulatinghormonetsh', ['TSH', 'thyroid']],
+  ['ft4', 'thyroxinet4free', ['free T4', 'FT4']],
+  ['hemoglobin', 'hemoglobin', ['haemoglobin', 'hemoglobin', 'CBC', 'full blood count']],
+  ['grip', '', ['grip', 'hand grip', 'handgrip', 'grip strength', 'dynamometer']],
+  ['bmd', '', ['bone density', 'BMD', 'bone mineral density', 'T-score', 'Z-score', 'DXA', 'DEXA']],
+  ['dexa', '', ['DXA', 'DEXA', 'body composition', 'VAT', 'visceral fat', 'lean mass', 'body fat']],
+  ['rhr', '', ['RHR', 'resting heart rate', 'resting pulse']],
+  ['hrv', '', ['HRV', 'heart rate variability', 'RMSSD', 'SDNN']],
+  ['sleep', '', ['sleep', 'sleep duration', 'hours asleep']],
+  ['sleepefficiency', '', ['sleep efficiency', 'time in bed']],
+  ['vo2', '', ['VO2', 'VO2 max', 'vo2max', 'fitness']],
+  ['wholebodymri', '', ['Prenuvo', 'Ezra', 'whole body MRI']],
+  ['colorectal', '', ['colon', 'bowel', 'Cologuard']],
+];
+
+export function measurementIdentity(id) {
+  const entry = IDENTITIES.find(([canonicalId, libraryId]) => id === canonicalId || id === libraryId);
+  return entry ? { id: entry[0], libraryId: entry[1], aliases: entry[2] } : { id, libraryId: '', aliases: [] };
+}

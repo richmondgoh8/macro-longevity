@@ -44,8 +44,8 @@ test('section picker tracks scrolling, remains reachable, and clears the shell',
     await page.locator('#biomarker-vitd .sg-copy-link').focus();
     await expect(page.locator('.sg-reference-picker')).not.toHaveAttribute('open');
   }
-  await expect(page.locator('[data-reference-card]:visible')).toHaveCount(39);
-  await expect(page.locator('.sg-card-action:visible')).toHaveCount(39);
+  await expect(page.locator('[data-reference-card]:visible')).toHaveCount(51);
+  await expect(page.locator('.sg-card-action:visible')).toHaveCount(51);
 });
 
 test('search supports aliases, keyboard navigation, no matches, and does not filter cards', async ({ page }) => {
@@ -54,7 +54,7 @@ test('search supports aliases, keyboard navigation, no matches, and does not fil
   const input = page.getByRole('searchbox', { name: 'Find a biomarker' });
   await input.fill('blood sugar');
   await expect(page.locator('[data-reference-results]')).toContainText('Fasting glucose');
-  await expect(page.locator('[data-reference-card]:visible')).toHaveCount(39);
+  await expect(page.locator('[data-reference-card]:visible')).toHaveCount(51);
   await input.fill('does-not-exist');
   await expect(page.locator('#reference-search-status')).toContainText('No matches');
   await input.press('Escape');

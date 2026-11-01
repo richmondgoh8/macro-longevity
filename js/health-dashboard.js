@@ -1,6 +1,7 @@
 // Shared local-first baseline workspace for the Home and Health routes.
 import { SG_MARKERS, SG_MARKER_GROUPS, SG_SCREENING_PATHS, SG_SOURCES, SG_ACTION_SOURCES } from './data/screening.js';
 import { escapeHTML } from './components/ui.js';
+import { mountHealthSearch } from './components/health-measurement-search.js';
 
 const STORAGE_KEY = 'sg-health-baseline-v1';
 
@@ -173,10 +174,12 @@ export function mountHealthDashboard(mount, { compact = false } = {}) {
   const markers = [...SG_MARKERS];
   mount.innerHTML = `<section class="sg-workspace${compact ? ' sg-workspace-compact' : ''}" aria-labelledby="sg-baseline-title">
     <div class="sg-workspace-intro"><div><p class="section-eyebrow">Your Singapore baseline</p><h2 id="sg-baseline-title">Know where you stand, then pick one next move.</h2><p>Enter results from your latest screening to make the guide personal. This stays in your browser; it is not a diagnosis or a replacement for your doctor.</p></div><div class="sg-score-card"><span class="sg-score-label">Results recorded</span><strong data-baseline-score>0</strong><span data-baseline-copy>Add the results you have. You do not need every test listed.</span></div></div>
+    <form class="sg-health-search" role="search" aria-label="Find a result field"><label for="health-measurement-search">Find a result field</label><input id="health-measurement-search" type="search" data-health-search placeholder="HDL, grip, bone density, thyroid…" autocomplete="off" aria-describedby="health-search-status"><p id="health-search-status" data-health-search-status role="status"></p><ul data-health-results></ul></form>
     <aside class="sg-priority-note" aria-label="High-value screening shortlist"><strong>Priority first</strong><span>Compare packages for blood pressure, BMI + waist, glucose and a full lipid panel (total cholesterol, HDL-C, LDL-C, triglycerides). Ask explicitly about ApoB for particle risk and a one-time Lp(a) test for inherited risk. Add kidney checks when indicated; more tests do not automatically mean better screening.</span></aside>
     <form class="sg-profile" data-profile-form><div><label for="sg-age">Age</label><input id="sg-age" data-profile-age type="number" min="18" max="120" inputmode="numeric" value="${escapeHTML(state.age)}" placeholder="e.g. 42"></div><div><label for="sg-sex">Sex for screening context</label><select id="sg-sex" data-profile-sex><option value="">Choose if useful</option><option value="female"${state.sex === 'female' ? ' selected' : ''}>Female</option><option value="male"${state.sex === 'male' ? ' selected' : ''}>Male</option></select></div><p data-profile-summary>${escapeHTML(profileSummary(state))}</p></form>
     <div class="sg-marker-groups">${SG_MARKER_GROUPS.map(group => `<details class="sg-marker-group" data-marker-group="${group.id}"${group.open ? ' open' : ''}><summary><h3>${escapeHTML(group.title)}</h3></summary><p class="sg-group-copy">${escapeHTML(group.description)}</p><div class="sg-marker-grid">${group.ids.map(id => markerCard(SG_MARKERS.find(marker => marker.id === id), state)).join('')}</div></details>`).join('')}</div>
-    <details class="sg-marker-group" data-additional-screening><summary><h3>More lab results · HDL, insulin, liver, thyroid, iron, electrolytes, blood count and vitamin D</h3></summary><div data-additional-mount><p>Open to record additional results with units and practical guidance. These are optional context, not tests everyone needs.</p></div></details>
+    <details class="sg-marker-group" data-physical-measurements><summary><h3>Physical measurements · grip, bone density, fitness, body composition and sleep</h3></summary><div data-physical-mount><p>Open to record measurements beyond the blood draw.</p></div></details>
+    <details class="sg-marker-group" data-additional-screening><summary><h3>More lab results · insulin, liver, thyroid, iron, electrolytes, blood count and vitamin D</h3></summary><div data-additional-mount><p>Open to record additional results with units and practical guidance. These are optional context, not tests everyone needs.</p></div></details>
     <details class="sg-marker-group sg-library" data-biomarker-library><summary><h3>Full Blueprint biomarker library · 144 measurements</h3></summary><div data-library-mount><p>Open to search the published blood-and-urine panel and record your results.</p></div></details>
     <section class="sg-roadmap" aria-labelledby="sg-roadmap-title"><div class="sg-section-head"><div><p class="section-eyebrow">Screening roadmap</p><h2 id="sg-roadmap-title">Ask for the right checks at the right time.</h2></div><p>Eligibility can depend on age, sex, last screening date, diagnosis and risk. Use this as a conversation starter with a primary care clinic.</p></div><div class="sg-screening-grid">${SG_SCREENING_PATHS.map((path) => screeningCard(path, state)).join('')}</div></section>
     <p class="sg-source-note">Built from <a href="${SG_SOURCES[0].href}" target="_blank" rel="noreferrer">MOH’s 2026 screening review</a> and <a href="${SG_SOURCES[1].href}" target="_blank" rel="noreferrer">HealthHub guidance</a>. Guidance changes; confirm the current recommendation with your clinic.</p>
@@ -185,6 +188,23 @@ export function mountHealthDashboard(mount, { compact = false } = {}) {
   </section>`;
 
   const form = mount.querySelector('[data-profile-form]');
+  function lazySection(selector, render) {
+    const details = mount.querySelector(selector);
+    const target = details.querySelector(':scope > div');
+    let task;
+    const load = () => task ||= (async () => {
+      target.setAttribute('aria-busy', 'true');
+      try { await render(target); return true; }
+      catch { target.textContent = 'Results could not load. Close and reopen to retry; reconnect once if offline files are missing.'; task = undefined; return false; }
+      finally { target.removeAttribute('aria-busy'); }
+    })();
+    details.addEventListener('toggle', () => { if (details.open) load(); });
+    return load;
+  }
+  const loadPhysical = lazySection('[data-physical-measurements]', async target => {
+    const { mountPhysicalMeasurements } = await import('./physical-measurements.js');
+    mountPhysicalMeasurements(target);
+  });
   mount.addEventListener('toggle', async event => {
     const details = event.target;
     if (!details.matches('.sg-marker-details')) return;
@@ -208,42 +228,20 @@ export function mountHealthDashboard(mount, { compact = false } = {}) {
       delete details.dataset.actionsLoaded;
     } finally { target.removeAttribute('aria-busy'); }
   }, true);
-  const additional = mount.querySelector('[data-additional-screening]');
-  let additionalLoading = false;
-  async function loadAdditional() {
-    if (additionalLoading) return;
-    additionalLoading = true;
-    const target = additional.querySelector('[data-additional-mount]');
-    target.setAttribute('aria-busy', 'true');
-    try {
+  const loadAdditional = lazySection('[data-additional-screening]', async target => {
       const { ADDITIONAL_MARKERS, ADDITIONAL_MARKER_GROUPS } = await import('./data/additional-screening.js');
       const html = ADDITIONAL_MARKER_GROUPS.map(group => `<details class="sg-marker-group" data-marker-group="${group.id}"><summary><h3>${escapeHTML(group.title)}</h3></summary><p class="sg-group-copy">${escapeHTML(group.description)}</p><div class="sg-marker-grid">${ADDITIONAL_MARKERS.filter(marker => marker.group === group.id).map(marker => markerCard(marker, state)).join('')}</div></details>`).join('');
       markers.push(...ADDITIONAL_MARKERS);
       target.innerHTML = html;
       target.classList.add('sg-marker-groups');
       updateWorkspace(mount, state, markers);
-    } catch {
-      target.textContent = 'Additional results could not load. Close and reopen to retry.';
-      additionalLoading = false;
-    } finally { target.removeAttribute('aria-busy'); }
-  }
-  additional.addEventListener('toggle', () => { if (additional.open) loadAdditional(); });
+  });
   if (Object.entries(state.values).some(([id, value]) => value && !SG_MARKERS.some(marker => marker.id === id))) loadAdditional();
-  const library = mount.querySelector('[data-biomarker-library]');
-  let libraryLoading = false;
-  library.addEventListener('toggle', async () => {
-    if (!library.open || libraryLoading) return;
-    libraryLoading = true;
-    const target = library.querySelector('[data-library-mount]');
-    target.setAttribute('aria-busy', 'true');
-    try {
+  const loadLibrary = lazySection('[data-biomarker-library]', async target => {
       const { mountBiomarkerLibrary } = await import('./biomarker-library.js');
       mountBiomarkerLibrary(target);
-    } catch {
-      target.textContent = 'The library could not load. Close and reopen to retry; if offline, reconnect once to download it.';
-      libraryLoading = false;
-    } finally { target.removeAttribute('aria-busy'); }
   });
+  mountHealthSearch(mount, SG_MARKERS, { physical: loadPhysical, additional: loadAdditional, library: loadLibrary });
   const persist = () => {
     state.age = mount.querySelector('[data-profile-age]').value;
     state.sex = mount.querySelector('[data-profile-sex]').value;

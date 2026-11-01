@@ -26,6 +26,15 @@ test('Home cancer screening reference card visual baseline', async ({ page }) =>
   await expect(page.locator('[data-reference-card="colorectal"]')).toHaveScreenshot('home-cancer-reference.png');
 });
 
+test('physical bone density card visual baseline', async ({ page }) => {
+  await page.goto('/pages/blood.html#physical-bmd-hip');
+  const card = page.locator('[data-physical-card="bmd-hip"]');
+  await expect(card).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await card.evaluate(node => node.blur());
+  await expect(card).toHaveScreenshot('physical-bone-density.png');
+});
+
 test('sticky pin rail visual baseline', async ({ page }) => {
   test.skip(page.viewportSize().width < 1024, 'Sticky rail is static on tablet and mobile.');
   await page.goto('/pages/protocol.html');

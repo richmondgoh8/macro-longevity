@@ -1,5 +1,6 @@
 // Published panel coverage reference, not a prescription to order every test.
 // Test names retained from the official list; follow-up aliases resolve to baseline entries.
+import { measurementIdentity } from './measurement-index.js';
 export const BLUEPRINT_REFERENCE = {
   "source": "https://immortals.com/pages/biomarkers",
   "checked": "2026-10-27",
@@ -291,15 +292,6 @@ export const BLUEPRINT_MARKERS = ['baseline', 'male', 'female'].flatMap(panel =>
     id: normalizeTestName(name), name, panel,
     specimen: name.includes('(Urine)') ? 'Urine' : 'Blood',
     followup: BLUEPRINT_REFERENCE.followup.some(item => normalizeTestName(item) === normalizeTestName(name)),
-    aliases: ({
-      apolipoproteinb: 'ApoB',
-      lipoproteina: 'Lp(a) LPA',
-      highsensitivitycreactiveprotein: 'hs-CRP hsCRP hs CRP high sensitivity CRP inflammation hr-csp',
-      hemoglobina1c: 'HbA1c A1c',
-      estimatedglomerularfiltrationrate: 'eGFR kidney',
-      alaninetransaminase: 'ALT liver',
-      aspartateaminotransferase: 'AST liver',
-      ureanitrogenbun: 'BUN kidney',
-    })[normalizeTestName(name)] || '',
+    aliases: measurementIdentity(normalizeTestName(name)).aliases.join(' '),
   }))
 );

@@ -1,11 +1,28 @@
 // Reviewed 2026-10-29. Clinical references are not universal longevity targets.
 // Keep uncertain, assay-dependent and emerging tests explicitly labelled.
 import { REFERENCE_RANGES } from './reference-ranges.js';
+import { PHYSICAL_REFERENCES } from './physical-measurements.js';
 
 const LIVER = 'https://medlineplus.gov/lab-tests/liver-function-tests/';
 const B12 = 'https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/';
 const SG_SCREEN = 'https://www.healthhub.sg/well-being-and-lifestyle/personal-care/type-2-screening-tests';
 const CLINICAL = [
+  {
+    id: 'hdl', label: 'HDL cholesterol', unit: 'mmol/L',
+    reference: 'Interpret HDL with LDL/non-HDL, ApoB and overall cardiovascular risk. There is no isolated HDL treatment target.',
+    alternate: { unit: 'mg/dL' },
+    note: 'HDL is not non-HDL cholesterol. A high HDL result does not cancel high LDL/ApoB, and continually raising HDL has not been established as a prevention strategy.',
+    action: 'Build regular activity, replace saturated fats with unsaturated fats and stay smoke-free. Do not start drinking alcohol or add supplements just to raise HDL; address overall cardiovascular risk instead.',
+    source: 'https://www.heart.org/en/health-topics/cholesterol/your-complete-guide-to-understanding-cholesterol-and-lipids',
+  },
+  {
+    id: 'totalchol', label: 'Total cholesterol', unit: 'mmol/L',
+    reference: 'A component of the full lipid panel, not a standalone personal treatment target. Interpret the LDL, HDL and triglyceride components together.',
+    alternate: { unit: 'mg/dL' },
+    note: 'Total cholesterol combines cholesterol in different lipoproteins. A single total does not show atherogenic particle burden; individual risk and the rest of the panel matter.',
+    action: 'Replace butter/ghee and fatty processed meats with unsaturated oils, beans, tofu or fish. Choose fibre-rich wholegrains and legumes and keep regular activity; take indicated lipid treatment consistently.',
+    source: 'https://www.heart.org/en/health-topics/cholesterol/your-complete-guide-to-understanding-cholesterol-and-lipids',
+  },
   {
     id: 'insulin', label: 'Fasting insulin', unit: 'µIU/mL',
     reference: 'Example assay interval: 2.6–24.9 µIU/mL. Use your laboratory’s fasting interval.',
@@ -195,7 +212,7 @@ const CLINICAL = [
   },
 ];
 
-export const HEALTH_REFERENCES = [...REFERENCE_RANGES, ...CLINICAL].map(reference => ({
+export const HEALTH_REFERENCES = [...REFERENCE_RANGES, ...CLINICAL, ...PHYSICAL_REFERENCES].map(reference => ({
   ...reference,
   note: reference.note + (reference.id === 'hba1c' ? ' A target of 4.8–5.3% is not an established universal longevity recommendation.' : reference.id === 'hscrp' ? ' Targets below 0.8 or 0.5 mg/L are not universal treatment goals.' : ''),
 }));
@@ -216,7 +233,7 @@ export const HEALTH_REFERENCE_GROUPS = [
   {
     id: 'cardiovascular', title: 'Cardiovascular & endothelial health', short: 'Cardiovascular',
     description: 'Control modifiable cardiovascular risk. A favourable ratio or calcium score does not cancel elevated atherogenic particles.',
-    ids: ['apob', 'lpa', 'homocysteine', 'ldl', 'tg', 'nonhdl', 'bp'],
+    ids: ['apob', 'lpa', 'homocysteine', 'totalchol', 'hdl', 'ldl', 'tg', 'nonhdl', 'bp', 'rhr'],
     plan: ['Swap butter/ghee and fatty processed meats for unsaturated oils, beans, tofu or fish.', 'Build toward 25–30 g fibre/day and regular walking; aim for 150 minutes of weekly activity and two strength sessions.', 'Keep sodium below 2,000 mg/day unless your care team sets another plan, stay smoke-free and take indicated medicines consistently.'],
   },
   {
@@ -241,7 +258,7 @@ export const HEALTH_REFERENCE_GROUPS = [
   {
     id: 'functional', title: 'Functional & physiological biomarkers', short: 'Fitness & body',
     description: 'Physical capacity, body composition and selected plaque assessment complement blood tests. Compare like-for-like methods and avoid guaranteed mortality-reduction claims.',
-    ids: ['vo2', 'dexa', 'cac', 'bmi', 'waist'],
+    ids: ['vo2', 'grip', 'bmd', 'dexa', 'weight', 'bodyfat', 'leanmass', 'vat', 'hrv', 'sleep', 'sleepefficiency', 'cac', 'bmi', 'waist'],
     plan: ['Build aerobic volume gradually toward 150–300 minutes/week at a moderate intensity suited to your health.', 'Train major muscle groups twice weekly; track improvements in real-world walking, stairs and lifting as well as any test result.', 'Use sustainable meals to reduce excess fat when appropriate, not crash dieting. Reserve CAC/DXA for a decision they can actually inform.'],
   },
 ];

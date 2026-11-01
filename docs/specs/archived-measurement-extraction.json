@@ -1,0 +1,1147 @@
+{
+  "source": "https://protocol-museum.bryanjohnson.com/",
+  "retrieved": "2026-11-01",
+  "historical": true,
+  "scope": "Named measurement labels from the clinical-results table, results/ideal-markers and routine-measurement lists (source lines 652–863). No personal values or target ranges copied.",
+  "status": "extracted-not-reconciled",
+  "remaining": [
+    "Named organ/fitness measurements outside this extraction window",
+    "Bundle decomposition, canonical mappings and reference/action content review"
+  ],
+  "entries": [
+    {
+      "sourceLine": 652,
+      "originalName": "ALT",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 653,
+      "originalName": "BMI",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 654,
+      "originalName": "Fasting plasma glucose",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 655,
+      "originalName": "Body Fat",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 656,
+      "originalName": "Cholesterol (total)",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 657,
+      "originalName": "DHEA",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 658,
+      "originalName": "Free Testosterone Index",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 659,
+      "originalName": "GGT",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 660,
+      "originalName": "Glutathione",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 661,
+      "originalName": "Grip Strength Dominant",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 662,
+      "originalName": "Grip Strength Non-dominant",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 663,
+      "originalName": "HbA1C",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 664,
+      "originalName": "HDL",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 665,
+      "originalName": "hsCRP",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 666,
+      "originalName": "IGF-1",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 667,
+      "originalName": "LDL",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 668,
+      "originalName": "NAD",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 669,
+      "originalName": "PSA",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 670,
+      "originalName": "RDW",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 671,
+      "originalName": "SHBG",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 672,
+      "originalName": "TSH",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 673,
+      "originalName": "Triglycerides",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 674,
+      "originalName": "Testosterone",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 675,
+      "originalName": "VO2 max treadmill",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 676,
+      "originalName": "WBC",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 677,
+      "originalName": "20th percentile telomeres PBMC",
+      "section": "Results: Optimal Clinical Outcome Range",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 682,
+      "originalName": "hsCRP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 683,
+      "originalName": "DunedinPoAm",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 684,
+      "originalName": "NAD",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 685,
+      "originalName": "Frailty index",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 686,
+      "originalName": "Total glutathione",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 687,
+      "originalName": "VO2 max",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 688,
+      "originalName": "12 min run distance",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 689,
+      "originalName": "Whole brain volume",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 690,
+      "originalName": "White matter volume",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 691,
+      "originalName": "Cerebral volume",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 692,
+      "originalName": "Total sleep time",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 693,
+      "originalName": "Wake after sleep onset",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 694,
+      "originalName": "Sleep efficiency",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 695,
+      "originalName": "Digit comparison score",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 696,
+      "originalName": "Digit symbol score",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 697,
+      "originalName": "ETS score",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 698,
+      "originalName": "RAVENS score",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 699,
+      "originalName": "Letter number sequencing score",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 700,
+      "originalName": "Ventricular volumes",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 701,
+      "originalName": "Subcortical grey matter",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 702,
+      "originalName": "Pituitary brightness",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 703,
+      "originalName": "Cerebellar volume",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 704,
+      "originalName": "Stand on 1 leg",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 705,
+      "originalName": "5 min deep sleep RMSSD",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 706,
+      "originalName": "MaxHR",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 707,
+      "originalName": "BNP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 708,
+      "originalName": "LVEDV",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 709,
+      "originalName": "LV E",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 710,
+      "originalName": "LV A",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 711,
+      "originalName": "LV E/A",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 712,
+      "originalName": "LV E’m",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 713,
+      "originalName": "LV IVRT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 714,
+      "originalName": "LV PWT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 715,
+      "originalName": "LA A’ lat",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 716,
+      "originalName": "LA SRE",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 717,
+      "originalName": "LA SRA",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 718,
+      "originalName": "LA SRE/SRA",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 719,
+      "originalName": "cfPWV",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 723,
+      "originalName": "RCCA PSEM",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 725,
+      "originalName": "LCCA PSEM",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 726,
+      "originalName": "RCCA CIMT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 727,
+      "originalName": "LCCA CIMT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 729,
+      "originalName": "RICA CIMT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 730,
+      "originalName": "LICA  CIMT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 731,
+      "originalName": "TPA",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 732,
+      "originalName": "Systolic blood pressure",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 733,
+      "originalName": "Brachial blood pressure",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 734,
+      "originalName": "Non-map C2 CSBP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 735,
+      "originalName": "Non-map C2 CDBP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 736,
+      "originalName": "PPA ratio",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 737,
+      "originalName": "AI",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 738,
+      "originalName": "AP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 739,
+      "originalName": "FEV1",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 740,
+      "originalName": "FVC",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 741,
+      "originalName": "PEFT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 742,
+      "originalName": "DLCOc",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 743,
+      "originalName": "A line quant",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 744,
+      "originalName": "MIP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 745,
+      "originalName": "MEP",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 746,
+      "originalName": "RDW",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 747,
+      "originalName": "EpiTOC2.tnsc",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 748,
+      "originalName": "PC telo length methylation pred",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 749,
+      "originalName": "QFISH median PBMC telo",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 750,
+      "originalName": "QFISH 20th cent PBMC teloRRI left",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 751,
+      "originalName": "RRI right",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 752,
+      "originalName": "Cystatin C",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 753,
+      "originalName": "eGFR CKD EPI",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 754,
+      "originalName": "EHF Hz Right",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 755,
+      "originalName": "14-16k Hz Left",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 756,
+      "originalName": "Calculus index",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 757,
+      "originalName": "Recession gingival",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 758,
+      "originalName": "Index gingival",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 759,
+      "originalName": "HbA1c",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 760,
+      "originalName": "FPG",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 761,
+      "originalName": "CGM",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 762,
+      "originalName": "Albumin",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 766,
+      "originalName": "QT",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 768,
+      "originalName": "VISIA Tru L",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 769,
+      "originalName": "VISIA Tru R",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 770,
+      "originalName": "ZM-Facial age",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 771,
+      "originalName": "ZM Neck age",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 772,
+      "originalName": "ZM Decollete age",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 773,
+      "originalName": "ZM Gluteal age",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 774,
+      "originalName": "ZM Lower limb age",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 776,
+      "originalName": "Facial left spots",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 777,
+      "originalName": "Facial right spots",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 778,
+      "originalName": "Facial left texture",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 779,
+      "originalName": "Facial right texture",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 780,
+      "originalName": "Facial left brown",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 781,
+      "originalName": "Facial right brown",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 782,
+      "originalName": "Facial left wrinkles",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 783,
+      "originalName": "Facial right wrinkles",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 784,
+      "originalName": "Facial central spots",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 785,
+      "originalName": "Facial central texture",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 786,
+      "originalName": "Facial central browns",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 787,
+      "originalName": "Modified HN hair",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 788,
+      "originalName": "DHEA-S",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 789,
+      "originalName": "Thyroid volumetrics",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 790,
+      "originalName": "Push up continuity",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 791,
+      "originalName": "Bench press 1 rep max",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 792,
+      "originalName": "Leg press 1 rep max",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 793,
+      "originalName": "Grip strength L",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 794,
+      "originalName": "Grip strength R",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 795,
+      "originalName": "WC",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 796,
+      "originalName": "BF%",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 797,
+      "originalName": "DEXA L1-4",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 798,
+      "originalName": "DEXA Femur",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 799,
+      "originalName": "DEXA Hip",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 800,
+      "originalName": "Osteocalcin",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 801,
+      "originalName": "Spinal flexibility",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 802,
+      "originalName": "Prostatic volume",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 803,
+      "originalName": "PSA total",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 804,
+      "originalName": "Total testosterone",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 805,
+      "originalName": "Free testosterone index",
+      "section": "Results: younger than chronological age",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 809,
+      "originalName": "Vit A",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 810,
+      "originalName": "Alpha carotene",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 811,
+      "originalName": "Beta Carotene",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 812,
+      "originalName": "Lycopene",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 813,
+      "originalName": "Vit C",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 814,
+      "originalName": "B1",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 815,
+      "originalName": "B2",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 816,
+      "originalName": "B3",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 817,
+      "originalName": "B5",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 818,
+      "originalName": "B6",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 819,
+      "originalName": "B7",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 820,
+      "originalName": "B12",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 821,
+      "originalName": "Vit E (Alpha + Gamma)",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 822,
+      "originalName": "Vit D",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 823,
+      "originalName": "Vit K",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 824,
+      "originalName": "CoQ10",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 825,
+      "originalName": "Bicarbonate",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 826,
+      "originalName": "Calcium",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 827,
+      "originalName": "Chloride",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 828,
+      "originalName": "Chromium",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 829,
+      "originalName": "Copper",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 830,
+      "originalName": "Iodine",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 831,
+      "originalName": "Magnesium",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 832,
+      "originalName": "Phosphate",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 833,
+      "originalName": "Potassium",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 834,
+      "originalName": "Selenium",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 835,
+      "originalName": "Sodium",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 836,
+      "originalName": "Zinc",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 837,
+      "originalName": "ALT",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 838,
+      "originalName": "AST",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 839,
+      "originalName": "ALP",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 840,
+      "originalName": "GGT",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 841,
+      "originalName": "TG",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 842,
+      "originalName": "LDL",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 843,
+      "originalName": "HDL",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 844,
+      "originalName": "IGF-1",
+      "section": "Ideal markers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 851,
+      "originalName": "Weight, body fat, muscle mass, body water, BMI",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 852,
+      "originalName": "Sleep: HR, HRV, Deep, REM, Respiration Rate, Body Temp",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 853,
+      "originalName": "Waking body temp (ear)",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 854,
+      "originalName": "SpO2 while sleeping",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 855,
+      "originalName": "Blood Glucose",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 856,
+      "originalName": "MRI – whole body",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 857,
+      "originalName": "Ultrasound – whole body",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 858,
+      "originalName": "Biofluids (blood, stool, urine, saliva)",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 859,
+      "originalName": "Physical fitness – whoop + Polar",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 860,
+      "originalName": "VO2Max",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 861,
+      "originalName": "Hearing",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 862,
+      "originalName": "Eyes",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 863,
+      "originalName": "Air quality",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    }
+  ]
+}

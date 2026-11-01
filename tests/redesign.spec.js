@@ -34,7 +34,7 @@ test('the redesigned routes reflow at narrow and intermediate widths', async ({ 
 
 test('Home presents references and plans together without a result-recording CTA', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('[data-reference-card] .sg-card-action:visible')).toHaveCount(39);
+  await expect(page.locator('[data-reference-card] .sg-card-action:visible')).toHaveCount(51);
   await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Testing schedule: match the test to the question' })).toBeVisible();
 });

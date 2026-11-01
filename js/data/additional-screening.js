@@ -4,23 +4,11 @@ import { biomarkerUnits } from './blueprint-markers.js';
 const FAMILIES = [
   {
     "id": "lipid-context",
-    "title": "Full lipids and insulin",
+    "title": "Fasting insulin",
     "source": "https://www.healthhub.sg/health-conditions/hyperlipidemia",
-    "context": "HDL and total cholesterol are context, not isolated treatment targets. A higher HDL does not cancel high LDL/ApoB. Fasting insulin has no universal “optimal” target; HOMA-IR is a derived estimate, not a diagnosis.",
+    "context": "Fasting insulin has no universal “optimal” target; HOMA-IR is a derived estimate, not a diagnosis. Interpret with fasting glucose, the assay and your clinical context.",
     "actionKey": "ldl",
     "rows": [
-      [
-        "totalchol",
-        "Total cholesterol",
-        "Cholesterol, Total",
-        "4.8"
-      ],
-      [
-        "hdl",
-        "HDL cholesterol",
-        "Hdl Cholesterol",
-        "1.3"
-      ],
       [
         "insulin",
         "Fasting insulin",

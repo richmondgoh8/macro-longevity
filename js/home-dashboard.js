@@ -1,4 +1,3 @@
-import { SG_MARKERS } from './data/screening.js';
 import { SG_MARKER_ACTIONS } from './data/screening-actions.js';
 import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS, TESTING_SCHEDULE } from './data/health-reference-groups.js';
 import { escapeHTML } from './components/ui.js';
@@ -7,7 +6,6 @@ import { initReferenceNavigation } from './components/reference-navigation.js';
 const mount = document.getElementById('sg-home-dashboard');
 let alternate = false;
 const references = new Map(HEALTH_REFERENCES.map(reference => [reference.id, reference]));
-const markers = new Map(SG_MARKERS.map(marker => [marker.id, marker]));
 
 function scale(reference) {
   const variant = alternate && reference.alternate;
@@ -21,8 +19,7 @@ function scale(reference) {
 
 function card(id) {
   const reference = references.get(id);
-  const marker = markers.get(id);
-  const label = reference.label || marker.label;
+  const label = reference.label;
   const action = reference.action || SG_MARKER_ACTIONS[id][0].join('. ');
   return `<article id="biomarker-${id}" tabindex="-1" class="sg-marker-card sg-reference-card" data-reference-card="${id}" aria-labelledby="biomarker-${id}-title">
     <header><h3 id="biomarker-${id}-title">${escapeHTML(label)}</h3><button type="button" class="sg-copy-link" data-copy-reference="${id}" aria-label="Copy link to ${escapeHTML(label)}">Copy link</button></header>
@@ -30,7 +27,7 @@ function card(id) {
     <p class="sg-reference-note">${escapeHTML(reference.note)}</p>
     ${reference.safety ? `<p class="sg-reference-safety">${escapeHTML(reference.safety)} <a href="${escapeHTML(reference.safetySource)}" target="_blank" rel="noreferrer">Urgent-care guidance ↗</a></p>` : ''}
     <div class="sg-card-action"><h4>Action plan</h4><p>${escapeHTML(action)}</p></div>
-    <p class="sg-marker-reference sg-reference-source"><a href="${escapeHTML(reference.source || marker.source)}" aria-label="Reference source for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Reference source <span aria-hidden="true">↗</span></a>${reference.extraSource ? ` · <a href="${escapeHTML(reference.extraSource)}" aria-label="Additional guidance for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Additional guidance <span aria-hidden="true">↗</span></a>` : ''}</p>
+    <p class="sg-marker-reference sg-reference-source"><a href="${escapeHTML(reference.source)}" aria-label="Reference source for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Reference source <span aria-hidden="true">↗</span></a>${reference.extraSource ? ` · <a href="${escapeHTML(reference.extraSource)}" aria-label="Additional guidance for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Additional guidance <span aria-hidden="true">↗</span></a>` : ''}</p>
   </article>`;
 }
 
@@ -75,7 +72,7 @@ if (mount) {
     <p class="sr-only" data-reference-feedback role="status"></p>
   </div>`;
 
-  initReferenceNavigation(mount, HEALTH_REFERENCE_GROUPS, references, markers);
+  initReferenceNavigation(mount, HEALTH_REFERENCE_GROUPS, references);
 
   mount.addEventListener('click', event => {
     const button = event.target.closest('[data-reference-units]');

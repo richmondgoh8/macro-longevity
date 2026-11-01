@@ -1,0 +1,134 @@
+{
+  "source": "https://protocol.bryanjohnson.com/",
+  "retrieved": "2026-11-01",
+  "scope": "Named Biomarkers examples, Routine Measurement list and morning body-composition bundle; not personal targets or testing recommendations",
+  "status": "extracted-not-reconciled",
+  "entries": [
+    {
+      "sourceLine": 87,
+      "originalName": "muscle",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 88,
+      "originalName": "fat",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 89,
+      "originalName": "bone mineral density",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 90,
+      "originalName": "resting heart rate",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 91,
+      "originalName": "fertility",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 92,
+      "originalName": "sexual function (NTE)",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 93,
+      "originalName": "blood pressure",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 94,
+      "originalName": "vascular function",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 95,
+      "originalName": "sleep",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 96,
+      "originalName": "grip strength",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 97,
+      "originalName": "blood glucose",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 98,
+      "originalName": "blood sugar control",
+      "section": "Bryan Johnson’s Biomarkers",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 488,
+      "originalName": "Blood draw",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 489,
+      "originalName": "Full body MRI",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 490,
+      "originalName": "Mole check",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 491,
+      "originalName": "Dentist",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 492,
+      "originalName": "Eye doctor",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 493,
+      "originalName": "Blood glucose CPM",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 494,
+      "originalName": "Breast self-examination",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 495,
+      "originalName": "Testicular self-examination",
+      "section": "Routine Measurement",
+      "mappingStatus": "pending"
+    },
+    {
+      "sourceLine": 506,
+      "originalName": "Body composition measurement: weight, fat, muscle, hydration, arterial stiffness",
+      "section": "My daily routine",
+      "mappingStatus": "pending-bundle-decomposition"
+    }
+  ]
+}

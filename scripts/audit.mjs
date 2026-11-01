@@ -106,6 +106,8 @@ const javascriptFiles = [
   'js/biomarker-library.js', 'js/data/blueprint-markers.js',
   'js/data/screening-actions.js',
   'js/data/additional-screening.js',
+  'js/data/physical-measurements.js', 'js/data/measurement-index.js', 'js/data/measurement-sources.js',
+  'js/physical-measurements.js', 'js/components/measurement-search.js', 'js/components/health-measurement-search.js',
   'js/components/coverage-pin.js', 'js/components/nutrition-totals.js', 'js/components/modal.js', 'js/components/coverage-dialog.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
   'js/components/toast.js', 'js/components/tooltip.js',
 ];
@@ -113,6 +115,10 @@ javascriptFiles.forEach((file) => {
   const result = spawnSync(process.execPath, ['--check', file], { cwd: root, encoding: 'utf8' });
   check(result.status === 0, `${file}: node --check failed${result.stderr ? ` (${result.stderr.trim()})` : ''}`);
 });
+
+const coverage = spawnSync(process.execPath, ['scripts/audit-measurement-coverage.mjs'], { cwd: root, encoding: 'utf8' });
+check(coverage.status === 0, `Measurement coverage baseline failed: ${coverage.stderr}`);
+if (coverage.stdout) console.log(coverage.stdout.trim());
 
 if (failures.length) {
   console.error(`Audit failed with ${failures.length} issue(s):`);

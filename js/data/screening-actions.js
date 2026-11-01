@@ -1,4 +1,6 @@
 export const SG_MARKER_CONTEXT = {
+  hdl: 'HDL is not an isolated treatment target. A high result does not cancel high LDL/ApoB; do not start drinking alcohol or take supplements merely to raise HDL.',
+  totalchol: 'Interpret total cholesterol with the full lipid panel and overall cardiovascular risk. A single total is not a personal treatment target.',
   hscrp: 'Use the high-sensitivity assay for cardiovascular context, not a standard CRP result. Interpret when clinically stable: infection, injury or hard exercise can raise it. A result above 10 mg/L needs clinical assessment and often repeat testing after recovery, not just a lifestyle response. Do not self-start aspirin, anti-inflammatory drugs or supplements to chase the number.',
   bp: 'Use the correct cuff, rest five minutes and average two readings. Persistent readings at or above 140/90 need clinical review; very high readings or symptoms can need urgent care.',
   waist: 'Measure at the same level after a normal exhale. These cut-offs are risk guideposts, not a requirement for everyone to lose weight.',
@@ -15,6 +17,16 @@ export const SG_MARKER_CONTEXT = {
 };
 
 export const SG_MARKER_ACTIONS = {
+  hdl: [
+    ['Move regularly', 'Build toward 150 minutes of moderate activity weekly and two strength sessions, starting from your current ability.'],
+    ['Use unsaturated fats', 'Swap butter/ghee and fatty processed meats for unsaturated oils, beans, tofu or fish.'],
+    ['Stay smoke-free', 'Avoid smoking and vaping. Do not start drinking alcohol or buy HDL-raising supplements to chase this number.'],
+  ],
+  totalchol: [
+    ['Choose fibre-rich meals', 'Include oats or other wholegrains, beans, vegetables and whole fruit regularly; increase fibre gradually.'],
+    ['Replace saturated fats', 'Use unsaturated oils instead of butter/ghee and choose beans, tofu or fish instead of fatty processed meats.'],
+    ['Keep activity and care consistent', 'Build toward 150 minutes of weekly activity and two strength sessions; take indicated lipid treatment consistently.'],
+  ],
   hscrp: [
     ['Move on most days', 'Build toward 150 minutes of moderate activity each week and two strength sessions. Add a 10-minute walk after meals to build the routine.'],
     ['Make meals fibre-rich', 'Include vegetables, whole fruit, oats or other wholegrains, and beans or lentils regularly; build gradually toward 25–30 g fibre/day. If excess weight is present, replace sugary drinks and oversized portions with these foods.'],

@@ -1,17 +1,7 @@
 import { escapeHTML } from './ui.js';
+import { searchMeasurements } from './measurement-search.js';
 
-// Search synonyms are navigation vocabulary, not additional medical claims.
-const ALIASES = {
-  glucose: 'blood sugar fasting blood glucose', hba1c: 'a1c glycated haemoglobin hemoglobin blood sugar',
-  apob: 'apolipoprotein b', lpa: 'lipoprotein a lp(a)', tg: 'triglycerides',
-  hscrp: 'high sensitivity c reactive protein inflammation', bp: 'blood pressure',
-  vitd: 'vitamin d 25 hydroxy', b12: 'cobalamin', vo2: 'vo2 max fitness',
-  egfr: 'kidney filtration', uacr: 'urine albumin creatinine kidney',
-  wholebodymri: 'prenuvo ezra whole body mri', colorectal: 'colon bowel cologuard',
-};
-const normalize = value => value.normalize('NFKD').replace(/₂/g, '2').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-
-export function initReferenceNavigation(mount, groups, references, markers) {
+export function initReferenceNavigation(mount, groups, references) {
   const picker = mount.querySelector('.sg-reference-picker');
   const rail = mount.querySelector('.sg-reference-rail');
   const summary = picker.querySelector('summary');
@@ -24,8 +14,8 @@ export function initReferenceNavigation(mount, groups, references, markers) {
   const feedback = mount.querySelector('[data-reference-feedback]');
   const top = mount.querySelector('.sg-reference-top');
   const searchIndex = groups.flatMap(group => group.ids.map(id => {
-    const label = references.get(id).label || markers.get(id).label;
-    return { id, label, group: group.short, terms: normalize(`${label} ${id} ${ALIASES[id] || ''}`) };
+    const label = references.get(id).label;
+    return { id, label, group: group.short };
   }));
   let observer;
   let active = -1;
@@ -127,13 +117,13 @@ export function initReferenceNavigation(mount, groups, references, markers) {
   });
 
   function search() {
-    const tokens = normalize(input.value).split(' ').filter(Boolean);
-    const matches = tokens.length ? searchIndex.filter(item => tokens.every(token => item.terms.includes(token))) : [];
+    const hasQuery = Boolean(input.value.trim());
+    const matches = searchMeasurements(searchIndex, input.value);
     results.hidden = !matches.length;
     results.innerHTML = matches.slice(0, 5).map(item => `<li><a href="#biomarker-${item.id}">${escapeHTML(item.label)}<small>${escapeHTML(item.group)}</small></a></li>`).join('');
-    status.textContent = tokens.length ? (matches.length ? `${matches.length} matches.${matches.length > 5 ? ' Showing the first 5; refine your search.' : ' Choose a result to jump to its card.'}` : 'No matches. Try a marker name, such as ApoB or vitamin D.') : '';
+    status.textContent = hasQuery ? (matches.length ? `${matches.length} matches.${matches.length > 5 ? ' Showing the first 5; refine your search.' : ' Choose a result to jump to its card.'}` : 'No matches. Try a marker name, such as ApoB or vitamin D.') : '';
     // Replace the section list while searching, without hiding any reference cards.
-    mount.querySelector('.sg-reference-jumps').hidden = Boolean(tokens.length);
+    mount.querySelector('.sg-reference-jumps').hidden = hasQuery;
   }
   input.addEventListener('input', search);
   input.addEventListener('keydown', event => {

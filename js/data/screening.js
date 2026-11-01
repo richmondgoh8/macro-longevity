@@ -14,12 +14,19 @@ export const SG_ACTION_SOURCES = [
 
 export const SG_MARKER_GROUPS = [
   { id: 'routine', title: 'Common screening results', open: true, description: 'Start with blood pressure, body measurements, glucose and the full lipid panel. HbA1c may be offered as a glucose screening or monitoring test; ask which test fits your situation.', ids: ['bp', 'waist', 'bmi', 'glucose', 'ldl', 'tg', 'nonhdl', 'hba1c'] },
-  { id: 'lipids', title: 'Beyond LDL: ApoB and Lp(a)', open: true, description: 'Ask for ApoB when particle burden may be missed by LDL-C, especially with high triglycerides, diabetes or known cardiovascular disease. Discuss a one-time adult Lp(a) test for inherited risk. These may cost extra and are not automatically included in Healthier SG screening.', ids: ['apob', 'lpa'] },
+  { id: 'lipids', title: 'Full lipid context: HDL, total cholesterol, ApoB and Lp(a)', open: true, description: 'Read HDL and total cholesterol alongside LDL/non-HDL, triglycerides and overall cardiovascular risk. ApoB and Lp(a) can add particle and inherited-risk context; they may cost extra and are not automatically included in routine screening.', ids: ['totalchol', 'hdl', 'apob', 'lpa'] },
   { id: 'inflammation', title: 'Inflammation: hs-CRP', open: true, description: 'High-sensitivity C-reactive protein adds inflammatory context to cardiovascular risk. It is not the same as a routine CRP test and does not diagnose a disease on its own.', ids: ['hscrp'] },
   { id: 'kidney', title: 'Kidney checks: add when your risk warrants', open: false, description: 'Particularly useful with diabetes, hypertension or suspected kidney disease. Check filtration and urine albumin together; a single abnormal result does not establish chronic kidney disease.', ids: ['egfr', 'uacr'] },
 ];
 
 export const SG_MARKERS = [
+  ...[['totalchol', 'Total cholesterol', '4.8'], ['hdl', 'HDL cholesterol', '1.3']].map(([id, label, example]) => ({
+    id, label, eyebrow: 'Full lipid panel', icon: 'heart', inputLabel: 'Latest ' + label,
+    placeholder: 'e.g. ' + example, alternatePlaceholder: 'Value from your report', inputMode: 'decimal', suffix: 'mmol/L', units: ['mmol/L', 'mg/dL'],
+    target: 'Interpret the full lipid panel and overall cardiovascular risk; no isolated treatment target.',
+    why: id === 'hdl' ? 'HDL is distinct from non-HDL. A high HDL result does not cancel high LDL/ApoB.' : 'The total combines cholesterol in different lipoproteins; it does not describe particle burden by itself.',
+    source: 'https://www.heart.org/en/health-topics/cholesterol/your-complete-guide-to-understanding-cholesterol-and-lipids',
+  })),
   {
     id: 'hscrp', label: 'hs-CRP (high-sensitivity CRP)', eyebrow: 'Inflammation · cardiovascular context', icon: 'heart',
     inputLabel: 'Latest hs-CRP', placeholder: 'e.g. 0.8', inputMode: 'decimal', suffix: 'mg/L', units: ['mg/L', 'mg/dL'], alternatePlaceholder: 'e.g. 0.08',

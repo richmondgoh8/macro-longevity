@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v52-task-first-finance';
+const CACHE_NAME = 'macro-longevity-offline-v53-measurement-coverage';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -60,6 +60,11 @@ const STATIC_ASSETS = [
   'js/data/screening.js',
   'js/data/reference-ranges.js',
   'js/data/health-reference-groups.js',
+  'js/data/physical-measurements.js',
+  'js/data/measurement-index.js',
+  'js/physical-measurements.js',
+  'js/components/measurement-search.js',
+  'js/components/health-measurement-search.js',
   'js/data/nutrition.js',
   'offline.html',
   'favicon.svg',

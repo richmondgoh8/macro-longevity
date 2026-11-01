@@ -41,3 +41,18 @@
 .blood-prep-body .blood-prep-text:first-child { margin-top: var(--space-4); }
 @media (width <= 767px) {.blood-prep > summary { min-height: 64px; padding: var(--space-4); }
 .blood-prep-body { padding: 0 var(--space-4)var(--space-4); }}}
+.sg-physical-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(5rem, .6fr); gap: var(--space-3); }
+.sg-physical-fields > div { min-width: 0; }
+.sg-physical-fields label { display: block; margin-bottom: var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.sg-physical-fields input, .sg-physical-fields select { width: 100%; min-width: 0; min-height: 44px; }
+.sg-physical-fields input[aria-invalid="true"] { border-color: var(--color-danger); }
+.sg-physical-context > summary { min-height: 44px; align-content: center; cursor: pointer; }
+.sg-physical-card [data-physical-status] { font-size: var(--text-sm); }
+@media (max-width: 599px) { .sg-physical-fields { grid-template-columns: minmax(0, 1fr); } }
+.sg-health-search { display: grid; gap: var(--space-2); max-width: 48rem; margin-block: var(--space-5); }
+.sg-health-search label { font-weight: var(--weight-semi); }
+.sg-health-search input { min-height: 44px; width: 100%; }
+.sg-health-search ul { list-style: none; padding: 0; margin: 0; }
+.sg-health-search li a { display: grid; gap: var(--space-1); padding: var(--space-3); min-height: 44px; border-bottom: 1px solid var(--color-border); }
+.sg-health-search small, .sg-health-search p { color: var(--color-text-secondary); font-size: var(--text-sm); }
+.sg-physical-fixed-unit { grid-column: 1 / -1; }

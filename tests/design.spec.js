@@ -192,7 +192,7 @@ test('Homepage groups have stable in-page targets on desktop and mobile', async 
 test('Reference cards use calm surfaces and independent source links', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('[data-reference-card]');
-  await expect(cards).toHaveCount(39);
+  await expect(cards).toHaveCount(51);
   expect(await cards.first().evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
   await expect(cards.first().getByRole('link', { name: /^Reference source for / })).toHaveAttribute('href', /^https:\/\//);
 });

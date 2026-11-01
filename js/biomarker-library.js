@@ -1,5 +1,6 @@
 import { BLUEPRINT_MARKERS, BLUEPRINT_REFERENCE, biomarkerUnits } from './data/blueprint-markers.js';
 import { escapeHTML as escape } from './components/ui.js';
+import { searchMeasurements } from './components/measurement-search.js';
 
 const KEY = 'blueprint-marker-results-v1';
 const PAGE_SIZE = 20;
@@ -22,8 +23,8 @@ export function mountBiomarkerLibrary(root) {
   let limit = PAGE_SIZE;
   function render() {
     const query = search.value.toLowerCase().trim();
-    const matches = BLUEPRINT_MARKERS.filter(marker => `${marker.name} ${marker.aliases}`.toLowerCase().includes(query)
-      && (filter.value === 'all' || marker.specimen === filter.value || marker.panel === filter.value || (filter.value === 'followup' && marker.followup) || (filter.value === 'saved' && results[marker.id]?.result)));
+    const candidates = query ? searchMeasurements(BLUEPRINT_MARKERS, query) : BLUEPRINT_MARKERS;
+    const matches = candidates.filter(marker => filter.value === 'all' || marker.specimen === filter.value || marker.panel === filter.value || (filter.value === 'followup' && marker.followup) || (filter.value === 'saved' && results[marker.id]?.result));
     root.querySelector('[data-library-count]').textContent = `${matches.length} matching measurements · ${BLUEPRINT_MARKERS.filter(marker => results[marker.id]?.result).length} results recorded`;
     list.innerHTML = matches.slice(0, limit).map(marker => {
       const saved = { ...results[marker.id] };

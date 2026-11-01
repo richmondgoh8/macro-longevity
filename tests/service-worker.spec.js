@@ -64,7 +64,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v52-task-first-finance');
+  expect(cacheKeys).toContain('macro-longevity-offline-v53-measurement-coverage');
   expect(cacheKeys).toContain('other-app-preserve-test');
   expect(cacheKeys).not.toContain('macro-longevity-offline-v0-test');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
@@ -90,5 +90,13 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.getByRole('searchbox', { name: 'Find a biomarker' }).fill('ApoB');
   await page.locator('[data-reference-results] a').click();
   await expect(page).toHaveURL(/#biomarker-apob$/);
+  await page.goto(`${baseURL}/#biomarker-bmd`);
+  await expect(page.locator('[data-reference-card="bmd"]')).toContainText('T-score');
+  await page.goto(`${baseURL}/pages/blood.html#physical-bmd-hip`);
+  const bone = page.locator('[data-physical-card="bmd-hip"]');
+  await expect(bone).toBeVisible();
+  await bone.getByLabel('T-score', { exact: true }).fill('-1.3');
+  await page.reload();
+  await expect(bone.getByLabel('T-score', { exact: true })).toHaveValue('-1.3');
   await context.close();
 });
