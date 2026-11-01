@@ -50,7 +50,7 @@ test('guidance disclosures remain accessible and reversible', async ({ page }) =
   await expect(annual.locator('.blood-test-row').first()).toBeVisible();
 
   await page.goto('/pages/finance.html');
-  const intro = page.locator('#investments-app > .page-header');
+  const intro = page.locator('#investments-app .investment-intro');
   await expect(intro).toBeVisible();
   await expect(intro.locator('h2')).toHaveCSS('color', 'rgb(24, 37, 31)');
   expect(await intro.evaluate((node) => node.getBoundingClientRect().left)).toBeGreaterThanOrEqual(0);

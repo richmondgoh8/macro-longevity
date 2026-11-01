@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v51-compact-navigation';
+const CACHE_NAME = 'macro-longevity-offline-v52-task-first-finance';
 const STATIC_ASSETS = [
   './',
   'index.html',

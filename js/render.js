@@ -16,23 +16,14 @@ function safeRender(fn, container, fallback) {
 let budgetInvestments = 0;
 
 function renderInvestments() {
-  return `<div class="page-header">
-    <div class="section-inner">
-     <h2 class="page-title">Investment Combos (Singapore Edition)</h2>
-      <p class="page-desc">Pre-built portfolio combos based on r/singaporefi wisdom. Each combo shows how different instruments work together, why they synergize, and exactly how to execute. Pick the one that matches your goal and risk tolerance.</p>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-inner invest-combo-grid">
-      <p class="invest-disclaimer">Not financial advice. Information sourced from MAS, CPF Board, r/singaporefi, and HardwareZone for educational purposes. Consult a licensed adviser.</p>
-
+  return `<div class="invest-combo-grid">
       <div class="budget-tool" id="budgetTool">
-        <h3 class="budget-title">Your Budget at a Glance</h3>
-        <p class="budget-desc">Enter your monthly take-home salary. The 50/30/20 rule splits it into Expenses, Investments, and Savings. Drag the sliders to adjust.</p>
+        <h2 class="budget-title">Your budget at a glance</h2>
+        <p class="budget-desc" id="budgetDescription">Enter your take-home pay to try a 50/30/20 split for expenses, investments and savings. Adjust the sliders to suit you.</p>
         <div class="budget-input-row">
           <div class="budget-field">
-             <label for="budgetSalary">Monthly take-home salary</label>
-            <input type="number" id="budgetSalary" value="" min="0" step="500" placeholder="e.g. 5000" data-budget-input>
+             <label for="budgetSalary">Monthly take-home salary (SGD)</label>
+            <input type="number" id="budgetSalary" value="" min="0" step="500" placeholder="e.g. 5000" aria-describedby="budgetDescription" data-budget-input>
           </div>
         </div>
         <div id="budgetResults"></div>
@@ -57,6 +48,15 @@ function renderInvestments() {
           <p class="budget-slider-hint">Savings auto-calculates as the remainder. Total always sums to 100%.</p>
         </div>
       </div>
+
+      <p class="invest-disclaimer">Not financial advice. Information sourced from MAS, CPF Board, r/singaporefi, and HardwareZone for educational purposes. Consult a licensed adviser.</p>
+      <header class="investment-intro">
+        <h2 class="budget-title">Investment combos · Singapore</h2>
+        <details class="investment-guide">
+          <summary>About these portfolio examples</summary>
+          <p>Pre-built portfolio combos based on r/singaporefi wisdom. Each combo shows how different instruments work together, why they synergize, and exactly how to execute. Pick the one that matches your goal and risk tolerance.</p>
+        </details>
+      </header>
 
       ${INVESTMENTS.map(c => `
         <details class="invest-card invest-combo" id="inv-${c.id}" data-invest-combo open>
@@ -104,7 +104,6 @@ function renderInvestments() {
           </div>
         </details>
       `).join("")}
-    </div>
   </div>`;
 }
 document.addEventListener('input', function(e) {

@@ -1,5 +1,35 @@
 import { expect, test } from '@playwright/test';
 
+test('Finance starts with a usable budget and keeps example context accessible', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/pages/finance.html');
+  const salary = page.getByLabel('Monthly take-home salary (SGD)', { exact: true });
+  await expect(salary).toBeVisible();
+  const inputBox = await salary.boundingBox();
+  const navBox = await page.locator('.bottom-nav').boundingBox();
+  expect(inputBox.y + inputBox.height).toBeLessThan(navBox.y);
+  await expect(page.locator('.invest-disclaimer')).toBeVisible();
+  const guide = page.locator('.investment-guide');
+  await expect(guide).not.toHaveAttribute('open');
+  await guide.locator('summary').focus();
+  await guide.locator('summary').press('Enter');
+  await expect(guide.locator('p')).toBeVisible();
+  await guide.locator('summary').press('Space');
+  await expect(guide).not.toHaveAttribute('open');
+  await salary.fill('5000');
+  await expect(page.locator('#budgetResults .budget-card-amt')).toHaveText(['SGD 2,500', 'SGD 1,500', 'SGD 1,000']);
+  await expect(page.locator('.invest-table-row .invest-monthly').first()).not.toBeEmpty();
+  await salary.fill('');
+  await expect(page.locator('#budgetSliders')).toBeHidden();
+  await expect(page.locator('#budgetResults')).toBeEmpty();
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+});
+
 test('secondary section navigation is compact on mobile and retains keyboard and desktop access', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });

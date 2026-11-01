@@ -1,6 +1,8 @@
 # Stitch design brief — Macro Longevity
 Updated 2026-11-01. The connector currently returns `Authentication required`;
-no screen generated in this pass should be implied by this brief.
+no screen generated in this pass should be implied by this brief. The user has
+authorized native HTML/CSS implementation as the fallback, so this brief is an
+optional future reference, not a blocker or a requirement to reconnect.
 
 ## Current product contract
 

@@ -1,3 +1,6 @@
+.investment-guide { margin-top: var(--space-2); color: var(--color-text-secondary); font-size: var(--text-sm); }
+.investment-guide > summary { min-height: 44px; align-content: center; cursor: pointer; color: var(--color-primary); font-weight: var(--weight-semi); }
+.investment-guide > p { max-inline-size: 74ch; padding-block: var(--space-2); }
 @layer legacy {.invest-combo-grid { flex-direction: column; gap: 28px; display: flex; }
 .invest-disclaimer { font-size: var(--text-sm); color: var(--color-text-muted); background: var(--color-bg); border-radius: var(--radius-sm); border: 1px solid var(--color-border-light); text-align: center; margin-bottom: 8px; padding: 10px 14px; }
 .invest-card { background: var(--color-bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 32px; transition: box-shadow 0.2s; }
