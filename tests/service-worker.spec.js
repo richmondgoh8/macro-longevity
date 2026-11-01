@@ -64,7 +64,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v53-measurement-coverage');
+  expect(cacheKeys).toContain('macro-longevity-offline-v54-lab-identities');
   expect(cacheKeys).toContain('other-app-preserve-test');
   expect(cacheKeys).not.toContain('macro-longevity-offline-v0-test');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);

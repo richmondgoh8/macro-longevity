@@ -1,8 +1,19 @@
 # Biomarker and physical-measurement coverage specification
 
-Status: proposed implementation contract; not implemented or clinically approved.
-Date: 2026-11-01. Audited application baseline: `363eb4b`.
+Status: implementation contract; partially implemented, not clinically approved.
+Date: 2026-11-01. Original audited baseline: `363eb4b`.
 Companion: [Implementation plan](biomarker-coverage-plan.md).
+
+### Current checkpoint
+
+The tables below describe the original problem, not the current deployed state.
+The progress record reports runtime revision `e7389222a758eaedbb07f9ebe02099605cd3a006`
+as deployed and verified: 51 Home reference cards, promoted HDL/total cholesterol,
+13 optional physical cards, shared alias search and additive physical storage.
+These omissions have been addressed in that incremental release. Full specialist
+guidance, source reconciliation and complete Home search remain unfinished.
+See [recorded implementation evidence](biomarker-coverage-progress.md); this
+documentation update does not constitute a fresh deployment verification.
 
 ## 1. Outcome and problem
 
@@ -16,7 +27,7 @@ Its fixed-count tests verify a locally maintained blood-and-urine list, not all
 of Bryan Johnson's published measurements or individual guidance for every entry.
 More tests, higher percentiles and more extreme values are not inherently better.
 
-### Verified starting state
+### Original verified starting state (before the incremental release)
 
 | Surface | Current implementation | Known limitation |
 | --- | --- | --- |

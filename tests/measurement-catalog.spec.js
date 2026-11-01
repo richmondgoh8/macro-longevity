@@ -5,6 +5,47 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { auditMeasurementCoverage } from '../scripts/audit-measurement-coverage.mjs';
 import { HEALTH_REFERENCES } from '../js/data/health-reference-groups.js';
+import { ADDITIONAL_MARKERS } from '../js/data/additional-screening.js';
+import { BLUEPRINT_MARKERS, normalizeTestName } from '../js/data/blueprint-markers.js';
+import { measurementIdentity } from '../js/data/measurement-index.js';
+
+test('every optional lab field shares an explicit identity with its published library entry', () => {
+  for (const marker of ADDITIONAL_MARKERS) {
+    const libraryId = normalizeTestName(marker.catalogName);
+    expect(BLUEPRINT_MARKERS.some(item => item.id === libraryId), marker.id).toBe(true);
+    expect(measurementIdentity(marker.id).libraryId, marker.id).toBe(libraryId);
+    expect(measurementIdentity(libraryId).id, libraryId).toBe(marker.id);
+  }
+});
+
+test('optional field aliases find library entries without merging blood and urine specimens', () => {
+  for (const [query, id] of [
+    ['GGT', 'ggt'], ['ALP', 'alp'], ['TIBC', 'tibc'], ['TSAT', 'tsat'],
+    ['bicarbonate', 'bicarbonate'], ['haematocrit', 'hematocrit'],
+    ['RBC', 'rbc'], ['WBC', 'wbc'], ['MCV', 'mcv'], ['RDW', 'rdw'],
+  ]) {
+    const matches = searchMeasurements(BLUEPRINT_MARKERS, query);
+    expect(matches.length, query).toBeGreaterThan(0);
+    expect(measurementIdentity(matches[0].id).id, query).toBe(id);
+  }
+  for (const [blood, urine] of [
+    ['rbc', 'redbloodcellsurine'], ['wbc', 'whitebloodcellsurine'],
+    ['protein', 'proteinurine'], ['bilirubin', 'bilirubinurine'],
+    ['glucose', 'glucoseurine'], ['urate', 'uricacidcrystalsurine'],
+  ]) expect(measurementIdentity(blood).id).not.toBe(measurementIdentity(urine).id);
+});
+
+test('optional lab explanations are measurement-specific and retain evidence links', () => {
+  expect(new Set(ADDITIONAL_MARKERS.map(item => item.why)).size).toBe(ADDITIONAL_MARKERS.length);
+  for (const marker of ADDITIONAL_MARKERS) {
+    expect(marker.why.length, marker.id).toBeGreaterThan(65);
+    expect(marker.why, marker.id).not.toContain('Record ' + marker.label);
+    expect(marker.meaningSource, marker.id).toMatch(/^https:\/\/medlineplus\.gov\/lab-tests\/[a-z0-9-]+\/$/);
+  }
+  expect(ADDITIONAL_MARKERS.find(item => item.id === 'alp').why).toContain('not a bone-density measurement');
+  expect(ADDITIONAL_MARKERS.find(item => item.id === 'hemoglobin').why).toContain('different from HbA1c');
+  expect(ADDITIONAL_MARKERS.find(item => item.id === 'ft4').why).toContain('different from total T4');
+});
 
 test('coverage audit detects removed measurements, orphaned source entries and unfinished scope', () => {
   const inventory = JSON.parse(readFileSync(new URL('../docs/specs/biomarker-coverage-inventory.json', import.meta.url)));
@@ -48,7 +89,7 @@ test('Health promotes existing HDL records and searches physical, optional and l
   await expect(page.locator('[data-marker-input="hdl"]')).toHaveValue('61');
   await expect(page.locator('[data-marker-unit="hdl"]')).toHaveValue('mg/dL');
   const search = page.getByRole('searchbox', { name: 'Find a result field' });
-  for (const [query, target] of [['HDL-C', 'sg-hdl'], ['TSH', 'sg-tsh'], ['grip', 'physical-grip'], ['mercury', 'library-mercuryblood-result']]) {
+  for (const [query, target] of [['HDL-C', 'sg-hdl'], ['TSH', 'sg-tsh'], ['TIBC', 'sg-tibc'], ['bicarbonate', 'sg-bicarbonate'], ['RBC', 'sg-rbc'], ['grip', 'physical-grip'], ['mercury', 'library-mercuryblood-result']]) {
     await search.fill(query);
     const result = page.locator(`[data-health-result="${target}"]`);
     await expect(result).toBeVisible();
@@ -57,6 +98,10 @@ test('Health promotes existing HDL records and searches physical, optional and l
   }
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('blueprint-marker-results-v1')).hdlcholesterol.result)).toBe('55');
   await expect(page.locator('[data-marker-input="hdl"]')).toHaveValue('61');
+  const rbc = page.locator('[data-marker-card="rbc"]');
+  await expect(rbc.locator('.sg-marker-why')).toContainText('distinct from red cells found in urine');
+  await rbc.locator('summary').click();
+  await expect(rbc.getByRole('link', { name: 'About this test' })).toHaveAttribute('href', 'https://medlineplus.gov/lab-tests/complete-blood-count-cbc/');
 });
 
 test('physical results persist sides, signed bone scores and report units without conversion', async ({ page }) => {

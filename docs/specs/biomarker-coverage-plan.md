@@ -4,6 +4,73 @@ Status: implementation in progress following the user's 2026-11-01 instruction t
 Date: 2026-11-01. Baseline: `363eb4b`.
 Requirements: [Coverage specification](biomarker-coverage-spec.md).
 
+## Current execution checkpoint
+
+This plan retains the original phase sequence for traceability. Do not restart
+completed work or describe its historical baseline as the current website.
+The [progress record](biomarker-coverage-progress.md) documents the published P0
+slice and its test/deployment evidence; the broader goal remains active.
+
+| Workstream | Current state | Next exit condition |
+| --- | --- | --- |
+| Source inventory | Baseline frozen; published lab names independently compared; current/archive extracts partial | All chosen sections extracted, every source row dispositioned, no ambiguous included mappings |
+| Identity/search | Shared matcher and initial aliases shipped | All included identities explicitly mapped; Home and Health reach each designated destination |
+| Reported P0 gaps | Incremental release shipped with 51 Home cards and 13 physical cards | Preserve regressions; finish evidence/status reconciliation rather than rebuilding fields |
+| Specialist guidance | Generic library entries still insufficient | Each included lab/specialist item has meaningful context and actions or an explicit no-self-treatment rationale |
+| Release hardening | Incremental local/CI/live evidence recorded | Complete-scope print, old-worker upgrade, search timing and final release gates pass |
+
+## Next implementation slice — published lab guidance
+
+Deliver a bounded, usable extension before tackling the remaining historical
+organ/sensory inventory. This slice is not full-scope completion.
+
+1. Add explicit canonical mappings for existing optional fields. Keep blood/urine,
+   PSA screening/PSA analytes, and unlike methods distinct. First add regressions
+   that expose missing destinations; do not join clinical identities by fuzzy name.
+2. Add reviewed lab-reference data in `js/data/`, with an explicit row for every
+   unique entry in the independently captured published panel. Reuse existing
+   core destinations. Shared family plans must be visibly labelled and relevant;
+   each entry still needs its own meaning and interpretation limits.
+3. Extend `js/home-dashboard.js` with labelled native specialist disclosures inside
+   the existing seven groups. Keep all 51 core references and actions visible.
+   Load rich guidance on demand; never import result-entry controls into Home.
+4. Extend `js/components/reference-navigation.js` so full-index search, direct
+   fragments, copied URLs, reload and browser Back load/reveal/focus the actual
+   destination. Handle failed loading with retry and guard against stale searches.
+5. Link each `js/biomarker-library.js` row to its canonical reference. Do not add
+   duplicate result controls or merge independent saved observations.
+6. Provide a complete-reference reading/print path that loads and expands extended
+   content before printing. Do not claim browser Find searches unfetched modules;
+   an ordinary print must not silently suggest unloaded content was included.
+7. Test representative numeric, qualitative, inherited and specialist entries,
+   plus full row-level mapping/content assertions. Verify lazy-load failure/retry,
+   offline deep links and search timing, then run the applicable full gates.
+
+Slice exit: all unique published lab entries have a reviewed destination and
+tested search path, no duplicate canonical cards, no lost stored values, unchanged
+initial-load budgets and honest print behavior. The historical/current physical
+and specialist reconciliation remains a separate required slice afterward.
+
+## Requirement-to-evidence checklist
+
+| User concern | Required evidence before full completion |
+| --- | --- |
+| Missing HDL, grip and bone density | Dedicated references; exact aliases; left/right grip and separate BMD site/T-/Z-score fields; save/reload tests |
+| “All” published measurements | Versioned independent source fixture; row-level included/alias/repeat/excluded decisions; separate accounted/implemented/guidance/search/recordable counts |
+| Useful ranges and practical steps | Per-entry applicability, units and sources; actions immediately below context; justified no-target mode where needed; recorded evidence review |
+| Long-page navigation | Full-inventory search, mobile contents, desktop rail, current group, Top, adjacent sections, deep-link/reload/Back and focus tests |
+| Aligned cards and clean inputs | Reviewed 390/1440px screenshots plus 320/768px, landscape and enlarged-text checks; opening one card does not distort its neighbor; no nested borders or overlapping suffixes |
+| Unit switching explains itself | Number remains unchanged; visible unit-change feedback; applicable reference/status updates; Lp(a) conversion guard |
+| No unwanted clutter | Home remains read-only; no “Record and review my results” CTA; no new primary tabs or decorative dashboard widgets |
+| Sleek native implementation | Reuse existing tokens, spacing, typography and semantic controls; no design-service dependency, framework or unnecessary runtime packages |
+| Fast workflows and deployment | Fast deterministic regressions in quick CI; expensive checks remain full/manual/weekly; same tested SHA deployed, changed assets matched and isolated live smoke verified |
+| Reliable offline upgrade | New assets cached; old worker and old saved-store upgrade exercised; unrelated origin caches and all legacy values preserved |
+
+For each implementation slice, record its requirement IDs/rows, changed files,
+test commands/results, reviewed screenshots and remaining gaps in the progress
+document. A green suite does not replace source/content review, and a polished
+screen does not replace inventory completeness.
+
 ## 1. Delivery strategy
 
 Use small, reviewable changes in the current HTML/CSS/ES-module application.

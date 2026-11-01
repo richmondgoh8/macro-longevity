@@ -3,6 +3,12 @@
 Updated 2026-11-01. Overall goal remains active; full completion is unproven.
 Baseline for this correction: `363eb4b`.
 
+Planning refresh: the specification now distinguishes the original audit from the
+published incremental release. The plan includes a current-state checkpoint,
+an ordered specialist-guidance slice and a user-concern-to-evidence checklist.
+This is a documentation-only update: it does not add missing guidance, change
+runtime behavior or establish new CI/deployment evidence.
+
 ## Implemented in the first slice
 
 - Captured an independent pre-change inventory: 314 source entries across the
@@ -86,3 +92,40 @@ Research artifacts for the next slice:
 
 Next slice: finish the independent source manifest and named-entry reconciliation,
 then implement reviewed extended-family guidance and Home search destinations.
+
+## Optional-lab identity and explanation slice
+
+Implemented locally on 2026-11-01; publication evidence pending:
+
+- Every one of the 30 optional lab fields now explicitly maps to its published
+  library ID in both directions. Common aliases include GGT, ALP, TIBC, TSAT,
+  bicarbonate, RBC, WBC, MCV, RDW and the British spelling haematocrit.
+- Added per-test explanations rather than repeating the generic recording prompt.
+  Each links to its supporting NLM/MedlinePlus test reference; existing family
+  actions and interpretation limits remain. This is not specialist clinical approval.
+- Blood counts, blood proteins, blood bilirubin and blood urate remain distinct
+  from urine findings. The descriptions distinguish ALP from bone density,
+  haemoglobin from HbA1c and free T4 from total T4.
+- No result IDs, store formats, raw values, units or input controls changed.
+  The worker version advances to `v54-lab-identities`; no new precached assets.
+- New regressions first reproduced missing insulin/library identity and GGT search.
+  Corrected quick suite: 82 passed. Four performance checks passed with unchanged
+  budgets, including a new repeated-search input-to-painted-results <=200ms check
+  for Home and Health under the desktop 4x CPU profile. Optional module download
+  time is deliberately not represented as warm-search latency.
+- Reviewed RBC front/action screenshots at 390px and 1440px; no horizontal
+  overflow in these checks. Full suite: 334 passed, four expected skips (5.7
+  minutes); no screenshot baselines or tolerances changed. Audit/syntax and
+  whitespace checks passed; `npm audit` reported zero vulnerabilities.
+- A separate isolated mobile-width upgrade experiment served the actual previous
+  release `e7389222a758eaedbb07f9ebe02099605cd3a006`, then the current runtime.
+  After controller change and activation, the v54 cache contained new content;
+  all three saved stores were byte-preserved, another app's cache was retained,
+  and new GGT guidance/TIBC search worked offline with zero page errors.
+  An initial experiment switched offline before confirming new-worker control
+  and saw old content; waiting for activation corrected the verification sequence.
+  This experiment is not a physical-device test or a committed upgrade regression.
+
+Remaining scope is unchanged: optional-card explanations do not provide all 144
+lab entries with Home reference/action destinations, complete the historical
+inventory, or make full-catalogue search and print complete.

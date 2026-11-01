@@ -113,7 +113,7 @@ function markerCard(marker, state) {
     ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(value => `<option${unit === value ? ' selected' : ''}>${escapeHTML(value)}</option>`).join('')}</select></div>` : ''}
     <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span><span data-marker-target>${escapeHTML(markerTarget(marker, unit))}</span></p>
     </div>
-    <details class="sg-marker-details"><summary aria-label="View actions for ${escapeHTML(marker.label)}"><span class="sg-flip-open">View actions ↻</span><span class="sg-flip-close">← Back to result</span></summary><h4 class="sg-marker-back-title">${escapeHTML(marker.label)}</h4><div data-marker-actions><p>Loading practical actions…</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a></p></details>
+    <details class="sg-marker-details"><summary aria-label="View actions for ${escapeHTML(marker.label)}"><span class="sg-flip-open">View actions ↻</span><span class="sg-flip-close">← Back to result</span></summary><h4 class="sg-marker-back-title">${escapeHTML(marker.label)}</h4><div data-marker-actions><p>Loading practical actions…</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a>${marker.meaningSource ? ` · <a href="${escapeHTML(marker.meaningSource)}" target="_blank" rel="noreferrer">About this test ↗</a>` : ''}</p></details>
   </article>`;
 }
 

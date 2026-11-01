@@ -90,3 +90,34 @@ test('Non-planner routes keep critical JavaScript lean', async ({ page }) => {
     expect(bytes).toBeLessThanOrEqual(90000);
   }
 });
+
+test('Home and Health search paint results promptly under CPU throttling', async ({ page, context, browserName }, testInfo) => {
+  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'desktop-chromium', 'Chromium CDP budget');
+  const session = await context.newCDPSession(page);
+  await session.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  for (const [route, name, selector, queries] of [
+    ['/', 'Find a biomarker', '[data-reference-results]', ['HDL-C', 'hand grip', 'bone density']],
+    ['/pages/blood.html', 'Find a result field', '[data-health-results]', ['HDL-C', 'TIBC', 'bone density']],
+  ]) {
+    await page.goto(route);
+    const input = page.getByRole('searchbox', { name });
+    if (!await input.isVisible()) await page.locator('.sg-reference-picker > summary').click();
+    // Measure repeated index searches separately from optional module download time.
+    await input.fill('grip');
+    await expect(page.locator(`${selector} a`).first()).toBeVisible();
+    await input.evaluate((input, selector) => {
+      const results = document.querySelector(selector);
+      let started;
+      input.addEventListener('input', () => { started = performance.now(); window.__searchPaint = null; }, true);
+      new MutationObserver(() => {
+        requestAnimationFrame(() => requestAnimationFrame(() => { window.__searchPaint = performance.now() - started; }));
+      }).observe(results, { childList: true });
+    }, selector);
+    for (const query of queries) {
+      await input.fill(query);
+      await expect(page.locator(`${selector} a`).first()).toBeVisible();
+      await page.waitForFunction(() => window.__searchPaint !== null && window.__searchPaint !== undefined);
+      expect(await page.evaluate(() => window.__searchPaint), `${name}: ${query}`).toBeLessThanOrEqual(200);
+    }
+  }
+});
