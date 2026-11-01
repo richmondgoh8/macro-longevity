@@ -48,8 +48,14 @@ scores use a standard text keyboard so a mobile decimal keyboard cannot hide the
 minus key. The alias-cleanup regression for `hsCRP` was corrected and reverified.
 Health and new bone-density snapshots were reviewed; the existing mobile cancer
 card baseline was refreshed only after verifying a one-pixel position/crop shift.
-External CI, publishing and live acceptance follow these local gates; do not infer
-their results from the local test counts.
+External verification: code revision `e7389222a758eaedbb07f9ebe02099605cd3a006`
+passed GitHub Quality run `41318427739` and Pages deployment `41318577013`.
+Seven changed runtime assets matched the tested local files byte-for-byte.
+An isolated live mobile context verified the 51-card guide, exact HDL destination,
+preserved legacy HDL units/value, signed bone-score save/reload and cache v53.
+Offline grip guidance and saved bone/HDL results worked without browser errors.
+These are incremental-release results, not full-catalogue completion or physical
+iPhone/Android verification.
 
 Research artifacts for the next slice:
 
