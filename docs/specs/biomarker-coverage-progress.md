@@ -95,7 +95,8 @@ then implement reviewed extended-family guidance and Home search destinations.
 
 ## Optional-lab identity and explanation slice
 
-Implemented locally on 2026-11-01; publication evidence pending:
+Published and verified on 2026-11-01 at runtime revision
+`d6881d2fac7f0717179d83ea00ac8c5f7e07fcee`:
 
 - Every one of the 30 optional lab fields now explicitly maps to its published
   library ID in both directions. Common aliases include GGT, ALP, TIBC, TSAT,
@@ -125,6 +126,17 @@ Implemented locally on 2026-11-01; publication evidence pending:
   An initial experiment switched offline before confirming new-worker control
   and saw old content; waiting for activation corrected the verification sequence.
   This experiment is not a physical-device test or a committed upgrade regression.
+- [Quality run 41321310757](https://github.com/richmondgoh8/macro-longevity/actions/runs/41321310757)
+  passed both jobs (41 checks each): desktop 1m34s, mobile 1m28s.
+  [Pages run 41321444803](https://github.com/richmondgoh8/macro-longevity/actions/runs/41321444803)
+  successfully deployed the same SHA. All four changed runtime assets matched
+  local tested files byte-for-byte at `https://hazelah.me/macro-longevity/`.
+- An isolated live 390px Chromium context confirmed v54, GGT explanation and
+  save/reload, TIBC/TSAT/RBC/bicarbonate aliases, offline RBC guidance and evidence
+  links, offline HDL guidance, 51 core cards, no overflow and zero page errors.
+- CI emitted non-blocking Node 20 action-runtime deprecation annotations for
+  checkout/setup-node v4. Updating and validating those action dependencies is
+  remaining pipeline cleanup; green runs do not mean warning-free workflows.
 
 Remaining scope is unchanged: optional-card explanations do not provide all 144
 lab entries with Home reference/action destinations, complete the historical

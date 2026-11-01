@@ -12,8 +12,11 @@ as deployed and verified: 51 Home reference cards, promoted HDL/total cholestero
 13 optional physical cards, shared alias search and additive physical storage.
 These omissions have been addressed in that incremental release. Full specialist
 guidance, source reconciliation and complete Home search remain unfinished.
-See [recorded implementation evidence](biomarker-coverage-progress.md); this
-documentation update does not constitute a fresh deployment verification.
+The subsequent verified runtime release `d6881d2` adds explicit identities and
+individual explanations for all 30 optional lab fields, without changing stored
+values. See [recorded implementation evidence](biomarker-coverage-progress.md)
+for test, deployment and offline verification; neither release completes the
+full source catalogue.
 
 ## 1. Outcome and problem
 
