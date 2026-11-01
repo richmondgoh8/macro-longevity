@@ -231,6 +231,7 @@ test('Sticky pin rail follows the Calm Wellness contract', async ({ page }) => {
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pages/protocol.html');
+  await page.locator('.sticky-pin-disclosure > summary').click();
   const mobile = await page.locator('.sticky-pin-rail').evaluate((rail) => ({
     position: getComputedStyle(rail).position,
     overflow: getComputedStyle(rail).overflow,

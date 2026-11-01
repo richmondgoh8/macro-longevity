@@ -141,6 +141,7 @@ test('section rail underlines the active item and clears the context tabs', asyn
       return rail.top - nav.bottom;
     });
     expect(gap).toBeGreaterThanOrEqual(16);
+    if (width < 1100) await page.locator('.sticky-pin-disclosure > summary').click();
     const first = page.locator('.sticky-pin-link').first();
     await first.click();
     await expect(first).toHaveAttribute('aria-current', 'location');
@@ -164,10 +165,12 @@ test('sticky rail controls mirror Training views', async ({ page }) => {
 
 });
 
-test('sticky rail becomes a wrapped static list on mobile', async ({ page }) => {
+test('mobile section navigation starts collapsed and opens a wrapped static list', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of ['/pages/avoid.html', '/pages/blood.html', '/pages/protocol.html', '/pages/workout.html']) {
     await page.goto(route);
+    await expect(page.locator('.sticky-pin-disclosure')).not.toHaveAttribute('open');
+    await page.locator('.sticky-pin-disclosure > summary').click();
     const state = await page.locator('.sticky-pin-rail').evaluate((node) => ({
       position: getComputedStyle(node).position,
       overflow: getComputedStyle(node).overflow,
@@ -263,7 +266,7 @@ test('active workout tabs render one visible indicator bar', async ({ page }) =>
     });
     expect(state.parentBorderBottomStyle).toBe('none');
     expect(state.activeShadow).toContain('inset');
-    if (width === 390) expect(state.nextBorderTopColor).toMatch(/rgba\(0, 0, 0, 0\)/);
+    if (width === 390) expect(state.nextBorderTopColor).toBe('rgb(212, 221, 211)');
   }
 });
 
@@ -271,6 +274,7 @@ test('training metrics keep Zone 2 range and labels inside their cells', async (
   for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 900 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/pages/workout.html');
+    await page.locator('.workout-weekly-guide > summary').click();
     const metrics = page.locator('.workout-metrics');
     await expect(metrics).toContainText('150–300');
     await expect(metrics).toContainText('Zone 2 min / week');

@@ -25,10 +25,24 @@ Stitch before claiming its design-generation requirement is complete.
 - Actual install/launch behavior on iPhone and Android hardware is unverified;
   Chromium reports no installability errors in a non-private browser profile, but
   that check and offline tests are not substitutes for those device checks.
-- The broader minimalism/usability goal requires reviewing all five primary tools,
-  not only the reference homepage. This pass improves install support rather than
-  claiming a complete redesign or a perfect user experience.
+- All five primary mobile entry screens were reviewed at 390px and 200% text size;
+  no horizontally clipped controls were found. Health, Ingredient guide, Blueprint
+  and Training now use compact mobile contents disclosures. Training's four session
+  choices fit above the bottom navigation at 390×844, with weekly background guidance
+  still available in a disclosure. These checks are not a user study or a claim of
+  a perfect experience for every user.
 - Stitch generation and review remain pending authentication.
+
+## Verification — compact navigation pass
+
+- `npm run test:ui`: 311 passed, 3 platform-inapplicable skips (2026-11-01).
+- Desktop performance suite: all 3 checks passed after keeping the new section
+  navigation CSS out of Home and Nutrition. Existing budgets were not changed.
+- Mobile section menus retain keyboard opening, Escape, destination focus and
+  desktop access after resizing. Weekly training context and metrics remain
+  available; the four session choices fit above the mobile bottom bar.
+- Firefox and WebKit executables are unavailable in this workspace. These results
+  cover Chromium desktop/mobile emulation, not those engines or physical devices.
 
 ## Generation prompt
 

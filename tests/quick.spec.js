@@ -1,5 +1,60 @@
 import { expect, test } from '@playwright/test';
 
+test('secondary section navigation is compact on mobile and retains keyboard and desktop access', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const path of ['/pages/blood.html', '/pages/avoid.html', '/pages/protocol.html', '/pages/workout.html']) {
+    await page.goto(path);
+    const disclosure = page.locator('.sticky-pin-disclosure');
+    const summary = disclosure.locator('summary');
+    await expect(disclosure).not.toHaveAttribute('open');
+    expect((await summary.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect((await page.locator('.sticky-pin-rail').boundingBox()).height).toBeLessThanOrEqual(64);
+    await summary.focus();
+    await summary.press('Enter');
+    await expect(disclosure).toHaveAttribute('open', '');
+    await summary.press('Escape');
+    await expect(disclosure).not.toHaveAttribute('open');
+    await expect(summary).toBeFocused();
+    await summary.press('Enter');
+    const first = disclosure.locator('.sticky-pin-link').first();
+    const target = await first.getAttribute('data-sticky-pin-target') || await first.getAttribute('href');
+    await first.click();
+    await expect(disclosure).not.toHaveAttribute('open');
+    await expect(page.locator(target)).toBeVisible();
+    await expect(page.locator(target)).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const disclosure = page.locator('.sticky-pin-disclosure');
+  await expect(disclosure).toHaveAttribute('open', '');
+  await disclosure.locator('.sticky-pin-link').first().focus();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(disclosure).not.toHaveAttribute('open');
+  await expect(disclosure.locator('summary')).toBeFocused();
+});
+
+test('mobile Training exposes all four session choices before secondary guidance', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/pages/workout.html');
+  const guide = page.locator('.workout-weekly-guide');
+  await expect(guide).not.toHaveAttribute('open');
+  const bottom = (await page.locator('.bottom-nav').boundingBox()).y;
+  for (const tab of await page.locator('[data-pillar-tab]').all()) {
+    const box = await tab.boundingBox();
+    expect(box.y + box.height).toBeLessThanOrEqual(bottom);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  await guide.locator('summary').click();
+  await expect(page.locator('.workout-metrics')).toBeVisible();
+  await expect(page.locator('.workout-metrics')).toContainText('150–300');
+  await guide.locator('summary').click();
+  await page.getByRole('tab', { name: /Strength/ }).click();
+  await expect(page.locator('#section-strength')).toBeVisible();
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+});
+
 test('core routes load without errors or mobile overflow', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -7,6 +62,8 @@ test('core routes load without errors or mobile overflow', async ({ page }) => {
     expect((await page.goto(route)).status()).toBe(200);
     await expect(page.locator('main')).toBeVisible();
     await expect(page.locator('.nav-links .nav-link')).toHaveCount(5);
+    const usesSectionRail = ['/pages/blood.html', '/pages/workout.html'].includes(route);
+    await expect(page.locator('link[href$="section-navigation.css"]')).toHaveCount(usesSectionRail ? 1 : 0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   }
   expect(errors).toEqual([]);

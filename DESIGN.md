@@ -67,6 +67,14 @@ Active navigation/tabs use one 2px underline. Content links remain underlined.
 Context navigation and long-page layout wrappers are in initial HTML.
 Section rails remain optional content navigation, never an additional primary shell.
 Nutrition has no redundant side rail.
+Below 1100px, section rails start as a native “Jump to a section” disclosure,
+not a full-height table of contents above the main tool. Selection closes the
+disclosure and moves focus to the destination; Escape returns focus to its summary.
+Desktop retains the visible rail. Training keeps weekly background guidance in a
+separate disclosure, with session choices first; small screens use a compact grid
+that reflows to one column when larger text needs more space.
+`css/section-navigation.css` loads in the initial HTML of Health, Blueprint,
+Ingredient guide and Training only; Home and Nutrition do not pay for those styles.
 
 44px touch targets where practical; visible 3px focus outline.
 Native links preserve browser history and modifier-click behavior.

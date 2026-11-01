@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v50-install-icons';
+const CACHE_NAME = 'macro-longevity-offline-v51-compact-navigation';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -18,6 +18,7 @@ const STATIC_ASSETS = [
   'css/ingredients-layout.css',
   'css/nutrition.css',
   'css/wellness.css',
+  'css/section-navigation.css',
   'css/tooltip.css',
   'css/toast.css',
   'js/register-sw.js',

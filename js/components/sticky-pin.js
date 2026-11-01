@@ -102,8 +102,6 @@ function makeRail(config, root) {
   const heading = root.createElement('p');
   heading.className = 'sticky-pin-label';
   heading.textContent = 'On this page';
-  nav.append(heading);
-
   const list = root.createElement('ol');
   list.className = 'sticky-pin-list';
 
@@ -132,7 +130,36 @@ function makeRail(config, root) {
     list.append(item);
   });
 
-  nav.append(list);
+  const disclosure = root.createElement('details');
+  disclosure.className = 'sticky-pin-disclosure';
+  const summary = root.createElement('summary');
+  summary.textContent = 'Jump to a section';
+  disclosure.append(summary, heading, list);
+  const desktop = window.matchMedia('(min-width: 1100px)');
+  const adapt = () => {
+    const hadFocus = disclosure.contains(root.activeElement);
+    disclosure.open = desktop.matches;
+    if (hadFocus) (desktop.matches ? list.querySelector('a, button') : summary).focus({ preventScroll: true });
+  };
+  desktop.addEventListener('change', adapt);
+  adapt();
+  nav.addEventListener('click', (event) => {
+    const control = event.target.closest('[data-sticky-pin-link], [data-sticky-pin-control]');
+    if (desktop.matches || !control || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    disclosure.open = false;
+    const target = root.querySelector(control.dataset.stickyPinKey);
+    if (target) {
+      if (!target.hasAttribute('tabindex')) target.tabIndex = -1;
+      requestAnimationFrame(() => target.focus({ preventScroll: true }));
+    }
+  });
+  disclosure.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !desktop.matches) {
+      disclosure.open = false;
+      summary.focus();
+    }
+  });
+  nav.append(disclosure);
   aside.append(nav);
   return aside;
 }

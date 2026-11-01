@@ -911,7 +911,9 @@ function renderPillars(targetId) {
   if (!container) return;
 
   const intro = `
-    <section class="workout-console-intro">
+    <details class="workout-weekly-guide">
+      <summary>Weekly training guide</summary>
+      <section class="workout-console-intro">
       <div class="workout-console-copy">
         <span class="section-eyebrow">The minimum effective week</span>
         <h2>Four inputs. One durable body.</h2>
@@ -922,7 +924,8 @@ function renderPillars(targetId) {
         <div><strong>150–300</strong><span>Zone 2 min / week</span></div>
         <div><strong>2–3</strong><span>strength sessions</span></div>
       </div>
-    </section>
+      </section>
+    </details>
     <section class="workout-index" aria-label="Choose a training domain">
       <div class="workout-index-heading"><span>Choose a session</span><span data-current-pillar>${PILLARS[0].shortName || PILLARS[0].name}</span></div>
       <div class="workout-tabs" role="tablist">
