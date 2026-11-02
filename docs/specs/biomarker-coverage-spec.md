@@ -1,6 +1,7 @@
 # Biomarker and physical-measurement coverage specification
 
-Status: versioned scope completed, deployed and verified (`6535d61`); not clinically approved.
+Status: source-name/context scope completed; numerical-reference review partial.
+Latest verified runtime: `678b3b2` (numerical correction); not clinically approved.
 Correction (2026-11-02): that status covers source-name/context reconciliation,
 not complete numerical intervals. Numerical-reference review remains partial;
 40 lab examples and 15 banded references are now distinguished explicitly in

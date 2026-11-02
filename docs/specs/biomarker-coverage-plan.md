@@ -1,6 +1,7 @@
 # Biomarker coverage implementation plan
 
-Status: versioned scope completed, deployed and verified as runtime `6535d61`.
+Status: source-name/context scope completed; numerical-reference review partial.
+Latest verified runtime: `678b3b2` (numerical correction).
 Numerical-reference correction (2026-11-02): the completed scope above was
 source-name/context coverage, not complete numerical ranges. Forty published
 lab examples now have explicit units, lab and population metadata; numerical
@@ -20,6 +21,7 @@ and explicit scope/clinical limitations.
 | --- | --- | --- |
 | Source inventory | 663 versioned source entries accounted for; 38 explicit exclusions; frozen baseline preserved | Preserve reviewed source/mapping checksums in the full coverage gate |
 | Identity/search | 358 distinct destinations and 652 source-name fixtures; Home and Health verified | Preserve the full coverage gate for future changes |
+| Numerical applicability | 40 published lab examples, 15 banded references, 303 other guidance destinations; deployed as `678b3b2` | Classify the remaining destinations individually; add verified intervals where applicable and explicit reasons where no universal numerical interval is appropriate. Do not infer completeness from name coverage. |
 | Reported P0 gaps | Incremental release shipped with 51 Home cards and 13 physical cards | Preserve regressions; finish evidence/status reconciliation rather than rebuilding fields |
 | Specialist guidance | Full chosen current/archive scope implemented, including reference-only specialist/research entries and row-level evidence | No independent clinical-specialist approval is claimed |
 | Release hardening | Full suite, reviewed screenshots, expanded search budgets, upgrade, exact-SHA deployment and live smoke passed | Continue existing fast CI and manual/weekly full checks |

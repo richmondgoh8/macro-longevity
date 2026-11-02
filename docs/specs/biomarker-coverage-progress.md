@@ -18,7 +18,17 @@ both desktop/mobile diffs were inspected before refreshing those two
 baselines. No tolerance was relaxed. Full unrelated-route UI suite was not
 rerun for this bounded data change. Saved-result schemas are unchanged.
 
-Updated 2026-11-02. Versioned scope completed, deployed and verified as runtime `6535d61`.
+Published numerical correction: runtime `678b3b2c7b92d7f374e58583be51431f0e3d5d88`.
+[Quality run 41375094503](https://github.com/richmondgoh8/macro-longevity/actions/runs/41375094503)
+and [Pages run 41375292108](https://github.com/richmondgoh8/macro-longevity/actions/runs/41375292108)
+succeeded for that exact SHA. All six changed runtime assets byte-matched
+`https://hazelah.me/macro-longevity/`. An isolated 390px live Chromium context
+verified B12, HDL screening thresholds and sex-specific haemoglobin intervals,
+no horizontal overflow, installation of the v57 cache, offline phosphate and
+B12 deep links, and zero page errors. These checks verify publication/behaviour,
+not clinical approval or completion of the remaining numerical-applicability audit.
+
+Earlier source-name/context checkpoint, 2026-11-02: deployed runtime `6535d61`.
 Baseline for this correction: `363eb4b`.
 
 Current implementation: 663 source entries accounted for, 358 unique reference
