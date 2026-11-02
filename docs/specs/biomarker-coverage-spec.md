@@ -17,6 +17,11 @@ individual explanations for all 30 optional lab fields, without changing stored
 values. See [recorded implementation evidence](biomarker-coverage-progress.md)
 for test, deployment and offline verification; neither release completes the
 full source catalogue.
+Runtime release `ff920d6` subsequently supplies canonical reference/action
+destinations for all 144 unique captured published lab entries (19 core reused,
+125 extended), full published-lab Home search and library links. Native
+disclosures retain the initial 51-card guide; complete reading shows 176 cards.
+Current/archive reconciliation and row-level review records remain unfinished.
 
 ## 1. Outcome and problem
 

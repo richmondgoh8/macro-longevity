@@ -144,7 +144,8 @@ inventory, or make full-catalogue search and print complete.
 
 ## Published-lab reference and navigation slice
 
-Implemented locally 2026-11-01/02; publication evidence pending.
+Implemented and deployed 2026-11-01/02 as runtime revision
+`ff920d6ed7d98ca022f4aa6160638e094f81aee0`.
 
 - The captured 144 unique published lab entries now have explicit canonical
   reference destinations: 19 reuse core cards and 125 are extended cards. With
@@ -191,9 +192,19 @@ Implemented locally 2026-11-01/02; publication evidence pending.
   their published metadata. Kept the Node 22 test engine, npm cache, parallel
   desktop/mobile quick jobs, manual/weekly full gates and tested-SHA deployment
   guard. Explicitly retain public hidden files in the curated Pages artifact so
-  the newer uploader does not omit `.nojekyll`. CI execution remains to be verified.
+  the newer uploader does not omit `.nojekyll`.
+- Quality run `41369727047` passed on that exact SHA: 46 checks per parallel
+  project; mobile job 1m24s and desktop job 1m37s including setup. Pages run
+  `41369873844` succeeded for the same SHA (16-second deployment job). Checked
+  annotations: no Node 20 action-deprecation warnings; Pages retains an
+  informational `ubuntu-latest` image-migration notice, not a failure.
+- All nine changed runtime assets matched live bytes. An isolated live 390px
+  browser verified ANA direct links, TIBC search/focus/Back, 176 expanded cards,
+  the exact library reference link, no horizontal overflow, v55 activation and
+  offline free-PSA guidance, with zero page errors.
 
 The frozen 314-row baseline is not retroactively marked reviewed. Remaining work
 includes full current/archive named-entry reconciliation, row-level review/status
-records, broader specialist/physical destinations, and the outstanding release
-checks. No specialist clinical approval or physical-device testing is claimed.
+records and broader specialist/physical destinations. This slice's release
+checks are complete; full-inventory completion is not. No specialist clinical
+approval or physical-device testing is claimed.

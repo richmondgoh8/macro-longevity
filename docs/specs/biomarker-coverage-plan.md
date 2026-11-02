@@ -16,13 +16,15 @@ slice and its test/deployment evidence; the broader goal remains active.
 | Source inventory | Baseline frozen; published lab names independently compared; current/archive extracts partial | All chosen sections extracted, every source row dispositioned, no ambiguous included mappings |
 | Identity/search | Shared matcher and initial aliases shipped | All included identities explicitly mapped; Home and Health reach each designated destination |
 | Reported P0 gaps | Incremental release shipped with 51 Home cards and 13 physical cards | Preserve regressions; finish evidence/status reconciliation rather than rebuilding fields |
-| Specialist guidance | Generic library entries still insufficient | Each included lab/specialist item has meaningful context and actions or an explicit no-self-treatment rationale |
+| Specialist guidance | Published 144-entry lab guide implemented with canonical Home destinations and labelled family plans; broader inventory pending | Finish current/archive specialist and physical reconciliation and row-level review records |
 | Release hardening | Incremental local/CI/live evidence recorded | Complete-scope print, old-worker upgrade, search timing and final release gates pass |
 
-## Next implementation slice — published lab guidance
+## Published lab guidance slice — implemented and deployed as `ff920d6`
 
 Deliver a bounded, usable extension before tackling the remaining historical
 organ/sensory inventory. This slice is not full-scope completion.
+The steps below are completed for the captured published lab panel; release
+evidence and the remaining current/archive work are in the progress record.
 
 1. Add explicit canonical mappings for existing optional fields. Keep blood/urine,
    PSA screening/PSA analytes, and unlike methods distinct. First add regressions
