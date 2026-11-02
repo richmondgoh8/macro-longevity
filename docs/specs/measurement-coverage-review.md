@@ -91,6 +91,15 @@ additional references load on demand inside the existing seven groups.
   passed across desktop/mobile Chromium, including new direct-link range and
   assay-context regressions; all four performance checks passed unchanged budgets.
   No CSS, renderer, saved-store schema or visual baseline was changed in this batch.
+- Release `fb3fcfff9cb0aaeaba9489239a6bdff1b8744f69`: Quality run
+  `41482816067` succeeded (59 checks per desktop/mobile project); Pages run
+  `41483260351` published that exact SHA. Both changed runtime assets matched
+  live bytes. Isolated live 390px checks verified cortisol, calculated free
+  testosterone, BUN, urine pH and vitamin C numerical displays, provenance
+  disclosures, action panels and source links, with no horizontal overflow.
+  AMH loaded offline under v60; the isolated context's storage remained unchanged
+  (no saved-result migration was exercised in that smoke), with zero page errors.
+  Existing populated-result persistence is covered by the passing quick suite.
 
 ## Reproducible row-level evidence
 
