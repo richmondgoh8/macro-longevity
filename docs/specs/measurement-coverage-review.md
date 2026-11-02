@@ -9,8 +9,8 @@ those captures remain unchanged so the original omissions remain reproducible.
 Correction following the B12 screenshot: the completed review below concerns
 source names, destinations and contextual guidance, **not complete numerical
 reference-range coverage**. That distinction was insufficiently prominent.
-Numerical-reference review remains partial: 40 explicitly sourced laboratory
-examples, 15 existing banded references, and 303 other guidance destinations.
+Numerical-reference review remains partial: 59 explicitly sourced laboratory
+examples, 15 existing banded references, and 284 other guidance destinations.
 The latter include formulas, study estimates, screening and qualitative tests;
 they have not all been classified for numerical-interval applicability. Do not
 describe these counts as 358 complete reference ranges.
@@ -63,6 +63,34 @@ additional references load on demand inside the existing seven groups.
   removal of any required registry interval. The reviewed snapshot covers
   numeric metadata as well as displayed text. This is source transcription and
   engineering review, not independent clinical validation or a blanket testing plan.
+
+## Additional laboratory examples (2026-11-03)
+
+- Added 19 independently source-checked examples: morning cortisol, prolactin,
+  total and calculated free testosterone, FSH, LH, SHBG, estradiol, AMH,
+  free T3, ALP, lipase, zinc, TIBC, transferrin saturation, BUN, urine
+  specific gravity, urine pH and vitamin C. Each registry row retains its
+  laboratory, population/method, units, source URL and individual review date.
+- KKH hormone tables retain age and physiological-state distinctions; broad
+  cycle-dependent intervals are not presented as fertility or hormone targets.
+  Estradiol is explicitly an upper-limit example. Calculated free testosterone
+  uses the Vermeulen equation, not a direct free-testosterone assay.
+- SGH chemistry examples preserve the catalogue's specimen and age scope.
+  [Mayo BUN](https://renal.testcatalog.org/show/BUN) remains in mg/dL, not
+  silently relabelled as urea. [Iowa urinalysis](https://www.healthcare.uiowa.edu/path_handbook/handbook/test2590.html)
+  supplies urine-only pH and relative density. [Alfred vitamin C](https://pathology.alfred.org.au/handbook/index?testid=190)
+  supplies the HPLC interval, not a daily intake recommendation.
+- All additions remain demand-loaded; initial Home code and the 51 core cards
+  are unchanged. The offline cache revision advances to v60 and retains the
+  HTTP-cache-bypassing installation fix. No result data or units are migrated.
+- Outstanding applicability review still includes additional micronutrients,
+  lipid subfractions, hormones, specialist physiological measurements and
+  qualitative tests. The 284 context destinations must not be represented as
+  284 tests proven to have no numerical interval.
+- Local verification: audit and reviewed snapshot passed; all 118 quick checks
+  passed across desktop/mobile Chromium, including new direct-link range and
+  assay-context regressions; all four performance checks passed unchanged budgets.
+  No CSS, renderer, saved-store schema or visual baseline was changed in this batch.
 
 ## Reproducible row-level evidence
 

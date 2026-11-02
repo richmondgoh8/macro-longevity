@@ -29,9 +29,9 @@
   "numericalReferenceReview": {
     "status": "partial",
     "scope": "Published lab intervals and banded references counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.",
-    "publishedLabIntervals": 40,
+    "publishedLabIntervals": 59,
     "bandedReferences": 15,
-    "otherReferenceGuidance": 303
+    "otherReferenceGuidance": 284
   },
   "counts": {
     "sourceEntries": 663,
@@ -43,6 +43,6 @@
     "searchFixtures": 652
   },
   "failures": [],
-  "entriesSha256": "a4c718ed2c0b7cf8e7dae414bca617c88863f56af72c5811a952436c0cb50907",
-  "referenceContentSha256": "ff625d64d250600a257ca4bf60f60c1cb6474b84c81759105d2a1a8da96b120e"
+  "entriesSha256": "54f142e99fe314ad3dab33552651c7edee4a933d624230eb08986bd83deb9353",
+  "referenceContentSha256": "8bdd992505ded72399080d19f30411cbc05d58a7ad3f605f902b4651dc8256ee"
 }

@@ -7,7 +7,7 @@ import { reconcileMeasurements } from '../scripts/reconcile-measurements.mjs';
 
 test('routine numeric intervals have provenance and cannot regress to context-only coverage', () => {
   const report = reconcileMeasurements();
-  expect(report.numericalReferenceReview.publishedLabIntervals).toBe(40);
+  expect(report.numericalReferenceReview.publishedLabIntervals).toBe(59);
   expect(report.numericalReferenceReview.status).toBe('partial');
   for (const reference of EXTENDED_REFERENCES.filter(item => item.labInterval)) {
     expect(reference.reference).toContain(reference.labInterval.values);
@@ -39,6 +39,11 @@ test('extended numeric intervals preserve sex, specimen and assay distinctions',
     ['bicarbonate', '22–29 mmol/L', 'serum total CO₂, not blood-gas bicarbonate'],
     ['ft4', '8.8–14.4 pmol/L', 'SGH; adult example'],
     ['phosphate', '0.7–1.5 mmol/L', 'KKH; age ≥19 years'],
+    ['cortisol', '102–535 nmol/L', 'serum collected at 8 am'],
+    ['testosteronefree', 'Male: 0.180–0.994; female: 0.003–0.058 nmol/L', 'not a direct free-testosterone assay'],
+    ['bun', 'Male: 8–24; female: 6–21 mg/dL', 'not urea concentration'],
+    ['phurine', '5.0–9.0 pH', 'not blood pH'],
+    ['vitc', '23–85 µmol/L', 'protect collection from light'],
   ]) {
     await page.goto(`/#biomarker-${id}`);
     const card = page.locator(`#biomarker-${id}`);
@@ -47,6 +52,17 @@ test('extended numeric intervals preserve sex, specimen and assay distinctions',
     await expect(card.locator('.sg-lab-details')).toContainText(context);
     await expect(card.locator('.sg-card-action')).toBeVisible();
   }
+});
+
+test('hormone examples retain age, cycle and assay limits rather than universal targets', () => {
+  const interval = id => EXTENDED_REFERENCES.find(item => item.id === id).labInterval;
+  expect(interval('testosteronetotal').values).toContain('female ≥50: 0.4–1.2');
+  expect(interval('testosteronetotal').population).toContain('no interval supplied here for age ≤20');
+  expect(interval('antimullerianhormoneamh').values).toContain('45–50: 0.01–2.71');
+  expect(interval('luteinizinghormone').population).toContain('menstrual phase');
+  expect(interval('estradiol').population).toContain('upper reference limits');
+  expect(interval('zinc').unit).toBe('µg/L');
+  for (const id of ['cortisol', 'bun', 'vitc']) expect(interval(id).reviewed).toBe('2026-11-03');
 });
 
 test('Home search reveals a specialist reference with context and actions together', async ({ page }) => {

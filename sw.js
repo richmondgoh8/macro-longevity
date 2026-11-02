@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v59-reference-layout-refresh';
+const CACHE_NAME = 'macro-longevity-offline-v60-lab-intervals';
 const STATIC_ASSETS = [
   './',
   'index.html',
