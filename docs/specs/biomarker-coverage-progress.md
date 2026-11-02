@@ -15,7 +15,7 @@
   retain independent natural-height cards and narrow scales still reflow.
 - Print opens lab details and restores their prior state afterward. Storage,
   report values, five-destination navigation and unit semantics are unchanged.
-  Offline cache is v58-reference-layout.
+  Offline cache is v59-reference-layout-refresh.
 - Full browser run exercised 372 cases: 367 passed, four expected skips and
   one toast screenshot whose unchanged toast overlay sat above the changed
   Home background. That diff was inspected and refreshed; desktop/mobile
@@ -25,6 +25,13 @@
 - Additional Firefox smoke passed paired action alignment at 1024/1440px,
   keyboard disclosure toggles and 390px mobile text enlarged to 200%.
   Audit passed: 49 JavaScript files and 81 precached assets.
+- The v58 layout runtime (`2aacafd`) passed Quality/Pages publication, but a
+  live v57→v58 trial reached the new cache while still showing the old renderer.
+  The installer previously allowed fresh browser HTTP-cache responses. It now
+  uses `Request(..., { cache: 'reload' })` for every precached asset. A real-browser
+  regression primes a one-hour stale HTTP-cache entry, confirms ordinary fetch
+  still returns it after the server changes, and verifies installation fetches
+  the new renderer. All eight service-worker checks passed on desktop/mobile.
 
 ## Numerical-reference correction — earlier checkpoint
 

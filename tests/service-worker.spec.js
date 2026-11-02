@@ -1,4 +1,43 @@
 import { chromium, expect, test } from '@playwright/test';
+import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
+
+test('a new offline cache refreshes assets already fresh in the HTTP cache', async ({ browser }) => {
+  let latest = false;
+  const server = createServer((request, response) => {
+    const path = new URL(request.url, 'http://localhost').pathname;
+    const file = path === '/' ? 'index.html' : path.slice(1);
+    let body;
+    try { body = file === 'js/home-dashboard.js' && !latest ? '// obsolete HTTP-cached renderer' : readFileSync(new URL('../' + file, import.meta.url)); }
+    catch { response.writeHead(404); response.end(); return; }
+    response.writeHead(200, {
+      'Content-Type': file.endsWith('.js') ? 'application/javascript' : file.endsWith('.svg') ? 'image/svg+xml' : 'application/octet-stream',
+      'Cache-Control': file === 'sw.js' ? 'no-cache' : 'public, max-age=3600',
+    });
+    response.end(body);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const context = await browser.newContext({ serviceWorkers: 'allow' });
+  try {
+    const page = await context.newPage();
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    await page.goto(origin + '/favicon.svg');
+    expect(await page.evaluate(async () => (await fetch('/js/home-dashboard.js')).text())).toContain('obsolete HTTP-cached renderer');
+    latest = true;
+    expect(await page.evaluate(async () => (await fetch('/js/home-dashboard.js')).text())).toContain('obsolete HTTP-cached renderer');
+    await page.evaluate(async () => { await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready; });
+    await page.waitForFunction(() => navigator.serviceWorker.controller);
+    const installed = await page.evaluate(async () => {
+      const response = await caches.match('/js/home-dashboard.js');
+      return response.text();
+    });
+    expect(installed).toBe(readFileSync(new URL('../js/home-dashboard.js', import.meta.url), 'utf8'));
+  } finally {
+    await context.close();
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
 
 test('install metadata provides a stable identity and usable PNG icons on every route', async ({ page, context }) => {
   await page.goto('/');
@@ -64,7 +103,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v58-reference-layout');
+  expect(cacheKeys).toContain('macro-longevity-offline-v59-reference-layout-refresh');
   expect(cacheKeys).toContain('other-app-preserve-test');
   expect(cacheKeys).not.toContain('macro-longevity-offline-v0-test');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);

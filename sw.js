@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v58-reference-layout';
+const CACHE_NAME = 'macro-longevity-offline-v59-reference-layout-refresh';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -87,7 +87,7 @@ const SITE_SCOPE = new URL('./', self.location.href);
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS.map((asset) => new URL(asset, SITE_SCOPE))))
+      .then((cache) => cache.addAll(STATIC_ASSETS.map((asset) => new Request(new URL(asset, SITE_SCOPE), { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
