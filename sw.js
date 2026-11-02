@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v56-protocol-coverage';
+const CACHE_NAME = 'macro-longevity-offline-v57-lab-intervals';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -32,6 +32,8 @@ const STATIC_ASSETS = [
   'js/biomarker-library.js',
   'js/data/blueprint-markers.js',
   'js/data/lab-references.js',
+  'js/data/core-lab-intervals.js',
+  'js/data/lab-intervals.js',
   'js/data/extended-references.js',
   'js/data/specialist-references.js',
   'js/data/protocol-measurement-mappings.js',

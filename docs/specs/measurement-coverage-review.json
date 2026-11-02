@@ -26,6 +26,13 @@
     }
   ],
   "scope": "Versioned published lab lists, current Biomarkers/Measurement/daily measurement examples, archived results/routine/organ/fitness named measurements and explicit exclusions. Not every lifetime, future or unpublished test.",
+  "numericalReferenceReview": {
+    "status": "partial",
+    "scope": "Published lab intervals and banded references counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.",
+    "publishedLabIntervals": 40,
+    "bandedReferences": 15,
+    "otherReferenceGuidance": 303
+  },
   "counts": {
     "sourceEntries": 663,
     "accounted": 663,
@@ -36,6 +43,6 @@
     "searchFixtures": 652
   },
   "failures": [],
-  "entriesSha256": "c806bbf7d7403179af979e07e7150eb79cd585a74308a16acf19ec8841cc30ce",
-  "referenceContentSha256": "b8f285e201d3764aaab15c2fe9df87ab5e4b6b645b126b867a793d5bd6d75dd6"
+  "entriesSha256": "a4c718ed2c0b7cf8e7dae414bca617c88863f56af72c5811a952436c0cb50907",
+  "referenceContentSha256": "566d0916dfe02b5d779798faf8dda1bdbf9c4d2e8654989e04b9bb05ca7e23f4"
 }

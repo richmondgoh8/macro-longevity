@@ -1,6 +1,10 @@
 # Biomarker coverage implementation plan
 
 Status: versioned scope completed, deployed and verified as runtime `6535d61`.
+Numerical-reference correction (2026-11-02): the completed scope above was
+source-name/context coverage, not complete numerical ranges. Forty published
+lab examples now have explicit units, lab and population metadata; numerical
+applicability review remains partial. Preserve this distinction in release claims.
 Date: 2026-11-01. Baseline: `363eb4b`.
 Requirements: [Coverage specification](biomarker-coverage-spec.md).
 

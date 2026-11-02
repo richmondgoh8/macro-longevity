@@ -13,6 +13,8 @@ import { PROTOCOL_MAPPINGS, PROTOCOL_EXCLUSIONS } from '../js/data/protocol-meas
 import { measurementIdentity } from '../js/data/measurement-index.js';
 import { searchMeasurements } from '../js/components/measurement-search.js';
 import { MEASUREMENT_SOURCES } from '../js/data/measurement-sources.js';
+import { CORE_LAB_INTERVALS } from '../js/data/core-lab-intervals.js';
+import { LAB_INTERVALS } from '../js/data/lab-intervals.js';
 
 const read = name => JSON.parse(readFileSync(new URL(`../docs/specs/${name}.json`, import.meta.url)));
 const baseline = read('biomarker-coverage-inventory');
@@ -26,6 +28,11 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
   const map = new Map(mappings);
   const core = new Set(HEALTH_REFERENCES.map(item => item.id));
   const failures = [];
+  for (const id of Object.keys({ ...CORE_LAB_INTERVALS, ...LAB_INTERVALS })) {
+    const reference = byId.get(id);
+    const interval = reference?.labInterval;
+    if (!interval || !interval.lab || !interval.population || !interval.unit || !/\d/.test(interval.values) || !/^https:\/\//.test(interval.source) || !interval.reviewed || !reference.reference?.includes(interval.values) || reference.unit !== interval.unit) failures.push(`Missing published laboratory interval: ${id}`);
+  }
   if (map.size !== mappings.length) failures.push('Duplicate protocol mapping names.');
   const entries = [];
   const seen = new Set();
@@ -50,7 +57,7 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
       seen.add(id);
       return {
         id, homeCoverage: core.has(id) ? 'core-card' : 'extended-card', reference: `#biomarker-${id}`,
-        referenceCoverage: reference.bands ? 'source-linked-categories' : 'method/risk-specific-context',
+        referenceCoverage: reference.labInterval ? 'published-laboratory-interval' : reference.bands ? 'source-linked-categories' : 'method/risk-specific-context',
         actionCoverage: reference.actionLabel || 'specific-plan', guidanceSource: reference.source,
         actionSource: reference.extraSource || reference.source,
         healthCoverage: targets.length ? targets : ['reference-only'],
@@ -78,6 +85,13 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
     schemaVersion:1, reviewed:'2026-11-02', reviewScope:'Engineering source-name, mapping, guidance-link and search review; not specialist clinical approval.',
     status:failures.length?'incomplete':'complete', sources,
     scope:'Versioned published lab lists, current Biomarkers/Measurement/daily measurement examples, archived results/routine/organ/fitness named measurements and explicit exclusions. Not every lifetime, future or unpublished test.',
+    numericalReferenceReview: {
+      status: 'partial',
+      scope: 'Published lab intervals and banded references counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.',
+      publishedLabIntervals: references.filter(item => item.labInterval).length,
+      bandedReferences: references.filter(item => item.bands).length,
+      otherReferenceGuidance: references.filter(item => !item.labInterval && !item.bands).length,
+    },
     counts:{sourceEntries:entries.length,accounted:entries.filter(entry=>entry.reviewStatus==='source-checked').length,excluded:entries.filter(entry=>entry.disposition==='excluded').length,uniqueIncluded:included.length,guidanceDestinations:implemented.size,recordable:recordable.size,searchFixtures:entries.reduce((n,entry)=>n+entry.destinations.length,0)},
     failures, entries,
   };

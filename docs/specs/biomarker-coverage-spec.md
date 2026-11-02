@@ -1,6 +1,10 @@
 # Biomarker and physical-measurement coverage specification
 
 Status: versioned scope completed, deployed and verified (`6535d61`); not clinically approved.
+Correction (2026-11-02): that status covers source-name/context reconciliation,
+not complete numerical intervals. Numerical-reference review remains partial;
+40 lab examples and 15 banded references are now distinguished explicitly in
+the [review](measurement-coverage-review.md).
 Date: 2026-11-01. Original audited baseline: `363eb4b`.
 Companion: [Implementation plan](biomarker-coverage-plan.md).
 

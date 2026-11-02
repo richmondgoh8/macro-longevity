@@ -2,6 +2,49 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { auditMeasurementCoverage } from '../scripts/audit-measurement-coverage.mjs';
+import { EXTENDED_REFERENCES } from '../js/data/extended-references.js';
+import { reconcileMeasurements } from '../scripts/reconcile-measurements.mjs';
+
+test('routine numeric intervals have provenance and cannot regress to context-only coverage', () => {
+  const report = reconcileMeasurements();
+  expect(report.numericalReferenceReview.publishedLabIntervals).toBe(40);
+  expect(report.numericalReferenceReview.status).toBe('partial');
+  for (const reference of EXTENDED_REFERENCES.filter(item => item.labInterval)) {
+    expect(reference.reference).toContain(reference.labInterval.values);
+    expect(reference.reference).toContain(reference.labInterval.population);
+    expect(reference.source).toBe(reference.labInterval.source);
+    expect(reference.bands, reference.id).toBeUndefined();
+    expect(reference.reference).toContain('not a treatment target');
+  }
+  const incomplete = EXTENDED_REFERENCES.map(item => item.id === 'b12' ? { ...item, labInterval: undefined } : item);
+  expect(reconcileMeasurements({ references: incomplete }).failures).toContain('Missing published laboratory interval: b12');
+});
+
+test('B12 shows an actual adult lab interval before the extended catalogue loads', async ({ page }) => {
+  await page.goto('/');
+  const card = page.locator('#biomarker-b12');
+  await expect(card.locator('.sg-range-context')).toContainText('138–652 pmol/L');
+  await expect(card.locator('.sg-range-context')).toContainText('KKH; age ≥19 years');
+  await expect(card.getByRole('link', { name: 'Reference source for Vitamin B12', exact: true })).toHaveAttribute('href', 'https://www.kkh.com.sg/our-specialties/elab-book/vitamin-b12');
+  await page.getByRole('button', { name: 'Alternative units', exact: true }).click();
+  await expect(card.locator('.sg-reference-unit')).toHaveText('pmol/L');
+  await expect(card.locator('.sg-range-context')).toContainText('138–652 pmol/L');
+});
+
+test('extended numeric intervals preserve sex, specimen and assay distinctions', async ({ page }) => {
+  for (const [id, values, context] of [
+    ['hemoglobin', 'Male: 13.1–16.8; female: 11.5–14.9 g/dL', 'NUH; adult'],
+    ['bicarbonate', '22–29 mmol/L', 'serum total CO₂, not blood-gas bicarbonate'],
+    ['ft4', '8.8–14.4 pmol/L', 'SGH; adult example'],
+    ['phosphate', '0.7–1.5 mmol/L', 'KKH; age ≥19 years'],
+  ]) {
+    await page.goto(`/#biomarker-${id}`);
+    const card = page.locator(`#biomarker-${id}`);
+    await expect(card.locator('.sg-range-context')).toContainText(values);
+    await expect(card.locator('.sg-range-context')).toContainText(context);
+    await expect(card.locator('.sg-card-action')).toBeVisible();
+  }
+});
 
 test('Home search reveals a specialist reference with context and actions together', async ({ page }) => {
   await page.goto('/');

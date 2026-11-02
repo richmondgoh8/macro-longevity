@@ -64,7 +64,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v56-protocol-coverage');
+  expect(cacheKeys).toContain('macro-longevity-offline-v57-lab-intervals');
   expect(cacheKeys).toContain('other-app-preserve-test');
   expect(cacheKeys).not.toContain('macro-longevity-offline-v0-test');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
@@ -83,6 +83,9 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.goto(`${baseURL}/`);
   const reference = page.locator('[data-reference-card="apob"]');
   await expect(reference.locator('.sg-card-action')).toContainText('unsaturated');
+  await expect(page.locator('#biomarker-b12 .sg-range-context')).toContainText('138–652 pmol/L');
+  await page.goto(`${baseURL}/#biomarker-hemoglobin`);
+  await expect(page.locator('#biomarker-hemoglobin .sg-range-context')).toContainText('Male: 13.1–16.8; female: 11.5–14.9 g/dL');
   await expect(page.locator('[data-reference-group]')).toHaveCount(7);
   await page.goto(`${baseURL}/#biomarker-hearingright`);
   await expect(page.locator('#biomarker-hearingright .sg-card-action')).toBeVisible();

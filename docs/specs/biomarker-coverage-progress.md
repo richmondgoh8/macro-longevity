@@ -1,5 +1,23 @@
 # Coverage correction — implementation progress
 
+Numerical-reference correction, 2026-11-02: the previous completed scope was
+name/context coverage, not complete numerical ranges. Added 40 published lab
+examples plus numeric HDL/total-cholesterol screening guideposts, without
+inventing optimisation bands. Numeric applicability review remains partial
+(40 laboratory examples, 15 banded references, 303 other guidance destinations).
+See the numerical correction in [the review](measurement-coverage-review.md).
+Verification/deployment evidence for this correction is recorded separately;
+the older runtime evidence below does not verify these additions.
+
+Local verification of this numerical correction: audit passed (49 JavaScript
+files, 81 precached assets); quick regressions 110/110; performance 4/4;
+Home visual checks 6/6; explicit offline interval checks 2/2. B12 was also
+visually inspected. The longer upstream reference text changed fractional
+pixel placement in the otherwise unchanged colorectal-card screenshots;
+both desktop/mobile diffs were inspected before refreshing those two
+baselines. No tolerance was relaxed. Full unrelated-route UI suite was not
+rerun for this bounded data change. Saved-result schemas are unchanged.
+
 Updated 2026-11-02. Versioned scope completed, deployed and verified as runtime `6535d61`.
 Baseline for this correction: `363eb4b`.
 

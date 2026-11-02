@@ -5,6 +5,8 @@ import { ADDITIONAL_MARKERS } from './additional-screening.js';
 import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS } from './health-reference-groups.js';
 import { SG_MARKER_ACTIONS } from './screening-actions.js';
 import { measurementIdentity } from './measurement-index.js';
+import { LAB_INTERVALS } from './lab-intervals.js';
+import { withLabInterval } from './core-lab-intervals.js';
 
 const NLM = 'https://medlineplus.gov/lab-tests/';
 const encyclopedia = id => `https://medlineplus.gov/ency/article/${id}.htm`;
@@ -169,4 +171,4 @@ export const LAB_REFERENCES = BLUEPRINT_MARKERS.map(marker => {
     source: context.source ? NLM + context.source + '/' : source,
     extraSource: EXTRA_SOURCES[context.familyId],
   };
-});
+}).map(reference => withLabInterval(reference, LAB_INTERVALS));

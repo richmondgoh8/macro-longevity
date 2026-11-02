@@ -6,6 +6,15 @@ those captures remain unchanged so the original omissions remain reproducible.
 
 ## Scope and counts
 
+Correction following the B12 screenshot: the completed review below concerns
+source names, destinations and contextual guidance, **not complete numerical
+reference-range coverage**. That distinction was insufficiently prominent.
+Numerical-reference review remains partial: 40 explicitly sourced laboratory
+examples, 15 existing banded references, and 303 other guidance destinations.
+The latter include formulas, study estimates, screening and qualitative tests;
+they have not all been classified for numerical-interval applicability. Do not
+describe these counts as 358 complete reference ranges.
+
 | Dimension | Verified inventory |
 | --- | --- |
 | Source entries accounted for | 663 / 663 |
@@ -25,6 +34,35 @@ destination is not a claim that its component quantities are identical assays.
 The published panel remains 144 unique lab analytes; the whole guide is not
 marketed as 358 blood tests. Initial Home content remains 51 core cards; 307
 additional references load on demand inside the existing seven groups.
+
+## Numerical-interval correction (2026-11-02)
+
+- Added numerical examples to 40 destinations: B12, ferritin, ALT, AST, GGT,
+  ESR, homocysteine, cystatin C, 15 CBC/count indices, sodium, potassium,
+  creatinine, chloride, serum bicarbonate, total calcium, albumin, total
+  protein, total bilirubin, magnesium, serum iron, TSH, free T4, TPO antibodies,
+  urate, amylase and phosphate. Core examples are available immediately;
+  the larger registry is demand-loaded. Exact values/populations/units and
+  individual source URLs live in `core-lab-intervals.js` and `lab-intervals.js`.
+- Main primary sources: [KKH eLab catalogue](https://www.kkh.com.sg/our-specialties/elab-book/vitamin-b12),
+  [NUH full blood count](https://nuhsingapore.testcatalog.org/show/FBC),
+  [NHG Woodlands renal panel](https://www.nhghealth.com.sg/wh/our-partners/laboratory-services/test-catalogue/renal-panel),
+  [SGH free T4](https://www.sgh.com.sg/our-specialties/pathology/pathology-lab-services/thyroxine-t4-free-serum).
+  Cystatin C uses an explicitly labelled [Alfred Hospital Australian assay example](https://pathology.alfred.org.au/handbook/search?testid=870),
+  including its May 2026 reagent update; it is not represented as a Singapore interval.
+- Added paired published Singapore screening guideposts for HDL and total
+  cholesterol from [NUS University Health Centre](https://www.nus.edu.sg/uhc/articles/details/screening-for-heart-disease).
+  These are explicitly risk thresholds, not population intervals or treatment goals.
+- Retained clinical interpretation and action plans. No green/amber/red bands
+  were invented for lab intervals. Ferritin's lower lab bound does not establish
+  iron sufficiency. Sex, age, specimen and assay caveats remain visible.
+- No guessed BUN/urea, free/total hormone, absolute-count/percentage or Lp(a)
+  mass/molar conversions. Units on each example remain explicit when the global
+  alternative-units control has no source-backed paired interval.
+- The reconciliation now reports numerical coverage separately and rejects
+  removal of any required registry interval. The reviewed snapshot covers
+  numeric metadata as well as displayed text. This is source transcription and
+  engineering review, not independent clinical validation or a blanket testing plan.
 
 ## Reproducible row-level evidence
 

@@ -2,6 +2,7 @@
 // Keep uncertain, assay-dependent and emerging tests explicitly labelled.
 import { REFERENCE_RANGES } from './reference-ranges.js';
 import { PHYSICAL_REFERENCES } from './physical-measurements.js';
+import { CORE_LAB_INTERVALS, withLabInterval } from './core-lab-intervals.js';
 
 const LIVER = 'https://medlineplus.gov/lab-tests/liver-function-tests/';
 const B12 = 'https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/';
@@ -9,19 +10,21 @@ const SG_SCREEN = 'https://www.healthhub.sg/well-being-and-lifestyle/personal-ca
 const CLINICAL = [
   {
     id: 'hdl', label: 'HDL cholesterol', unit: 'mmol/L',
-    reference: 'Interpret HDL with LDL/non-HDL, ApoB and overall cardiovascular risk. There is no isolated HDL treatment target.',
+    reference: 'Singapore screening guidepost: HDL ≥1.0 mmol/L (40 mg/dL). This is a risk-assessment threshold, not a laboratory interval or a target to keep raising HDL. Interpret with LDL/non-HDL, ApoB and overall cardiovascular risk.',
     alternate: { unit: 'mg/dL' },
     note: 'HDL is not non-HDL cholesterol. A high HDL result does not cancel high LDL/ApoB, and continually raising HDL has not been established as a prevention strategy.',
     action: 'Build regular activity, replace saturated fats with unsaturated fats and stay smoke-free. Do not start drinking alcohol or add supplements just to raise HDL; address overall cardiovascular risk instead.',
     source: 'https://www.heart.org/en/health-topics/cholesterol/your-complete-guide-to-understanding-cholesterol-and-lipids',
+    extraSource: 'https://www.nus.edu.sg/uhc/articles/details/screening-for-heart-disease',
   },
   {
     id: 'totalchol', label: 'Total cholesterol', unit: 'mmol/L',
-    reference: 'A component of the full lipid panel, not a standalone personal treatment target. Interpret the LDL, HDL and triglyceride components together.',
+    reference: 'Singapore screening guidepost: total cholesterol <5.2 mmol/L (200 mg/dL). This is not a personal treatment target or a population laboratory interval. Interpret the LDL, HDL and triglyceride components together.',
     alternate: { unit: 'mg/dL' },
     note: 'Total cholesterol combines cholesterol in different lipoproteins. A single total does not show atherogenic particle burden; individual risk and the rest of the panel matter.',
     action: 'Replace butter/ghee and fatty processed meats with unsaturated oils, beans, tofu or fish. Choose fibre-rich wholegrains and legumes and keep regular activity; take indicated lipid treatment consistently.',
     source: 'https://www.heart.org/en/health-topics/cholesterol/your-complete-guide-to-understanding-cholesterol-and-lipids',
+    extraSource: 'https://www.nus.edu.sg/uhc/articles/details/screening-for-heart-disease',
   },
   {
     id: 'insulin', label: 'Fasting insulin', unit: 'µIU/mL',
@@ -61,7 +64,7 @@ const CLINICAL = [
   {
     id: 'ferritin', label: 'Ferritin', unit: 'µg/L (= ng/mL)',
     reference: 'Use your age-/sex-specific laboratory interval. Both low iron stores and unexplained high ferritin need context.',
-    note: 'Ferritin reflects iron storage but also rises with inflammation and liver disease. A high result alone does not prove iron overload; interpret with transferrin saturation and the clinical picture.',
+    note: 'Ferritin reflects iron storage but also rises with inflammation and liver disease. The lower limit of an example lab interval does not rule out iron deficiency. A high result alone does not prove iron overload; interpret with transferrin saturation and the clinical picture.',
     action: 'Do not add iron supplements without a demonstrated need. Avoid self-directed blood donation or phlebotomy to lower ferritin; treat a confirmed deficiency or overload using the agreed plan.',
     source: 'https://medlineplus.gov/lab-tests/ferritin-blood-test/',
   },
@@ -212,10 +215,10 @@ const CLINICAL = [
   },
 ];
 
-export const HEALTH_REFERENCES = [...REFERENCE_RANGES, ...CLINICAL, ...PHYSICAL_REFERENCES].map(reference => ({
+export const HEALTH_REFERENCES = [...REFERENCE_RANGES, ...CLINICAL, ...PHYSICAL_REFERENCES].map(reference => withLabInterval({
   ...reference,
   note: reference.note + (reference.id === 'hba1c' ? ' A target of 4.8–5.3% is not an established universal longevity recommendation.' : reference.id === 'hscrp' ? ' Targets below 0.8 or 0.5 mg/L are not universal treatment goals.' : ''),
-}));
+}, CORE_LAB_INTERVALS));
 
 export const HEALTH_REFERENCE_GROUPS = [
   {
