@@ -1,7 +1,7 @@
 # Biomarker coverage implementation plan
 
 Status: source-name/context scope completed; numerical-reference review partial.
-Latest verified runtime: `678b3b2` (numerical correction).
+Latest verified runtime: `2c1d610` (range layout and cache refresh).
 Numerical-reference correction (2026-11-02): the completed scope above was
 source-name/context coverage, not complete numerical ranges. Forty published
 lab examples now have explicit units, lab and population metadata; numerical

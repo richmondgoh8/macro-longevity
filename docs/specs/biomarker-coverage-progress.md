@@ -32,6 +32,19 @@
   regression primes a one-hour stale HTTP-cache entry, confirms ordinary fetch
   still returns it after the server changes, and verifies installation fetches
   the new renderer. All eight service-worker checks passed on desktop/mobile.
+- Final runtime: `2c1d6105c92516287204c0b023fe8a7249f04f02`.
+  [Quality 41479094507](https://github.com/richmondgoh8/macro-longevity/actions/runs/41479094507)
+  passed 58 checks per project (116 total), and
+  [Pages 41479542743](https://github.com/richmondgoh8/macro-longevity/actions/runs/41479542743)
+  published that exact SHA. Five changed runtime files byte-matched the live site.
+  A controlled live recovery trial inserted the pre-layout renderer into an
+  isolated browser cache and forced reinstallation using a unique worker URL
+  at the same scope. All four cached layout assets then matched the release.
+  Live action alignment at 1024/1440px passed with details closed/open; keyboard,
+  390px offline references and saved Health results passed. All three raw result
+  stores remained byte-identical without reseeding, an unrelated cache remained,
+  and page errors were zero. This was controlled reinstall/recovery, not an
+  untouched v58-to-v59 natural-update trial.
 
 ## Numerical-reference correction — earlier checkpoint
 
