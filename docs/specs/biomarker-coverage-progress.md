@@ -1,7 +1,13 @@
 # Coverage correction — implementation progress
 
-Updated 2026-11-02. Overall goal remains active; full completion is unproven.
+Updated 2026-11-02. Versioned-scope implementation complete; final release verification ongoing.
 Baseline for this correction: `363eb4b`.
+
+Current implementation: 663 source entries accounted for, 358 unique reference
+destinations, 38 explicit exclusions, 159 designated recordable measurements and
+652 source-name search fixtures. The [review](measurement-coverage-review.md)
+and reproducible row-level reconciliation supersede the frozen pending statuses
+below. No clinician approval or universal lifetime-test coverage is claimed.
 
 Planning refresh: the specification now distinguishes the original audit from the
 published incremental release. The plan includes a current-state checkpoint,
@@ -208,3 +214,59 @@ includes full current/archive named-entry reconciliation, row-level review/statu
 records and broader specialist/physical destinations. This slice's release
 checks are complete; full-inventory completion is not. No specialist clinical
 approval or physical-device testing is claimed.
+
+## Full versioned-scope implementation and release verification
+
+Implemented 2026-11-02; full local verification passed, publication evidence pending.
+
+- Completed chosen current/archive source reconciliation without rewriting the
+  frozen baseline. Added an independent 136-row archive supplement and one current
+  air-quality example, explicit mappings/bundles/exclusions and a reproducible
+  row-level report. Counts: 663/663 source entries accounted for, 358/358 distinct
+  guidance destinations, 652/652 source-name search fixtures and 159 designated
+  recordable canonical measurements. The 38 exclusions do not count as implemented.
+- Added 182 reference-only specialist destinations, including hearing/eye/oral,
+  sleep/oxygen/temperature, lung/vascular/cardiac/brain assessments, performance,
+  additional nutrients, infection testing and research assays. Specific meanings,
+  labelled shared plans, food-first nutrient actions and historical/current status
+  accompany the method-specific context; no invented longevity intervals.
+- Preserved all 51 initially visible core cards and the seven groups. Full reading
+  shows 358 cards; Home and Health search reach the same specialist destinations.
+  No fake result forms or extra Home recording CTA. Existing result stores/fields
+  remain unchanged. Native disclosures follow the web/UI skills' guidance; no new
+  framework, runtime dependency, custom listbox or design-service dependency.
+- A failing FEV1 browser test reproduced the missing destination before wiring.
+  New mutation checks reject removed mappings, missing guidance, an unaccounted
+  exclusion, wrong HDL/non-HDL identity and boilerplate actions. The normal audit
+  verifies the reviewed source/content checksums, never live-scrapes sources in CI.
+- Fixed Health's immediate-Enter race by awaiting the current search; a delayed
+  module response is covered on both projects. Stale previous-query results are
+  cleared while loading. Reference-only links are explicitly labelled.
+- Quick suite: 102 passed (2.7 minutes) before the final Enter case was added;
+  the two new Enter regressions subsequently passed. All four performance tests
+  passed unchanged budgets, now including FEV1, selenium and DunedinPoAm queries.
+  Audit: seven pages, 49 JS modules, 79 cached assets. npm audit: zero vulnerabilities.
+- Existing Home visual baselines passed unchanged on both projects. Reviewed new
+  390px/1440px hearing screenshots. Expanded guide had no horizontal overflow at
+  320/390/768/844-landscape/1440px at 100% and 200% text. Shortened complete-reading
+  feedback after visual review to keep the contents rail compact.
+- Chromium 151 and the available cached Firefox 151 binary passed targeted
+  specialist loading, all-card rendering, search/navigation, section tracking after
+  full expansion and mobile enlarged-text checks. This is a Firefox smoke check,
+  not the full Chromium suite or physical-device/Safari certification.
+- Actual v55-to-v56 update on a `/macro-longevity/` test origin preserved all three
+  stores byte-for-byte, including distinct HDL values; restored signed BMD; removed
+  only the old app cache and retained an unrelated cache. New Home/Health guidance
+  worked offline. One initial rapid-navigation probe emitted Chromium's native
+  “Transition was skipped” cancellation; reviewed primary platform guidance and
+  repeated with transitions settled: zero page errors. No application-wide error
+  filter or unnecessary transition script was added to hide it.
+
+- Final frozen-runtime suite: **356 passed, four expected skips (7.0 minutes)**,
+  including both Enter regressions, full source/content checks, expanded guide
+  accessibility/print, all visual baselines and expanded performance searches.
+  No assertions, budgets, screenshot tolerances or baselines were weakened.
+
+CI, exact-SHA Pages publication and isolated live acceptance remain the final
+release gates. Scope/clinical limitations are documented in
+[the review](measurement-coverage-review.md), not silently deferred implementation.

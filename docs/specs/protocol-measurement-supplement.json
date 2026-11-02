@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "retrieved": "2026-11-02",
+  "scope": "Completes the chosen archive results/routine/organ/fitness measurement sections (652–1321), explicitly accounts for unfinished/undefined items, and adds the current daily air-quality check. Names only; no personal values, ages or treatment regimens copied.",
+  "source": "https://protocol-museum.bryanjohnson.com/",
+  "currentSource": "https://protocol.bryanjohnson.com/",
+  "columns": ["sourceLine", "originalName", "mappingName"],
+  "archiveSections": [
+    {
+      "section": "Routine measurement details",
+      "rows": [
+        [864, "Vein health for blood draws (via ultrasound)", "Vein health for blood draws (via ultrasound)"],
+        [866, "Whole body MRI cancer screening", "Whole body MRI cancer screening"],
+        [870, "Right plantar 2 point discrimination", "Right plantar 2 point discrimination"],
+        [873, "cysts, parenchymal thickness abnormalities", "Kidney cysts and parenchymal thickness"],
+        [874, "Renal interlobar arteries resistive index (RRI)", "Renal interlobar arteries resistive index"],
+        [877, "Thyroid volume", "Thyroid volume"],
+        [881, "Prostate volume", "Prostate volume"],
+        [889, "Pulse Wave Velocity", "Pulse Wave Velocity"],
+        [891, "Blood urea nitrogen", "Blood urea nitrogen"],
+        [896, "follistatin levels", "Follistatin levels"]
+      ]
+    },
+    {
+      "section": "Heart measurement protocol and markers",
+      "rows": [
+        [913, "MRI", "Heart MRI"], [914, "Ultrasound", "Heart ultrasound"], [915, "RHR, HRV, VO2Max", "RHR, HRV, VO2Max"],
+        [922, "LV septal A’ mitral", "LV septal A’ mitral"], [923, "Aortic root diameter", "Aortic root diameter"],
+        [924, "LA E’ latbasal", "LA E’ latbasal"], [925, "RVSP", "RVSP"], [926, "LV sepal E/E’", "LV sepal E/E’"],
+        [927, "RV E/A", "RV E/A"], [928, "MaxHR", "MaxHR"], [929, "LV E/A", "LV E/A"],
+        [934, "total plaque area", "Carotid plaque area"], [935, "Internal carotid artery maximum intima media thicknesses", "Internal carotid artery maximum intima media thicknesses"],
+        [937, "Intraventricular relaxation time (IVRT)", "Intraventricular relaxation time"],
+        [938, "E/A pulsed wave doppler in the mitral valve", "Mitral E/A pulsed wave Doppler"],
+        [939, "septal LV E’ (e prime) mitral annulus speed", "Septal LV E’ mitral annulus speed"]
+      ]
+    },
+    {
+      "section": "Brain measurement protocol and markers",
+      "rows": [
+        [947, "3D T1, T2, T2 FLAIR, mag, phase, minIP, SWI, 2/3D MRA, 2/3D MRV, 3D DTI, triple 2D DWI, ASL, CSF, SPACE", "Brain MRI sequences"],
+        [947, "ultrasound", "Brain ultrasound"], [947, "cognitive testing", "Cognitive testing"], [947, "EEG", "EEG"], [947, "peripheral blood markers etc.", "Peripheral blood markers etc."],
+        [951, "White Matter Hyperintensities", "White Matter Hyperintensities"], [952, "Pineal calcification", "Pineal calcification"],
+        [953, "Ventricular volume", "Ventricular volume"], [954, "Cortical grey vol", "Cortical grey vol"], [955, "AI T1 brain age", "AI T1 brain age"],
+        [956, "RAVENS PM", "RAVENS PM"], [957, "Total Cerebral WMV", "Total Cerebral WMV"], [958, "WASO", "WASO"]
+      ]
+    },
+    {
+      "section": "Lung measurement protocol and markers",
+      "rows": [
+        [968, "Ultrasound", "Lung ultrasound"], [969, "Functional markers", "Functional markers"], [973, "FEV1", "FEV1"], [974, "FVC", "FVC"],
+        [975, "PEFR", "PEFR"], [976, "A lines", "A lines"], [977, "DLCOc", "DLCOc"], [978, "KCOc", "KCOc"], [979, "MIP & MEP", "MIP & MEP"]
+      ]
+    },
+    {
+      "section": "Gastrointestinal and joint measurements",
+      "rows": [
+        [985, "Small bowel capsule camera", "Small bowel capsule camera"], [988, "Microbiome, GI Effects", "Microbiome, GI Effects"], [989, "Stool", "Stool"],
+        [993, "SCFAs & elastase", "SCFAs & elastase"], [994, "Polyps", "Polyps"], [995, "Bleeds", "Bleeds"], [996, "Serial FIT FOBT, Cologuard Gen 1", "Serial FIT FOBT, Cologuard Gen 1"],
+        [1011, "MRI and musculoskeletal ultrasound", "Joint MRI and musculoskeletal ultrasound"]
+      ]
+    },
+    {
+      "section": "Hair and skin measurement protocol and markers",
+      "rows": [
+        [1059, "Grey+white", "Grey+white"], [1060, "Quant Hamilton-Norwood", "Quant Hamilton-Norwood"],
+        [1067, "Multi Spectral Imaging", "Multi Spectral Imaging"], [1068, "Autofluorescence", "Autofluorescence"], [1069, "Merz", "Merz"],
+        [1073, "Spots", "Spots"], [1074, "Wrinkles", "Wrinkles"], [1075, "Texture", "Texture"], [1076, "Pores", "Pores"],
+        [1077, "UV Spots", "UV Spots"], [1078, "Brown spots", "Brown spots"], [1079, "Red areas", "Red areas"],
+        [1080, "Autofluorescence", "Autofluorescence"], [1081, "Multispectral imaging face age", "Multispectral imaging face age"]
+      ]
+    },
+    {
+      "section": "Eye and ear measurement protocol and markers",
+      "rows": [
+        [1112, "Drusen volume", "Drusen volume"], [1113, "Enhanced depth imaging optical coherence tomography subfoveal choroidal thickness", "Sub-foveal choroidal thickness EDI-SD-OCT"],
+        [1114, "IOP", "IOP"], [1115, "Accommodative distance", "Accommodative distance"], [1116, "Eyelash length", "Eyelash length"],
+        [1119, "Sub-foveal choroidal thickness", "Sub-foveal choroidal thickness EDI-SD-OCT"], [1126, "digital audiometric setup", "Digital audiometry"],
+        [1131, "Right ear normal freq", "Right ear normal freq"], [1132, "Left ear normal freq", "Left ear normal freq"], [1133, "Right ear EHF", "Right ear EHF"], [1134, "Left ear EHF", "Left ear EHF"],
+        [1135, "Typmpanometric, OAE, cochlear magnetic resonance markers, waxome TBC", "Typmpanometric, OAE, cochlear magnetic resonance markers, waxome TBC"], [1136, "Pinna age", "Pinna age"]
+      ]
+    },
+    {
+      "section": "Oral, sleep and other measurements",
+      "rows": [
+        [1143, "Plaque index, recession, attachment loss", "Plaque index, recession, attachment loss"], [1147, "plaque index", "Plaque index"],
+        [1161, "plaque index", "Plaque index"], [1164, "Gingival index and calculus index", "Gingival index and calculus index"],
+        [1180, "sleep score performance; recovery score", "Sleep score and recovery score"], [1187, "PBMC LIfelength QFISH median telomere length", "PBMC LIfelength QFISH median telomere length"],
+        [1191, "Pancreatic elastase", "Pancreatic elastase"], [1195, "Tendons enthuses US", "Tendons enthuses US"], [1196, "[other]", "[other]"],
+        [1200, "Volume (Bolivia tribe)", "Volume (Bolivia tribe)"], [1201, "Volume (westerner)", "Volume (westerner)"], [1205, "Abdo aorta IMT", "Abdo aorta IMT"], [1206, "CCA IMT", "CCA IMT"]
+      ]
+    },
+    {
+      "section": "Organs explicitly marked to complete measurement for",
+      "rows": [
+        [1209, "Thymus", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1210, "Liver & GB", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1211, "Pancreas", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1212, "Bone marrow", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1213, "Retina", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1214, "Stomach, esophagus, large Bowel/small bowel", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1215, "Mesentery", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1216, "Trachea", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1217, "Larynx", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1218, "Pharynx", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1219, "Lips", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1220, "Bronchi/oles", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1221, "Glymphatics", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1222, "Lymphatics", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1223, "Spleen", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1224, "Ureters, bladder, urethra", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1225, "Middle ear", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1226, "Nose, tongue", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1227, "Peno-scrotal", "ORGANS TO COMPLETE MEASUREMENT FOR"], [1228, "Cartilage, ligaments", "ORGANS TO COMPLETE MEASUREMENT FOR"],
+        [1229, "Motor & sensory nerves, spinal cord", "ORGANS TO COMPLETE MEASUREMENT FOR"]
+      ]
+    },
+    {
+      "section": "Sexual-health testing",
+      "rows": [
+        [1232, "Urine Chlamydia", "Urine Chlamydia"], [1233, "Urine Gonorrhea", "Urine Gonorrhea"], [1234, "Hepatitis B [blood]", "Hepatitis B [blood]"],
+        [1235, "HepB core antibody, surface antibody, and surface antigen", "HepB core antibody, surface antibody, and surface antigen"], [1236, "Hepatitis C [blood]", "Hepatitis C [blood]"],
+        [1237, "Herpes Simplex Virus I (Typically Oral Herpes)", "Herpes Simplex Virus I (Typically Oral Herpes)"], [1238, "Herpes Simplex Virus II (Typically Genital Herpes)", "Herpes Simplex Virus II (Typically Genital Herpes)"],
+        [1239, "Oral Human Papilloma Virus (HPV)", "Oral Human Papilloma Virus (HPV)"], [1240, "PCR HPV 20 subtypes", "PCR HPV 20 subtypes"],
+        [1241, "HIV 1 [blood]", "HIV 1 [blood]"], [1242, "HIV 2 [blood]", "HIV 2 [blood]"], [1243, "RPR Syphilis [blood]", "RPR Syphilis [blood]"]
+      ]
+    },
+    {
+      "section": "Fitness scores and named lung challenge",
+      "rows": [
+        [1316, "Bench press single rep max", "Bench press single rep max"], [1317, "VO2 max", "VO2 max"], [1318, "Leg press, single rep max", "Leg press, single rep max"],
+        [1319, "Push ups, continuous", "Push ups, continuous"], [1320, "YMCA sit and reach", "YMCA sit and reach"], [1321, "Grip strength (dominant hand)", "Grip strength (dominant hand)"],
+        [1339, "LUNG B LINES", "Lung B lines"]
+      ]
+    }
+  ],
+  "currentSections": [
+    {"section": "Morning longevity protocol", "rows": [[538, "Check air quality indoors and outdoors", "Check air quality indoors and outdoors"]]}
+  ],
+  "limitations": [
+    "Frozen retrieval/version scope, not every historical post, therapy, future test or lifetime measurement.",
+    "Anatomical case diagnoses and exercise prescriptions are not reclassified as new biomarkers.",
+    "Brain sequence bundle, hepatitis B panel, sleep and body-composition bundles preserve their components/context rather than inflate unique-test counts.",
+    "Some source prose is malformed or uses undefined abbreviations; exclusions and annotated bundled mappings remain explicit."
+  ]
+}

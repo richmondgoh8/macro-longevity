@@ -104,6 +104,7 @@ const javascriptFiles = [
   'js/data/reference-ranges.js',
   'js/data/health-reference-groups.js',
   'js/data/lab-references.js', 'js/components/reference-navigation.js',
+  'js/data/extended-references.js', 'js/data/specialist-references.js', 'js/data/protocol-measurement-mappings.js',
   'js/biomarker-library.js', 'js/data/blueprint-markers.js',
   'js/data/screening-actions.js',
   'js/data/reference-actions.js',
@@ -121,6 +122,9 @@ javascriptFiles.forEach((file) => {
 const coverage = spawnSync(process.execPath, ['scripts/audit-measurement-coverage.mjs'], { cwd: root, encoding: 'utf8' });
 check(coverage.status === 0, `Measurement coverage baseline failed: ${coverage.stderr}`);
 if (coverage.stdout) console.log(coverage.stdout.trim());
+const completeCoverage = spawnSync(process.execPath, ['scripts/reconcile-measurements.mjs', '--check-snapshot'], { cwd: root, encoding: 'utf8' });
+check(completeCoverage.status === 0, `Full versioned measurement reconciliation failed: ${completeCoverage.stderr}`);
+if (completeCoverage.stdout) console.log(`Reconciled coverage: ${completeCoverage.stdout.trim()}`);
 
 if (failures.length) {
   console.error(`Audit failed with ${failures.length} issue(s):`);

@@ -1,6 +1,6 @@
 # Biomarker coverage implementation plan
 
-Status: implementation in progress following the user's 2026-11-01 instruction to proceed.
+Status: versioned-scope implementation complete; full release verification in progress.
 Date: 2026-11-01. Baseline: `363eb4b`.
 Requirements: [Coverage specification](biomarker-coverage-spec.md).
 
@@ -13,11 +13,11 @@ slice and its test/deployment evidence; the broader goal remains active.
 
 | Workstream | Current state | Next exit condition |
 | --- | --- | --- |
-| Source inventory | Baseline frozen; published lab names independently compared; current/archive extracts partial | All chosen sections extracted, every source row dispositioned, no ambiguous included mappings |
-| Identity/search | Shared matcher and initial aliases shipped | All included identities explicitly mapped; Home and Health reach each designated destination |
+| Source inventory | 663 versioned source entries accounted for; 38 explicit exclusions; frozen baseline preserved | Preserve reviewed source/mapping checksums in the full coverage gate |
+| Identity/search | 358 distinct destinations and 652 source-name fixtures; Home and Health wired | Finish full-suite/live verification of this release |
 | Reported P0 gaps | Incremental release shipped with 51 Home cards and 13 physical cards | Preserve regressions; finish evidence/status reconciliation rather than rebuilding fields |
-| Specialist guidance | Published 144-entry lab guide implemented with canonical Home destinations and labelled family plans; broader inventory pending | Finish current/archive specialist and physical reconciliation and row-level review records |
-| Release hardening | Incremental local/CI/live evidence recorded | Complete-scope print, old-worker upgrade, search timing and final release gates pass |
+| Specialist guidance | Full chosen current/archive scope implemented, including reference-only specialist/research entries and row-level evidence | No independent clinical-specialist approval is claimed; complete engineering release checks |
+| Release hardening | Coverage gate and expanded search budgets pass; browser verification ongoing | Full suite, reviewed screenshots, v55-to-v56 upgrade, exact-SHA deployment and live smoke |
 
 ## Published lab guidance slice — implemented and deployed as `ff920d6`
 

@@ -9,7 +9,7 @@ export function searchMeasurements(items, query, label = item => item.label || i
   const tokens = normalized.split(' ');
   return items.map((item, index) => {
     const identity = measurementIdentity(item.id);
-    const names = [label(item), item.id, identity.id, identity.libraryId, ...identity.aliases, ...(item.aliases ? [item.aliases] : [])].map(normalizeMeasurement);
+    const names = [label(item), item.id, identity.id, identity.libraryId, ...identity.aliases, ...(Array.isArray(item.aliases) ? item.aliases : item.aliases ? [item.aliases] : [])].map(normalizeMeasurement);
     const exact = names.some(name => name === normalized);
     const words = names.join(' ').split(' ');
     const match = exact || tokens.every(token => words.some(word => word.startsWith(token)));

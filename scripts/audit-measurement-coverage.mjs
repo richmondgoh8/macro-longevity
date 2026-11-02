@@ -65,6 +65,6 @@ export function auditMeasurementCoverage({ inventory, references = HEALTH_REFERE
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const inventory = JSON.parse(readFileSync(new URL('../docs/specs/biomarker-coverage-inventory.json', import.meta.url)));
   const report = auditMeasurementCoverage({ inventory, requireComplete: process.argv.includes('--require-complete') });
-  console.log(`Measurement baseline: ${report.sourceEntries} source entries, ${report.uniqueIncluded} unique included IDs, ${report.references} core Home references, ${report.labReferences} published lab references, ${report.pendingReview} source-entry reviews pending.`);
+  console.log(`Frozen pre-implementation baseline: ${report.sourceEntries} source entries, ${report.uniqueIncluded} original IDs, ${report.references} current core Home references, ${report.labReferences} published lab references, ${report.pendingReview} original pending statuses (superseded by the reconciled review).`);
   if (report.failures.length) { console.error(report.failures.join('\n')); process.exitCode = 1; }
 }

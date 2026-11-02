@@ -96,14 +96,14 @@ test('Home and Health search paint results promptly under CPU throttling', async
   const session = await context.newCDPSession(page);
   await session.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   for (const [route, name, selector, queries] of [
-    ['/', 'Find a biomarker', '[data-reference-results]', ['HDL-C', 'hand grip', 'bone density']],
-    ['/pages/blood.html', 'Find a result field', '[data-health-results]', ['HDL-C', 'TIBC', 'bone density']],
+    ['/', 'Find a biomarker', '[data-reference-results]', ['HDL-C', 'hand grip', 'bone density', 'FEV1', 'selenium', 'DunedinPoAm']],
+    ['/pages/blood.html', 'Find a result field', '[data-health-results]', ['HDL-C', 'TIBC', 'bone density', 'FEV1', 'selenium', 'DunedinPoAm']],
   ]) {
     await page.goto(route);
     const input = page.getByRole('searchbox', { name });
     if (!await input.isVisible()) await page.locator('.sg-reference-picker > summary').click();
     // Measure repeated index searches separately from optional module download time.
-    await input.fill('grip');
+    await input.fill('FEV1');
     await expect(page.locator(`${selector} a`).first()).toBeVisible();
     await input.evaluate((input, selector) => {
       const results = document.querySelector(selector);

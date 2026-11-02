@@ -53,7 +53,7 @@ test('specialist direct links, browser Back and complete-reference reading work'
   await expect(page.locator('#biomarker-antinuclearantibodiestiter')).toBeVisible();
   await page.goto('/');
   if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
-  await page.getByRole('button', { name: 'Show all lab references' }).click();
+  await page.getByRole('button', { name: 'Show all references', exact: true }).click();
   await expect(page.locator('#biomarker-abogroup')).toBeVisible();
   await expect(page.locator('#biomarker-abogroup .sg-card-action')).toContainText('No lifestyle intervention');
   const mounted = await page.locator('[data-reference-card]').evaluateAll(cards => cards.map(card => ({

@@ -1,6 +1,6 @@
 # Biomarker and physical-measurement coverage specification
 
-Status: implementation contract; partially implemented, not clinically approved.
+Status: versioned-scope implementation complete; release verification in progress, not clinically approved.
 Date: 2026-11-01. Original audited baseline: `363eb4b`.
 Companion: [Implementation plan](biomarker-coverage-plan.md).
 
@@ -22,6 +22,14 @@ destinations for all 144 unique captured published lab entries (19 core reused,
 125 extended), full published-lab Home search and library links. Native
 disclosures retain the initial 51-card guide; complete reading shows 176 cards.
 Current/archive reconciliation and row-level review records remain unfinished.
+
+The subsequent full-scope implementation supersedes that remaining-work status:
+663 versioned source entries are accounted for, with 358 distinct reference
+destinations and 38 explicit exclusions. Engineering/source review and exact
+scope are recorded in [the coverage review](measurement-coverage-review.md).
+The original captures remain frozen; their pending statuses are historical, not
+the current implementation status. Full release evidence is pending in the
+progress log until all final tests and publication checks finish.
 
 ## 1. Outcome and problem
 

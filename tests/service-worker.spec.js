@@ -64,7 +64,7 @@ test('service worker installs the current cache and serves fast offline navigati
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
   const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v55-lab-references');
+  expect(cacheKeys).toContain('macro-longevity-offline-v56-protocol-coverage');
   expect(cacheKeys).toContain('other-app-preserve-test');
   expect(cacheKeys).not.toContain('macro-longevity-offline-v0-test');
   expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
@@ -84,6 +84,12 @@ test('service worker installs the current cache and serves fast offline navigati
   const reference = page.locator('[data-reference-card="apob"]');
   await expect(reference.locator('.sg-card-action')).toContainText('unsaturated');
   await expect(page.locator('[data-reference-group]')).toHaveCount(7);
+  await page.goto(`${baseURL}/#biomarker-hearingright`);
+  await expect(page.locator('#biomarker-hearingright .sg-card-action')).toBeVisible();
+  await page.goto(`${baseURL}/pages/blood.html`);
+  await page.locator('[data-health-search]').fill('FEV1');
+  await page.locator('[data-health-results] a[href="../#biomarker-fev1"]').click();
+  await expect(page.locator('#biomarker-fev1 .sg-card-action')).toBeVisible();
   await expect(page.locator('#sg-home-dashboard input')).toHaveCount(1);
   const picker = page.locator('.sg-reference-picker');
   if (await picker.getAttribute('open') === null) await picker.locator('summary').click();

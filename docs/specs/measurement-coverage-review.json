@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "reviewed": "2026-11-02",
+  "reviewScope": "Engineering source-name, mapping, guidance-link and search review; not specialist clinical approval.",
+  "status": "complete",
+  "sources": [
+    {
+      "fixture": "biomarker-coverage-inventory.json",
+      "sha256": "a5b431bae2454b2f604001a4104a245e81b3075d430b5727279a21faffc82cd4"
+    },
+    {
+      "fixture": "archived-measurement-extraction.json",
+      "sha256": "21b284e193175cd3876a868bf76b8006da6fe34d5c6d635ed8dc820b4cd06e9f"
+    },
+    {
+      "fixture": "current-protocol-measurement-extraction.json",
+      "sha256": "dc78fa9219f7f551ea8958728763f648333628db2a41cd4530a610398309bdd7"
+    },
+    {
+      "fixture": "protocol-measurement-supplement.json",
+      "sha256": "7d5100ee588aa3d5dd9aa669578e78834d6670a364c936c1e59f6492c0d53cc8"
+    },
+    {
+      "fixture": "published-panel-reconciliation.json",
+      "sha256": "7b4e1bcbb117b485705d87fd1d5cb7c1121290e480a17644025348494b1a7fd7"
+    }
+  ],
+  "scope": "Versioned published lab lists, current Biomarkers/Measurement/daily measurement examples, archived results/routine/organ/fitness named measurements and explicit exclusions. Not every lifetime, future or unpublished test.",
+  "counts": {
+    "sourceEntries": 663,
+    "accounted": 663,
+    "excluded": 38,
+    "uniqueIncluded": 358,
+    "guidanceDestinations": 358,
+    "recordable": 159,
+    "searchFixtures": 652
+  },
+  "failures": [],
+  "entriesSha256": "c806bbf7d7403179af979e07e7150eb79cd585a74308a16acf19ec8841cc30ce",
+  "referenceContentSha256": "b8f285e201d3764aaab15c2fe9df87ab5e4b6b645b126b867a793d5bd6d75dd6"
+}

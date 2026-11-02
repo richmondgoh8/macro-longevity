@@ -23,7 +23,10 @@ export function initReferenceNavigation(mount, groups, references, extended) {
   function loadCatalogue() {
     if (!catalogueTask) catalogueTask = extended.load().then(items => {
       const known = new Set(searchIndex.map(item => item.id));
-      items.filter(item => !known.has(item.id)).forEach(item => searchIndex.push({ ...item, group: `${groups.find(group => group.id === item.groupId).short} · Extended lab reference` }));
+      for (const item of items) {
+        if (known.has(item.id)) searchIndex.find(entry => entry.id === item.id).aliases = item.aliases;
+        else searchIndex.push({ ...item, group: `${groups.find(group => group.id === item.groupId).short} · Extended reference` });
+      }
       catalogueReady = true;
     }).catch(error => { catalogueTask = undefined; throw error; });
     return catalogueTask;
