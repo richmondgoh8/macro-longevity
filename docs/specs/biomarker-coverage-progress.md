@@ -1,6 +1,6 @@
 # Coverage correction — implementation progress
 
-Updated 2026-11-01. Overall goal remains active; full completion is unproven.
+Updated 2026-11-02. Overall goal remains active; full completion is unproven.
 Baseline for this correction: `363eb4b`.
 
 Planning refresh: the specification now distinguishes the original audit from the
@@ -141,3 +141,59 @@ Published and verified on 2026-11-01 at runtime revision
 Remaining scope is unchanged: optional-card explanations do not provide all 144
 lab entries with Home reference/action destinations, complete the historical
 inventory, or make full-catalogue search and print complete.
+
+## Published-lab reference and navigation slice
+
+Implemented locally 2026-11-01/02; publication evidence pending.
+
+- The captured 144 unique published lab entries now have explicit canonical
+  reference destinations: 19 reuse core cards and 125 are extended cards. With
+  the 51 core references, complete reading shows 176 unique cards, not 195.
+  This is published-lab coverage, not every current/archive physical measurement.
+- Added individual analyte explanations plus labelled shared family context,
+  actions or no-self-directed-target rationale. Qualitative findings, inherited
+  blood groups, immature cells, urine microscopy, hormones and assay-specific
+  profiles are not forced into invented green/amber/red numerical bands.
+- Added native extended disclosures inside six of the existing seven groups;
+  all 51 core cards/actions remain initially visible. Rich data loads on demand.
+  Home search, copied links, direct fragments, reload and Back reach actual cards.
+  Library rows link to the same canonical destinations; saved observations remain
+  in their original stores. PSA analytes remain separate from PSA screening.
+- A complete-reading control expands the published labs before printing. A print
+  of an unloaded guide explicitly warns about missing extended content. Printing
+  loaded content expands it synchronously and restores the prior disclosure state.
+  Native Find is not claimed to search unfetched/unrendered cards.
+- New failures initially reproduced missing TIBC search. A regression caught Top
+  links being rejected because their target is outside the guide mount; fixed
+  without weakening the navigation assertions. Failed loads expose a visible
+  reload/retry path. Offline specialist links are included in worker tests.
+- The first performance run caught Home at 95,941 decoded JS bytes. Extracted
+  shared first action steps into a small module so Home no longer imports Health's
+  full action/context module. An exact before/after comparison proved every Health
+  action and interpretation string unchanged. All four performance checks now
+  pass with the original budgets, including <=200ms warm search at 4x CPU.
+- Quick suite: 92 passed. Audit: 7 pages, 46 JS files, 76 precached assets.
+  Full desktop/mobile suite: 344 passed, 4 expected skips (7.2 minutes), with
+  unchanged visual baselines and performance budgets.
+  Dependency audit: zero vulnerabilities. New static checks compare guidance
+  against the independent name fixture and reject removed entries/boilerplate.
+  Browser checks verify all 144 destinations have visible plans, unique card IDs,
+  accessible expanded content and library-to-reference links.
+- Reviewed specialist-card screenshots at 390px and 1440px. Expanded content had
+  zero horizontal overflow at 320/390/768/1440px with both normal and 200% text.
+  A complete-reference A4 PDF was generated; this is not a physical-printer test.
+- Isolated actual v54-to-v55 upgrade preserved all three saved stores byte-for-byte,
+  retained an unrelated cache, removed the old app cache and served new specialist
+  guidance offline with zero page errors after reload. The first probe only
+  changed the fragment, retaining the old document; corrected it to reload the
+  document after worker activation rather than mistake that for a new renderer.
+- Updated official workflow actions to Node-24-based releases after inspecting
+  their published metadata. Kept the Node 22 test engine, npm cache, parallel
+  desktop/mobile quick jobs, manual/weekly full gates and tested-SHA deployment
+  guard. Explicitly retain public hidden files in the curated Pages artifact so
+  the newer uploader does not omit `.nojekyll`. CI execution remains to be verified.
+
+The frozen 314-row baseline is not retroactively marked reviewed. Remaining work
+includes full current/archive named-entry reconciliation, row-level review/status
+records, broader specialist/physical destinations, and the outstanding release
+checks. No specialist clinical approval or physical-device testing is claimed.

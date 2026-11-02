@@ -1,7 +1,7 @@
 import { escapeHTML } from './ui.js';
 import { searchMeasurements } from './measurement-search.js';
 
-export function initReferenceNavigation(mount, groups, references) {
+export function initReferenceNavigation(mount, groups, references, extended) {
   const picker = mount.querySelector('.sg-reference-picker');
   const rail = mount.querySelector('.sg-reference-rail');
   const summary = picker.querySelector('summary');
@@ -17,6 +17,17 @@ export function initReferenceNavigation(mount, groups, references) {
     const label = references.get(id).label;
     return { id, label, group: group.short };
   }));
+  let catalogueTask;
+  let catalogueReady = false;
+  let navigation = 0;
+  function loadCatalogue() {
+    if (!catalogueTask) catalogueTask = extended.load().then(items => {
+      const known = new Set(searchIndex.map(item => item.id));
+      items.filter(item => !known.has(item.id)).forEach(item => searchIndex.push({ ...item, group: `${groups.find(group => group.id === item.groupId).short} · Extended lab reference` }));
+      catalogueReady = true;
+    }).catch(error => { catalogueTask = undefined; throw error; });
+    return catalogueTask;
+  }
   let observer;
   let active = -1;
   let highlightTimer;
@@ -88,7 +99,7 @@ export function initReferenceNavigation(mount, groups, references) {
       try {
         await navigator.clipboard.writeText(url.href);
         feedback.classList.add('sr-only');
-        feedback.textContent = `Link copied for ${searchIndex.find(item => item.id === copy.dataset.copyReference).label}.`;
+        feedback.textContent = `Link copied for ${references.get(copy.dataset.copyReference).label}.`;
         copy.textContent = 'Copied';
         setTimeout(() => { copy.textContent = 'Copy link'; }, 2000);
       } catch {
@@ -101,22 +112,12 @@ export function initReferenceNavigation(mount, groups, references) {
     }
     const link = event.target.closest('a[href^="#"]');
     if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
-    const target = document.getElementById(link.hash.slice(1));
-    if (!target) return;
-    if (!desktop.matches) picker.open = false;
-    if (link.closest('[data-reference-results]')) {
-      highlight(target);
-      input.value = '';
-      search();
-    }
-    // Retain native fragment history and browser Back behavior.
-    requestAnimationFrame(() => {
-      target.focus({ preventScroll: true });
-      target.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-    });
+    if (!document.getElementById(link.hash.slice(1)) && !link.hash.startsWith('#biomarker-')) return;
+    event.preventDefault();
+    await navigate(link.hash, true);
   });
 
-  function search() {
+  function renderSearch() {
     const hasQuery = Boolean(input.value.trim());
     const matches = searchMeasurements(searchIndex, input.value);
     results.hidden = !matches.length;
@@ -125,13 +126,25 @@ export function initReferenceNavigation(mount, groups, references) {
     // Replace the section list while searching, without hiding any reference cards.
     mount.querySelector('.sg-reference-jumps').hidden = hasQuery;
   }
+  function search() {
+    renderSearch();
+    if (!input.value.trim() || catalogueReady) return;
+    const query = input.value;
+    status.textContent += ' Loading extended lab index…';
+    loadCatalogue().then(() => { if (input.value === query) renderSearch(); }).catch(() => {
+      if (input.value !== query) return;
+      status.innerHTML = 'Core matches only. Extended search could not load; reconnect if needed. <button type="button" class="sg-show-all" data-reference-reload>Reload to retry</button>';
+    });
+  }
+  input.addEventListener('focus', () => { loadCatalogue().catch(() => {}); });
   input.addEventListener('input', search);
   input.addEventListener('keydown', event => {
     if (event.key === 'Escape') { input.value = ''; search(); }
     if (event.key === 'ArrowDown') { event.preventDefault(); results.querySelector('a')?.focus(); }
   });
-  mount.querySelector('form').addEventListener('submit', event => {
+  mount.querySelector('form').addEventListener('submit', async event => {
     event.preventDefault();
+    try { await loadCatalogue(); renderSearch(); } catch { /* Existing core matches remain usable. */ }
     results.querySelector('a')?.click();
   });
   picker.addEventListener('keydown', event => {
@@ -144,12 +157,34 @@ export function initReferenceNavigation(mount, groups, references) {
   document.addEventListener('focusin', event => {
     if (!desktop.matches && !picker.contains(event.target)) picker.open = false;
   });
-  function restoreFragment() {
-    const target = document.getElementById(location.hash.slice(1));
-    if (!target || !mount.contains(target)) return;
+  async function navigate(hash, writeHistory = false) {
+    const ticket = ++navigation;
+    let target = document.getElementById(hash.slice(1));
+    if (!target && hash.startsWith('#biomarker-')) {
+      try { target = await extended.reveal(hash.slice('#biomarker-'.length)); }
+      catch {
+        mount.prepend(feedback);
+        feedback.classList.remove('sr-only');
+        feedback.innerHTML = 'This reference could not load. Reconnect if needed. <button type="button" class="sg-show-all" data-reference-reload>Reload to retry</button>';
+        return;
+      }
+    }
+    if (ticket !== navigation) return;
+    if (!target || (!mount.contains(target) && target.id !== 'reference-top')) return;
+    for (let parent = target.parentElement; parent && parent !== mount; parent = parent.parentElement) if (parent.tagName === 'DETAILS' && parent !== picker) parent.open = true;
+    if (!desktop.matches) picker.open = false;
+    if (writeHistory && location.hash !== hash) history.pushState(null, '', hash);
     if (target.matches('[data-reference-card]')) highlight(target);
-    requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    input.value = '';
+    renderSearch();
+    requestAnimationFrame(() => {
+      if (ticket !== navigation) return;
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
   }
   // Module-rendered cards do not exist when the browser first resolves an incoming fragment.
+  const restoreFragment = () => navigate(location.hash);
+  window.addEventListener('hashchange', restoreFragment);
   restoreFragment();
 }

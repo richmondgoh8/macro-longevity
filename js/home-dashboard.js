@@ -1,4 +1,4 @@
-import { SG_MARKER_ACTIONS } from './data/screening-actions.js';
+import { REFERENCE_ACTIONS } from './data/reference-actions.js';
 import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS, TESTING_SCHEDULE } from './data/health-reference-groups.js';
 import { escapeHTML } from './components/ui.js';
 import { initReferenceNavigation } from './components/reference-navigation.js';
@@ -6,6 +6,44 @@ import { initReferenceNavigation } from './components/reference-navigation.js';
 const mount = document.getElementById('sg-home-dashboard');
 let alternate = false;
 const references = new Map(HEALTH_REFERENCES.map(reference => [reference.id, reference]));
+let labReferences;
+let catalogueTask;
+const extendedGroups = HEALTH_REFERENCE_GROUPS.filter(group => group.id !== 'functional');
+
+async function loadReferences() {
+  if (!catalogueTask) catalogueTask = import('./data/lab-references.js').then(module => {
+    labReferences = module.LAB_REFERENCES;
+    for (const reference of labReferences) if (!references.has(reference.id)) references.set(reference.id, reference);
+    return labReferences;
+  }).catch(error => { catalogueTask = undefined; throw error; });
+  return catalogueTask;
+}
+
+function renderExtended(groupId) {
+  const disclosure = mount.querySelector(`[data-reference-extended="${groupId}"]`);
+  if (!disclosure || disclosure.dataset.rendered) return;
+  const families = new Map();
+  for (const reference of labReferences.filter(item => item.groupId === groupId && !HEALTH_REFERENCES.some(core => core.id === item.id))) {
+    if (!families.has(reference.familyId)) families.set(reference.familyId, []);
+    families.get(reference.familyId).push(reference);
+  }
+  disclosure.querySelector('[data-extended-content]').innerHTML = [...families.values()].map(items => `<div class="sg-extended-family"><h3>${escapeHTML(items[0].familyLabel)}</h3><div class="sg-marker-grid">${items.map(item => card(item.id, true)).join('')}</div></div>`).join('');
+  disclosure.dataset.rendered = 'true';
+}
+
+async function revealReference(id) {
+  await loadReferences();
+  const reference = references.get(id);
+  if (!reference) return;
+  renderExtended(reference.groupId);
+  const target = document.getElementById(`biomarker-${id}`);
+  if (target) for (let parent = target.parentElement; parent && parent !== mount; parent = parent.parentElement) if (parent.tagName === 'DETAILS') parent.open = true;
+  return target;
+}
+
+function loadFailure(node) {
+  node.innerHTML = 'Extended references could not load. Reconnect if these files have not been cached, then reload to retry. <button type="button" data-reference-reload>Reload to retry</button>';
+}
 
 function scale(reference) {
   const variant = alternate && reference.alternate;
@@ -17,16 +55,18 @@ function scale(reference) {
     </dl>`;
 }
 
-function card(id) {
+function card(id, extended = false) {
   const reference = references.get(id);
   const label = reference.label;
-  const action = reference.action || SG_MARKER_ACTIONS[id][0].join('. ');
+  const action = reference.action || REFERENCE_ACTIONS[id].join('. ');
+  const heading = extended ? 'h4' : 'h3';
+  const actionHeading = extended ? 'h5' : 'h4';
   return `<article id="biomarker-${id}" tabindex="-1" class="sg-marker-card sg-reference-card" data-reference-card="${id}" aria-labelledby="biomarker-${id}-title">
-    <header><h3 id="biomarker-${id}-title">${escapeHTML(label)}</h3><button type="button" class="sg-copy-link" data-copy-reference="${id}" aria-label="Copy link to ${escapeHTML(label)}">Copy link</button></header>
+    <header><${heading} id="biomarker-${id}-title">${escapeHTML(label)}</${heading}><button type="button" class="sg-copy-link" data-copy-reference="${id}" aria-label="Copy link to ${escapeHTML(label)}">Copy link</button></header>
     <div data-reference-scale>${scale(reference)}</div>
     <p class="sg-reference-note">${escapeHTML(reference.note)}</p>
     ${reference.safety ? `<p class="sg-reference-safety">${escapeHTML(reference.safety)} <a href="${escapeHTML(reference.safetySource)}" target="_blank" rel="noreferrer">Urgent-care guidance ↗</a></p>` : ''}
-    <div class="sg-card-action"><h4>Action plan</h4><p>${escapeHTML(action)}</p></div>
+    <div class="sg-card-action"><${actionHeading}>${escapeHTML(reference.actionLabel || 'Action plan')}</${actionHeading}><p>${escapeHTML(action)}</p></div>
     <p class="sg-marker-reference sg-reference-source"><a href="${escapeHTML(reference.source)}" aria-label="Reference source for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Reference source <span aria-hidden="true">↗</span></a>${reference.extraSource ? ` · <a href="${escapeHTML(reference.extraSource)}" aria-label="Additional guidance for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Additional guidance <span aria-hidden="true">↗</span></a>` : ''}</p>
   </article>`;
 }
@@ -36,7 +76,8 @@ function group(group, index) {
   const next = HEALTH_REFERENCE_GROUPS[index + 1];
   return `<section id="reference-${group.id}" tabindex="-1" class="sg-reference-group" data-reference-group="${group.id}" aria-labelledby="reference-${group.id}-title">
     <header><p class="section-eyebrow">${String(index + 1).padStart(2, '0')}</p><h2 id="reference-${group.id}-title">${escapeHTML(group.title)}</h2><p class="sg-reference-note">${escapeHTML(group.description)}${group.source ? ` <a href="${escapeHTML(group.source)}" target="_blank" rel="noreferrer">Screening evidence ↗</a>` : ''}</p></header>
-    <div class="sg-marker-grid">${group.ids.map(card).join('')}</div>
+    <div class="sg-marker-grid">${group.ids.map(id => card(id)).join('')}</div>
+    ${group.id !== 'functional' ? `<details class="sg-extended-references" data-reference-extended="${group.id}"><summary>Extended lab references · ${escapeHTML(group.short)}</summary><div data-extended-content><p>Open for additional lab explanations, report-specific context and shared family plans. These are not tests everyone needs.</p></div></details>` : ''}
     <div class="sg-group-plan"><h3>Put this group into practice</h3><ol>${group.plan.map(step => `<li>${escapeHTML(step)}</li>`).join('')}</ol></div>
     <nav class="sg-section-paging" aria-label="${escapeHTML(group.short)} adjacent sections">${previous ? `<a href="#reference-${previous.id}">← Previous: ${escapeHTML(previous.short)}</a>` : '<a href="#reference-top">↑ Guide overview</a>'}${next ? `<a href="#reference-${next.id}">Next: ${escapeHTML(next.short)} →</a>` : '<a href="#testing-schedule">Next: Testing schedule →</a>'}</nav>
   </section>`;
@@ -61,10 +102,12 @@ if (mount) {
           <ul data-reference-results hidden></ul>
         </form>
         <nav aria-label="Health reference groups" class="sg-reference-jumps sticky-pin-list">${HEALTH_REFERENCE_GROUPS.map(group => `<a class="sticky-pin-link" href="#reference-${group.id}">${escapeHTML(group.short)}</a>`).join('')}<a class="sticky-pin-link" href="#testing-schedule">Testing schedule</a></nav>
+        <button type="button" class="sg-show-all" data-reference-show-all>Show all lab references</button><p class="sg-reference-note" data-reference-complete-status role="status"></p>
       </details>
       <a class="sg-reference-top" href="#reference-top" hidden>↑ Top</a>
     </aside>
     <div class="sg-reference-content">
+    <p class="sg-print-warning">This print may omit unloaded extended lab references. Before printing a complete guide, choose “Show all lab references” in the contents picker.</p>
     ${HEALTH_REFERENCE_GROUPS.map(group).join('')}
     <section id="testing-schedule" tabindex="-1" class="sg-testing-schedule" aria-labelledby="testing-schedule-title"><h2 id="testing-schedule-title">Testing schedule: match the test to the question</h2><dl>${TESTING_SCHEDULE.map(([title, text]) => `<div><dt>${escapeHTML(title)}</dt><dd>${escapeHTML(text)}</dd></div>`).join('')}</dl><p class="sg-reference-note">Schedule references: <a href="https://www.healthhub.sg/well-being-and-lifestyle/personal-care/type-2-screening-tests" target="_blank" rel="noreferrer">Singapore screening guidance</a> · <a href="https://www.cancer.gov/about-cancer/causes-prevention/genetics/genetic-testing-fact-sheet" target="_blank" rel="noreferrer">Genetic risk assessment</a> · <a href="https://www.endocrine.org/clinical-practice-guidelines/vitamin-d-for-prevention-of-disease" target="_blank" rel="noreferrer">Vitamin D testing guidance</a>.</p><nav class="sg-section-paging" aria-label="Testing schedule adjacent sections"><a href="#reference-functional">← Previous: Fitness &amp; body</a><a href="#reference-top">↑ Guide overview</a></nav></section>
     <p class="sg-reference-note">Educational guidance, not an individual testing prescription. Actions do not guarantee a biomarker target or cancer prevention. Start gradually and follow any limits from your care team. Action references: <a href="https://www.healthhub.sg/well-being-and-lifestyle/exercise-and-fitness/150minutes" target="_blank" rel="noreferrer">Activity</a> · <a href="https://www.healthhub.sg/health-conditions/hyperlipidemia" target="_blank" rel="noreferrer">Food and fibre</a> · <a href="https://www.who.int/news-room/fact-sheets/detail/sodium-reduction" target="_blank" rel="noreferrer">Sodium</a>.</p>
@@ -72,9 +115,43 @@ if (mount) {
     <p class="sr-only" data-reference-feedback role="status"></p>
   </div>`;
 
-  initReferenceNavigation(mount, HEALTH_REFERENCE_GROUPS, references);
+  initReferenceNavigation(mount, HEALTH_REFERENCE_GROUPS, references, { load: loadReferences, reveal: revealReference });
+
+  mount.querySelectorAll('[data-reference-extended]').forEach(disclosure => disclosure.addEventListener('toggle', async () => {
+    if (!disclosure.open || disclosure.dataset.rendered) return;
+    const content = disclosure.querySelector('[data-extended-content]');
+    content.textContent = 'Loading extended references…';
+    try { await loadReferences(); renderExtended(disclosure.dataset.referenceExtended); }
+    catch { loadFailure(content); }
+  }));
+  mount.querySelector('[data-reference-show-all]').addEventListener('click', async event => {
+    const button = event.currentTarget;
+    const status = mount.querySelector('[data-reference-complete-status]');
+    button.disabled = true;
+    status.textContent = 'Loading the published lab references…';
+    try {
+      await loadReferences();
+      extendedGroups.forEach(group => { renderExtended(group.id); mount.querySelector(`[data-reference-extended="${group.id}"]`).open = true; });
+      mount.dataset.completeReferences = 'true';
+      status.textContent = 'All published lab references are shown and ready for reading or printing. Other historical measurements remain outside this lab panel.';
+    } catch { loadFailure(status); }
+    finally { button.disabled = false; }
+  });
+  let printState;
+  window.addEventListener('beforeprint', () => {
+    if (!labReferences) return;
+    printState = { complete: mount.dataset.completeReferences, disclosures: [...mount.querySelectorAll('[data-reference-extended]')].map(node => [node, node.open]) };
+    extendedGroups.forEach(group => { renderExtended(group.id); mount.querySelector(`[data-reference-extended="${group.id}"]`).open = true; });
+    mount.dataset.completeReferences = 'true';
+  });
+  window.addEventListener('afterprint', () => {
+    printState?.disclosures.forEach(([node, open]) => { node.open = open; });
+    if (!printState?.complete) delete mount.dataset.completeReferences;
+    printState = undefined;
+  });
 
   mount.addEventListener('click', event => {
+    if (event.target.closest('[data-reference-reload]')) { location.reload(); return; }
     const button = event.target.closest('[data-reference-units]');
     if (!button) return;
     alternate = button.dataset.referenceUnits === 'alternate';

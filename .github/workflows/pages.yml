@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
       - name: Verify tested revision is still current
@@ -35,16 +35,17 @@ jobs:
           CURRENT_SHA=$(git ls-remote origin refs/heads/main | cut -f1)
           test "$CURRENT_SHA" = "$TESTED_SHA" || { echo 'A newer revision exists; refusing stale deployment.'; exit 1; }
       - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Prepare website files
         run: |
           mkdir -p _site
           cp index.html offline.html sw.js manifest.json favicon.svg robots.txt sitemap.xml .nojekyll _site/
           cp -R css js fonts pages icons _site/
       - name: Upload static site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+          include-hidden-files: true
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

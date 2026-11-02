@@ -1,3 +1,5 @@
+import { REFERENCE_ACTIONS } from './reference-actions.js';
+
 export const SG_MARKER_CONTEXT = {
   hdl: 'HDL is not an isolated treatment target. A high result does not cancel high LDL/ApoB; do not start drinking alcohol or take supplements merely to raise HDL.',
   totalchol: 'Interpret total cholesterol with the full lipid panel and overall cardiovascular risk. A single total is not a personal treatment target.',
@@ -18,25 +20,22 @@ export const SG_MARKER_CONTEXT = {
 
 export const SG_MARKER_ACTIONS = {
   hdl: [
-    ['Move regularly', 'Build toward 150 minutes of moderate activity weekly and two strength sessions, starting from your current ability.'],
+    REFERENCE_ACTIONS.hdl,
     ['Use unsaturated fats', 'Swap butter/ghee and fatty processed meats for unsaturated oils, beans, tofu or fish.'],
     ['Stay smoke-free', 'Avoid smoking and vaping. Do not start drinking alcohol or buy HDL-raising supplements to chase this number.'],
   ],
   totalchol: [
-    ['Choose fibre-rich meals', 'Include oats or other wholegrains, beans, vegetables and whole fruit regularly; increase fibre gradually.'],
+    REFERENCE_ACTIONS.totalchol,
     ['Replace saturated fats', 'Use unsaturated oils instead of butter/ghee and choose beans, tofu or fish instead of fatty processed meats.'],
     ['Keep activity and care consistent', 'Build toward 150 minutes of weekly activity and two strength sessions; take indicated lipid treatment consistently.'],
   ],
   hscrp: [
-    ['Move on most days', 'Build toward 150 minutes of moderate activity each week and two strength sessions. Add a 10-minute walk after meals to build the routine.'],
+    REFERENCE_ACTIONS.hscrp,
     ['Make meals fibre-rich', 'Include vegetables, whole fruit, oats or other wholegrains, and beans or lentils regularly; build gradually toward 25–30 g fibre/day. If excess weight is present, replace sugary drinks and oversized portions with these foods.'],
     ['Stay smoke-free and sleep regularly', 'Avoid smoking and vaping, and keep a consistent sleep schedule with 7–9 hours available. These habits support overall risk reduction; they do not guarantee a particular hs-CRP result.'],
   ],
   "bp": [
-    [
-      "Keep sodium below 2,000 mg/day",
-      "Choose lower-sodium products, request sauce on the side and leave soup broth behind. Count sodium from all food, not just added salt."
-    ],
+    REFERENCE_ACTIONS.bp,
     [
       "Walk daily and train weekly",
       "Build gradually toward 7,000 steps/day and 150 minutes of moderate activity/week, plus strength training on two days. Adapt to your ability."
@@ -47,10 +46,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "waist": [
-    [
-      "Build a repeatable plate",
-      "At main meals fill half the plate with vegetables and fruit, one quarter with wholegrains and one quarter with lean protein."
-    ],
+    REFERENCE_ACTIONS.waist,
     [
       "Accumulate daily movement",
       "Build toward 7,000 steps/day; add a short walk after meals and break up long sitting periods."
@@ -61,10 +57,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "bmi": [
-    [
-      "Match food intake to your starting point",
-      "If above your appropriate range, replace sugary drinks and reduce oversized portions. If underweight, add regular meals and nourishing snacks instead of restricting."
-    ],
+    REFERENCE_ACTIONS.bmi,
     [
       "Train strength twice a week",
       "Use squats or sit-to-stands, rows, presses and hip hinges at a manageable resistance; increase gradually."
@@ -75,10 +68,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "glucose": [
-    [
-      "Walk after meals",
-      "Take a 10-minute walk after one or more main meals; build toward 150 minutes of moderate activity each week."
-    ],
+    REFERENCE_ACTIONS.glucose,
     [
       "Replace liquid sugar",
       "Choose water or unsweetened tea instead of soft drinks, sweetened coffee and juice; choose whole fruit rather than juice."
@@ -89,10 +79,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "ldl": [
-    [
-      "Eat fibre-rich foods every day",
-      "Build toward 25–30 g fibre/day with oats or barley, beans or lentils, vegetables and whole fruit. Increase gradually."
-    ],
+    REFERENCE_ACTIONS.ldl,
     [
       "Replace saturated fats",
       "Use olive or other unsaturated oils instead of butter or ghee; replace fatty or processed meats with beans, tofu or fish."
@@ -103,10 +90,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "tg": [
-    [
-      "Remove sugary drinks",
-      "Drink water or unsweetened tea; swap refined-grain snacks and sweets for whole fruit, plain yoghurt or unsalted nuts."
-    ],
+    REFERENCE_ACTIONS.tg,
     [
       "Skip alcohol",
       "Choose alcohol-free drinks, especially if triglycerides are high. Alcohol can substantially raise triglycerides in susceptible people."
@@ -117,10 +101,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "nonhdl": [
-    [
-      "Add soluble-fibre foods daily",
-      "Eat oats or barley and a serving of beans or lentils regularly; build toward 25–30 g total fibre/day."
-    ],
+    REFERENCE_ACTIONS.nonhdl,
     [
       "Swap the fat source",
       "Replace butter, ghee and fatty meats with unsaturated oils, tofu, beans or fish; choose unsalted nuts in place of pastries."
@@ -131,10 +112,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "hba1c": [
-    [
-      "Take a post-meal walk",
-      "Walk for about 10 minutes after one or more meals and break up prolonged sitting."
-    ],
+    REFERENCE_ACTIONS.hba1c,
     [
       "Make meals predictable",
       "Choose water over sweet drinks; use a quarter-plate portion of wholegrains with vegetables and a protein source rather than large refined-carbohydrate meals."
@@ -145,10 +123,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "apob": [
-    [
-      "Replace saturated-fat staples",
-      "Swap butter or ghee for unsaturated oils and fatty or processed meats for tofu, beans or fish."
-    ],
+    REFERENCE_ACTIONS.apob,
     [
       "Reach a daily fibre routine",
       "Build toward 25–30 g fibre/day; include oats or barley plus beans or lentils regularly. Increase gradually."
@@ -159,10 +134,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "lpa": [
-    [
-      "Lower the risks you can change",
-      "Replace saturated fats with unsaturated fats and eat fibre-rich foods daily to support LDL/ApoB control; these changes do not reliably lower Lp(a) itself."
-    ],
+    REFERENCE_ACTIONS.lpa,
     [
       "Stay smoke-free",
       "Do not smoke or vape; avoid second-hand smoke. If quitting, use an evidence-based cessation programme and agreed treatment."
@@ -173,10 +145,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "egfr": [
-    [
-      "Reduce sodium each day",
-      "Keep sodium below 2,000 mg/day unless your care team gives a different plan; request less sauce and leave broth behind."
-    ],
+    REFERENCE_ACTIONS.egfr,
     [
       "Keep prescribed treatment consistent",
       "Take blood-pressure or diabetes medicines as prescribed. Do not stop them or change doses to chase an eGFR number."
@@ -187,10 +156,7 @@ export const SG_MARKER_ACTIONS = {
     ]
   ],
   "uacr": [
-    [
-      "Make low-sodium choices",
-      "Choose lower-sodium foods and sauces; aim below 2,000 mg sodium/day unless your kidney team sets another limit."
-    ],
+    REFERENCE_ACTIONS.uacr,
     [
       "Move regularly",
       "Build toward 150 minutes of moderate activity/week at a comfortable intensity, with strength work twice weekly when appropriate."
