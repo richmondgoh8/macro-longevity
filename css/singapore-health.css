@@ -112,8 +112,8 @@
 .sg-reference-units button[aria-pressed="true"] { color: var(--color-on-primary); background: var(--sg-green); }
 .sg-reference-key { max-width: var(--content-measure); margin: 0; color: var(--sg-muted); font-size: var(--text-sm); line-height: 1.6; }
 .sg-reference-key strong { display: block; margin-bottom: var(--space-1); color: var(--sg-ink); }
-.sg-reference-card { container-type: inline-size; }
 .sg-reference-card > header :is(h3, h4) { margin: 0; color: var(--sg-ink); font-size: var(--text-md); line-height: 1.25; }
+.sg-reference-card > [data-reference-scale] { container-type: inline-size; min-width: 0; }
 .sg-reference-unit { margin: 0 0 var(--space-2); color: var(--sg-muted); font-size: var(--text-sm); }
 .sg-range-scale { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); margin: 0; }
 .sg-range-binary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -139,6 +139,17 @@
 .sg-card-action :is(h4, h5), .sg-group-plan h3 { margin: 0 0 var(--space-2); color: var(--sg-ink); font-size: var(--text-md); }
 .sg-card-action p { margin: 0; color: var(--sg-ink); font-size: var(--text-sm); line-height: 1.6; }
 .sg-reference-card .sg-reference-source { margin-top: auto; }
+.sg-reference-copy { display: grid; gap: var(--space-3); align-content: start; }
+.sg-lab-interval dd { font-size: var(--text-md); font-variant-numeric: tabular-nums; }
+.sg-lab-details { margin-top: var(--space-2); color: var(--sg-muted); font-size: var(--text-sm); line-height: 1.6; }
+.sg-lab-details summary { display: list-item; min-height: 44px; padding-block: var(--space-2); cursor: pointer; }
+.sg-lab-details p { margin: var(--space-2) 0 0; }
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 800px) {
+    .sg-reference-card { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 16px; }
+    .sg-reference-card > :is(header, [data-reference-scale], .sg-reference-copy) { align-self: start; }
+  }
+}
 
 /* Long-guide navigation reuses the site's rail surfaces and active-link tokens. */
 html:has(.sg-reference-guide) { scroll-padding-top: var(--reference-clearance, 80px); scroll-padding-bottom: 100px; }
@@ -158,7 +169,7 @@ html:has(.sg-reference-guide) { scroll-padding-top: var(--reference-clearance, 8
 [data-reference-results] a { display: grid; gap: var(--space-1); min-height: 44px; padding: var(--space-2); overflow-wrap: anywhere; }
 [data-reference-results] small { color: var(--sg-muted); }
 .sg-reference-card > header { display: flex; align-items: start; justify-content: space-between; gap: var(--space-3); }
-.sg-reference-card > header :is(h3, h4) { align-self: center; }
+.sg-reference-card > header :is(h3, h4) { align-self: center; min-width: 0; overflow-wrap: anywhere; }
 .sg-extended-references { padding: var(--space-4); border: 1px solid var(--sg-line); border-radius: var(--radius-md); }
 .sg-extended-references > summary { min-height: 44px; align-content: center; cursor: pointer; font-weight: var(--weight-semi); }
 .sg-extended-family { margin-top: var(--space-5); }
@@ -190,9 +201,6 @@ html:has(.sg-reference-guide) { scroll-padding-top: var(--reference-clearance, 8
 @media (height <= 650px) {
   .sg-reference-rail { position: relative; top: auto; height: auto; }
   .sg-reference-rail .sg-reference-picker { max-height: none; overflow: visible; }
-}
-@container (max-width: 18rem) {
-  .sg-reference-card > header { flex-wrap: wrap; }
 }
 @media print {
   #sg-home-dashboard:not([data-complete-references]) .sg-print-warning { display: block; }

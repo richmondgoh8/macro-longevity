@@ -51,6 +51,10 @@ function loadFailure(node) {
 function scale(reference) {
   const variant = alternate && reference.alternate;
   const unit = variant ? variant.unit : reference.unit;
+  if (reference.labInterval) {
+    const lab = reference.labInterval;
+    return `<p class="sg-reference-unit">${escapeHTML(unit)}</p><dl class="sg-range-context sg-lab-interval"><dt>Example lab interval</dt><dd><strong>${escapeHTML(lab.values)} ${escapeHTML(lab.unit)}</strong></dd></dl><details class="sg-lab-details"><summary>Lab & interpretation details</summary><p>${escapeHTML(lab.lab)}; ${escapeHTML(lab.population)}.</p><p>Your reporting laboratory’s interval takes precedence; not a treatment target.</p>${reference.interpretation ? `<p>${escapeHTML(reference.interpretation)}</p>` : ''}</details>`;
+  }
   if (!reference.bands) return `<p class="sg-reference-unit">${escapeHTML(unit)}</p><dl class="sg-range-context"><dt>Reference / eligibility</dt><dd>${escapeHTML(reference.reference)}</dd></dl>`;
   return `<p class="sg-reference-unit">${escapeHTML(unit)}</p>
     <dl class="sg-range-scale${reference.bands.length === 2 ? ' sg-range-binary' : ''}" aria-label="Reference categories, not a linear scale">
@@ -67,9 +71,9 @@ function card(id, extended = false) {
   return `<article id="biomarker-${id}" tabindex="-1" class="sg-marker-card sg-reference-card" data-reference-card="${id}" aria-labelledby="biomarker-${id}-title">
     <header><${heading} id="biomarker-${id}-title">${escapeHTML(label)}</${heading}><button type="button" class="sg-copy-link" data-copy-reference="${id}" aria-label="Copy link to ${escapeHTML(label)}">Copy link</button></header>
     <div data-reference-scale>${scale(reference)}</div>
-    ${reference.inventoryNote ? `<p class="sg-reference-note">${escapeHTML(reference.inventoryNote)}</p>` : ''}
+    <div class="sg-reference-copy">${reference.inventoryNote ? `<p class="sg-reference-note">${escapeHTML(reference.inventoryNote)}</p>` : ''}
     <p class="sg-reference-note">${escapeHTML(reference.note)}</p>
-    ${reference.safety ? `<p class="sg-reference-safety">${escapeHTML(reference.safety)} <a href="${escapeHTML(reference.safetySource)}" target="_blank" rel="noreferrer">Urgent-care guidance ↗</a></p>` : ''}
+    ${reference.safety ? `<p class="sg-reference-safety">${escapeHTML(reference.safety)} <a href="${escapeHTML(reference.safetySource)}" target="_blank" rel="noreferrer">Urgent-care guidance ↗</a></p>` : ''}</div>
     <div class="sg-card-action"><${actionHeading}>${escapeHTML(reference.actionLabel || 'Action plan')}</${actionHeading}><p>${escapeHTML(action)}</p></div>
     <p class="sg-marker-reference sg-reference-source"><a href="${escapeHTML(reference.source)}" aria-label="Reference source for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Reference source <span aria-hidden="true">↗</span></a>${reference.extraSource ? ` · <a href="${escapeHTML(reference.extraSource)}" aria-label="Additional guidance for ${escapeHTML(label)}" target="_blank" rel="noreferrer">Additional guidance <span aria-hidden="true">↗</span></a>` : ''}</p>
   </article>`;
@@ -142,13 +146,17 @@ if (mount) {
     finally { button.disabled = false; }
   });
   let printState;
+  const printLabs = [];
   window.addEventListener('beforeprint', () => {
-    if (!labReferences) return;
-    printState = { complete: mount.dataset.completeReferences, disclosures: [...mount.querySelectorAll('[data-reference-extended]')].map(node => [node, node.open]) };
-    extendedGroups.forEach(group => { renderExtended(group.id); mount.querySelector(`[data-reference-extended="${group.id}"]`).open = true; });
-    mount.dataset.completeReferences = 'true';
+    if (labReferences) {
+      printState = { complete: mount.dataset.completeReferences, disclosures: [...mount.querySelectorAll('[data-reference-extended]')].map(node => [node, node.open]) };
+      extendedGroups.forEach(group => { renderExtended(group.id); mount.querySelector(`[data-reference-extended="${group.id}"]`).open = true; });
+      mount.dataset.completeReferences = 'true';
+    }
+    mount.querySelectorAll('.sg-lab-details:not([open])').forEach(node => { node.open = true; printLabs.push(node); });
   });
   window.addEventListener('afterprint', () => {
+    printLabs.splice(0).forEach(node => { node.open = false; });
     printState?.disclosures.forEach(([node, open]) => { node.open = open; });
     if (!printState?.complete) delete mount.dataset.completeReferences;
     printState = undefined;

@@ -1,5 +1,33 @@
 # Coverage correction — implementation progress
 
+## Card layout correction — 2026-11-03
+
+- Lab examples now show a labelled, bold numeric interval separately from
+  native “Lab & interpretation details” disclosures. Published values, units,
+  sources and population metadata are unchanged; redundant generic range
+  reminders were removed from several core definitions. Clinical notes and
+  action plans remain visible. This does not complete the wider range audit.
+- Desktop cards share five intrinsic subgrid rows: header, range, clinical
+  notes, action plan and source links. Actions align when an adjacent lab
+  disclosure opens; no fixed heights, clipped text or JavaScript equalisation.
+  Inline-size containment moved from the card to its range region because
+  whole-card containment prevented subgrid from sharing tracks. Small screens
+  retain independent natural-height cards and narrow scales still reflow.
+- Print opens lab details and restores their prior state afterward. Storage,
+  report values, five-destination navigation and unit semantics are unchanged.
+  Offline cache is v58-reference-layout.
+- Full browser run exercised 372 cases: 367 passed, four expected skips and
+  one toast screenshot whose unchanged toast overlay sat above the changed
+  Home background. That diff was inspected and refreshed; desktop/mobile
+  toast rechecks passed (2/2). All four performance checks passed within the
+  full run. Reviewed Home/card baselines were refreshed; two compact Cystatin C
+  baselines were added. Screenshot tolerances were not changed.
+- Additional Firefox smoke passed paired action alignment at 1024/1440px,
+  keyboard disclosure toggles and 390px mobile text enlarged to 200%.
+  Audit passed: 49 JavaScript files and 81 precached assets.
+
+## Numerical-reference correction — earlier checkpoint
+
 Numerical-reference correction, 2026-11-02: the previous completed scope was
 name/context coverage, not complete numerical ranges. Added 40 published lab
 examples plus numeric HDL/total-cholesterol screening guideposts, without

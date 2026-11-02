@@ -24,7 +24,9 @@ test('B12 shows an actual adult lab interval before the extended catalogue loads
   await page.goto('/');
   const card = page.locator('#biomarker-b12');
   await expect(card.locator('.sg-range-context')).toContainText('138–652 pmol/L');
-  await expect(card.locator('.sg-range-context')).toContainText('KKH; age ≥19 years');
+  await expect(card.locator('.sg-lab-details')).not.toHaveAttribute('open');
+  await card.locator('.sg-lab-details summary').click();
+  await expect(card.locator('.sg-lab-details')).toContainText('KKH; age ≥19 years');
   await expect(card.getByRole('link', { name: 'Reference source for Vitamin B12', exact: true })).toHaveAttribute('href', 'https://www.kkh.com.sg/our-specialties/elab-book/vitamin-b12');
   await page.getByRole('button', { name: 'Alternative units', exact: true }).click();
   await expect(card.locator('.sg-reference-unit')).toHaveText('pmol/L');
@@ -41,7 +43,8 @@ test('extended numeric intervals preserve sex, specimen and assay distinctions',
     await page.goto(`/#biomarker-${id}`);
     const card = page.locator(`#biomarker-${id}`);
     await expect(card.locator('.sg-range-context')).toContainText(values);
-    await expect(card.locator('.sg-range-context')).toContainText(context);
+    await card.locator('.sg-lab-details summary').click();
+    await expect(card.locator('.sg-lab-details')).toContainText(context);
     await expect(card.locator('.sg-card-action')).toBeVisible();
   }
 });
@@ -60,6 +63,54 @@ test('Home search reveals a specialist reference with context and actions togeth
   await page.reload();
   await expect(card).toBeVisible();
   await expect(page.locator('[data-reference-card="hdl"]')).toBeVisible();
+});
+
+test('numeric ranges are prominent and paired action panels align even when details expand', async ({ page }) => {
+  await page.goto('/');
+  for (const width of [1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const [left, right] of [['ast', 'cystatin'], ['vitd', 'b12'], ['glucose', 'insulin']]) {
+      const a = page.locator(`#biomarker-${left}`);
+      const b = page.locator(`#biomarker-${right}`);
+      for (const selector of ['[data-reference-scale]', '.sg-reference-copy', '.sg-card-action', '.sg-reference-source']) {
+        const one = await a.locator(selector).boundingBox();
+        const two = await b.locator(selector).boundingBox();
+        expect(Math.abs(one.y - two.y), `${left}/${right}: ${selector}`).toBeLessThan(1);
+      }
+    }
+    const ast = page.locator('#biomarker-ast');
+    const cystatin = page.locator('#biomarker-cystatin');
+    await expect(ast.locator('.sg-lab-interval strong')).toHaveText('5–34 U/L');
+    await expect(cystatin.locator('.sg-lab-interval strong')).toHaveText('0.59–1.28 mg/L');
+    const summary = cystatin.locator('.sg-lab-details summary');
+    await summary.focus();
+    await summary.press('Enter');
+    await expect(cystatin.locator('.sg-lab-details p').first()).toBeVisible();
+    const a = await ast.locator('.sg-card-action').boundingBox();
+    const b = await cystatin.locator('.sg-card-action').boundingBox();
+    expect(Math.abs(a.y - b.y)).toBeLessThan(1);
+    expect(Math.abs(a.height - b.height)).toBeLessThan(1);
+    await summary.press('Enter');
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  await page.locator('#biomarker-cystatin .sg-lab-details summary').click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  await expect(page.locator('#biomarker-cystatin .sg-card-action')).toBeVisible();
+});
+
+test('printing exposes lab details and restores the reader disclosure state', async ({ page }) => {
+  await page.goto('/');
+  const b12 = page.locator('#biomarker-b12 .sg-lab-details');
+  const cystatin = page.locator('#biomarker-cystatin .sg-lab-details');
+  await cystatin.locator('summary').click();
+  await page.evaluate(() => dispatchEvent(new Event('beforeprint')));
+  await expect(b12).toHaveAttribute('open');
+  await page.emulateMedia({ media: 'print' });
+  await expect(b12.locator('p').first()).toBeVisible();
+  await page.evaluate(() => dispatchEvent(new Event('afterprint')));
+  await expect(b12).not.toHaveAttribute('open');
+  await expect(cystatin).toHaveAttribute('open');
 });
 
 test('published lab guidance accounts for every independently captured unique entry', async () => {
