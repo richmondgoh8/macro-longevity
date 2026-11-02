@@ -1,6 +1,6 @@
 # Biomarker coverage implementation plan
 
-Status: versioned-scope implementation complete; full release verification in progress.
+Status: versioned scope completed, deployed and verified as runtime `6535d61`.
 Date: 2026-11-01. Baseline: `363eb4b`.
 Requirements: [Coverage specification](biomarker-coverage-spec.md).
 
@@ -9,15 +9,16 @@ Requirements: [Coverage specification](biomarker-coverage-spec.md).
 This plan retains the original phase sequence for traceability. Do not restart
 completed work or describe its historical baseline as the current website.
 The [progress record](biomarker-coverage-progress.md) documents the published P0
-slice and its test/deployment evidence; the broader goal remains active.
+slice and the completed versioned-scope release, with test/deployment evidence
+and explicit scope/clinical limitations.
 
 | Workstream | Current state | Next exit condition |
 | --- | --- | --- |
 | Source inventory | 663 versioned source entries accounted for; 38 explicit exclusions; frozen baseline preserved | Preserve reviewed source/mapping checksums in the full coverage gate |
-| Identity/search | 358 distinct destinations and 652 source-name fixtures; Home and Health wired | Finish full-suite/live verification of this release |
+| Identity/search | 358 distinct destinations and 652 source-name fixtures; Home and Health verified | Preserve the full coverage gate for future changes |
 | Reported P0 gaps | Incremental release shipped with 51 Home cards and 13 physical cards | Preserve regressions; finish evidence/status reconciliation rather than rebuilding fields |
-| Specialist guidance | Full chosen current/archive scope implemented, including reference-only specialist/research entries and row-level evidence | No independent clinical-specialist approval is claimed; complete engineering release checks |
-| Release hardening | Coverage gate and expanded search budgets pass; browser verification ongoing | Full suite, reviewed screenshots, v55-to-v56 upgrade, exact-SHA deployment and live smoke |
+| Specialist guidance | Full chosen current/archive scope implemented, including reference-only specialist/research entries and row-level evidence | No independent clinical-specialist approval is claimed |
+| Release hardening | Full suite, reviewed screenshots, expanded search budgets, upgrade, exact-SHA deployment and live smoke passed | Continue existing fast CI and manual/weekly full checks |
 
 ## Published lab guidance slice — implemented and deployed as `ff920d6`
 
@@ -362,17 +363,17 @@ user to choose an unrelated redesign.
 
 ## 9. Handoff evidence and completion checklist
 
-- [ ] Versioned source manifest and full row-level inventory exist.
-- [ ] No unexplained/ambiguous source mappings remain.
-- [ ] Each included item has a tested reference/context, actions and aliases.
-- [ ] All P0 omissions and designated physical-result fields are implemented.
-- [ ] Lab/specialist rows have real reference destinations, not only generic fields.
-- [ ] Legacy values, conflicts, unit changes and signed scores pass regression tests.
-- [ ] Browser suites, content audit and performance gates pass unchanged.
-- [ ] Screenshots and keyboard/mobile/zoom flows are reviewed.
-- [ ] Tested SHA is live; new cache and offline/upgrade flows pass.
-- [ ] Final report includes coverage dimensions, source versions and honest limits.
+- [x] Versioned source manifest and full row-level inventory exist.
+- [x] No unexplained/ambiguous included source mappings remain; exclusions are explicit.
+- [x] Each included item has a tested reference/context, actions and aliases.
+- [x] All P0 omissions and designated physical-result fields are implemented.
+- [x] Lab/specialist rows have real reference destinations, not only generic fields.
+- [x] Legacy values, conflicts, unit changes and signed scores pass regression tests.
+- [x] Browser suites, content audit and performance gates pass unchanged.
+- [x] Screenshots and keyboard/mobile/zoom flows are reviewed.
+- [x] Tested SHA is live; new cache and offline/upgrade flows pass.
+- [x] Final report includes coverage dimensions, source versions and honest limits.
 
-These full-release boxes remain unchecked until the complete scope is verified.
-See [implementation progress](biomarker-coverage-progress.md) for verified milestones;
-an incremental P0 release is not completion of the full source inventory.
+Checked against runtime `6535d61`; see [implementation progress](biomarker-coverage-progress.md)
+and the [scope/source review](measurement-coverage-review.md). This completes the
+documented versioned scope, not every possible medical test or clinical approval.

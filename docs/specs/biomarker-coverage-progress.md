@@ -1,6 +1,6 @@
 # Coverage correction — implementation progress
 
-Updated 2026-11-02. Versioned-scope implementation complete; final release verification ongoing.
+Updated 2026-11-02. Versioned scope completed, deployed and verified as runtime `6535d61`.
 Baseline for this correction: `363eb4b`.
 
 Current implementation: 663 source entries accounted for, 358 unique reference
@@ -217,7 +217,8 @@ approval or physical-device testing is claimed.
 
 ## Full versioned-scope implementation and release verification
 
-Implemented 2026-11-02; full local verification passed, publication evidence pending.
+Implemented and deployed 2026-11-02 as runtime
+`6535d61103032acd2f044d434d194fd145f246ea`.
 
 - Completed chosen current/archive source reconciliation without rewriting the
   frozen baseline. Added an independent 136-row archive supplement and one current
@@ -267,6 +268,21 @@ Implemented 2026-11-02; full local verification passed, publication evidence pen
   accessibility/print, all visual baselines and expanded performance searches.
   No assertions, budgets, screenshot tolerances or baselines were weakened.
 
-CI, exact-SHA Pages publication and isolated live acceptance remain the final
-release gates. Scope/clinical limitations are documented in
+- Quality run `41373081278` passed on that SHA: **52 checks per parallel project**
+  (104 total); both complete jobs took 2m12s including setup/audits. Pages run
+  `41373284081` successfully published the same tested SHA in a 13-second job.
+  Annotations contain passing-test notices and the existing informational runner
+  image-migration notice; no Node 20 action-deprecation warnings or failed gates.
+- All nine changed runtime assets matched live bytes. Isolated live 390px acceptance
+  verified HDL value/unit and signed BMD save/reload, independent library HDL,
+  historical hearing deep link, FEV1 search/focus/Back, exact copied deployment-subpath
+  link, all 358 expanded references and no horizontal overflow. v56 activated;
+  Health-to-selenium reference navigation/actions worked offline. All three stores
+  remained unchanged and the settled-navigation smoke recorded zero page errors.
+- Final runtime and assertions remained frozen through the full suite and release.
+  The follow-up records evidence/checklist completion in Markdown only; no new
+  runtime changes or unnecessary second deployment are introduced.
+
+All engineering implementation/release gates in the agreed versioned scope are
+complete. Scope/clinical/platform limitations are documented in
 [the review](measurement-coverage-review.md), not silently deferred implementation.

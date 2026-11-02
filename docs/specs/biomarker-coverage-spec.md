@@ -1,6 +1,6 @@
 # Biomarker and physical-measurement coverage specification
 
-Status: versioned-scope implementation complete; release verification in progress, not clinically approved.
+Status: versioned scope completed, deployed and verified (`6535d61`); not clinically approved.
 Date: 2026-11-01. Original audited baseline: `363eb4b`.
 Companion: [Implementation plan](biomarker-coverage-plan.md).
 
@@ -10,8 +10,8 @@ The tables below describe the original problem, not the current deployed state.
 The progress record reports runtime revision `e7389222a758eaedbb07f9ebe02099605cd3a006`
 as deployed and verified: 51 Home reference cards, promoted HDL/total cholesterol,
 13 optional physical cards, shared alias search and additive physical storage.
-These omissions have been addressed in that incremental release. Full specialist
-guidance, source reconciliation and complete Home search remain unfinished.
+These omissions were addressed in that incremental release. Full specialist
+guidance, source reconciliation and complete Home search were outside that slice.
 The subsequent verified runtime release `d6881d2` adds explicit identities and
 individual explanations for all 30 optional lab fields, without changing stored
 values. See [recorded implementation evidence](biomarker-coverage-progress.md)
@@ -21,15 +21,17 @@ Runtime release `ff920d6` subsequently supplies canonical reference/action
 destinations for all 144 unique captured published lab entries (19 core reused,
 125 extended), full published-lab Home search and library links. Native
 disclosures retain the initial 51-card guide; complete reading shows 176 cards.
-Current/archive reconciliation and row-level review records remain unfinished.
+Current/archive reconciliation and row-level review records remained unfinished
+at that checkpoint.
 
 The subsequent full-scope implementation supersedes that remaining-work status:
 663 versioned source entries are accounted for, with 358 distinct reference
 destinations and 38 explicit exclusions. Engineering/source review and exact
 scope are recorded in [the coverage review](measurement-coverage-review.md).
 The original captures remain frozen; their pending statuses are historical, not
-the current implementation status. Full release evidence is pending in the
-progress log until all final tests and publication checks finish.
+the current implementation status. Runtime `6535d61` passed full local gates,
+GitHub Quality and exact-SHA Pages publication, live asset comparison and isolated
+mobile/offline acceptance. Evidence is recorded in the progress log.
 
 ## 1. Outcome and problem
 
