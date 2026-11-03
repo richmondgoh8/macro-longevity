@@ -84,6 +84,9 @@ export const PROTOCOL_MAPPINGS = [
 
 // Accounted exclusions, not implemented measurements. No guessing an unknown test.
 export const PROTOCOL_EXCLUSIONS = {
+  'HOMA-IR': 'A derived insulin-resistance estimate with population- and assay-dependent thresholds, not a standardized standalone clinical measure; its glucose and insulin components remain available.',
+  'Triglyceride-to-HDL ratio': 'No generally accepted clinical cutoff or supported optimization target; the ratio adds no actionable guidance beyond interpreting triglycerides, HDL-C and ApoB separately.',
+  'Neutrophil-to-lymphocyte ratio (NLR)': 'No standalone clinical use or general screening cutoff; the underlying CBC differential already has clinically interpretable components.',
   'ETS score': 'The archive does not identify the instrument or scoring method behind ETS; no clinical equivalence can be resolved.',
   'QT': 'The isolated QT label does not establish whether an ECG interval, correction or another metric was meant.',
   'RCCA PSEM': 'PSEM is not defined with a reproducible method in the captured list; do not invent a clinical threshold or expansion.',

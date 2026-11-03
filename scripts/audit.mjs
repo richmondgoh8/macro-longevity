@@ -109,7 +109,7 @@ const javascriptFiles = [
   'js/data/screening-actions.js',
   'js/data/reference-actions.js',
   'js/data/additional-screening.js',
-  'js/data/physical-measurements.js', 'js/data/measurement-index.js', 'js/data/measurement-sources.js',
+  'js/data/physical-measurements.js', 'js/data/physical-result-fields.js', 'js/data/measurement-index.js', 'js/data/measurement-sources.js',
   'js/physical-measurements.js', 'js/components/measurement-search.js', 'js/components/health-measurement-search.js',
   'js/components/coverage-pin.js', 'js/components/nutrition-totals.js', 'js/components/modal.js', 'js/components/coverage-dialog.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
   'js/components/toast.js', 'js/components/tooltip.js',

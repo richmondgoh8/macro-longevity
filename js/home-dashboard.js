@@ -5,17 +5,22 @@ import { initReferenceNavigation } from './components/reference-navigation.js';
 
 const mount = document.getElementById('sg-home-dashboard');
 let alternate = false;
-const references = new Map(HEALTH_REFERENCES.map(reference => [reference.id, reference]));
+const homeReferenceExclusions = new Set(['insulin']);
+const references = new Map(HEALTH_REFERENCES.filter(reference => !homeReferenceExclusions.has(reference.id)).map(reference => [reference.id, reference]));
+const coreReferenceIds = new Set(HEALTH_REFERENCE_GROUPS.flatMap(group => group.ids));
 let labReferences;
 let catalogueTask;
 const extendedGroups = HEALTH_REFERENCE_GROUPS;
 
 async function loadReferences() {
   if (!catalogueTask) catalogueTask = import('./data/extended-references.js').then(module => {
-    labReferences = module.EXTENDED_REFERENCES;
+    labReferences = module.EXTENDED_REFERENCES.filter(reference => !homeReferenceExclusions.has(reference.id));
     for (const reference of labReferences) {
       if (!references.has(reference.id)) references.set(reference.id, reference);
-      else references.get(reference.id).aliases = reference.aliases;
+      else {
+        references.get(reference.id).aliases = reference.aliases;
+        if (!coreReferenceIds.has(reference.id)) references.get(reference.id).groupId = reference.groupId;
+      }
     }
     return labReferences;
   }).catch(error => { catalogueTask = undefined; throw error; });
@@ -26,7 +31,7 @@ function renderExtended(groupId) {
   const disclosure = mount.querySelector(`[data-reference-extended="${groupId}"]`);
   if (!disclosure || disclosure.dataset.rendered) return;
   const families = new Map();
-  for (const reference of labReferences.filter(item => item.groupId === groupId && !HEALTH_REFERENCES.some(core => core.id === item.id))) {
+  for (const reference of labReferences.filter(item => item.groupId === groupId && !coreReferenceIds.has(item.id))) {
     if (!families.has(reference.familyId)) families.set(reference.familyId, []);
     families.get(reference.familyId).push(reference);
   }
@@ -48,18 +53,47 @@ function loadFailure(node) {
   node.innerHTML = 'Extended references could not load. Reconnect if these files have not been cached, then reload to retry. <button type="button" data-reference-reload>Reload to retry</button>';
 }
 
-function scale(reference) {
+// Normalize the different reference sources to one display shape.
+function rangeDisplay(reference) {
   const variant = alternate && reference.alternate;
-  const unit = variant ? variant.unit : reference.unit;
+  const display = { unit: variant ? variant.unit : reference.unit, items: [], details: [] };
   if (reference.labInterval) {
-    const lab = reference.labInterval;
-    return `<p class="sg-reference-unit">${escapeHTML(unit)}</p><dl class="sg-range-context sg-lab-interval"><dt>Example lab interval</dt><dd><strong>${escapeHTML(lab.values)} ${escapeHTML(lab.unit)}</strong></dd></dl><details class="sg-lab-details"><summary>Lab & interpretation details</summary><p>${escapeHTML(lab.lab)}; ${escapeHTML(lab.population)}.</p><p>Your reporting laboratory’s interval takes precedence; not a treatment target.</p>${reference.interpretation ? `<p>${escapeHTML(reference.interpretation)}</p>` : ''}</details>`;
+    display.items.push({
+      label: 'Interpretive context',
+      value: reference.interpretation || reference.reference,
+      tone: 'neutral',
+      emphasis: false,
+    });
+  } else if (reference.guide) {
+    const [label, value, alternative] = reference.guide;
+    display.items.push({ label, value: variant && alternative ? alternative : value, tone: 'neutral', emphasis: true });
+    display.details.push(reference.reference);
+  } else if (reference.bands) {
+    display.items = reference.bands.map(([label, value], index) => ({
+      label,
+      value: variant ? variant.values[index] : value,
+      tone: reference.bands.length === 2 && index === 1 ? 'review' : ['normal', 'watch', 'review'][index] || 'neutral',
+      emphasis: true,
+    }));
+  } else {
+    const cancer = HEALTH_REFERENCE_GROUPS.find(group => group.id === 'cancer');
+    display.items.push({
+      label: reference.groupId === 'cancer' || cancer.ids.includes(reference.id) ? 'Screening eligibility & evidence' : 'Report-specific reference context',
+      value: reference.reference,
+      tone: 'neutral',
+      emphasis: false,
+    });
   }
-  if (!reference.bands) return `<p class="sg-reference-unit">${escapeHTML(unit)}</p><dl class="sg-range-context"><dt>Reference / eligibility</dt><dd>${escapeHTML(reference.reference)}</dd></dl>`;
-  return `<p class="sg-reference-unit">${escapeHTML(unit)}</p>
-    <dl class="sg-range-scale${reference.bands.length === 2 ? ' sg-range-binary' : ''}" aria-label="Reference categories, not a linear scale">
-      ${reference.bands.map(([label, value], index) => `<div class="sg-range-band sg-range-${reference.bands.length === 2 && index === 1 ? 2 : index}"><dt>${escapeHTML(label)}</dt><dd>${escapeHTML(variant ? variant.values[index] : value)}</dd></div>`).join('')}
-    </dl>`;
+  return display;
+}
+
+function scale(reference) {
+  const display = rangeDisplay(reference);
+  const single = display.items.length === 1;
+  return `<p class="sg-reference-unit">${escapeHTML(display.unit)}</p>
+    <dl class="sg-range-scale${single ? ' sg-range-single' : ''}" aria-label="Reference values">
+      ${display.items.map(item => `<div class="sg-range-band" data-range-item data-range-tone="${item.tone}"><dt>${escapeHTML(item.label)}</dt><dd data-range-value>${item.emphasis ? `<strong>${escapeHTML(item.value)}</strong>` : escapeHTML(item.value)}</dd></div>`).join('')}
+    </dl>${display.details.length ? `<details class="sg-lab-details"><summary>Reference details</summary>${display.details.map(detail => `<p>${escapeHTML(detail)}</p>`).join('')}</details>` : ''}`;
 }
 
 function card(id, extended = false) {
@@ -101,7 +135,7 @@ if (mount) {
     <div class="sg-reference-layout">
     <aside class="sg-reference-rail">
       <details class="sticky-pin-nav sg-reference-picker" open>
-        <summary>Jump to: <span data-reference-current>Metabolic · 1/7</span></summary>
+        <summary>Jump to: <span data-reference-current>Metabolic · 1/${HEALTH_REFERENCE_GROUPS.length}</span></summary>
         <p class="sticky-pin-label sg-reference-desktop-label">On this page</p>
         <form class="sg-reference-search" role="search" aria-label="Find a biomarker">
           <label for="reference-search">Find a biomarker</label>

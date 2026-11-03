@@ -89,7 +89,7 @@ test('active primary navigation uses one selected treatment', async ({ page }) =
 test('long routes expose one sticky section rail with stable targets', async ({ page }) => {
   const routes = [
     ['/pages/avoid.html', 3],
-    ['/pages/blood.html', 7],
+    ['/pages/blood.html', 3],
     ['/pages/protocol.html', 6],
     ['/pages/workout.html', 4],
   ];
@@ -134,7 +134,7 @@ test('section rail underlines the active item and clears the context tabs', asyn
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/pages/blood.html');
-    await expect(page.locator('.sticky-pin-link')).toHaveCount(7);
+    await expect(page.locator('.sticky-pin-link')).toHaveCount(3);
     const gap = await page.locator('.sticky-pin-layout').evaluate((node) => {
       const nav = document.querySelector('.context-nav').getBoundingClientRect();
       const rail = node.querySelector('.sticky-pin-rail').getBoundingClientRect();
@@ -314,45 +314,43 @@ test('training metrics keep Zone 2 range and labels inside their cells', async (
   }
 });
 
-test('blood cards use intrinsic columns and responsive flow', async ({ page }) => {
+test('screening cards use intrinsic columns and responsive flow', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pages/blood.html');
-  const desktop = await page.evaluate(() => {
-    const grid = document.querySelector('.blood-grid');
-    const card = [...grid.querySelectorAll('.blood-card')].find((node) => node.textContent.includes('Ferritin'));
-    const other = [...grid.querySelectorAll('.blood-card')].find((node) => node.textContent.includes('Uric Acid'));
-    const summary = card.querySelector('summary');
-    const summaryContentWidth = summary.clientWidth - parseFloat(getComputedStyle(summary).paddingLeft) - parseFloat(getComputedStyle(summary).paddingRight);
+  const desktop = await page.locator('.sg-screening-grid').evaluate((grid) => {
+    const cards = [...grid.querySelectorAll('.sg-screening-card')];
+    const positions = cards.map((card) => card.getBoundingClientRect());
     return {
-      columns: getComputedStyle(grid).columnCount,
-      ferritinHeight: card.getBoundingClientRect().height,
-      uricHeight: other.getBoundingClientRect().height,
-      rangeDisplay: getComputedStyle(card.querySelector('.blood-card-range')).display,
-      rangeWidth: card.querySelector('.blood-card-range').getBoundingClientRect().width,
-      summaryContentWidth,
+      firstRowCount: positions.filter((rect) => Math.abs(rect.y - positions[0].y) < 1).length,
+      overflow: grid.scrollWidth - grid.clientWidth,
     };
   });
-  expect(desktop.columns).toBe('2');
-  expect(desktop.uricHeight).toBeLessThan(desktop.ferritinHeight);
-  expect(desktop.rangeDisplay).toBe('grid');
-  expect(desktop.rangeWidth).toBeGreaterThanOrEqual(desktop.summaryContentWidth - 1);
+  expect(desktop.firstRowCount).toBe(2);
+  expect(desktop.overflow).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const mobileColumns = await page.locator('.blood-grid').first().evaluate((node) => getComputedStyle(node).columnCount);
-  expect(mobileColumns).toBe('1');
+  const mobile = await page.locator('.sg-screening-grid').evaluate((grid) => {
+    const cards = [...grid.querySelectorAll('.sg-screening-card')];
+    const positions = cards.map((card) => card.getBoundingClientRect());
+    return {
+      firstRowCount: positions.filter((rect) => Math.abs(rect.y - positions[0].y) < 1).length,
+      overflow: grid.scrollWidth - grid.clientWidth,
+    };
+  });
+  expect(mobile.firstRowCount).toBe(1);
+  expect(mobile.overflow).toBeLessThanOrEqual(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
 
-test('ApoB follow-up keeps the comparison table without numbered steps', async ({ page }) => {
+test('screening shortlist prioritizes routine lipids and frames ApoB as an addition', async ({ page }) => {
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/pages/blood.html');
-    const section = page.locator('.progressive-section').filter({ hasText: 'ApoB elevated? Options' });
-    await section.locator('summary').click();
-    await expect(section.locator('.apob-steps')).toHaveCount(0);
-    await expect(section.locator('table.apob-table')).toBeVisible();
-    await expect(section.locator('thead th')).toHaveCount(3);
-    await expect(section.locator('tbody tr')).toHaveCount(8);
+    const shortlist = page.getByLabel('High-value screening shortlist');
+    await expect(shortlist).toContainText('a full lipid panel');
+    await expect(shortlist).toContainText('Ask explicitly about ApoB for particle risk');
+    await expect(shortlist).toContainText('a one-time Lp(a) test for inherited risk');
+    await expect(shortlist).toContainText('more tests do not automatically mean better screening');
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   }
 });

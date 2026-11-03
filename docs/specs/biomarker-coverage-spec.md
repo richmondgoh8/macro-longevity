@@ -30,8 +30,8 @@ Current/archive reconciliation and row-level review records remained unfinished
 at that checkpoint.
 
 The subsequent full-scope implementation supersedes that remaining-work status:
-663 versioned source entries are accounted for, with 358 distinct reference
-destinations and 38 explicit exclusions. Engineering/source review and exact
+663 versioned source entries are accounted for, with 355 distinct reference
+destinations and 41 explicit exclusions. Engineering/source review and exact
 scope are recorded in [the coverage review](measurement-coverage-review.md).
 The original captures remain frozen; their pending statuses are historical, not
 the current implementation status. Runtime `6535d61` passed full local gates,
@@ -153,10 +153,15 @@ P0 is a useful incremental release, not completion of the full inventory.
 
 ### P1: reconcile all existing and published lab coverage
 
-- Cardiovascular/metabolic: complete lipid context, insulin, HOMA-IR, TG:HDL,
-  IGF-1, advanced lipoprotein entries and related calculated ratios.
-- Blood/immune/inflammation: CBC components and differential, NLR, ferritin/iron
+- Cardiovascular/metabolic: complete lipid context, insulin, IGF-1,
+  advanced lipoprotein entries and related calculated measures. TG:HDL is retained
+  in the source inventory but excluded from user guidance because it has no
+  actionable general cutoff or supported optimization target.
+  HOMA-IR is inventoried but excluded as a standalone card because its cutoffs
+  vary by population and assay; glucose and insulin remain available separately.
+- Blood/immune/inflammation: CBC components and differential, ferritin/iron
   studies, hs-CRP, ESR, fibrinogen, autoimmune and other published panel entries.
+  NLR is inventoried but excluded because it has no standalone general screening role.
 - Liver/kidneys: enzymes, bilirubin, albumin/proteins, creatinine, BUN, cystatin C,
   eGFR, uACR and urine qualitative/microscopy entries.
 - Micronutrients/electrolytes: every published entry plus existing B12/MMA

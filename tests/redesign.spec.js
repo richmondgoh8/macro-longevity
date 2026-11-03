@@ -34,20 +34,19 @@ test('the redesigned routes reflow at narrow and intermediate widths', async ({ 
 
 test('Home presents references and plans together without a result-recording CTA', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('[data-reference-card] .sg-card-action:visible')).toHaveCount(51);
+  await expect(page.locator('[data-reference-card] .sg-card-action:visible')).toHaveCount(37);
   await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Testing schedule: match the test to the question' })).toBeVisible();
 });
 
 test('guidance disclosures remain accessible and reversible', async ({ page }) => {
   await page.goto('/pages/blood.html');
-  const annual = page.locator('#blood-annual');
-  await expect(annual).toHaveAttribute('open', '');
-  await expect(annual.locator('.blood-test-row').first()).toBeVisible();
-  await annual.locator('> summary').click();
-  await expect(annual.locator('.blood-test-row').first()).not.toBeVisible();
-  await annual.locator('> summary').click();
-  await expect(annual.locator('.blood-test-row').first()).toBeVisible();
+  const cautions = page.locator('#blood-low-value');
+  await expect(cautions).not.toHaveAttribute('open', '');
+  await cautions.locator('> summary').click();
+  await expect(cautions.locator('.blood-card-low').first()).toBeVisible();
+  await cautions.locator('> summary').click();
+  await expect(cautions.locator('.blood-card-low').first()).not.toBeVisible();
 
   await page.goto('/pages/finance.html');
   const intro = page.locator('#investments-app .investment-intro');

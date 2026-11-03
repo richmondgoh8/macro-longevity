@@ -9,8 +9,8 @@ those captures remain unchanged so the original omissions remain reproducible.
 Correction following the B12 screenshot: the completed review below concerns
 source names, destinations and contextual guidance, **not complete numerical
 reference-range coverage**. That distinction was insufficiently prominent.
-Numerical-reference review remains partial: 59 explicitly sourced laboratory
-examples, 15 existing banded references, and 284 other guidance destinations.
+Numerical-reference review remains partial: 60 explicitly sourced laboratory
+examples, 14 existing banded references, and 281 other guidance destinations.
 The latter include formulas, study estimates, screening and qualitative tests;
 they have not all been classified for numerical-interval applicability. Do not
 describe these counts as 358 complete reference ranges.
@@ -18,11 +18,11 @@ describe these counts as 358 complete reference ranges.
 | Dimension | Verified inventory |
 | --- | --- |
 | Source entries accounted for | 663 / 663 |
-| Included distinct reference destinations | 358 / 358 |
-| Included destinations with context and an action/follow-up rationale | 358 / 358 |
-| Source-name → destination search fixtures | 652 / 652 |
+| Included distinct reference destinations | 355 / 355 |
+| Included destinations with context and an action/follow-up rationale | 355 / 355 |
+| Source-name → destination search fixtures | 649 / 649 |
 | Canonical measurements designated recordable | 159 |
-| Explicitly excluded source entries | 38; not counted as implemented |
+| Explicitly excluded source entries | 41; not counted as implemented |
 
 Source memberships: 230 published baseline/sex-specific/follow-up lab entries,
 325 archived measurement entries, 22 current protocol measurement examples,
@@ -32,8 +32,19 @@ source memberships do not inflate the unique-destination count. A family/context
 destination is not a claim that its component quantities are identical assays.
 
 The published panel remains 144 unique lab analytes; the whole guide is not
-marketed as 358 blood tests. Initial Home content remains 51 core cards; 307
-additional references load on demand inside the existing seven groups.
+marketed as 355 blood tests. Home shows 37 core cards and 317 additional
+references; fasting insulin is excluded from this reference browser. The
+separate results tracker can still record it when a clinician orders it.
+
+Three low-value standalone entries are excluded from the displayed guide:
+HOMA-IR has population-/assay-dependent cutoffs and no standard clinical
+threshold; TG:HDL has no actionable general cutoff; NLR has no standalone
+general-screening role. Their underlying clinically useful component tests
+remain available.
+
+The Blood route no longer duplicates an annual/one-time/periodic target list.
+It keeps result tracking, test-preparation guidance and cautions; the shared
+reference guide is the source for interpretation and screening timing.
 
 ## Numerical-interval correction (2026-11-02)
 
@@ -41,8 +52,9 @@ additional references load on demand inside the existing seven groups.
   ESR, homocysteine, cystatin C, 15 CBC/count indices, sodium, potassium,
   creatinine, chloride, serum bicarbonate, total calcium, albumin, total
   protein, total bilirubin, magnesium, serum iron, TSH, free T4, TPO antibodies,
-  urate, amylase and phosphate. Core examples are available immediately;
-  the larger registry is demand-loaded. Exact values/populations/units and
+  urate, amylase and phosphate. Sourced interval metadata remains in the registry
+  for coverage and provenance; interval values are not displayed in reference
+  cards or details. Exact values/populations/units and
   individual source URLs live in `core-lab-intervals.js` and `lab-intervals.js`.
 - Main primary sources: [KKH eLab catalogue](https://www.kkh.com.sg/our-specialties/elab-book/vitamin-b12),
   [NUH full blood count](https://nuhsingapore.testcatalog.org/show/FBC),
@@ -81,16 +93,32 @@ additional references load on demand inside the existing seven groups.
   supplies urine-only pH and relative density. [Alfred vitamin C](https://pathology.alfred.org.au/handbook/index?testid=190)
   supplies the HPLC interval, not a daily intake recommendation.
 - All additions remain demand-loaded; initial Home code and the 51 core cards
-  are unchanged. The offline cache revision advances to v60 and retains the
+  were unchanged in that implementation. The offline cache revision advances to v60 and retains the
   HTTP-cache-bypassing installation fix. No result data or units are migrated.
 - Outstanding applicability review still includes additional micronutrients,
   lipid subfractions, hormones, specialist physiological measurements and
-  qualitative tests. The 284 context destinations must not be represented as
-  284 tests proven to have no numerical interval.
+  qualitative tests. The 281 other-guidance destinations must not be represented
+  as tests proven to have no numerical interval.
 - Local verification: audit and reviewed snapshot passed; all 118 quick checks
   passed across desktop/mobile Chromium, including new direct-link range and
   assay-context regressions; all four performance checks passed unchanged budgets.
   No CSS, renderer, saved-store schema or visual baseline was changed in this batch.
+
+## Reference display correction (2026-11-03)
+
+- hs-CRP no longer presents legacy `<1 / 1–3 / >3 mg/L` population categories
+  as colored bands. The Home card shows the clinically used `≥2 mg/L` risk-
+  enhancing guidepost (`≥0.2 mg/dL`) and retains the acute-inflammation caveat.
+- Ferritin no longer shows the KKH sample interval on the Home card. It directs
+  readers to their own age-, sex- and method-specific laboratory interval; the
+  sourced KKH value remains in metadata only and is not rendered in the guide.
+- All sourced example lab intervals are now omitted from reference cards and
+  their details disclosures. The structured interval registry remains for
+  provenance and coverage audits. Clinically meaningful guideposts and
+  screening thresholds remain visible.
+- The reference schema checks accept a single `guide` alongside a report
+  context or categorical bands. The reviewed numerical snapshot now records 60
+  lab intervals, 14 banded references and 281 other guidance destinations.
 - Release `fb3fcfff9cb0aaeaba9489239a6bdff1b8744f69`: Quality run
   `41482816067` succeeded (59 checks per desktop/mobile project); Pages run
   `41483260351` published that exact SHA. Both changed runtime assets matched

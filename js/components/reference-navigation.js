@@ -49,7 +49,7 @@ export function initReferenceNavigation(mount, groups, references, extended) {
       else link.removeAttribute('aria-current');
     });
     mount.querySelector('[data-reference-current]').textContent = index < groups.length
-      ? `${groups[index].short} · ${index + 1}/7` : 'Testing schedule';
+      ? `${groups[index].short} · ${index + 1}/${groups.length}` : 'Testing schedule';
   }
 
   function measure() {

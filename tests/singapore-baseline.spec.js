@@ -9,10 +9,10 @@ test('Home contains the seven requested groups with visible references and actio
   await expect(page.locator('input:not([type="search"]), select, [data-export], #hero-pillar-map, #pillars-app, #stack-summary-app, #longevity101-app')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
   await expect(guide.locator('[data-reference-group]')).toHaveCount(7);
-  await expect(guide.locator('[data-reference-card]:visible')).toHaveCount(51);
+  await expect(guide.locator('[data-reference-card]:visible')).toHaveCount(37);
   const ids = HEALTH_REFERENCE_GROUPS.flatMap(group => group.ids);
-  expect(new Set(ids).size).toBe(51);
-  expect(ids.slice().sort()).toEqual(HEALTH_REFERENCES.map(item => item.id).sort());
+  expect(new Set(ids).size).toBe(37);
+  expect(ids.slice().sort()).toEqual(HEALTH_REFERENCES.filter(item => ids.includes(item.id)).map(item => item.id).sort());
   for (const group of HEALTH_REFERENCE_GROUPS) {
     const section = guide.locator(`[data-reference-group="${group.id}"]`);
     await expect(section.getByRole('heading', { name: group.title, exact: true })).toBeVisible();
@@ -24,8 +24,12 @@ test('Home contains the seven requested groups with visible references and actio
       await expect(card.getByRole('link', { name: /^Reference source for / })).toHaveAttribute('href', /^https:\/\//);
     }
   }
-  await expect(guide.locator('[data-reference-card="hscrp"]')).toContainText('not universal treatment goals');
-  await expect(guide.locator('[data-reference-card="vitd"]')).toContainText('40–60 ng/mL');
+  await expect(guide.locator('[data-reference-card="hscrp"]')).toContainText('risk-enhancing');
+  await expect(guide.locator('[data-reference-card="hscrp"] dd')).toHaveText('≥2 mg/L');
+  await expect(guide.locator('[data-reference-card="ferritin"]')).toContainText('age-, sex- and method-specific interval');
+  await expect(guide.locator('[data-reference-card="ferritin"]')).not.toContainText('21.8–274.7');
+  await expect(guide.locator('[data-reference-card="ferritin"]')).not.toContainText('Example lab interval');
+  await expect(guide.locator('[data-reference-card="vitd"]')).toContainText('not a cancer-prevention target');
   await expect(guide.locator('[data-reference-card="mced"]')).toContainText('No established routine testing frequency');
   await expect(guide.locator('[data-reference-card="wholebodymri"]')).toContainText('No evidence-based routine interval');
   await expect(guide.locator('.sg-testing-schedule')).toContainText('not a blanket annual panel');
@@ -48,7 +52,6 @@ test('Home reference units update all supported scales and leave stored Health v
     ['tg', 'mg/dL', ['<150', '150–<200', '≥200']],
     ['apob', 'mg/dL', ['<90', '90–<120', '≥120']],
     ['lpa', 'mg/dL', ['<30', '30–<50', '≥50']],
-    ['hscrp', 'mg/dL', ['<0.1', '0.1–0.3', '>0.3']],
     ['uacr', 'mg/g', ['<30', '30–300', '>300']],
     ['hba1c', 'mmol/mol', ['≤42', '43–52', '≥53']],
     ['vitd', 'ng/mL', ['20–50', '12–<20', '<12']],
@@ -57,6 +60,9 @@ test('Home reference units update all supported scales and leave stored Health v
     await expect(card.locator('.sg-reference-unit')).toHaveText(unit);
     await expect(card.locator('dd')).toHaveText(values);
   }
+  const hscrp = guide.locator('[data-reference-card="hscrp"]');
+  await expect(hscrp.locator('.sg-reference-unit')).toHaveText('mg/dL');
+  await expect(hscrp.locator('dd')).toHaveText('≥0.2 mg/dL');
   await guide.getByRole('button', { name: 'Singapore units' }).click();
   await expect(guide.locator('[data-reference-card="tg"] dd')).toHaveText(['<1.7', '1.7–<2.3', '≥2.3']);
   await expect(guide.locator('[data-reference-card="lpa"]')).toContainText('No fixed conversion');
@@ -75,10 +81,10 @@ test('Home grouped references remain aligned and readable across viewport widths
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     if (width >= 1024) {
       const first = await guide.locator('[data-reference-card="glucose"]').boundingBox();
-      const second = await guide.locator('[data-reference-card="insulin"]').boundingBox();
+      const second = await guide.locator('[data-reference-card="hba1c"]').boundingBox();
       expect(Math.abs(first.height - second.height)).toBeLessThan(1);
       const a = await guide.locator('[data-reference-card="glucose"] .sg-reference-source').boundingBox();
-      const b = await guide.locator('[data-reference-card="insulin"] .sg-reference-source').boundingBox();
+      const b = await guide.locator('[data-reference-card="hba1c"] .sg-reference-source').boundingBox();
       expect(Math.abs(a.y - b.y)).toBeLessThan(1);
     }
   }
@@ -112,7 +118,7 @@ test('Health baseline accepts screening values and explains the next move', asyn
   await expect(workspace.locator('[data-marker-card="bp"] [data-marker-status]')).toHaveText('Within the guide');
 });
 
-test('Health route keeps deeper guidance progressively disclosed', async ({ page }) => {
+test('Health route keeps low-value testing cautions progressively disclosed', async ({ page }) => {
   await page.goto('/pages/blood.html');
   const workspace = page.locator('#sg-health-dashboard .sg-workspace');
   await expect(workspace.locator('.sg-marker-card')).toHaveCount(15);
@@ -121,7 +127,11 @@ test('Health route keeps deeper guidance progressively disclosed', async ({ page
   await details.locator('summary').click();
   await expect(details).toHaveAttribute('open', '');
   await expect(details.locator('li')).toHaveCount(3);
-  await expect(page.locator('#blood-annual')).toBeVisible();
+  const cautions = page.locator('#blood-low-value');
+  await expect(cautions).toBeVisible();
+  await expect(cautions).not.toHaveAttribute('open', '');
+  await cautions.locator('> summary').click();
+  await expect(cautions.locator('.blood-card-low').first()).toBeVisible();
 });
 
 test('Singapore baseline stays within the viewport on mobile', async ({ page }) => {

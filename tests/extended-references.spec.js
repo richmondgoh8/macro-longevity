@@ -5,52 +5,90 @@ import { auditMeasurementCoverage } from '../scripts/audit-measurement-coverage.
 import { EXTENDED_REFERENCES } from '../js/data/extended-references.js';
 import { reconcileMeasurements } from '../scripts/reconcile-measurements.mjs';
 
-test('routine numeric intervals have provenance and cannot regress to context-only coverage', () => {
+test('routine numeric intervals retain sourced metadata without leaking into reference text', () => {
   const report = reconcileMeasurements();
-  expect(report.numericalReferenceReview.publishedLabIntervals).toBe(59);
+  expect(report.numericalReferenceReview.publishedLabIntervals).toBe(60);
   expect(report.numericalReferenceReview.status).toBe('partial');
   for (const reference of EXTENDED_REFERENCES.filter(item => item.labInterval)) {
-    expect(reference.reference).toContain(reference.labInterval.values);
-    expect(reference.reference).toContain(reference.labInterval.population);
+    expect(reference.reference).not.toContain(reference.labInterval.values);
+    expect(reference.labInterval.population).toBeTruthy();
     expect(reference.source).toBe(reference.labInterval.source);
     expect(reference.bands, reference.id).toBeUndefined();
-    expect(reference.reference).toContain('not a treatment target');
   }
   const incomplete = EXTENDED_REFERENCES.map(item => item.id === 'b12' ? { ...item, labInterval: undefined } : item);
-  expect(reconcileMeasurements({ references: incomplete }).failures).toContain('Missing published laboratory interval: b12');
+  expect(reconcileMeasurements({ references: incomplete }).failures).toContain('Missing or exposed published laboratory interval: b12');
 });
 
-test('B12 shows an actual adult lab interval before the extended catalogue loads', async ({ page }) => {
+test('no reference card shows example lab interval values or lab interval details', async ({ page }) => {
   await page.goto('/');
-  const card = page.locator('#biomarker-b12');
-  await expect(card.locator('.sg-range-context')).toContainText('138–652 pmol/L');
-  await expect(card.locator('.sg-lab-details')).not.toHaveAttribute('open');
-  await card.locator('.sg-lab-details summary').click();
-  await expect(card.locator('.sg-lab-details')).toContainText('KKH; age ≥19 years');
-  await expect(card.getByRole('link', { name: 'Reference source for Vitamin B12', exact: true })).toHaveAttribute('href', 'https://www.kkh.com.sg/our-specialties/elab-book/vitamin-b12');
-  await page.getByRole('button', { name: 'Alternative units', exact: true }).click();
-  await expect(card.locator('.sg-reference-unit')).toHaveText('pmol/L');
-  await expect(card.locator('.sg-range-context')).toContainText('138–652 pmol/L');
+  const picker = page.locator('.sg-reference-picker');
+  if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
+  await page.locator('[data-reference-show-all]').click();
+  for (const reference of EXTENDED_REFERENCES.filter(item => item.labInterval && item.id !== 'insulin')) {
+    const card = page.locator(`[data-reference-card="${reference.id}"]`);
+    await expect(card, reference.id).toHaveCount(1);
+    await expect(card, reference.id).not.toContainText(reference.labInterval.values);
+    await expect(card, reference.id).not.toContainText('Example lab interval');
+    await expect(card.locator('.sg-lab-details'), reference.id).toHaveCount(0);
+  }
 });
 
-test('extended numeric intervals preserve sex, specimen and assay distinctions', async ({ page }) => {
-  for (const [id, values, context] of [
-    ['hemoglobin', 'Male: 13.1–16.8; female: 11.5–14.9 g/dL', 'NUH; adult'],
-    ['bicarbonate', '22–29 mmol/L', 'serum total CO₂, not blood-gas bicarbonate'],
-    ['ft4', '8.8–14.4 pmol/L', 'SGH; adult example'],
-    ['phosphate', '0.7–1.5 mmol/L', 'KKH; age ≥19 years'],
-    ['cortisol', '102–535 nmol/L', 'serum collected at 8 am'],
-    ['testosteronefree', 'Male: 0.180–0.994; female: 0.003–0.058 nmol/L', 'not a direct free-testosterone assay'],
-    ['bun', 'Male: 8–24; female: 6–21 mg/dL', 'not urea concentration'],
-    ['phurine', '5.0–9.0 pH', 'not blood pH'],
-    ['vitc', '23–85 µmol/L', 'protect collection from light'],
-  ]) {
-    await page.goto(`/#biomarker-${id}`);
+test('core guideposts have usable comparators; contextual markers stay in the extended reference list', async ({ page }) => {
+  await page.goto('/');
+  for (const [id, value] of [['hdl', '≥1.0 mmol/L'], ['totalchol', '<5.2 mmol/L'], ['mma', '>0.271 µmol/L'], ['rhr', '60–100 bpm'], ['sleep', '7–9 hours/night'], ['bmd', 'T-score ≤−2.5']]) {
     const card = page.locator(`#biomarker-${id}`);
-    await expect(card.locator('.sg-range-context')).toContainText(values);
-    await card.locator('.sg-lab-details summary').click();
-    await expect(card.locator('.sg-lab-details')).toContainText(context);
-    await expect(card.locator('.sg-card-action')).toBeVisible();
+    await expect(card.locator('[data-range-value] strong')).toContainText(value);
+    await expect(card.locator('.sg-range-scale [data-range-item]')).toHaveCount(1);
+    await expect(card.locator('.sg-lab-details')).not.toHaveAttribute('open');
+  }
+  for (const id of ['fibrinogen', 'esr']) {
+    const card = page.locator(`#biomarker-${id}`);
+    await expect(card.locator('[data-range-value]')).toContainText('Use the interval on your laboratory report');
+    await expect(card.locator('[data-range-value]')).not.toContainText('Example lab interval');
+  }
+  for (const id of ['homair', 'igf1', 'grip', 'vo2', 'bodyfat', 'hrv', 'tghdl', 'nlr']) {
+    await expect(page.locator(`#biomarker-${id}`)).toHaveCount(0);
+  }
+  await expect(page.locator('#biomarker-insulin')).toHaveCount(0);
+  const picker = page.locator('.sg-reference-picker');
+  if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
+  const search = page.getByRole('searchbox', { name: 'Find a biomarker' });
+  for (const query of ['fasting insulin', 'HOMA-IR', 'triglyceride-to-HDL ratio', 'neutrophil-to-lymphocyte ratio']) {
+    await search.fill(query);
+    await expect(page.locator('#reference-search-status')).toContainText('No matches');
+    await expect(page.locator('#biomarker-insulin')).toHaveCount(0);
+  }
+  await page.getByRole('button', { name: 'Alternative units', exact: true }).click();
+  await expect(page.locator('#biomarker-hdl [data-range-value] strong')).toHaveText('≥40 mg/dL');
+  await expect(page.locator('#biomarker-totalchol [data-range-value] strong')).toHaveText('<200 mg/dL');
+  await expect(page.locator('#biomarker-fibrinogen [data-range-value]')).toContainText('Use the interval on your laboratory report');
+  await expect(page.locator('#biomarker-bmd .sg-reference-copy')).toContainText('≤−2.0');
+  await expect(page.locator('#biomarker-colorectal [data-range-item] dt')).toHaveText('Screening eligibility & evidence');
+});
+
+test('every core and extended reference has a readable range or explicitly contextual presentation', async ({ page }) => {
+  await page.goto('/');
+  const picker = page.locator('.sg-reference-picker');
+  if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
+  await page.locator('[data-reference-show-all]').click();
+  await expect(page.locator('#sg-home-dashboard')).toHaveAttribute('data-complete-references', 'true');
+  for (const [id, text] of [['igf1', 'no single adult longevity range']]) {
+    await expect(page.locator(`#biomarker-${id}`)).toContainText(text);
+  }
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    const problems = await page.locator('[data-reference-card]').evaluateAll(cards => cards.flatMap(card => {
+      const range = card.querySelector('[data-reference-scale]');
+      const issues = [];
+      if (!range?.querySelector('dl dt')?.textContent.trim() || !range.querySelector('dl dd')?.textContent.trim()) issues.push('missing presentation');
+      if (range.scrollWidth > range.clientWidth + 1) issues.push('range overflow');
+      if (!card.querySelector('.sg-card-action p')?.textContent.trim()) issues.push('missing action');
+      if (range.querySelector('dt')?.textContent === 'Reference / eligibility') issues.push('ambiguous legacy heading');
+      return issues.map(issue => `${card.id}: ${issue}`);
+    }));
+    expect(problems).toEqual([]);
+    await expect(page.locator('[data-reference-card]')).toHaveCount(354);
+    await expect(page.locator('#biomarker-insulin')).toHaveCount(0);
   }
 });
 
@@ -74,18 +112,18 @@ test('Home search reveals a specialist reference with context and actions togeth
   await page.locator('[data-reference-results] a[href="#biomarker-tibc"]').click();
   const card = page.locator('#biomarker-tibc');
   await expect(card).toBeFocused();
-  await expect(card.locator('.sg-range-context')).toBeVisible();
+  await expect(card.locator('.sg-range-scale')).toBeVisible();
   await expect(card.locator('.sg-card-action')).toBeVisible();
   await page.reload();
   await expect(card).toBeVisible();
   await expect(page.locator('[data-reference-card="hdl"]')).toBeVisible();
 });
 
-test('numeric ranges are prominent and paired action panels align even when details expand', async ({ page }) => {
+test('lab context stays legible and paired action panels align when details expand', async ({ page }) => {
   await page.goto('/');
   for (const width of [1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const [left, right] of [['ast', 'cystatin'], ['vitd', 'b12'], ['glucose', 'insulin']]) {
+    for (const [left, right] of [['ast', 'cystatin'], ['vitd', 'b12'], ['glucose', 'hba1c']]) {
       const a = page.locator(`#biomarker-${left}`);
       const b = page.locator(`#biomarker-${right}`);
       for (const selector of ['[data-reference-scale]', '.sg-reference-copy', '.sg-card-action', '.sg-reference-source']) {
@@ -96,37 +134,32 @@ test('numeric ranges are prominent and paired action panels align even when deta
     }
     const ast = page.locator('#biomarker-ast');
     const cystatin = page.locator('#biomarker-cystatin');
-    await expect(ast.locator('.sg-lab-interval strong')).toHaveText('5–34 U/L');
-    await expect(cystatin.locator('.sg-lab-interval strong')).toHaveText('0.59–1.28 mg/L');
-    const summary = cystatin.locator('.sg-lab-details summary');
-    await summary.focus();
-    await summary.press('Enter');
-    await expect(cystatin.locator('.sg-lab-details p').first()).toBeVisible();
+    await expect(ast.locator('[data-range-value]')).toContainText('Use the interval on your laboratory report');
+    await expect(cystatin.locator('[data-range-value]')).toContainText('Use the assay interval');
+    await expect(cystatin.locator('.sg-lab-details')).toHaveCount(0);
+    await expect(cystatin).not.toContainText('0.59–1.28 mg/L');
     const a = await ast.locator('.sg-card-action').boundingBox();
     const b = await cystatin.locator('.sg-card-action').boundingBox();
     expect(Math.abs(a.y - b.y)).toBeLessThan(1);
     expect(Math.abs(a.height - b.height)).toBeLessThan(1);
-    await summary.press('Enter');
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
-  await page.locator('#biomarker-cystatin .sg-lab-details summary').click();
+  await expect(page.locator('#biomarker-cystatin .sg-lab-details')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
   await expect(page.locator('#biomarker-cystatin .sg-card-action')).toBeVisible();
 });
 
-test('printing exposes lab details and restores the reader disclosure state', async ({ page }) => {
+test('printing does not reintroduce example lab intervals', async ({ page }) => {
   await page.goto('/');
-  const b12 = page.locator('#biomarker-b12 .sg-lab-details');
-  const cystatin = page.locator('#biomarker-cystatin .sg-lab-details');
-  await cystatin.locator('summary').click();
   await page.evaluate(() => dispatchEvent(new Event('beforeprint')));
-  await expect(b12).toHaveAttribute('open');
   await page.emulateMedia({ media: 'print' });
-  await expect(b12.locator('p').first()).toBeVisible();
+  for (const [id, value] of [['b12', '138–652'], ['fibrinogen', '200–393'], ['esr', '3–20'], ['cystatin', '0.59–1.28']]) {
+    const card = page.locator(`#biomarker-${id}`);
+    await expect(card).not.toContainText(value);
+    await expect(card.locator('.sg-lab-details')).toHaveCount(0);
+  }
   await page.evaluate(() => dispatchEvent(new Event('afterprint')));
-  await expect(b12).not.toHaveAttribute('open');
-  await expect(cystatin).toHaveAttribute('open');
 });
 
 test('published lab guidance accounts for every independently captured unique entry', async () => {
@@ -138,7 +171,7 @@ test('published lab guidance accounts for every independently captured unique en
   expect(new Set(LAB_REFERENCES.map(item => item.id)).size).toBe(names.length);
   for (const reference of LAB_REFERENCES) {
     expect(reference.note.length, reference.id).toBeGreaterThan(35);
-    expect(reference.reference || reference.bands, reference.id).toBeTruthy();
+    expect(reference.reference || reference.bands || reference.guide, reference.id).toBeTruthy();
     expect(reference.action.length, reference.id).toBeGreaterThan(40);
     expect(reference.source, reference.id).toMatch(/^https:\/\//);
     expect(reference.groupId, reference.id).toBeTruthy();
@@ -172,7 +205,7 @@ test('specialist direct links, browser Back and complete-reference reading work'
   })));
   const { LAB_REFERENCES } = await import('../js/data/lab-references.js');
   expect(new Set(mounted.map(item => item.id)).size).toBe(mounted.length);
-  expect(LAB_REFERENCES.every(reference => mounted.some(item => item.id === reference.id && item.visiblePlan))).toBe(true);
+  expect(LAB_REFERENCES.filter(reference => reference.id !== 'insulin').every(reference => mounted.some(item => item.id === reference.id && item.visiblePlan))).toBe(true);
   const result = await new AxeBuilder({ page }).include('#sg-home-dashboard').analyze();
   expect(result.violations).toEqual([]);
   for (const width of [320, 768]) {

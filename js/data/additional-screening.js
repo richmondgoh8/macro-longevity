@@ -379,15 +379,3 @@ export const ADDITIONAL_MARKERS = FAMILIES.flatMap(family => family.rows.map(([i
     actions: family.actions, context: family.context,
   };
 }));
-
-// Each existing core-panel reference must have a usable tracker entry, not just a library name.
-// Ratios/HOMA-IR use their component results; no universal ratio targets are inferred.
-export const CORE_PANEL_TRACKER_COVERAGE = {
-  'apob-lipids': ['apob', 'totalchol', 'hdl', 'ldl', 'tg'],
-  'tg-hdl-ratio': ['tg', 'hdl'], hba1c: ['hba1c'],
-  'fasting-insulin': ['glucose', 'insulin'], 'ferritin-iron': ['ferritin', 'iron', 'tibc', 'tsat'],
-  'uric-acid': ['urate'], cbc: ['hemoglobin', 'hematocrit', 'rbc', 'wbc', 'platelets', 'mcv', 'rdw'],
-  'liver-enzymes': ['alt', 'ast', 'ggt'], kidney: ['creatinine', 'egfr'],
-  tsh: ['tsh', 'ft4'], 'cmp-electrolytes': ['sodium', 'potassium', 'chloride', 'bicarbonate', 'calcium', 'albumin'],
-  hscrp: ['hscrp'], bp: ['bp'],
-};

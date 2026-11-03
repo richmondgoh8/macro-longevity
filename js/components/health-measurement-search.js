@@ -11,12 +11,13 @@ export function mountHealthSearch(root, priority, loaders) {
   async function getCatalog() {
     if (!task) task = Promise.all([
       import('../data/additional-screening.js'), import('../data/physical-measurements.js'), import('../data/blueprint-markers.js'), import('../data/extended-references.js'),
-    ]).then(([additional, physical, library, extended]) => {
+      import('../data/physical-result-fields.js'),
+    ]).then(([additional, physical, library, extended, observations]) => {
       const structured = [...priority, ...additional.ADDITIONAL_MARKERS];
       const owned = new Set(structured.map(item => item.catalogName ? library.normalizeTestName(item.catalogName) : measurementIdentity(item.id).libraryId));
       const fields = [
         ...structured.map(item => ({ ...item, destination: 'structured', target: `sg-${item.id}` })),
-        ...physical.PHYSICAL_MEASUREMENTS.map(item => ({ id: item.referenceId, label: item.label || physical.PHYSICAL_REFERENCES.find(reference => reference.id === item.referenceId).label, destination: 'physical', target: `physical-${item.id}` })),
+        ...observations.PHYSICAL_MEASUREMENTS.map(item => ({ id: item.referenceId, label: item.label || physical.PHYSICAL_REFERENCES.find(reference => reference.id === item.referenceId).label, destination: 'physical', target: `physical-${item.id}` })),
         ...library.BLUEPRINT_MARKERS.filter(item => !owned.has(item.id)).map(item => ({ ...item, label: item.name, destination: 'library', target: `library-${item.id}-result` })),
       ];
       const referenceById = new Map(extended.EXTENDED_REFERENCES.map(item => [item.id, item]));

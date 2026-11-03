@@ -18,13 +18,9 @@ const PAGE_CONFIG = {
   },
   '/pages/blood.html': {
     entries: [
-      { label: 'Before you draw', href: '#blood-prep' },
-      { label: 'Annual panel', href: '#blood-annual' },
-      { label: 'One-time checks', href: '#blood-one-time' },
-      { label: 'Periodic checks', href: '#blood-periodic' },
-      { label: 'ApoB options', href: '#blood-apob' },
-      { label: 'Beyond the blood panel', href: '#blood-beyond' },
-      { label: 'Low-value tests', href: '#blood-low-value' },
+      { label: 'Results tracker', href: '#sg-health-dashboard' },
+      { label: 'Before a blood test', href: '#blood-prep' },
+      { label: 'Low-value test cautions', href: '#blood-low-value' },
     ],
   },
   '/pages/protocol.html': {
@@ -57,13 +53,9 @@ const TARGET_FALLBACKS = {
     'avoid-upf-guide': '.upf-guide',
   },
   '/pages/blood.html': {
+    'sg-health-dashboard': '#sg-health-dashboard',
     'blood-prep': '.blood-prep',
-    'blood-annual': '#blood-app > .blood-tier:nth-of-type(2)',
-    'blood-one-time': '#blood-app > .blood-tier:nth-of-type(3)',
-    'blood-periodic': '#blood-app > .blood-tier:nth-of-type(4)',
-    'blood-apob': '#blood-app > .blood-tier:nth-of-type(5)',
-    'blood-beyond': '#blood-app > .blood-tier:nth-of-type(6)',
-    'blood-low-value': '#blood-app > .blood-tier:nth-of-type(7)',
+    'blood-low-value': '#blood-low-value',
   },
 };
 

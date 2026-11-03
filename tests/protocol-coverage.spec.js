@@ -56,7 +56,7 @@ test('complete guide exposes every specialist reference without duplicate cards'
     id: card.dataset.referenceCard, plan: card.querySelector('.sg-card-action').getBoundingClientRect().height > 0,
   })));
   expect(new Set(mounted.map(item => item.id)).size).toBe(mounted.length);
-  expect(mounted.length).toBe(EXTENDED_REFERENCES.length);
+  expect(mounted.length).toBe(EXTENDED_REFERENCES.filter(reference => reference.id !== 'insulin').length);
   expect(SPECIALIST_REFERENCES.every(reference => mounted.some(item => item.id === reference.id && item.plan))).toBe(true);
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('#biomarker-selenium .sg-card-action')).toBeVisible();

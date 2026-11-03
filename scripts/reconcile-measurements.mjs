@@ -8,7 +8,7 @@ import { SG_MARKER_ACTIONS } from '../js/data/screening-actions.js';
 import { SG_MARKERS } from '../js/data/screening.js';
 import { ADDITIONAL_MARKERS } from '../js/data/additional-screening.js';
 import { BLUEPRINT_MARKERS } from '../js/data/blueprint-markers.js';
-import { PHYSICAL_MEASUREMENTS } from '../js/data/physical-measurements.js';
+import { PHYSICAL_MEASUREMENTS } from '../js/data/physical-result-fields.js';
 import { PROTOCOL_MAPPINGS, PROTOCOL_EXCLUSIONS } from '../js/data/protocol-measurement-mappings.js';
 import { measurementIdentity } from '../js/data/measurement-index.js';
 import { searchMeasurements } from '../js/components/measurement-search.js';
@@ -31,7 +31,7 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
   for (const id of Object.keys({ ...CORE_LAB_INTERVALS, ...LAB_INTERVALS })) {
     const reference = byId.get(id);
     const interval = reference?.labInterval;
-    if (!interval || !interval.lab || !interval.population || !interval.unit || !/\d/.test(interval.values) || !/^https:\/\//.test(interval.source) || !interval.reviewed || !reference.reference?.includes(interval.values) || reference.unit !== interval.unit) failures.push(`Missing published laboratory interval: ${id}`);
+    if (!interval || !interval.lab || !interval.population || !interval.unit || !/\d/.test(interval.values) || !/^https:\/\//.test(interval.source) || !interval.reviewed || !reference.reference || reference.reference.includes(interval.values) || reference.unit !== interval.unit) failures.push(`Missing or exposed published laboratory interval: ${id}`);
   }
   if (map.size !== mappings.length) failures.push('Duplicate protocol mapping names.');
   const entries = [];
@@ -51,7 +51,7 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
       const physical = PHYSICAL_MEASUREMENTS.filter(item => item.referenceId === id).map(item => `#physical-${item.id}`);
       const targets = [...fields,...library,...physical];
       const action = reference.action || SG_MARKER_ACTIONS[id]?.[0]?.join('. ');
-      if (!reference.note || reference.note.length < 35 || !(reference.reference || reference.bands) || !action || action.length < 40 || /^Copy your report/i.test(action) || !/^https:\/\//.test(reference.source)) failures.push(`Incomplete guidance: ${id}`);
+      if (!reference.note || reference.note.length < 35 || !(reference.reference || reference.bands || reference.guide) || !action || action.length < 40 || /^Copy your report/i.test(action) || !/^https:\/\//.test(reference.source)) failures.push(`Incomplete guidance: ${id}`);
       const matches = searchMeasurements(references, lookup);
       if (!matches.some(item => item.id === id)) failures.push(`Unsearchable source name: ${lookup} → ${id}`);
       seen.add(id);
@@ -68,7 +68,7 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
     });
     entries.push({ ...entry, disposition: exclusion ? 'excluded' : repeated ? 'repeat' : ids.length > 1 ? 'components' : 'included', canonicalIds: ids, reason: exclusion || (ids.length > 1 ? 'Explicitly decomposed bundle or contextual components; distinct quantities and report methods are retained.' : 'Explicit source-name mapping; repeated observations do not inflate unique measurement counts.'), destinations, reviewStatus: decision || exclusion ? 'source-checked' : 'pending' });
   }
-  for (const entry of baseline.entries) add({ sourceEntryId: entry.sourceEntryId, sourceId: entry.sourceId, sourceSection: entry.sourceSection, originalName: entry.originalName }, entry.originalName, measurementIdentity(entry.canonicalId).id);
+  for (const entry of baseline.entries) add({ sourceEntryId: entry.sourceEntryId, sourceId: entry.sourceId, sourceSection: entry.sourceSection, originalName: entry.originalName }, entry.originalName, entry.disposition === 'excluded' ? undefined : measurementIdentity(entry.canonicalId).id);
   for (const [sourceId, extract] of [['blueprint-archive', archive],['blueprint-current',current]]) extract.entries.forEach((entry,index) => add({sourceEntryId:`${sourceId}-${index+1}`,sourceId,sourceSection:entry.section,originalName:entry.originalName,sourceLine:entry.sourceLine,historical:sourceId==='blueprint-archive'},entry.originalName));
   for (const [sourceId, sections] of [['blueprint-archive',supplement.archiveSections],['blueprint-current',supplement.currentSections]]) for (const [sectionIndex,section] of sections.entries()) section.rows.forEach(([sourceLine,originalName,mappingName],index)=>add({sourceEntryId:`${sourceId}-supplement-${sectionIndex+1}-${index+1}`,sourceId,sourceSection:section.section,sourceLine,originalName,historical:sourceId==='blueprint-archive'},mappingName));
   for (const [id,name] of [['leanmass','Lean mass'],['vat','Visceral adipose tissue (VAT)']]) add({sourceEntryId:`app-added-${id}`,sourceId:'app-coverage-additions',sourceSection:'User-requested body-composition distinctions',originalName:name},name,id);
@@ -87,7 +87,7 @@ export function reconcileMeasurements({ references = EXTENDED_REFERENCES, mappin
     scope:'Versioned published lab lists, current Biomarkers/Measurement/daily measurement examples, archived results/routine/organ/fitness named measurements and explicit exclusions. Not every lifetime, future or unpublished test.',
     numericalReferenceReview: {
       status: 'partial',
-      scope: 'Published lab intervals and banded references counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.',
+      scope: 'Published lab intervals are retained as sourced metadata for audit and are not displayed in reference cards. Banded references are counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.',
       publishedLabIntervals: references.filter(item => item.labInterval).length,
       bandedReferences: references.filter(item => item.bands).length,
       otherReferenceGuidance: references.filter(item => !item.labInterval && !item.bands).length,

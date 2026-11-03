@@ -2,8 +2,9 @@
 const KKH = 'https://www.kkh.com.sg/our-specialties/elab-book/';
 const kkh = (unit, values, slug) => ({ lab: 'KKH', population: 'age ≥19 years', unit, values, source: KKH + slug, reviewed: '2026-11-02' });
 export const CORE_LAB_INTERVALS = {
+  insulin: { lab: 'Mayo Clinic Laboratories', population: 'fasting serum; 8-hour fast required; assay-specific', unit: 'µIU/mL', values: '2.6–24.9', source: 'https://cardiology.testcatalog.org/show/INS', reviewed: '2026-11-03' },
+  fibrinogen: { lab: 'Boone Health', population: 'citrated plasma; ACL TOP Clauss clotting method', unit: 'mg/dL', values: '200–393', source: 'https://boonehealth.testcatalog.org/show/FIB', reviewed: '2026-11-03' },
   b12: kkh('pmol/L', '138–652', 'vitamin-b12'),
-  ferritin: kkh('µg/L', 'Male: 21.8–274.7; female: 4.6–204.0', 'ferritin-serum'),
   alt: kkh('U/L', '0–55', 'alanine-transaminase-alt'),
   ast: kkh('U/L', '5–34', 'aspartate-transaminase-ast'),
   ggt: kkh('U/L', 'Male: <55; female: <38', 'gamma-glutamyl-transferase-ggt'),
@@ -15,10 +16,10 @@ export const CORE_LAB_INTERVALS = {
 export function withLabInterval(reference, intervals) {
   const interval = intervals[reference.id];
   if (!interval || reference.labInterval) return reference;
+  const context = reference.reference || 'Use the interval on your laboratory report; interpretation varies by laboratory, population and method.';
   return {
     ...reference, unit: interval.unit, labInterval: interval,
-    reference: `${interval.values} ${interval.unit}. ${interval.lab}; ${interval.population}. Example lab interval, not a treatment target.`,
-    interpretation: reference.reference,
+    reference: context, interpretation: context,
     source: interval.source, extraSource: reference.source,
   };
 }

@@ -10,6 +10,7 @@ const SG_SCREEN = 'https://www.healthhub.sg/well-being-and-lifestyle/personal-ca
 const CLINICAL = [
   {
     id: 'hdl', label: 'HDL cholesterol', unit: 'mmol/L',
+    guide: ['Screening guidepost · not a treatment target', '≥1.0 mmol/L', '≥40 mg/dL'],
     reference: 'Singapore screening guidepost: HDL ≥1.0 mmol/L (40 mg/dL). This is a risk-assessment threshold, not a laboratory interval or a target to keep raising HDL. Interpret with LDL/non-HDL, ApoB and overall cardiovascular risk.',
     alternate: { unit: 'mg/dL' },
     note: 'HDL is not non-HDL cholesterol. A high HDL result does not cancel high LDL/ApoB, and continually raising HDL has not been established as a prevention strategy.',
@@ -19,6 +20,7 @@ const CLINICAL = [
   },
   {
     id: 'totalchol', label: 'Total cholesterol', unit: 'mmol/L',
+    guide: ['Screening guidepost · not a treatment target', '<5.2 mmol/L', '<200 mg/dL'],
     reference: 'Singapore screening guidepost: total cholesterol <5.2 mmol/L (200 mg/dL). This is not a personal treatment target or a population laboratory interval. Interpret the LDL, HDL and triglyceride components together.',
     alternate: { unit: 'mg/dL' },
     note: 'Total cholesterol combines cholesterol in different lipoproteins. A single total does not show atherogenic particle burden; individual risk and the rest of the panel matter.',
@@ -28,24 +30,10 @@ const CLINICAL = [
   },
   {
     id: 'insulin', label: 'Fasting insulin', unit: 'µIU/mL',
-    reference: 'Example assay interval: 2.6–24.9 µIU/mL. Use your laboratory’s fasting interval.',
-    note: 'Optional metabolic context, not an established population screening test or a universal “keep insulin as low as possible” target. Low insulin can also reflect insufficient production.',
-    action: 'Walk for 10 minutes after meals, replace sweet drinks with water and train strength twice weekly. Do not change insulin or diabetes medicine to chase this number.',
-    source: 'https://www.mayocliniclabs.com/test-notifications/attachment.php?id=14648',
-  },
-  {
-    id: 'homair', label: 'HOMA-IR', unit: 'Derived estimate',
-    reference: 'Fasting insulin (µIU/mL) × fasting glucose (mmol/L) ÷ 22.5. With glucose in mg/dL, divide by 405.',
-    note: 'Use results from the same fasting sample. This is HOMA1-IR, not HOMA2; cut-offs vary by population and insulin assay. It does not diagnose insulin resistance on its own.',
-    action: 'Build toward 150 minutes of moderate activity weekly and two strength sessions. If excess weight is present, reduce sugary drinks and oversized portions without crash dieting.',
-    source: 'https://doi.org/10.2337/diacare.27.6.1487',
-  },
-  {
-    id: 'tghdl', label: 'Triglyceride-to-HDL ratio', unit: 'Ratio',
-    reference: 'Triglycerides ÷ HDL-C, both in the same units. No universally accepted diagnostic or longevity cut-off.',
-    note: 'A ratio below 1.5 in mg/dL is a proposed optimisation target, not a universal guideline. A ratio calculated in mmol/L is numerically different. Low triglycerides or high HDL do not cancel high ApoB.',
-    action: 'Replace sugary drinks, limit refined-grain snacks, avoid alcohol if triglycerides are elevated and add post-meal walks. Address LDL/ApoB independently.',
-    source: 'https://pubmed.ncbi.nlm.nih.gov/22075272/',
+    note: 'Not useful for routine diabetes screening and does not diagnose insulin resistance on its own. A clinician may order it for a specific question, such as investigating unexplained low blood sugar; interpret it with glucose from the same draw and clinical context.',
+    action: 'If this was ordered to answer a specific clinical question, review it with the clinician who ordered it. Use fasting glucose or HbA1c for routine diabetes screening; do not change insulin or diabetes medicine based on this value.',
+    source: 'https://cardiology.testcatalog.org/show/INS',
+    extraSource: 'https://www2.gov.bc.ca/gov/content/health/practitioner-professional-resources/bc-guidelines/special-endocrine-testing',
   },
   {
     id: 'igf1', label: 'IGF-1', unit: 'ng/mL · age-/assay-specific',
@@ -55,21 +43,14 @@ const CLINICAL = [
     source: 'https://www.mayocliniclabs.com/test-catalog/overview/75932',
   },
   {
-    id: 'nlr', label: 'Neutrophil-to-lymphocyte ratio (NLR)', unit: 'Ratio · CBC differential',
-    reference: 'Absolute neutrophil count ÷ absolute lymphocyte count, using the same count units. One healthy-adult study found 0.78–3.53; this is not a universal clinical cut-off.',
-    note: 'Infection, stress, medicines and other conditions affect NLR. Associations in people with cancer do not make NLR a cancer-screening or “immune exhaustion” test.',
-    action: 'Avoid smoking, keep a consistent sleep schedule and allow recovery from illness. Follow up unexplained persistent blood-count changes rather than using immune-boosting supplements.',
-    source: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5217256/',
-  },
-  {
     id: 'ferritin', label: 'Ferritin', unit: 'µg/L (= ng/mL)',
-    note: 'Ferritin reflects iron storage but also rises with inflammation and liver disease. The lower limit of an example lab interval does not rule out iron deficiency. A high result alone does not prove iron overload; interpret with transferrin saturation and the clinical picture.',
+    reference: 'Use the age-, sex- and method-specific interval on your laboratory report; there is no universal ferritin target for longevity screening.',
+    note: 'Ferritin reflects iron storage but also rises with inflammation and liver disease. A result within the laboratory interval does not rule out iron deficiency. A high result alone does not prove iron overload; interpret with transferrin saturation and the clinical picture.',
     action: 'Do not add iron supplements without a demonstrated need. Avoid self-directed blood donation or phlebotomy to lower ferritin; treat a confirmed deficiency or overload using the agreed plan.',
     source: 'https://medlineplus.gov/lab-tests/ferritin-blood-test/',
   },
   {
     id: 'fibrinogen', label: 'Fibrinogen', unit: 'g/L',
-    reference: 'Example laboratory interval: 2.00–3.93 g/L (200–393 mg/dL); match the assay on your report.',
     note: 'A clotting protein and acute-phase reactant, not a standalone cancer or plasma-viscosity screening test. Low and high results can both matter.',
     action: 'Stay smoke-free and build regular walking into your week. Do not start aspirin or anticoagulants to change fibrinogen; abnormal results require cause-specific assessment.',
     source: 'https://boonehealth.testcatalog.org/show/FIB',
@@ -82,7 +63,7 @@ const CLINICAL = [
   },
   {
     id: 'homocysteine', label: 'Homocysteine', unit: 'µmol/L',
-    reference: 'Below 9–10 µmol/L is not a proven universal prevention target.',
+    reference: 'Use the laboratory interval and interpret with vitamin B12, folate and kidney function; lowering a normal result is not established cardiovascular prevention.',
     note: 'B12/folate status and kidney function affect this marker. Lowering the concentration with vitamins does not automatically prevent cardiovascular events or demonstrate improved “detoxification”.',
     action: 'Include B12-containing foods or an appropriate fortified alternative, plus folate-rich vegetables and legumes. Correct a confirmed deficiency; avoid high-dose B-vitamin stacks without advice.',
     source: 'https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/',
@@ -117,7 +98,7 @@ const CLINICAL = [
     id: 'vitd', label: 'Vitamin D (25-OH)', unit: 'nmol/L',
     bands: [['Adequate for most', '50–125'], ['May be inadequate', '30–<50'], ['Too low', '<30']],
     alternate: { unit: 'ng/mL', values: ['20–50', '12–<20', '<12'] },
-    note: 'Bone-health reference, not a cancer-prevention target. Above 125 nmol/L (50 ng/mL) can also be concerning. A universal target of 40–60 ng/mL and routine testing of healthy adults are not established recommendations.',
+    note: 'Bone-health reference, not a cancer-prevention target. Do not supplement solely to chase a higher result; routine testing of healthy adults is not established.',
     action: 'Choose oily fish or fortified foods. If supplementation is indicated, use the agreed dose and avoid overlapping high-dose products; do not pursue unprotected sun exposure to chase a result.',
     source: 'https://ods.od.nih.gov/factsheets/VitaminD-Consumer/',
   },
@@ -130,6 +111,7 @@ const CLINICAL = [
   },
   {
     id: 'mma', label: 'Methylmalonic acid (MMA)', unit: 'µmol/L',
+    guide: ['B12-deficiency assessment threshold · not diagnostic alone', '>0.271 µmol/L'],
     reference: 'Use the assay interval. MMA above 0.271 µmol/L can support B12 deficiency, but is not diagnostic in isolation.',
     note: 'Kidney impairment can raise MMA. Interpret alongside B12, kidney function and symptoms rather than using it as an isolated optimisation target.',
     action: 'Use prescribed B12 replacement consistently when deficiency is confirmed. Do not take folic acid alone to mask an unexplained B12 deficiency; have persistent neurological symptoms assessed.',
@@ -211,28 +193,26 @@ const CLINICAL = [
   },
 ];
 
-export const HEALTH_REFERENCES = [...REFERENCE_RANGES, ...CLINICAL, ...PHYSICAL_REFERENCES].map(reference => withLabInterval({
-  ...reference,
-  note: reference.note + (reference.id === 'hba1c' ? ' A target of 4.8–5.3% is not an established universal longevity recommendation.' : reference.id === 'hscrp' ? ' Targets below 0.8 or 0.5 mg/L are not universal treatment goals.' : ''),
-}, CORE_LAB_INTERVALS));
+const CORE_PHYSICAL_REFERENCES = new Set(['bmd', 'rhr', 'sleep']);
+export const HEALTH_REFERENCES = [...REFERENCE_RANGES, ...CLINICAL, ...PHYSICAL_REFERENCES.filter(reference => CORE_PHYSICAL_REFERENCES.has(reference.id))].map(reference => withLabInterval(reference, CORE_LAB_INTERVALS));
 
 export const HEALTH_REFERENCE_GROUPS = [
   {
-    id: 'metabolic', title: 'Metabolic health & insulin regulation', short: 'Metabolic',
+    id: 'metabolic', title: 'Metabolic health & glucose regulation', short: 'Metabolic',
     description: 'Assess glucose regulation and metabolic risk together. These markers support clinical assessment; they are not cancer-screening tests.',
-    ids: ['glucose', 'insulin', 'homair', 'hba1c', 'tghdl', 'igf1'],
+    ids: ['glucose', 'hba1c'], extendedIds: ['igf1'],
     plan: ['Walk for 10 minutes after one or more main meals; work toward 150 minutes of moderate activity a week.', 'Replace sweet drinks with water and use a quarter-plate portion of wholegrains alongside vegetables and protein.', 'Train strength twice weekly. If taking glucose-lowering medicines, follow your agreed meal/exercise plan to avoid hypoglycaemia.'],
   },
   {
     id: 'inflammation', title: 'Chronic inflammation & immune balance', short: 'Inflammation',
     description: 'Interpret trends when clinically well. These nonspecific markers do not measure cancer surveillance or establish that cancer is present.',
-    ids: ['hscrp', 'nlr', 'ferritin', 'fibrinogen', 'esr'],
+    ids: ['hscrp', 'ferritin', 'fibrinogen', 'esr'],
     plan: ['Build regular activity gradually and allow recovery from illness rather than training hard through it.', 'Include vegetables, whole fruit, wholegrains and legumes; increase fibre gradually toward 25–30 g/day.', 'Stay smoke-free and keep 7–9 hours available for sleep. Do not take iron or anti-inflammatory drugs merely to change a biomarker.'],
   },
   {
     id: 'cardiovascular', title: 'Cardiovascular & endothelial health', short: 'Cardiovascular',
     description: 'Control modifiable cardiovascular risk. A favourable ratio or calcium score does not cancel elevated atherogenic particles.',
-    ids: ['apob', 'lpa', 'homocysteine', 'totalchol', 'hdl', 'ldl', 'tg', 'nonhdl', 'bp', 'rhr'],
+    ids: ['apob', 'lpa', 'homocysteine', 'totalchol', 'hdl', 'ldl', 'tg', 'nonhdl', 'bp', 'rhr', 'cac'],
     plan: ['Swap butter/ghee and fatty processed meats for unsaturated oils, beans, tofu or fish.', 'Build toward 25–30 g fibre/day and regular walking; aim for 150 minutes of weekly activity and two strength sessions.', 'Keep sodium below 2,000 mg/day unless your care team sets another plan, stay smoke-free and take indicated medicines consistently.'],
   },
   {
@@ -255,16 +235,17 @@ export const HEALTH_REFERENCE_GROUPS = [
     plan: ['List your last completed screening dates, prior abnormal results and relevant family history.', 'Book the screening you are due for under your local guideline; discuss an earlier or specialist pathway for inherited/family risk.', 'Complete follow-up after an abnormal screen. Do not replace proven screening with tumour markers, MCED or a whole-body MRI.'],
   },
   {
-    id: 'functional', title: 'Functional & physiological biomarkers', short: 'Fitness & body',
-    description: 'Physical capacity, body composition and selected plaque assessment complement blood tests. Compare like-for-like methods and avoid guaranteed mortality-reduction claims.',
-    ids: ['vo2', 'grip', 'bmd', 'dexa', 'weight', 'bodyfat', 'leanmass', 'vat', 'hrv', 'sleep', 'sleepefficiency', 'cac', 'bmi', 'waist'],
-    plan: ['Build aerobic volume gradually toward 150–300 minutes/week at a moderate intensity suited to your health.', 'Train major muscle groups twice weekly; track improvements in real-world walking, stairs and lifting as well as any test result.', 'Use sustainable meals to reduce excess fat when appropriate, not crash dieting. Reserve CAC/DXA for a decision they can actually inform.'],
+    id: 'functional', title: 'Body, bone & sleep', short: 'Body & sleep',
+    description: 'Use established screening guideposts for body size, the appropriate DXA bone score and adult sleep-duration guidance. These are separate measures, not a single health score.',
+    ids: ['bmd', 'sleep', 'bmi', 'waist'],
+    extendedIds: ['grip', 'dexa', 'weight', 'bodyfat', 'leanmass', 'vat', 'vo2', 'hrv', 'sleepefficiency'],
+    plan: ['Keep a representative sleep schedule that allows enough time for rest.', 'Measure waist consistently and interpret it with BMI, health history and body composition.', 'Use DXA bone results with the age-appropriate score and clinical fracture-risk assessment; do not treat body-composition estimates as universal targets.'],
   },
 ];
 
 export const TESTING_SCHEDULE = [
   ['Routine review', 'Review blood pressure, BMI/waist, habits, family history and screening due dates regularly. In Singapore, core glucose/lipid screening is commonly offered from 40 about every 3 years—not automatically every year for all healthy adults.'],
-  ['Additional blood/urine tests: indication-led', 'Discuss CBC with differential; CMP (ALT, AST, creatinine/eGFR and electrolytes); lipid panel + ApoB; fasting insulin/HbA1c; hs-CRP; GGT; 25-OH vitamin D; ferritin; homocysteine; and uACR when results would change care. This is a discussion list, not a blanket annual panel. Monitoring frequency depends on disease, medicines and prior results.'],
+  ['Additional blood/urine tests: indication-led', 'Discuss CBC with differential; CMP (ALT, AST, creatinine/eGFR and electrolytes); lipid panel + ApoB; HbA1c; hs-CRP; GGT; 25-OH vitamin D; ferritin; homocysteine; and uACR when results would change care. Fasting insulin is for specific clinician-directed questions, not routine screening. This is a discussion list, not a blanket annual panel. Monitoring frequency depends on disease, medicines and prior results.'],
   ['Usually once in adulthood / inherited risk', 'Lp(a) is generally checked once, with repeats in selected clinical circumstances. BRCA1/2, Lynch syndrome and other germline tests should follow personal/family-risk assessment and genetic counselling—not universal “baseline genetic screening”. APOE is not a routine general longevity or cancer-screening test.'],
   ['Cancer screening', 'Use the eligibility and intervals in the cancer group, adjusted for local guidance, prior results and personal/family history. Do not wait for a routine screen if symptoms develop.'],
 ];

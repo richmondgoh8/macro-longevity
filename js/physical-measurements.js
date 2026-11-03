@@ -1,5 +1,6 @@
-import { PHYSICAL_MEASUREMENTS } from './data/physical-measurements.js';
-import { HEALTH_REFERENCES } from './data/health-reference-groups.js';
+import { PHYSICAL_MEASUREMENTS } from './data/physical-result-fields.js';
+import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS } from './data/health-reference-groups.js';
+import { PHYSICAL_REFERENCES } from './data/physical-measurements.js';
 import { escapeHTML as escape } from './components/ui.js';
 
 const KEY = 'health-physical-results-v1';
@@ -17,7 +18,8 @@ export function mountPhysicalMeasurements(root) {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
     if (saved && typeof saved === 'object' && !Array.isArray(saved)) records = saved;
   } catch { /* Keep a usable session if storage is unavailable. */ }
-  const references = new Map(HEALTH_REFERENCES.map(item => [item.id, item]));
+  const references = new Map([...PHYSICAL_REFERENCES, ...HEALTH_REFERENCES].map(item => [item.id, item]));
+  const guideIds = new Set(HEALTH_REFERENCE_GROUPS.flatMap(group => group.ids));
   const input = (cardId, key, label, value, attributes = '') => `<div><label for="physical-${cardId}-${key}">${escape(label)}</label><input id="physical-${cardId}-${key}" data-physical-field="${key}" value="${escape(String(value || ''))}" maxlength="120" ${attributes}></div>`;
   root.innerHTML = `<p class="sg-group-copy">Optional measurements beyond the blood draw. Copy your report and method; these do not count toward the blood-and-urine panel. Units label your entered value and never convert it.</p>
     <div class="sg-marker-grid">${PHYSICAL_MEASUREMENTS.map(measurement => {
@@ -39,7 +41,7 @@ export function mountPhysicalMeasurements(root) {
           ${measurement.metric ? `<div><label for="physical-${measurement.id}-metric">HRV metric</label><select id="physical-${measurement.id}-metric" data-physical-field="metric">${['Not specified', ...measurement.metric].map(metric => `<option${saved.metric === metric ? ' selected' : ''}>${escape(metric)}</option>`).join('')}</select></div>` : ''}
         </div></details>
         <p id="physical-${measurement.id}-status" data-physical-status role="status"></p>
-        <a href="../#biomarker-${measurement.referenceId}">Reference &amp; action plan →</a>
+        ${guideIds.has(measurement.referenceId) ? `<a href="../#biomarker-${measurement.referenceId}">Reference &amp; action plan →</a>` : ''}
       </article>`;
     }).join('')}</div><p data-physical-storage role="status">Physical results stay in this browser, separately from laboratory results.</p>`;
 

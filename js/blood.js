@@ -1,127 +1,29 @@
-// blood.js — Blood Tests rendering (annual panel, deficiency markers, low-value tests)
-import { ANNUAL_PANEL, BLOOD_TIERS, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_EFFECTS } from './data/blood.js';
+import { LOW_VALUE_TESTS } from './data/blood.js';
 import { escapeHTML } from './components/ui.js';
 import { mountHealthDashboard } from './health-dashboard.js';
 
-function labelWithoutMarker(value) {
-  return String(value ?? '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
-}
-
-function evidenceBadge(level) {
-  if (!level) return "";
-  const label = level.charAt(0).toUpperCase() + level.slice(1);
-  return `<span class="evidence-badge evidence-badge-${level}">${label}</span>`;
-}
-function testCard(t) {
-  return `
-    <details class="blood-card blood-test-row">
-      <summary><span><span class="blood-card-name" role="heading" aria-level="3">${t.name}</span><span class="blood-card-range"><span class="stack-line-label">Target</span> <span class="blood-range">${t.optimalRange}</span></span></span><span class="blood-test-meta"><span class="blood-card-freq">${t.frequency}</span>${t.evidence ? evidenceBadge(t.evidence) : ""}</span></summary>
-      <div class="blood-test-detail"><p class="blood-card-why">${t.why}</p>${t.carnivoreNote ? `<div class="carnivore-note"><span class="stack-line-label">Context</span> ${t.carnivoreNote}</div>` : ""}</div>
-    </details>`;
-}
-
-function disclosureSection({ title, description, body, count = '', open = false, className = '', id = '' }) {
-  return `<details class="progressive-section blood-tier ${className}"${id ? ` id="${id}"` : ''}${open ? ' open' : ''}>
-    <summary>
-      <span class="progressive-section-heading"><span class="blood-tier-title" role="heading" aria-level="2">${escapeHTML(title)}</span><span class="blood-tier-desc">${escapeHTML(description)}</span></span>
-      ${count ? `<span class="progressive-section-count">${escapeHTML(count)}</span>` : ''}
-    </summary>
-    <div class="progressive-section-body">${body}</div>
+function renderLowValueTests() {
+  return `<details class="progressive-section blood-tier progressive-section-muted" id="blood-low-value">
+    <summary><span class="progressive-section-heading"><span class="blood-tier-title" role="heading" aria-level="2">Tests that rarely help without a clinical question</span><span class="blood-tier-desc">Check whether a result would change a decision before ordering an additional test.</span></span><span class="progressive-section-count">${LOW_VALUE_TESTS.length} examples</span></summary>
+    <div class="progressive-section-body"><div class="blood-grid">${LOW_VALUE_TESTS.map(test => `<article class="blood-card blood-card-low"><h3 class="blood-card-name">${escapeHTML(test.name)}</h3><p class="blood-card-why">${escapeHTML(test.why)}</p></article>`).join('')}</div></div>
   </details>`;
-}
-
-function tierSection(tier, open = false) {
-  const meta = BLOOD_TIERS[tier];
-  const items = ANNUAL_PANEL.filter(t => t.tier === tier);
-  return disclosureSection({
-    title: labelWithoutMarker(meta.label),
-    description: meta.desc,
-    count: `${items.length} tests`,
-    open,
-    id: `blood-${tier === 'annual' ? 'annual' : tier === 'one-time' ? 'one-time' : 'periodic'}`,
-    body: `<div class="blood-grid">${items.map(testCard).join("")}</div>`,
-  });
 }
 
 export function renderBlood() {
   mountHealthDashboard(document.getElementById('sg-health-dashboard'), { compact: true });
-  const container = document.getElementById("blood-app");
+  const container = document.getElementById('blood-app');
   if (!container) return;
 
-  const preparation = `
-    <details class="blood-prep" id="blood-prep" data-blood-prep open>
-      <summary><span><span class="blood-prep-title">Before You Draw</span><span class="blood-prep-summary">Fasting, hydration and timing guidance for comparable results.</span></span></summary>
-      <div class="blood-prep-body">
-      <p class="blood-prep-text">
-        Follow the lab's fasting instructions · arrive normally hydrated · keep the timing and
-        training conditions consistent when you trend results. A hard workout can transiently
-        change creatinine, AST and CRP, so avoid testing immediately after unusually hard training.
-      </p>
-      <p class="blood-prep-text">
-        In Singapore, Healthier SG screening covers the core cardiovascular checks for eligible people:
-        blood pressure, glucose, lipids, BMI and waist. Ask your clinic which tests are included,
-        whether fasting is needed, and how follow-up will work before paying for a larger package.
-      </p>
-      </div>
-    </details>`;
-
   container.innerHTML = `
-    ${preparation}
-    ${tierSection("annual", true)}
-    ${tierSection("one-time")}
-    ${tierSection("periodic")}
-    ${disclosureSection({
-      title: 'ApoB elevated? Options',
-      description: 'Low triglycerides and high HDL are favourable context — not proof that a high ApoB is harmless. Compare the practical options below with your clinician.',
-      count: `${APOB_EFFECTS.length} interventions`,
-      id: 'blood-apob',
-      body: `
-      <div class="apob-table-wrap">
-        <table class="apob-table">
-          <thead><tr><th scope="col">Intervention</th><th scope="col">Also helps</th><th scope="col">Lowers ApoB?</th></tr></thead>
-          <tbody>${APOB_EFFECTS.map(r => `
-            <tr><th scope="row" data-label="Intervention">${escapeHTML(r[0])}</th><td data-label="Also helps">${escapeHTML(r[1])}</td><td data-label="Lowers ApoB?">${escapeHTML(r[2])}</td></tr>
-          `).join("")}</tbody>
-        </table>
+    <details class="blood-prep" id="blood-prep" data-blood-prep open>
+      <summary><span><span class="blood-prep-title">Before a blood test</span><span class="blood-prep-summary">Follow the instructions for the specific test.</span></span></summary>
+      <div class="blood-prep-body">
+        <p class="blood-prep-text">Fasting and other preparation are needed only for some tests. Follow your lab or clinician’s instructions, tell them if you could not follow them, and do not stop medicines unless they tell you to.</p>
+        <p class="blood-prep-text"><a href="https://medlineplus.gov/lab-tests/how-to-prepare-for-a-lab-test/" target="_blank" rel="noreferrer">How to prepare for a lab test ↗</a></p>
       </div>
-    `})}
-    ${disclosureSection({
-      title: 'Beyond the blood panel',
-      description: 'These checkable habits matter more than most supplements and most low-value tests.',
-      count: `${BEYOND_PANEL.length} habits`,
-      id: 'blood-beyond',
-      body: `
-      <div class="blood-grid">
-        ${BEYOND_PANEL.map(t => `
-          <article class="blood-card">
-            <div class="blood-card-head">
-              <h3 class="blood-card-name">${t.name}</h3>
-            </div>
-            <p class="blood-card-why"><span class="stack-line-label">Do</span> ${t.action}</p>
-            <p class="blood-card-why">${t.why}</p>
-          </article>
-        `).join("")}
-      </div>
-    `})}
-    ${disclosureSection({
-      title: 'Low-value tests — save your money',
-      description: 'Expensive or fashionable tests that rarely produce an actionable decision.',
-      count: `${LOW_VALUE_TESTS.length} tests`,
-      className: 'progressive-section-muted',
-      id: 'blood-low-value',
-      body: `
-      <div class="blood-grid">
-        ${LOW_VALUE_TESTS.map(t => `
-          <article class="blood-card blood-card-low">
-            <div class="blood-card-head">
-              <h3 class="blood-card-name">${t.name}</h3>
-              <span class="evidence-badge evidence-badge-skip">Skip</span>
-            </div>
-            <p class="blood-card-why">${t.why}</p>
-          </article>
-        `).join("")}
-      </div>
-    `})}`;
+    </details>
+    <p class="blood-reference-link"><a href="../#testing-schedule">Reference guide: test context and screening schedule →</a></p>
+    ${renderLowValueTests()}`;
 
   if (window.matchMedia('(max-width: 767px)').matches) {
     const prep = container.querySelector('[data-blood-prep]');

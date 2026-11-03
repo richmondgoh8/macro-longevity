@@ -6,7 +6,7 @@
   "sources": [
     {
       "fixture": "biomarker-coverage-inventory.json",
-      "sha256": "a5b431bae2454b2f604001a4104a245e81b3075d430b5727279a21faffc82cd4"
+      "sha256": "35b55c6a061812ee475ce4c0092d460794e86ec11e073a6827ef6232fa0a3d33"
     },
     {
       "fixture": "archived-measurement-extraction.json",
@@ -28,21 +28,21 @@
   "scope": "Versioned published lab lists, current Biomarkers/Measurement/daily measurement examples, archived results/routine/organ/fitness named measurements and explicit exclusions. Not every lifetime, future or unpublished test.",
   "numericalReferenceReview": {
     "status": "partial",
-    "scope": "Published lab intervals and banded references counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.",
-    "publishedLabIntervals": 59,
-    "bandedReferences": 15,
-    "otherReferenceGuidance": 284
+    "scope": "Published lab intervals are retained as sourced metadata for audit and are not displayed in reference cards. Banded references are counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.",
+    "publishedLabIntervals": 60,
+    "bandedReferences": 14,
+    "otherReferenceGuidance": 281
   },
   "counts": {
     "sourceEntries": 663,
     "accounted": 663,
-    "excluded": 38,
-    "uniqueIncluded": 358,
-    "guidanceDestinations": 358,
+    "excluded": 41,
+    "uniqueIncluded": 355,
+    "guidanceDestinations": 355,
     "recordable": 159,
-    "searchFixtures": 652
+    "searchFixtures": 649
   },
   "failures": [],
-  "entriesSha256": "54f142e99fe314ad3dab33552651c7edee4a933d624230eb08986bd83deb9353",
-  "referenceContentSha256": "8bdd992505ded72399080d19f30411cbc05d58a7ad3f605f902b4651dc8256ee"
+  "entriesSha256": "720fec9509cfa9d4cb0bc588331f0685b58989195a3d8eab8882332623cea2e3",
+  "referenceContentSha256": "9802a2b15cc2e193670114ca056f0c48e440a4623c709485ab04600ba5217fe9"
 }

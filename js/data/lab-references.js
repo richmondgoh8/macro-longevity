@@ -159,7 +159,7 @@ export const LAB_REFERENCES = BLUEPRINT_MARKERS.map(marker => {
   const id = measurementIdentity(marker.id).id;
   const common = { id, libraryId: marker.id, aliases: [marker.name, marker.aliases].join(' '), reviewed: '2026-11-01' };
   const existing = core.get(id);
-  if (existing) return { ...existing, ...common, groupId: HEALTH_REFERENCE_GROUPS.find(group => group.ids.includes(id)).id, action: existing.action || SG_MARKER_ACTIONS[id][0].join('. ') };
+  if (existing) return { ...existing, ...common, groupId: HEALTH_REFERENCE_GROUPS.find(group => group.ids.includes(id) || group.extendedIds?.includes(id))?.id || existing.groupId || optionalGroups[optional.get(id)?.group], action: existing.action || SG_MARKER_ACTIONS[id][0].join('. ') };
   const extra = optional.get(id);
   if (extra) return { ...common, label: extra.label, unit: extra.suffix, groupId: optionalGroups[extra.group], familyId: 'optional-' + extra.group, familyLabel: extra.eyebrow, reference: extra.context, note: extra.why, action: (extra.actions || SG_MARKER_ACTIONS[extra.actionKey]).map(step => step.join('. ')).join(' '), actionLabel: 'Shared family action plan', source: extra.meaningSource, extraSource: extra.source };
   const context = contexts.get(marker.id);

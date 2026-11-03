@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS } from '../js/data/health-reference-groups.js';
+import { PHYSICAL_REFERENCES } from '../js/data/physical-measurements.js';
 import { SG_MARKER_ACTIONS } from '../js/data/screening-actions.js';
 import { SG_MARKERS } from '../js/data/screening.js';
 import { ADDITIONAL_MARKERS } from '../js/data/additional-screening.js';
@@ -13,7 +14,8 @@ import { measurementIdentity } from '../js/data/measurement-index.js';
 
 const REQUIRED_QUERIES = [['HDL-C', 'hdl'], ['non-HDL-C', 'nonhdl'], ['total cholesterol', 'totalchol'], ['hand grip', 'grip'], ['bone density', 'bmd'], ['RHR', 'rhr'], ['HRV', 'hrv'], ['sleep duration', 'sleep'], ['sleep efficiency', 'sleepefficiency']];
 const PUBLISHED_PANEL = JSON.parse(readFileSync(new URL('../docs/specs/published-panel-reconciliation.json', import.meta.url)));
-export function auditMeasurementCoverage({ inventory, references = HEALTH_REFERENCES, labReferences = LAB_REFERENCES, search = searchMeasurements, requireComplete = false }) {
+const REFERENCE_CATALOG = [...new Map([...HEALTH_REFERENCES, ...PHYSICAL_REFERENCES].map(item => [item.id, item])).values()];
+export function auditMeasurementCoverage({ inventory, references = REFERENCE_CATALOG, labReferences = LAB_REFERENCES, search = searchMeasurements, requireComplete = false }) {
   const failures = [];
   const check = (condition, message) => { if (!condition) failures.push(message); };
   for (const panel of ['baseline', 'male', 'female', 'followup']) {
@@ -26,7 +28,7 @@ export function auditMeasurementCoverage({ inventory, references = HEALTH_REFERE
   check(new Set(labReferences.map(item => item.id)).size === labReferences.length, 'Duplicate canonical lab guidance IDs.');
   for (const reference of labReferences) {
     check(HEALTH_REFERENCE_GROUPS.some(group => group.id === reference.groupId), `Unknown lab guidance group: ${reference.id}`);
-    check(Boolean(reference.unit && reference.note?.length > 35 && (reference.reference || reference.bands)), `Incomplete lab guidance: ${reference.id}`);
+    check(Boolean(reference.unit && reference.note?.length > 35 && (reference.reference || reference.bands || reference.guide)), `Incomplete lab guidance: ${reference.id}`);
     check(/^https:\/\//.test(reference.source), `Missing lab guidance source: ${reference.id}`);
     check(reference.action?.length > 40 && !/^Copy your report/i.test(reference.action), `Missing lab action/context: ${reference.id}`);
   }
@@ -46,7 +48,7 @@ export function auditMeasurementCoverage({ inventory, references = HEALTH_REFERE
   }
   for (const reference of references) {
     const action = reference.action || SG_MARKER_ACTIONS[reference.id]?.[0]?.join('. ');
-    check(Boolean(reference.label && reference.unit && reference.note && (reference.reference || reference.bands)), `Incomplete reference: ${reference.id}`);
+    check(Boolean(reference.label && reference.unit && reference.note && (reference.reference || reference.bands || reference.guide)), `Incomplete reference: ${reference.id}`);
     check(/^https:\/\//.test(reference.source), `Missing reference source: ${reference.id}`);
     check(typeof action === 'string' && action.length >= 40, `Missing substantive action/context: ${reference.id}`);
   }

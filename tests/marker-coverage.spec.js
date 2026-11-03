@@ -1,23 +1,27 @@
 import { expect, test } from '@playwright/test';
 import { SG_MARKERS, SG_MARKER_GROUPS } from '../js/data/screening.js';
 import { SG_MARKER_ACTIONS } from '../js/data/screening-actions.js';
-import { ADDITIONAL_MARKERS, CORE_PANEL_TRACKER_COVERAGE } from '../js/data/additional-screening.js';
-import { ANNUAL_PANEL } from '../js/data/blood.js';
+import { ADDITIONAL_MARKERS } from '../js/data/additional-screening.js';
 
-test('every existing core-panel reference has actual tracker fields and guidance', () => {
+test('every optional tracker field has an individual explanation, source and action', () => {
   const markers = [...SG_MARKERS, ...ADDITIONAL_MARKERS];
   expect(markers).toHaveLength(45);
   expect(new Set(markers.map(marker => marker.id)).size).toBe(45);
   expect(SG_MARKER_GROUPS.flatMap(group => group.ids)).toContain('hscrp');
-  for (const panel of ANNUAL_PANEL.filter(panel => panel.tier === 'annual')) {
-    const ids = CORE_PANEL_TRACKER_COVERAGE[panel.id];
-    expect(ids, panel.name).toBeTruthy();
-    for (const id of ids) expect(markers.some(marker => marker.id === id), panel.name + ': ' + id).toBe(true);
-  }
   for (const marker of markers) {
     expect(marker.actions || SG_MARKER_ACTIONS[marker.actionKey || marker.id], marker.id).toHaveLength(3);
     expect(marker.source, marker.id).toMatch(/^https:\/\//);
   }
+});
+
+test('Blood route uses the shared reference guide instead of a duplicate target schedule', async ({ page }) => {
+  await page.goto('/pages/blood.html');
+  await expect(page.locator('#blood-annual')).toHaveCount(0);
+  await expect(page.locator('#blood-app')).not.toContainText('Target');
+  await expect(page.locator('#blood-low-value')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Reference guide: test context and screening schedule' })).toHaveAttribute('href', '../#testing-schedule');
+  await page.getByRole('link', { name: 'Reference guide: test context and screening schedule' }).click();
+  await expect(page).toHaveURL(/#testing-schedule$/);
 });
 
 test('hs-CRP is visible, unit-aware, saved and does not confuse acute inflammation with a lifestyle target', async ({ page }) => {

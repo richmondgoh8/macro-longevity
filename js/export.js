@@ -2,7 +2,7 @@ export async function exportData() {
     const [
         { DAILY_SUPPLEMENTS, FOOD_SPICES, EXTRAS, AVOID_INGREDIENTS, AVOID_LABEL_GUIDE, UPF_GUIDE, TIMING_GUIDE, SKIP_LIST, CONDITIONAL_LIST },
         { CORE_OUTCOMES },
-        { ANNUAL_PANEL, LOW_VALUE_TESTS, BEYOND_PANEL, APOB_PLAN, APOB_EFFECTS },
+        { LOW_VALUE_TESTS },
         { INVESTMENTS },
         { PILLARS, EXERCISES },
         { PILLARS: MASTER_PILLARS, LONGEVITY_101, DECISION_RULE, EVIDENCE_TIERS },
@@ -51,11 +51,7 @@ export async function exportData() {
         coreOutcomes: CORE_OUTCOMES,
         conditionalList: CONDITIONAL_LIST,
         skipList: SKIP_LIST,
-        bloodPanel: ANNUAL_PANEL,
         lowValueTests: LOW_VALUE_TESTS,
-        beyondPanel: BEYOND_PANEL,
-        apobPlan: APOB_PLAN,
-        apobEffects: APOB_EFFECTS,
         investments: INVESTMENTS,
         passiveIncome,
         pillars: PILLARS,
@@ -218,38 +214,11 @@ export async function exportData() {
         md += `\n`;
     });
 
-    md += `## Annual Blood Panel (${data.bloodPanel.length})\n\n`;
-    data.bloodPanel.forEach(t => {
-        md += `### ${t.name}\n`;
-        if (t.evidence) md += `- **Evidence:** ${t.evidence}\n`;
-        md += `- **Frequency:** ${t.frequency}\n`;
-        md += `- **Target:** ${t.optimalRange}\n`;
-        md += `- **Why:** ${t.why}\n`;
-        if (t.carnivoreNote) md += `- **Carnivore note:** ${t.carnivoreNote}\n`;
-        md += `\n`;
-    });
-
-    md += `## Low-Value Tests — Skip (${data.lowValueTests.length})\n\n`;
+    md += `## Tests to discuss only when there is a clinical question (${data.lowValueTests.length})\n\n`;
     data.lowValueTests.forEach(t => {
         md += `### ${t.name}\n`;
-        md += `- **Why it's a trap:** ${t.why}\n\n`;
+        md += `- ${t.why}\n\n`;
     });
-
-    md += `## Beyond the Blood Panel (${data.beyondPanel.length})\n\n`;
-    data.beyondPanel.forEach(t => {
-        md += `### ${t.name}\n`;
-        md += `- **Do:** ${t.action}\n`;
-        md += `- **Why:** ${t.why}\n\n`;
-    });
-
-    md += `## ApoB Elevated? Next Steps (${data.apobPlan.length})\n\n`;
-    data.apobPlan.forEach((s, i) => {
-        md += `${i + 1}. **${s.step}:** ${s.action}\n`;
-    });
-    md += `\n**What helps what:**\n\n`;
-    md += `| Intervention | Also helps | Lowers ApoB? |\n|---|---|---|\n`;
-    data.apobEffects.forEach(r => { md += `| ${r[0]} | ${r[1]} | ${r[2]} |\n`; });
-    md += `\n`;
 
     md += `## Investment Combos (${data.investments.length})\n\n`;
     data.investments.forEach(inv => {

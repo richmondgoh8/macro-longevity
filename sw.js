@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-longevity-offline-v60-lab-intervals';
+const CACHE_NAME = 'macro-longevity-offline-v61-range-presentation';
 const STATIC_ASSETS = [
   './',
   'index.html',
@@ -68,6 +68,7 @@ const STATIC_ASSETS = [
   'js/data/reference-ranges.js',
   'js/data/health-reference-groups.js',
   'js/data/physical-measurements.js',
+  'js/data/physical-result-fields.js',
   'js/data/measurement-index.js',
   'js/physical-measurements.js',
   'js/components/measurement-search.js',

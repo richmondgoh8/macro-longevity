@@ -579,7 +579,7 @@ export const CONDITIONAL_LIST = [
     name: "Berberine",
     icon: "⚠️",
     evidence: "conditional",
-    who: "Individuals with suboptimal metabolic health — elevated HOMA-IR, fasting glucose, triglycerides, or waist circumference.",
+    who: "People with a defined metabolic concern, such as elevated fasting glucose or triglycerides, or an increased waist circumference.",
     why: "Trials suggest modest improvements in glucose and lipids in people with metabolic problems. That is a treatment question, not a general longevity upgrade, and the supplement is not a substitute for a diagnosis or prescribed therapy.",
     dose: "Only with clinician guidance; common study doses are 500 mg 1–2×/day with meals",
     timing: "With meals if prescribed for a defined metabolic indication.",

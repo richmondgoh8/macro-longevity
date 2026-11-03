@@ -77,10 +77,10 @@ export const REFERENCE_RANGES = [
   },
   {
     id: 'hscrp', label: 'hs-CRP (high-sensitivity CRP)', unit: 'mg/L',
-    bands: [['Lower relative risk', '<1'], ['Average relative risk', '1–3'], ['Higher relative risk', '>3']],
-    alternate: { unit: 'mg/dL', values: ['<0.1', '0.1–0.3', '>0.3'] },
+    guide: ['Risk-enhancing factor', '≥2 mg/L', '≥0.2 mg/dL'],
+    alternate: { unit: 'mg/dL' },
     note: 'Use the high-sensitivity test when well. ≥2 mg/L (0.2 mg/dL) is also risk-enhancing; >10 mg/L (1 mg/dL) can reflect acute inflammation and needs assessment.',
-    source: 'https://www.clevelandheartlab.com/content/dam/other-brands/clevelandheartlab/documents/pdf/CHL-D009-SEPT2019-hs-CRP-Practitioner-One-Pager.pdf',
+    source: 'https://www.acc.org/Latest-in-Cardiology/Articles/2025/12/01/01/Prioritizing-Health-hsCRP',
   },
   {
     id: 'egfr', label: 'Kidney filtration (eGFR)', unit: 'mL/min/1.73m²',
