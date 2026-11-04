@@ -10,9 +10,13 @@ const SG_SCREEN = 'https://www.healthhub.sg/well-being-and-lifestyle/personal-ca
 const CLINICAL = [
   {
     id: 'hdl', label: 'HDL cholesterol', unit: 'mmol/L',
-    guide: ['Screening guidepost · not a treatment target', '≥1.0 mmol/L', '≥40 mg/dL'],
-    reference: 'Singapore screening guidepost: HDL ≥1.0 mmol/L (40 mg/dL). This is a risk-assessment threshold, not a laboratory interval or a target to keep raising HDL. Interpret with LDL/non-HDL, ApoB and overall cardiovascular risk.',
-    alternate: { unit: 'mg/dL' },
+    bands: [
+      ['Low / higher-risk marker', '<1.0 men · <1.3 women', 'review'],
+      ['Desirable screening level', '≥1.0 men · ≥1.3 women and <1.6', 'normal'],
+      ['Higher HDL-associated level', '≥1.6', 'normal'],
+    ],
+    alternate: { unit: 'mg/dL', values: ['<40 men · <50 women', '≥40 men · ≥50 women and <60', '≥60'] },
+    reference: 'Singapore screening guidance uses low-HDL thresholds of <1.0 mmol/L for men and <1.3 mmol/L for women. HDL ≥1.6 mmol/L (about 60 mg/dL) is associated with lower risk in population studies, but is not a treatment target or proven protection.',
     note: 'HDL is not non-HDL cholesterol. A high HDL result does not cancel high LDL/ApoB, and continually raising HDL has not been established as a prevention strategy.',
     action: 'Build regular activity, replace saturated fats with unsaturated fats and stay smoke-free. Do not start drinking alcohol or add supplements just to raise HDL; address overall cardiovascular risk instead.',
     source: 'https://www.heart.org/en/health-topics/cholesterol/your-complete-guide-to-understanding-cholesterol-and-lipids',
@@ -96,8 +100,8 @@ const CLINICAL = [
   },
   {
     id: 'vitd', label: 'Vitamin D (25-OH)', unit: 'nmol/L',
-    bands: [['Adequate for most', '50–125'], ['May be inadequate', '30–<50'], ['Too low', '<30']],
-    alternate: { unit: 'ng/mL', values: ['20–50', '12–<20', '<12'] },
+    bands: [['Adequate for most', '50–125'], ['May be inadequate', '30–<50'], ['Too low', '<30'], ['Potential adverse-effect range', '>125', 'review']],
+    alternate: { unit: 'ng/mL', values: ['20–50', '12–<20', '<12', '>50'] },
     note: 'Bone-health reference, not a cancer-prevention target. Do not supplement solely to chase a higher result; routine testing of healthy adults is not established.',
     action: 'Choose oily fish or fortified foods. If supplementation is indicated, use the agreed dose and avoid overlapping high-dose products; do not pursue unprotected sun exposure to chase a result.',
     source: 'https://ods.od.nih.gov/factsheets/VitaminD-Consumer/',

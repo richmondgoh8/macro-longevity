@@ -15,8 +15,8 @@ test('all routes keep a readable editorial introduction without overflow', async
           page: getComputedStyle(document.body).backgroundColor,
         }));
         expect(colors.background).toBe('rgba(0, 0, 0, 0)');
-        expect(colors.page).toBe('rgb(247, 248, 243)');
-        expect(colors.title).toBe('rgb(24, 37, 31)');
+        expect(colors.page).toBe('rgb(253, 251, 247)');
+        expect(colors.title).toBe('rgb(30, 41, 59)');
       }
     }
   }
@@ -51,7 +51,7 @@ test('guidance disclosures remain accessible and reversible', async ({ page }) =
   await page.goto('/pages/finance.html');
   const intro = page.locator('#investments-app .investment-intro');
   await expect(intro).toBeVisible();
-  await expect(intro.locator('h2')).toHaveCSS('color', 'rgb(24, 37, 31)');
+  await expect(intro.locator('h2')).toHaveCSS('color', 'rgb(30, 41, 59)');
   expect(await intro.evaluate((node) => node.getBoundingClientRect().left)).toBeGreaterThanOrEqual(0);
   const combo = page.locator('[data-invest-combo]').first();
   if (await combo.getAttribute('open') !== null) await combo.locator('> summary').click();

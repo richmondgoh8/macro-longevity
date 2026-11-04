@@ -1,7 +1,7 @@
-# Calm Wellness design system (Warm Canvas tokens)
+# Calm Wellness design system (Warm Serenity tokens)
 
-Approved direction: warm ivory, forest-green actions, readable typography, calm surfaces.
-Updated: 2026-09-24.
+Approved direction: warm ivory #FDFBF7, teal #0F766E, slate #1E293B, readable Inter typography, white cards and calm sage surfaces.
+Updated: 2026-11-03.
 
 The Singapore baseline workspace extends this contract with flat-color marker tiles
 (teal, yellow, lilac, blue and coral) and original inline SVG icons. It keeps the
@@ -42,10 +42,10 @@ the current local-storage keys. Never add new medical or financial claims throug
 
 ## Tokens and layout
 
-- Canvas #F7F8F3; white main surfaces; sage #EDF3EC secondary surfaces.
-- Text #18251F; secondary text #526158.
-- Primary #246B4B; hover #1B5239; white primary-action labels.
-- Decorative border #D4DDD3; input border #7B897F.
+- Canvas #FDFBF7; white main surfaces; sage #F3F7F1 secondary surfaces.
+- Text #1E293B; secondary text #526158.
+- Primary #0F766E; hover #0D655D; white primary-action labels.
+- Decorative border #D8E4DC; input border #7B897F.
 - Attention #8A5600; danger #A33434. Always pair status colors with text.
 - Local Inter: body 16/24px, secondary 14/21px, metadata >=12px.
 - Page headings 32px desktop / 28px mobile; section 24px / 22px; card 18px.
@@ -81,7 +81,7 @@ Native links preserve browser history and modifier-click behavior.
 Motion is restrained to short color/opacity transitions. Marker cards also use a user-triggered front/back flip with the existing 200ms motion token; reduced motion disables the animation. Only the active face is visible and keyboard reachable. Paired cards share equal-height shells with bottom-aligned front actions, but never stretch each other's text.
 Do not make navigation wait for animation.
 
-Home is a read-only guide with seven health groups and 39 cards, not a result-entry form. All references and per-card action plans are visible together, with a concrete group plan below each grid. Neutral cards show assay-/age-/sex-dependent references or screening criteria rather than invented universal longevity thresholds. Label established numeric categories; green/amber/red are redundant cues, never the only meaning. Equal-width segments are categorical, not a numeric ruler. Preserve low-value, risk-based and urgent-care caveats. The recording CTA, promotional hero, protocol preview and export control are absent from Home; saved result tools remain on Health.
+Home starts with five source-linked health priorities, a cited activity guide and brief benefits, then keeps the seven-group read-only reference guide with its visible action plans and group plans. Neutral cards show assay-/age-/sex-dependent references or screening criteria rather than invented universal longevity thresholds. Label established numeric categories; green/amber/red are redundant cues, never the only meaning. Equal-width segments are categorical, not a numeric ruler. Preserve low-value, risk-based and urgent-care caveats. The recording CTA, promotional hero, protocol preview and export control are absent from Home; saved result tools remain on Health.
 
 ## Nutrition
 

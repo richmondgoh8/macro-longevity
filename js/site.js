@@ -62,7 +62,7 @@ document.querySelectorAll('.bottom-nav-item.active').forEach((item) => {
 
 const P='.nav-links a.nav-link,.bottom-nav-item,[data-context-link]',F=new Set;
 function prefetchNavigationPage(l){if(navigator.connection?.saveData||!l||l.target==='_blank')return;const u=new URL(l.href),h=u.pathname+u.search;if(u.origin!==location.origin||u.pathname===location.pathname||F.has(h))return;F.add(h);const p=document.createElement('link');p.rel='prefetch';p.href=u.href;document.head.append(p)}
-['pointerover','focusin'].forEach(t=>document.addEventListener(t,e=>{const l=e.target.closest?.(P);if(l)prefetchNavigationPage(l)},true));
+['pointerover','pointerdown','focusin'].forEach(t=>document.addEventListener(t,e=>{const l=e.target.closest?.(P);if(l)prefetchNavigationPage(l)},true));
 
 if (appPath() === '/') {
   window.addEventListener('load', () => setTimeout(() => {

@@ -5,7 +5,17 @@ import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS } from '../js/data/health-re
 test('Home contains the seven requested groups with visible references and action plans, without promotional extras', async ({ page }) => {
   await page.goto('/');
   const guide = page.locator('#sg-home-dashboard');
-  await expect(page.getByRole('heading', { name: 'Health reference & action plans' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Build health from the basics.' })).toBeVisible();
+  await expect(guide.locator('.sg-priority-card')).toHaveCount(5);
+  await expect(guide.locator('.sg-priority-card .sg-priority-benefit')).toHaveCount(5);
+  await expect(guide.locator('.sg-weekly-guide')).toContainText('150–300 min');
+  await expect(guide.locator('.sg-home-priorities')).toContainText('Why it matters');
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    const columns = await guide.locator('.sg-priority-grid').evaluate(node => getComputedStyle(node).gridTemplateColumns.trim().split(/\s+/).length);
+    expect(columns).toBe(width === 390 ? 1 : 2);
+  }
   await expect(page.locator('input:not([type="search"]), select, [data-export], #hero-pillar-map, #pillars-app, #stack-summary-app, #longevity101-app')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
   await expect(guide.locator('[data-reference-group]')).toHaveCount(7);
@@ -25,6 +35,7 @@ test('Home contains the seven requested groups with visible references and actio
     }
   }
   await expect(guide.locator('[data-reference-card="hscrp"]')).toContainText('risk-enhancing');
+  await expect(guide.locator('.sg-lab-details')).toHaveCount(0);
   await expect(guide.locator('[data-reference-card="hscrp"] dd')).toHaveText('≥2 mg/L');
   await expect(guide.locator('[data-reference-card="ferritin"]')).toContainText('age-, sex- and method-specific interval');
   await expect(guide.locator('[data-reference-card="ferritin"]')).not.toContainText('21.8–274.7');

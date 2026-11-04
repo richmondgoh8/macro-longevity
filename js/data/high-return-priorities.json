@@ -1,0 +1,96 @@
+[
+  {
+    "number": "01",
+    "category": "Move & build strength",
+    "title": "Make movement a weekly baseline",
+    "action": "Work toward 150–300 minutes of moderate aerobic activity each week, plus muscle-strengthening activity on at least 2 days. Start from your current level and build gradually.",
+    "benefit": "Regular activity supports health and physical capacity. Any amount is a useful start; the weekly range is a guide, not a pass/fail test.",
+    "weeklyTarget": true,
+    "sources": [
+      {
+        "label": "Singapore activity guidance",
+        "href": "https://www.healthhub.sg/well-being-and-lifestyle/exercise-and-fitness/150minutes"
+      }
+    ],
+    "links": [
+      {
+        "label": "Open Training",
+        "href": "pages/workout.html"
+      }
+    ]
+  },
+  {
+    "number": "02",
+    "category": "Food quality",
+    "title": "Build meals from less processed foods",
+    "action": "Choose vegetables, fruit, whole grains, pulses and other minimally processed foods more often; limit excess salt, free sugars and unhealthy fats.",
+    "benefit": "A varied, balanced diet supports health and helps prevent major noncommunicable diseases.",
+    "sources": [
+      {
+        "label": "WHO healthy-diet guidance",
+        "href": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+      }
+    ],
+    "links": [
+      {
+        "label": "Open Nutrition",
+        "href": "pages/stack.html"
+      }
+    ]
+  },
+  {
+    "number": "03",
+    "category": "Tobacco & alcohol",
+    "title": "Get help to quit smoking; reduce alcohol exposure",
+    "action": "Avoid tobacco. If you smoke, use a quit plan and local support. Drinking less reduces alcohol exposure; no level of drinking is risk-free.",
+    "benefit": "Quitting smoking improves health and lowers the risk of several diseases. Alcohol is also linked to disease; lowering exposure lowers risk.",
+    "sources": [
+      {
+        "label": "Singapore quit support",
+        "href": "https://www.healthhub.sg/well-being-and-lifestyle/personal-care/howtoquit"
+      },
+      {
+        "label": "Benefits of quitting smoking",
+        "href": "https://www.cdc.gov/tobacco/about/benefits-of-quitting.html"
+      },
+      {
+        "label": "WHO alcohol guidance",
+        "href": "https://www.who.int/news-room/fact-sheets/detail/alcohol"
+      }
+    ],
+    "links": []
+  },
+  {
+    "number": "04",
+    "category": "Sleep & recovery",
+    "title": "Protect enough regular sleep",
+    "action": "For adults aged 18–60, CDC guidance is at least 7 hours a night. Make enough time for sleep and talk with a clinician about persistent sleep problems.",
+    "benefit": "Good sleep supports health and emotional well-being.",
+    "sources": [
+      {
+        "label": "CDC sleep guidance",
+        "href": "https://www.cdc.gov/sleep/about/index.html"
+      }
+    ],
+    "links": []
+  },
+  {
+    "number": "05",
+    "category": "Prevention",
+    "title": "Check the risks that can change care",
+    "action": "Keep blood pressure, glucose, lipids and age-/risk-appropriate screening current. Review results with a clinician; more tests do not automatically mean better screening.",
+    "benefit": "Finding an eligible risk or screening need creates a chance to discuss timely follow-up and prevention.",
+    "sources": [
+      {
+        "label": "Singapore screening guidance",
+        "href": "https://www.healthhub.sg/well-being-and-lifestyle/personal-care/type-2-screening-tests"
+      }
+    ],
+    "links": [
+      {
+        "label": "Open Health",
+        "href": "pages/blood.html"
+      }
+    ]
+  }
+]

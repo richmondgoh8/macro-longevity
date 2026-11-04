@@ -35,8 +35,8 @@ for (const route of routes) {
         },
       };
     });
-    expect(contract.primary).toBe('#246B4B');
-    expect(contract.text).toBe('#18251F');
+    expect(contract.primary).toBe('#0F766E');
+    expect(contract.text).toBe('#1E293B');
     expect(contract.radius).toBe('16px');
     expect(contract.bodyFont).toContain('Inter');
     expect(contract.renderedEmoji).toBe(false);
@@ -46,7 +46,7 @@ for (const route of routes) {
     if (contract.primaryStyle) {
       expect(contract.primaryStyle.padding).toBe('8px 16px');
       expect(contract.primaryStyle.radius).toBe('10px');
-      expect(contract.primaryStyle.background).toBe('rgb(36, 107, 75)');
+      expect(contract.primaryStyle.background).toBe('rgb(15, 118, 110)');
     }
     if (contract.cardStyle) {
       expect(contract.cardStyle.radius).toBe('16px');
@@ -223,7 +223,7 @@ test('Sticky pin rail follows the Calm Wellness contract', async ({ page }) => {
   expect(desktop.navRadius).toBe('16px');
   expect(desktop.navShadow).not.toBe('none');
   expect(desktop.linkHeight).toBeGreaterThanOrEqual(44);
-  expect(desktop.activeIndicator).toBe('rgb(36, 107, 75)');
+  expect(desktop.activeIndicator).toBe('rgb(15, 118, 110)');
   expect(desktop.label).toBe('On this page');
 
   await page.emulateMedia({ reducedMotion: 'reduce' });

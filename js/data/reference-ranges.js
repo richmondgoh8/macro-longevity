@@ -77,9 +77,13 @@ export const REFERENCE_RANGES = [
   },
   {
     id: 'hscrp', label: 'hs-CRP (high-sensitivity CRP)', unit: 'mg/L',
-    guide: ['Risk-enhancing factor', '≥2 mg/L', '≥0.2 mg/dL'],
-    alternate: { unit: 'mg/dL' },
-    note: 'Use the high-sensitivity test when well. ≥2 mg/L (0.2 mg/dL) is also risk-enhancing; >10 mg/L (1 mg/dL) can reflect acute inflammation and needs assessment.',
+    bands: [
+      ['Lower relative risk', '<1', 'normal'],
+      ['Intermediate relative range', '1–3', 'watch'],
+      ['Higher relative range', '>3', 'review'],
+    ],
+    alternate: { unit: 'mg/dL', values: ['<0.1', '0.1–0.3', '>0.3'] },
+    note: 'Use the high-sensitivity assay when clinically well. The <1 / 1–3 / >3 mg/L bands are conventional relative-risk categories; current ACC/AHA guidance treats ≥2 mg/L as a risk-enhancing factor. A result >10 mg/L may reflect acute inflammation and needs clinical assessment, not cardiovascular categorisation.',
     source: 'https://www.acc.org/Latest-in-Cardiology/Articles/2025/12/01/01/Prioritizing-Health-hsCRP',
   },
   {

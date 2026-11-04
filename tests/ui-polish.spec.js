@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('homepage keeps only the grouped guide and main site shell', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('main h1')).toHaveText('Health reference & action plans');
+  await expect(page.locator('main h1')).toHaveText('Build health from the basics.');
   await expect(page.locator('.hero, #stack-summary-app, #longevity101-app, [data-export]')).toHaveCount(0);
   await expect(page.locator('[data-reference-group]')).toHaveCount(7);
 });
@@ -68,7 +68,7 @@ test('active primary navigation uses one selected treatment', async ({ page }) =
         afterContent: afterStyle.content,
       };
     });
-    expect(state.navBorderBottomColor).toBe('rgb(212, 221, 211)');
+    expect(state.navBorderBottomColor).toBe('rgb(216, 228, 220)');
     expect(state.activeBackground).toBe('rgba(0, 0, 0, 0)');
     expect(state.activeShadow).toContain('0px -2px');
     expect(state.afterContent).toBe('none');
@@ -81,7 +81,7 @@ test('active primary navigation uses one selected treatment', async ({ page }) =
       const style = getComputedStyle(active);
       return { background: style.backgroundColor, shadow: style.boxShadow };
     });
-    expect(state.background).toBe('rgb(237, 243, 236)');
+    expect(state.background).toBe('rgb(243, 247, 241)');
     expect(state.shadow).toBe('none');
   }
 });
@@ -149,7 +149,7 @@ test('section rail underlines the active item and clears the context tabs', asyn
       const style = getComputedStyle(active);
       return { underline: style.borderBottomColor, leftBorder: style.borderInlineStartWidth, background: style.backgroundColor };
     });
-    expect(layout.underline).toBe('rgb(36, 107, 75)');
+    expect(layout.underline).toBe('rgb(15, 118, 110)');
     expect(layout.leftBorder).toBe('0px');
     expect(layout.background).toBe('rgba(0, 0, 0, 0)');
   }
@@ -266,7 +266,7 @@ test('active workout tabs render one visible indicator bar', async ({ page }) =>
     });
     expect(state.parentBorderBottomStyle).toBe('none');
     expect(state.activeShadow).toContain('inset');
-    if (width === 390) expect(state.nextBorderTopColor).toBe('rgb(212, 221, 211)');
+    if (width === 390) expect(state.nextBorderTopColor).toBe('rgb(216, 228, 220)');
   }
 });
 
@@ -348,8 +348,7 @@ test('screening shortlist prioritizes routine lipids and frames ApoB as an addit
     await page.goto('/pages/blood.html');
     const shortlist = page.getByLabel('High-value screening shortlist');
     await expect(shortlist).toContainText('a full lipid panel');
-    await expect(shortlist).toContainText('Ask explicitly about ApoB for particle risk');
-    await expect(shortlist).toContainText('a one-time Lp(a) test for inherited risk');
+    await expect(shortlist).toContainText('Ask whether ApoB, a one-time Lp(a), or kidney tests would change a decision for you');
     await expect(shortlist).toContainText('more tests do not automatically mean better screening');
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   }
@@ -649,7 +648,7 @@ test('planner mode uses equal-width underlined tabs', async ({ page }) => {
     expect(initial.role).toBe('tablist');
     expect(initial.active).toBe('meals');
     expect(initial.selected).toBe(1);
-    expect(initial.indicator.background).toBe('rgb(36, 107, 75)');
+    expect(initial.indicator.background).toBe('rgb(15, 118, 110)');
     expect(initial.indicator.height).toBe('3px');
     expect(initial.widths).toHaveLength(2);
     initial.widths.forEach((width) => expect(width).toBeCloseTo(initial.widths[0], 1));

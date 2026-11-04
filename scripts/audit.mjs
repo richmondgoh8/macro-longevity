@@ -57,7 +57,7 @@ check(!sw.includes('geist-'), 'sw.js: legacy Geist font remains precached');
 
 const variables = read('css/variables.css');
 check(!/url\(\/(?:fonts|css|js|pages)\//.test(variables), 'css/variables.css: root-absolute asset path breaks project Pages hosting');
-check(variables.includes('--color-primary: #246B4B'), 'css/variables.css: Warm Canvas primary token missing');
+check(variables.includes('--color-primary: #0F766E'), 'css/variables.css: Warm Serenity teal primary token missing');
 check(variables.includes("font-family: 'Inter'"), 'css/variables.css: Inter font face missing');
 check(variables.includes("font-family: 'JetBrains Mono'"), 'css/variables.css: JetBrains Mono font face missing');
 check(!variables.includes('Geist'), 'css/variables.css: legacy Geist token remains');
@@ -68,9 +68,9 @@ check(styles.includes('navigation: none') && styles.includes('prefers-reduced-mo
 check(styles.includes('macro-page-view-transition-out') && styles.includes('macro-page-view-transition-in'), 'css/style.css: view-transition animations missing');
 
 const manifest = read('manifest.json');
-check(manifest.includes('"theme_color": "#F7F8F3"'), 'manifest.json: Warm Canvas theme color missing');
-check(manifest.includes('"background_color": "#F7F8F3"'), 'manifest.json: Warm Canvas background color missing');
-check(read('favicon.svg').includes('fill="#246B4B"'), 'favicon.svg: Warm Canvas primary fill missing');
+check(manifest.includes('"theme_color": "#FDFBF7"'), 'manifest.json: Warm Serenity theme color missing');
+check(manifest.includes('"background_color": "#FDFBF7"'), 'manifest.json: Warm Serenity background color missing');
+check(read('favicon.svg').includes('fill="#0F766E"'), 'favicon.svg: Warm Serenity primary fill missing');
 ['fonts/geist-sans.woff2', 'fonts/geist-mono.woff2', 'fonts/dm-sans-latin.woff2'].forEach((file) => {
   check(!fs.existsSync(path.join(root, file)), `${file}: retired font asset remains`);
 });
@@ -78,6 +78,14 @@ check(read('favicon.svg').includes('fill="#246B4B"'), 'favicon.svg: Warm Canvas 
 const financeData = read('js/data/finance.js');
 check(!/Zero chance of loss/i.test(financeData), 'js/data/finance.js: absolute loss claim remains');
 check(read('css/variables.css').includes('--tint-secondary-12:'), 'css/variables.css: conditional tint token missing');
+
+try {
+  const homePriorities = JSON.parse(read('js/data/high-return-priorities.json'));
+  check(Array.isArray(homePriorities) && homePriorities.length === 5, 'js/data/high-return-priorities.json: expected five Home priorities');
+  check(homePriorities.every((priority) => priority.title && priority.action && priority.benefit && priority.sources?.length), 'js/data/high-return-priorities.json: priority content is incomplete');
+} catch {
+  check(false, 'js/data/high-return-priorities.json: invalid JSON');
+}
 
 const nutritionData = read('js/data/nutrition.js');
 ['protein', 'leucine', 'ala', 'epaDha', 'magnesium', 'potassium', 'calcium', 'zinc', 'selenium', 'iron', 'iodine', 'vitaminD', 'vitaminC', 'folate', 'b12', 'b1', 'vitaminA', 'fiber', 'choline'].forEach((id) => {

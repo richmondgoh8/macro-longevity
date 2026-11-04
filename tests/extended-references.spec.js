@@ -24,6 +24,7 @@ test('no reference card shows example lab interval values or lab interval detail
   const picker = page.locator('.sg-reference-picker');
   if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
   await page.locator('[data-reference-show-all]').click();
+  await expect(page.locator('.sg-reference-card .sg-lab-details')).toHaveCount(0);
   for (const reference of EXTENDED_REFERENCES.filter(item => item.labInterval && item.id !== 'insulin')) {
     const card = page.locator(`[data-reference-card="${reference.id}"]`);
     await expect(card, reference.id).toHaveCount(1);
@@ -39,7 +40,7 @@ test('core guideposts have usable comparators; contextual markers stay in the ex
     const card = page.locator(`#biomarker-${id}`);
     await expect(card.locator('[data-range-value] strong')).toContainText(value);
     await expect(card.locator('.sg-range-scale [data-range-item]')).toHaveCount(1);
-    await expect(card.locator('.sg-lab-details')).not.toHaveAttribute('open');
+    await expect(card.locator('.sg-lab-details')).toHaveCount(0);
   }
   for (const id of ['fibrinogen', 'esr']) {
     const card = page.locator(`#biomarker-${id}`);

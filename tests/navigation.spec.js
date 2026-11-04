@@ -85,12 +85,16 @@ test('Planner mode switching is stable and keyboard operable', async ({ page }) 
 
 test('primary navigation prefetches a destination on intent', async ({ page }) => {
   await page.goto('/');
-  const nutrition = page.getByRole('link', { name: 'Nutrition' }).first();
-  await page.mouse.move(1, 1);
-  await nutrition.hover();
-  await expect(page.locator('link[rel="prefetch"][href$="/pages/stack.html"]')).toHaveCount(1);
+  test.skip(await page.evaluate(() => navigator.connection?.saveData === true), 'Prefetch is disabled when Data Saver is active.');
+  const nutrition = page.getByRole('link', { name: 'Nutrition', exact: true }).first();
+  const prefetch = page.locator('link[rel="prefetch"][href$="/pages/stack.html"]');
+  if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {
+    await page.mouse.move(1, 1);
+    await nutrition.hover();
+    await expect(prefetch).toHaveCount(1);
+  }
   await nutrition.focus();
-  await expect(page.locator('link[rel="prefetch"][href$="/pages/stack.html"]')).toHaveCount(1);
+  await expect(prefetch).toHaveCount(1);
   await expect(page.locator('link[rel="prefetch"][href$="/"]')).toHaveCount(0);
 });
 

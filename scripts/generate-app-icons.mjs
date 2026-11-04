@@ -18,7 +18,7 @@ try {
       const image = new Image();
       image.src = `data:image/svg+xml;base64,${btoa(source)}`;
       await image.decode();
-      context.fillStyle = '#246B4B';
+      context.fillStyle = '#0F766E';
       context.fillRect(0, 0, size, size);
       context.drawImage(image, 0, 0, size, size);
     }, { source, size });
