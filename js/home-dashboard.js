@@ -77,7 +77,7 @@ if (mount) {
       <button type="button" data-reference-units="local" aria-pressed="true">Singapore units</button>
       <button type="button" data-reference-units="alternate" aria-pressed="false">Alternative units</button>
     </div>
-    <p class="sg-reference-key">Adult guideposts, not diagnoses or personal treatment targets.</p>
+    <p class="sg-reference-key">Favourable marks the most favourable category supported by the cited reference. These guideposts are not diagnoses or universal longevity targets; some results need personal context, and higher or lower is not always better.</p>
     <div class="sg-marker-grid">${HOME_CORE_VITALS.map(id => card(id)).join('')}</div>
     <p class="sr-only" data-reference-feedback role="status"></p>
   </div>`;

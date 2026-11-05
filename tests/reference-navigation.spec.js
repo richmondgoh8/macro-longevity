@@ -7,8 +7,13 @@ test('core reference cards use consistent statuses and support copy links', asyn
   await page.goto('/');
   const card = page.locator('#biomarker-apob');
   await expect(card).toBeVisible();
+  await expect(page.locator('.sg-reference-key')).toContainText('universal longevity targets');
   const labels = await page.locator('.sg-range-status').allTextContents();
   expect(new Set(labels).isSubsetOf(new Set(['Favourable', 'Context', 'Review']))).toBe(true);
+  await expect(page.locator('#biomarker-ldl .sg-range-description')).toHaveText([
+    'Desirable screening category', 'Above desirable / borderline range', 'High',
+  ]);
+  await expect(page.locator('#biomarker-egfr .sg-range-description').first()).toHaveText('Normal / high');
   await page.evaluate(() => {
     window.__copiedLink = '';
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.__copiedLink = text; } } });

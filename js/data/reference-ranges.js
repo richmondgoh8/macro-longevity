@@ -29,21 +29,21 @@ export const REFERENCE_RANGES = [
   },
   {
     id: 'ldl', label: 'LDL cholesterol', unit: 'mmol/L',
-    bands: [['Optimal reference', '<2.6'], ['Above optimal', '2.6–<4.1'], ['High', '≥4.1']],
+    bands: [['Desirable screening category', '<2.6'], ['Above desirable / borderline range', '2.6–<4.1'], ['High', '≥4.1']],
     alternate: { unit: 'mg/dL', values: ['<100', '100–<160', '≥160'] },
     note: 'The middle band groups desirable and borderline-high results. Your treatment target can be much lower, depending on cardiovascular risk.',
     source: LIPIDS,
   },
   {
     id: 'tg', label: 'Triglycerides', unit: 'mmol/L',
-    bands: [['Optimal reference', '<1.7'], ['Above optimal', '1.7–<2.3'], ['High', '≥2.3']],
+    bands: [['Within fasting reference', '<1.7'], ['Above fasting reference', '1.7–<2.3'], ['High', '≥2.3']],
     alternate: { unit: 'mg/dL', values: ['<150', '150–<200', '≥200'] },
     note: 'Fasting references; meals and alcohol affect the result. Very high triglycerides need prompt clinical advice, not only lifestyle changes.',
     source: LIPIDS,
   },
   {
     id: 'apob', label: 'Apolipoprotein B (ApoB)', unit: 'g/L',
-    bands: [['Desirable reference', '<0.90'], ['Above desirable', '0.90–<1.20'], ['High', '≥1.20']],
+    bands: [['Desirable adult reference', '<0.90'], ['Above desirable', '0.90–<1.20'], ['High', '≥1.20']],
     alternate: { unit: 'mg/dL', values: ['<90', '90–<120', '≥120'] },
     note: 'Adult lab categories, not personal goals. The middle band includes borderline-high results. High / very-high-risk treatment goals may be <0.80 / <0.65 g/L (80 / 65 mg/dL).',
     source: MAYO,
@@ -56,7 +56,7 @@ export const REFERENCE_RANGES = [
   },
   {
     id: 'nonhdl', label: 'Non-HDL cholesterol', unit: 'mmol/L',
-    bands: [['Desirable reference', '<3.4'], ['Above desirable', '3.4–<4.9'], ['High', '≥4.9']],
+    bands: [['Desirable adult reference', '<3.4'], ['Above desirable', '3.4–<4.9'], ['High', '≥4.9']],
     alternate: { unit: 'mg/dL', values: ['<130', '130–<190', '≥190'] },
     note: 'Total cholesterol minus HDL-C. Rounded adult lab bands; the middle includes borderline-high results. Personal treatment goals are risk-based.',
     source: MAYO,
