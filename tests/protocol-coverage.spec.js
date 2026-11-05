@@ -33,62 +33,36 @@ test('full inventory gate rejects lost mappings, unreviewed exclusions, wrong id
   expect(reconcileMeasurements({ references: EXTENDED_REFERENCES.map(item=>item.id==='fev1'?{...item,action:'Copy your report exactly, including the laboratory units and the reference range, and keep it for review with your health care team.'}:item) }).failures).toContain('Incomplete guidance: fev1');
 });
 
-test('specialist search reaches the real card with context and actions', async ({ page }) => {
+test('Home core references are present without restoring the full reference guide', async ({ page }) => {
   await page.goto('/');
-  const picker = page.locator('.sg-reference-picker');
-  if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
-  await page.getByRole('searchbox', { name: 'Find a biomarker' }).fill('FEV1');
-  await page.locator('[data-reference-results] a[href="#biomarker-fev1"]').click();
-  await expect(page.locator('#biomarker-fev1')).toBeFocused();
-  await expect(page.locator('#biomarker-fev1 .sg-card-action')).toBeVisible();
-  await expect(page.locator('#biomarker-fev1')).toContainText('first second');
-  await page.reload();
-  await expect(page.locator('#biomarker-fev1 .sg-card-action')).toBeVisible();
+  const expected = ['bp', 'glucose', 'hba1c', 'apob', 'waist', 'hscrp', 'hdl', 'ldl', 'tg', 'egfr'];
+  const mounted = await page.locator('#sg-home-dashboard [data-reference-card]').evaluateAll(cards => cards.map(card => card.dataset.referenceCard));
+  expect(mounted).toEqual(expected);
+  expect(EXTENDED_REFERENCES.some(item => item.id === 'fev1')).toBe(true);
+  await expect(page.locator('#biomarker-fev1')).toHaveCount(0);
 });
 
-test('complete guide exposes every specialist reference without duplicate cards', async ({ page }) => {
-  await page.goto('/#biomarker-hearingright');
-  await expect(page.locator('#biomarker-hearingright')).toBeVisible();
-  const picker = page.locator('.sg-reference-picker');
-  if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
-  await page.getByRole('button', { name: 'Show all references', exact: true }).click();
-  const mounted = await page.locator('[data-reference-card]').evaluateAll(cards => cards.map(card => ({
-    id: card.dataset.referenceCard, plan: card.querySelector('.sg-card-action').getBoundingClientRect().height > 0,
-  })));
-  expect(new Set(mounted.map(item => item.id)).size).toBe(mounted.length);
-  expect(mounted.length).toBe(EXTENDED_REFERENCES.filter(reference => reference.id !== 'insulin').length);
-  expect(SPECIALIST_REFERENCES.every(reference => mounted.some(item => item.id === reference.id && item.plan))).toBe(true);
-  await page.emulateMedia({ media: 'print' });
-  await expect(page.locator('#biomarker-selenium .sg-card-action')).toBeVisible();
-  await expect(page.locator('.sg-print-warning')).toBeHidden();
-});
-
-test('Health finds reference-only specialist tests without adding fake result controls', async ({ page }) => {
+test('Health search opens a supported screening result', async ({ page }) => {
   await page.goto('/pages/blood.html');
   const input = page.locator('[data-health-search]');
-  await input.fill('FEV1');
-  const link = page.locator('[data-health-results] a[href="../#biomarker-fev1"]');
-  await expect(link).toContainText('Reference only');
-  await link.click();
-  await expect(page.locator('#biomarker-fev1 .sg-card-action')).toBeVisible();
-  await page.goBack();
-  await expect(input).toBeVisible();
-  await input.fill('DunedinPoAm');
-  await page.locator('[data-health-results] a[href="../#biomarker-dunedin"]').click();
-  await expect(page.locator('#biomarker-dunedin')).toContainText('Historical protocol');
-  await expect(page.locator('#biomarker-dunedin input')).toHaveCount(0);
+  await input.fill('ApoB');
+  const result = page.locator('[data-health-results] a[data-health-result="sg-apob"]');
+  await expect(result).toBeVisible();
+  await result.click();
+  await expect(page.locator('#sg-apob')).toBeFocused();
 });
 
-test('Health Enter waits for the full index instead of dropping the query', async ({ page }) => {
+test('Health Enter waits for the screening index before opening a result', async ({ page }) => {
   let release;
   const gate = new Promise(resolve => { release = resolve; });
   await page.route('**/js/data/extended-references.js', async route => { await gate; await route.continue(); });
   try {
     await page.goto('/pages/blood.html');
-    await page.locator('[data-health-search]').fill('FEV1');
-    await page.locator('[data-health-search]').press('Enter');
+    const input = page.locator('[data-health-search]');
+    await input.fill('ApoB');
+    await input.press('Enter');
     release();
-    await expect(page).toHaveURL(/\/#biomarker-fev1$/);
-    await expect(page.locator('#biomarker-fev1 .sg-card-action')).toBeVisible();
+    await expect(page).toHaveURL(/#sg-apob$/);
+    await expect(page.locator('#sg-apob')).toBeFocused();
   } finally { release(); }
 });

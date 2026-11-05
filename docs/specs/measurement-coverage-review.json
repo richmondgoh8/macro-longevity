@@ -30,8 +30,8 @@
     "status": "partial",
     "scope": "Published lab intervals are retained as sourced metadata for audit and are not displayed in reference cards. Banded references are counted separately from source-name/guidance coverage. Other guidance can include formulas, study estimates, screening eligibility or contextual interpretation; it has not all been classified for interval applicability.",
     "publishedLabIntervals": 60,
-    "bandedReferences": 14,
-    "otherReferenceGuidance": 281
+    "bandedReferences": 16,
+    "otherReferenceGuidance": 279
   },
   "counts": {
     "sourceEntries": 663,
@@ -43,6 +43,6 @@
     "searchFixtures": 649
   },
   "failures": [],
-  "entriesSha256": "720fec9509cfa9d4cb0bc588331f0685b58989195a3d8eab8882332623cea2e3",
-  "referenceContentSha256": "9802a2b15cc2e193670114ca056f0c48e440a4623c709485ab04600ba5217fe9"
+  "entriesSha256": "8d88222da4f2d5b022db5fc5d9650c07f57a2b696ed0ca52b13e41c38e171089",
+  "referenceContentSha256": "f6aebce2d000f8ec8e4fa3b02d5bd5ebabbae4acee95e9cab0280aae27e57e14"
 }

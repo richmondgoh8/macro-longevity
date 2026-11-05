@@ -79,9 +79,27 @@ if (mount) {
     </div>
     <p class="sg-reference-key">Adult guideposts, not diagnoses or personal treatment targets.</p>
     <div class="sg-marker-grid">${HOME_CORE_VITALS.map(id => card(id)).join('')}</div>
+    <p class="sr-only" data-reference-feedback role="status"></p>
   </div>`;
 
-  mount.addEventListener('click', event => {
+  mount.addEventListener('click', async event => {
+    const copy = event.target.closest('[data-copy-reference]');
+    if (copy) {
+      const url = new URL(location.href);
+      url.hash = `biomarker-${copy.dataset.copyReference}`;
+      const feedback = mount.querySelector('[data-reference-feedback]');
+      try {
+        await navigator.clipboard.writeText(url.href);
+        feedback.textContent = `Link copied for ${references.get(copy.dataset.copyReference).label}.`;
+        copy.textContent = 'Copied';
+        setTimeout(() => { copy.textContent = 'Copy link'; }, 2000);
+      } catch {
+        copy.closest('article').append(feedback);
+        feedback.classList.remove('sr-only');
+        feedback.textContent = `Copy this link: ${url.href}`;
+      }
+      return;
+    }
     const button = event.target.closest('[data-reference-units]');
     if (!button) return;
     alternate = button.dataset.referenceUnits === 'alternate';

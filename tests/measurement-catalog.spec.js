@@ -135,19 +135,12 @@ test('physical results persist sides, signed bone scores and report units withou
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
 });
 
-test('Home has dedicated guidance for the reported missing measurements', async ({ page }) => {
+test('Home shows direct guidance for each core vital reference', async ({ page }) => {
   await page.goto('/');
-  for (const [query, id] of [['HDL-C', 'hdl'], ['total cholesterol', 'totalchol'], ['hand grip', 'grip'], ['bone density', 'bmd']]) {
-    const picker = page.locator('.sg-reference-picker');
-    if (await picker.getAttribute('open') === null) await picker.locator('summary').click();
-    await page.getByRole('searchbox', { name: 'Find a biomarker' }).fill(query);
-    await expect(page.locator('[data-reference-results] a').first()).toHaveAttribute('href', `#biomarker-${id}`);
-    await page.locator('[data-reference-results] a').first().click();
+  for (const id of ['bp', 'glucose', 'hba1c', 'apob', 'waist', 'hscrp', 'hdl', 'ldl', 'tg', 'egfr']) {
     const card = page.locator(`[data-reference-card="${id}"]`);
+    await expect(card).toBeVisible();
     await expect(card.locator('.sg-card-action')).toBeVisible();
     await expect(card.locator('.sg-range-scale')).toBeVisible();
   }
-  await expect(page.locator('[data-reference-card="bmd"]')).toContainText('T-score');
-  await expect(page.locator('[data-reference-card="bmd"]')).toContainText('Z-score');
-  await expect(page.locator('[data-reference-card="dexa"]')).toBeVisible();
 });

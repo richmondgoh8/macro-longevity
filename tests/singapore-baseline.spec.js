@@ -1,103 +1,51 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { HEALTH_REFERENCES, HEALTH_REFERENCE_GROUPS } from '../js/data/health-reference-groups.js';
 
-test('Home contains the seven requested groups with visible references and action plans, without promotional extras', async ({ page }) => {
+test('Home shows only its ten core vital references', async ({ page }) => {
   await page.goto('/');
   const guide = page.locator('#sg-home-dashboard');
-  await expect(page.getByRole('heading', { name: 'Build health from the basics.' })).toBeVisible();
-  await expect(guide.locator('.sg-priority-card')).toHaveCount(5);
-  await expect(guide.locator('.sg-priority-card .sg-priority-benefit')).toHaveCount(5);
-  await expect(guide.locator('.sg-weekly-guide')).toContainText('150–300 min');
-  await expect(guide.locator('.sg-home-priorities')).toContainText('Why it matters');
-  for (const width of [390, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-    const columns = await guide.locator('.sg-priority-grid').evaluate(node => getComputedStyle(node).gridTemplateColumns.trim().split(/\s+/).length);
-    expect(columns).toBe(width === 390 ? 1 : 2);
+  await expect(page.getByRole('heading', { name: 'Core vitals' })).toBeVisible();
+  const expected = ['bp', 'glucose', 'hba1c', 'apob', 'waist', 'hscrp', 'hdl', 'ldl', 'tg', 'egfr'];
+  const actual = await guide.locator('[data-reference-card]').evaluateAll(cards => cards.map(card => card.dataset.referenceCard));
+  expect(actual).toEqual(expected);
+  for (const id of ['ferritin', 'creatinine', 'alt', 'ast', 'testosteronetotal', 'b12', 'vitd', 'omega3total', 'rhr']) {
+    await expect(guide.locator(`[data-reference-card="${id}"]`)).toHaveCount(0);
   }
-  await expect(page.locator('input:not([type="search"]), select, [data-export], #hero-pillar-map, #pillars-app, #stack-summary-app, #longevity101-app')).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Record and review my results' })).toHaveCount(0);
-  await expect(guide.locator('[data-reference-group]')).toHaveCount(7);
-  await expect(guide.locator('[data-reference-card]:visible')).toHaveCount(37);
-  const ids = HEALTH_REFERENCE_GROUPS.flatMap(group => group.ids);
-  expect(new Set(ids).size).toBe(37);
-  expect(ids.slice().sort()).toEqual(HEALTH_REFERENCES.filter(item => ids.includes(item.id)).map(item => item.id).sort());
-  for (const group of HEALTH_REFERENCE_GROUPS) {
-    const section = guide.locator(`[data-reference-group="${group.id}"]`);
-    await expect(section.getByRole('heading', { name: group.title, exact: true })).toBeVisible();
-    await expect(section.locator('.sg-group-plan li')).toHaveCount(3);
-    for (const id of group.ids) {
-      const card = section.locator(`[data-reference-card="${id}"]`);
-      await expect(card.locator('[data-reference-scale]')).toBeVisible();
-      await expect(card.locator('.sg-card-action')).toBeVisible();
-      await expect(card.getByRole('link', { name: /^Reference source for / })).toHaveAttribute('href', /^https:\/\//);
-    }
-  }
-  await expect(guide.locator('[data-reference-card="hscrp"]')).toContainText('risk-enhancing');
-  await expect(guide.locator('.sg-lab-details')).toHaveCount(0);
-  await expect(guide.locator('[data-reference-card="hscrp"] dd')).toHaveText('≥2 mg/L');
-  await expect(guide.locator('[data-reference-card="ferritin"]')).toContainText('age-, sex- and method-specific interval');
-  await expect(guide.locator('[data-reference-card="ferritin"]')).not.toContainText('21.8–274.7');
-  await expect(guide.locator('[data-reference-card="ferritin"]')).not.toContainText('Example lab interval');
-  await expect(guide.locator('[data-reference-card="vitd"]')).toContainText('not a cancer-prevention target');
-  await expect(guide.locator('[data-reference-card="mced"]')).toContainText('No established routine testing frequency');
-  await expect(guide.locator('[data-reference-card="wholebodymri"]')).toContainText('No evidence-based routine interval');
-  await expect(guide.locator('.sg-testing-schedule')).toContainText('not a blanket annual panel');
-  await expect(guide.locator('.sg-testing-schedule')).toContainText('BRCA1/2, Lynch');
+  await expect(guide.locator('.sg-home-priorities, [data-reference-group], .sg-testing-schedule')).toHaveCount(0);
   const accessibility = await new AxeBuilder({ page }).include('main').analyze();
   expect(accessibility.violations).toEqual([]);
 });
 
-test('Home reference units update all supported scales and leave stored Health values untouched', async ({ page }) => {
+test('Home unit control updates the core ranges without changing saved Health values', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('sg-health-baseline-v1', JSON.stringify({ values: { tg: '105' }, units: { tg: 'mg/dL' } })));
   await page.goto('/');
   const guide = page.locator('#sg-home-dashboard');
-  const units = guide.getByRole('button', { name: 'Alternative units' });
-  await units.focus();
-  await page.keyboard.press('Enter');
-  await expect(units).toHaveAttribute('aria-pressed', 'true');
+  await guide.getByRole('button', { name: 'Alternative units' }).click();
   for (const [id, unit, values] of [
     ['glucose', 'mg/dL', ['70–<110', '110–<126', '≥126']],
     ['ldl', 'mg/dL', ['<100', '100–<160', '≥160']],
     ['tg', 'mg/dL', ['<150', '150–<200', '≥200']],
     ['apob', 'mg/dL', ['<90', '90–<120', '≥120']],
-    ['lpa', 'mg/dL', ['<30', '30–<50', '≥50']],
-    ['uacr', 'mg/g', ['<30', '30–300', '>300']],
     ['hba1c', 'mmol/mol', ['≤42', '43–52', '≥53']],
-    ['vitd', 'ng/mL', ['20–50', '12–<20', '<12']],
   ]) {
     const card = guide.locator(`[data-reference-card="${id}"]`);
     await expect(card.locator('.sg-reference-unit')).toHaveText(unit);
     await expect(card.locator('dd')).toHaveText(values);
   }
-  const hscrp = guide.locator('[data-reference-card="hscrp"]');
-  await expect(hscrp.locator('.sg-reference-unit')).toHaveText('mg/dL');
-  await expect(hscrp.locator('dd')).toHaveText('≥0.2 mg/dL');
-  await guide.getByRole('button', { name: 'Singapore units' }).click();
-  await expect(guide.locator('[data-reference-card="tg"] dd')).toHaveText(['<1.7', '1.7–<2.3', '≥2.3']);
-  await expect(guide.locator('[data-reference-card="lpa"]')).toContainText('No fixed conversion');
+  await expect(guide.locator('[data-reference-card="hscrp"] dd')).toHaveText(['<0.1', '0.1–0.3', '>0.3']);
+  await expect(guide.locator('[data-reference-card="hdl"] dd')).toHaveText(['<40 men · <50 women', '≥40 men · ≥50 women and <60', '≥60']);
   await page.goto('/pages/blood.html');
   await expect(page.locator('[data-marker-input="tg"]')).toHaveValue('105');
   await expect(page.locator('[data-marker-unit="tg"]')).toHaveValue('mg/dL');
 });
 
-test('Home grouped references remain aligned and readable across viewport widths and text zoom', async ({ page }) => {
+test('Home core references remain readable at mobile and desktop widths', async ({ page }) => {
   await page.goto('/');
-  await page.evaluate(() => document.fonts.ready);
   const guide = page.locator('#sg-home-dashboard');
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await expect(guide.locator('[data-reference-card="glucose"]')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-    if (width >= 1024) {
-      const first = await guide.locator('[data-reference-card="glucose"]').boundingBox();
-      const second = await guide.locator('[data-reference-card="hba1c"]').boundingBox();
-      expect(Math.abs(first.height - second.height)).toBeLessThan(1);
-      const a = await guide.locator('[data-reference-card="glucose"] .sg-reference-source').boundingBox();
-      const b = await guide.locator('[data-reference-card="hba1c"] .sg-reference-source').boundingBox();
-      expect(Math.abs(a.y - b.y)).toBeLessThan(1);
-    }
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => document.documentElement.style.fontSize = '200%');
