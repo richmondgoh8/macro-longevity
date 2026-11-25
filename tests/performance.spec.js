@@ -1,123 +1,96 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from "@playwright/test";
 
-test('first Home to Nutrition navigation becomes usable promptly', async ({ page, context, browserName }, testInfo) => {
-  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'desktop-chromium', 'Chromium CDP budget');
+test("throttled routes stay lean and core actions paint within budget", async ({
+  page,
+  context,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "desktop-chromium",
+    "Desktop Chromium CDP budget",
+  );
   const session = await context.newCDPSession(page);
-  await session.send('Network.enable');
-  await session.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 200_000, uploadThroughput: 75_000, connectionType: 'cellular4g' });
-  await session.send('Emulation.setCPUThrottlingRate', { rate: 4 });
-  await page.goto('/');
-  await page.waitForFunction(() => ['/js/stack.js', '/js/data/nutrition.js', '/css/nutrition-layout.css'].every((path) =>
-    performance.getEntriesByType('resource').some((entry) => new URL(entry.name).pathname === path && entry.responseEnd > 0)), null, { timeout: 10000 });
-  const started = Date.now();
-  await page.getByRole('link', { name: 'Nutrition', exact: true }).first().click();
-  await expect(page.locator('#stack-app[data-planner-ready="true"]')).toHaveAttribute('aria-busy', 'false');
-  expect(Date.now() - started).toBeLessThan(1500);
-});
+  await session.send("Network.enable");
+  await session.send("Network.setCacheDisabled", { cacheDisabled: true });
+  await session.send("Network.emulateNetworkConditions", {
+    offline: false,
+    latency: 150,
+    downloadThroughput: 200_000,
+    uploadThroughput: 75_000,
+    connectionType: "cellular4g",
+  });
+  await session.send("Emulation.setCPUThrottlingRate", { rate: 4 });
 
-test('Nutrition meets throttled usable-load and painted-interaction budgets', async ({ page, context, browserName }, testInfo) => {
-  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'desktop-chromium', 'Chromium CDP budget');
-  test.setTimeout(60000);
-  const session = await context.newCDPSession(page);
-  await session.send('Network.enable');
-  await session.send('Network.setCacheDisabled', { cacheDisabled: true });
-  await session.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 200_000, uploadThroughput: 75_000, connectionType: 'cellular4g' });
-  await session.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await page.addInitScript(() => {
-    window.__metrics = { lcp: 0, shifts: [], longTasks: 0 };
-    const ready = new MutationObserver(() => {
-      if (!document.querySelector('[data-planner-ready="true"][aria-busy="false"]')) return;
-      ready.disconnect();
-      requestAnimationFrame(() => requestAnimationFrame(() => { window.__metrics.usable = performance.now(); }));
-    });
-    ready.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-planner-ready', 'aria-busy'] });
-    new PerformanceObserver(list => { window.__metrics.longTasks += list.getEntries().reduce((s, e) => s + e.duration, 0); }).observe({ type: 'longtask', buffered: true });
-    new PerformanceObserver(list => { window.__metrics.lcp = list.getEntries().at(-1)?.startTime || 0; }).observe({ type: 'largest-contentful-paint', buffered: true });
-    new PerformanceObserver(list => { window.__metrics.shifts.push(...list.getEntries().filter(e => !e.hadRecentInput).map(e => ({ at: e.startTime, value: e.value }))); }).observe({ type: 'layout-shift', buffered: true });
+    window.metrics = { lcp: 0, cls: 0, longTasks: 0, interaction: null };
+    new PerformanceObserver((list) => {
+      window.metrics.lcp = list.getEntries().at(-1).startTime;
+    }).observe({ type: "largest-contentful-paint", buffered: true });
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries())
+        if (!entry.hadRecentInput) window.metrics.cls += entry.value;
+    }).observe({ type: "layout-shift", buffered: true });
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries())
+        window.metrics.longTasks += entry.duration;
+    }).observe({ type: "longtask", buffered: true });
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (!event.target.matches('button[type="submit"]')) return;
+        const start = performance.now();
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            window.metrics.interaction = performance.now() - start;
+          }),
+        );
+      },
+      true,
+    );
   });
+
   const runs = [];
-  for (let run = 0; run < 3; run++) {
-    await page.goto('/pages/stack.html');
-    await expect(page.locator('[data-planner-ready="true"]')).toHaveAttribute('aria-busy', 'false');
-    await expect(page.getByRole('tab', { name: /^Meals/ })).toBeVisible();
-    await page.waitForFunction(() => window.__metrics.usable > 0);
-    const usable = await page.evaluate(() => window.__metrics.usable);
-    await page.waitForTimeout(750);
-    runs.push(await page.evaluate(usable => {
-      const resources = performance.getEntriesByType('resource');
-      let cls = 0, sum = 0, start = 0, last = 0;
-      for (const shift of window.__metrics.shifts) {
-        if (shift.at - last > 1000 || shift.at - start > 5000) { sum = 0; start = shift.at; }
-        sum += shift.value; cls = Math.max(cls, sum); last = shift.at;
-      }
-      return { usable, lcp: window.__metrics.lcp, cls, longTasks: window.__metrics.longTasks,
-        cssBytes: resources.filter(e => new URL(e.name).pathname.endsWith('.css')).reduce((s,e)=>s+e.decodedBodySize,0),
-        jsBytes: resources.filter(e => new URL(e.name).pathname.endsWith('.js')).reduce((s,e)=>s+e.decodedBodySize,0) };
-    }, usable));
-  }
-  await testInfo.attach('cold-load-measurements', { body: JSON.stringify(runs, null, 2), contentType: 'application/json' });
-  const median = key => runs.map(r => r[key]).sort((a,b)=>a-b)[1];
-  expect.soft(median('lcp')).toBeGreaterThan(0);
-  expect.soft(median('lcp')).toBeLessThanOrEqual(2500);
-  expect.soft(median('usable')).toBeLessThanOrEqual(3000);
-  expect.soft(median('cls')).toBeLessThanOrEqual(.1);
-  expect.soft(median('cssBytes')).toBeLessThanOrEqual(190000);
-  expect.soft(median('jsBytes')).toBeLessThanOrEqual(160000);
-  expect.soft(median('longTasks')).toBeLessThanOrEqual(200);
-  // Real visible clicks, measured from event entry through two animation frames.
-  await page.evaluate(() => {
-    document.addEventListener('click', event => {
-      if (!event.target.closest('[data-planner-mode]')) return;
-      const start = performance.now();
-      requestAnimationFrame(() => requestAnimationFrame(() => { window.__paintedInteraction = performance.now() - start; }));
-    }, true);
-  });
-  for (let index = 0; index < 6; index++) {
-    await page.evaluate(() => { window.__paintedInteraction = null; });
-    const quick = index % 2 === 0;
-    await page.getByRole('tab', { name: quick ? /Quick add/ : /^Meals/ }).click();
-    await expect(page.locator(quick ? '#planner-quick-add' : '#planner-meals')).toBeVisible();
-    await page.waitForFunction(() => window.__paintedInteraction !== null);
-    expect(await page.evaluate(() => window.__paintedInteraction)).toBeLessThan(200);
-  }
-});
-
-test('Non-planner routes keep critical JavaScript lean', async ({ page }) => {
-  for (const route of ['/', '/pages/avoid.html']) {
-    await page.goto(route);
-    await page.waitForTimeout(500);
-    const bytes = await page.evaluate(() => performance.getEntriesByType('resource').filter(e => new URL(e.name).pathname.endsWith('.js')).reduce((sum,e)=>sum+e.decodedBodySize,0));
-    expect(bytes).toBeLessThanOrEqual(90000);
-  }
-});
-
-test('Home and Health search paint results promptly under CPU throttling', async ({ page, context, browserName }, testInfo) => {
-  test.skip(browserName !== 'chromium' || testInfo.project.name !== 'desktop-chromium', 'Chromium CDP budget');
-  const session = await context.newCDPSession(page);
-  await session.send('Emulation.setCPUThrottlingRate', { rate: 4 });
-  for (const [route, name, selector, queries] of [
-    ['/', 'Find a biomarker', '[data-reference-results]', ['HDL-C', 'hand grip', 'bone density', 'FEV1', 'selenium', 'DunedinPoAm']],
-    ['/pages/blood.html', 'Find a result field', '[data-health-results]', ['HDL-C', 'TIBC', 'bone density', 'FEV1', 'selenium', 'DunedinPoAm']],
+  for (const [url, ready, action] of [
+    ["/", "#priorities-title", null],
+    ["/pages/stack.html", "#oats", null],
+    ["/pages/food-labels.html", "#quick-title", null],
+    ["/pages/supplements.html", "#options-title", null],
+    ["/pages/skin-care.html", "#routine-title", null],
+    ["/pages/blood.html", "#results-form button", "click"],
   ]) {
-    await page.goto(route);
-    const input = page.getByRole('searchbox', { name });
-    if (!await input.isVisible()) await page.locator('.sg-reference-picker > summary').click();
-    // Measure repeated index searches separately from optional module download time.
-    await input.fill('FEV1');
-    await expect(page.locator(`${selector} a`).first()).toBeVisible();
-    await input.evaluate((input, selector) => {
-      const results = document.querySelector(selector);
-      let started;
-      input.addEventListener('input', () => { started = performance.now(); window.__searchPaint = null; }, true);
-      new MutationObserver(() => {
-        requestAnimationFrame(() => requestAnimationFrame(() => { window.__searchPaint = performance.now() - started; }));
-      }).observe(results, { childList: true });
-    }, selector);
-    for (const query of queries) {
-      await input.fill(query);
-      await expect(page.locator(`${selector} a`).first()).toBeVisible();
-      await page.waitForFunction(() => window.__searchPaint !== null && window.__searchPaint !== undefined);
-      expect(await page.evaluate(() => window.__searchPaint), `${name}: ${query}`).toBeLessThanOrEqual(200);
+    await page.goto(url, { waitUntil: "commit" });
+    const control = page.locator(ready).first();
+    await control.waitFor({ state: "visible" });
+    const usable = await page.evaluate(() => performance.now());
+    await page.waitForFunction(() => window.metrics.lcp > 0);
+    await page.waitForLoadState("load");
+    const metrics = await page.evaluate(() => {
+      const resources = performance.getEntriesByType("resource");
+      return {
+        ...window.metrics,
+        bytes: resources.reduce((sum, entry) => sum + entry.transferSize, 0),
+        scripts: resources
+          .filter((entry) => new URL(entry.name).pathname.endsWith(".js"))
+          .reduce((sum, entry) => sum + entry.decodedBodySize, 0),
+      };
+    });
+    if (action) {
+      await control[action]();
+      await page.waitForFunction(() => window.metrics.interaction !== null);
+      metrics.interaction = await page.evaluate(
+        () => window.metrics.interaction,
+      );
+      expect(metrics.interaction, url).toBeLessThan(200);
     }
+    runs.push({ url, usable, ...metrics });
+    expect(usable, url).toBeLessThan(1500);
+    expect(metrics.lcp, url).toBeLessThan(2500);
+    expect(metrics.cls, url).toBeLessThanOrEqual(0.1);
+    expect(metrics.longTasks, url).toBeLessThanOrEqual(200);
+    expect(metrics.bytes, url).toBeLessThan(160_000);
+    expect(metrics.scripts, url).toBeLessThan(16_000);
   }
+  await testInfo.attach("throttled-metrics", {
+    body: JSON.stringify(runs, null, 2),
+    contentType: "application/json",
+  });
 });

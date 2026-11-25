@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en-SG">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="text-scale" content="scale" />
+    <meta
+      name="description"
+      content="A simple skin care routine with ingredient checks for sunscreen, moisturiser and cleanser, plus Singapore safety alerts."
+    />
+    <meta name="theme-color" content="#f7f5ed" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'self'; form-action 'none'"
+    />
+    <link
+      rel="canonical"
+      href="https://hazelah.me/macro-longevity/pages/skin-care.html"
+    />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../manifest.json" />
+    <link
+      rel="preload"
+      href="../fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../css/variables.css?v=5" />
+    <link rel="stylesheet" href="../css/style.css?v=17" />
+    <title>Skin Care · Macro Longevity</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="wordmark" href="../"
+          ><img src="../favicon.svg" width="34" height="34" alt="" /><span
+            >Macro Longevity</span
+          ></a
+        >
+        <nav class="site-nav" aria-label="Primary">
+          <ul>
+            <li>
+              <a href="../"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm6 11v-7h6v7"
+                  /></svg
+                ><span>Overview</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/stack.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M3 13h18a9 9 0 0 1-18 0Zm4-3c0-3 3-3 4-6m1 6c0-3 3-3 4-6m-7 18h6"
+                  /></svg
+                ><span>Food</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/food-labels.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20 13 13 20a2 2 0 0 1-3 0l-6-6V4h10l6 6a2 2 0 0 1 0 3Z"
+                  />
+                  <circle cx="8.5" cy="8.5" r="1" /></svg
+                ><span>Food Labels</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/blood.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20.8 8.8c0 5.4-8.8 11-8.8 11S3.2 14.2 3.2 8.8A4.6 4.6 0 0 1 12 6.2a4.6 4.6 0 0 1 8.8 2.6Z"
+                  /></svg
+                ><span>Health</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/supplements.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="m8.5 19.5 11-11a4.24 4.24 0 0 0-6-6l-11 11a4.24 4.24 0 0 0 6 6Zm-.5-11 6 6"
+                  /></svg
+                ><span>Supplements</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/skin-care.html" aria-current="page"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path
+                    d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"
+                  /></svg
+                ><span>Skin Care</span></a
+              >
+            </li>
+          </ul>
+        </nav>
+        <button class="button primary" type="button" data-update-app hidden>
+          Update app
+        </button>
+        <span class="visually-hidden" data-update-status role="status"></span>
+      </div>
+    </header>
+    <main id="main" class="wrap" tabindex="-1">
+      <section class="hero page-intro" aria-labelledby="skin-care-title">
+        <div>
+          <p class="eyebrow">Three essentials</p>
+          <h1 id="skin-care-title">Skin care</h1>
+          <p class="lede">
+            Cleanse gently, moisturise and protect exposed skin from the sun.
+          </p>
+        </div>
+      </section>
+      <nav class="section-nav" aria-label="On this page">
+        <p>On this page</p>
+        <div class="section-links">
+          <a class="button" href="#routine-title">Daily routine</a>
+          <a class="button" href="#products-title">Ingredient checks</a>
+          <a class="button" href="#safety-title">Safety warnings</a>
+        </div>
+      </nav>
+      <div class="page-content">
+        <section class="priorities" aria-labelledby="routine-title">
+          <h2 id="routine-title">Your daily routine</h2>
+          <div class="card-grid">
+            <article class="panel guide routine-card routine-morning">
+              <h3>
+                <svg
+                  class="routine-icon"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M2 19h20M7 19a5 5 0 0 1 10 0M12 4v3M4 9l2 2m12 0 2-2M2 15h2m16 0h2"
+                  /></svg
+                >Morning
+              </h3>
+              <ol class="routine-steps" role="list">
+                <li>
+                  <strong>Cleanse</strong> Rinse with water or use a gentle
+                  cleanser.
+                </li>
+                <li>
+                  <strong>Moisturise</strong> Apply to slightly damp skin.
+                </li>
+                <li>
+                  <strong>Protect</strong> Apply sunscreen to exposed skin
+                  before going outdoors.
+                </li>
+              </ol>
+            </article>
+            <article class="panel guide routine-card">
+              <h3>
+                <svg
+                  class="routine-icon"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M20 15a8 8 0 1 1-11-11 9 9 0 0 0 11 11Zm-3-11v4m-2-2h4"
+                  /></svg
+                >Evening
+              </h3>
+              <ol class="routine-steps" role="list">
+                <li>
+                  <strong>Cleanse</strong> Wash off sunscreen, sweat and makeup
+                  with a gentle cleanser.
+                </li>
+                <li>
+                  <strong>Moisturise</strong> Pat dry and apply while your skin
+                  is still slightly damp.
+                </li>
+              </ol>
+            </article>
+          </div>
+        </section>
+
+        <section class="priorities" aria-labelledby="products-title">
+          <h2 id="products-title">What to look for on the label</h2>
+          <div class="priority-grid">
+            <article class="panel guide">
+              <h3>Sunscreen</h3>
+              <p>
+                <strong>Look for</strong> broad-spectrum, water-resistant SPF 30
+                or higher for protection against UVA and UVB. If sunscreen
+                stings, try a fragrance-free mineral formula with zinc oxide,
+                titanium dioxide or both.
+              </p>
+              <p>
+                <strong>Watch for</strong> fragrance if your skin reacts to it.
+              </p>
+              <p>
+                Cover exposed skin, including your ears and neck. Reapply about
+                every two hours outdoors and after swimming or sweating. Use
+                shade and protective clothing when you can.
+              </p>
+              <div class="priority-links">
+                <a
+                  class="text-link"
+                  href="https://www.aad.org/public/everyday-care/sun-protection/shade-clothing-sunscreen/choosing-right-sunscreen"
+                  >AAD · Choosing sunscreen for your skin</a
+                >
+                <a
+                  class="text-link"
+                  href="https://www.nsc.com.sg/about-nsc/Newsroom/PublishingImages/Pages/Derma-Digest/NSC%20Derma%20Digest_May%202024%20Issue%2024%20-%20Peak%20Heat.pdf"
+                  >National Skin Centre · Sun care in Singapore</a
+                >
+              </div>
+            </article>
+            <article class="panel guide">
+              <h3>Moisturiser</h3>
+              <p>
+                <strong>Look for</strong> a plain, fragrance-free moisturiser.
+                Glycerin and ceramides are useful ingredients. A
+                petrolatum-based ointment can help very dry patches. If you’re
+                prone to breakouts, look for <strong>non-comedogenic</strong> on
+                the label.
+              </p>
+              <p>
+                <strong>Watch for</strong> fragrance or parfum if you have
+                sensitive skin. “Unscented” products can still contain
+                ingredients that mask odour. Check for “fragrance-free” on the
+                label.
+              </p>
+              <div class="priority-links">
+                <a
+                  class="text-link"
+                  href="https://www.aad.org/public/everyday-care/skin-care-basics/dry/pick-moisturizer"
+                  >AAD · Choosing a moisturiser</a
+                >
+                <a
+                  class="text-link"
+                  href="https://www.aad.org/public/everyday-care/skin-care-basics/dry/dermatologists-tips-relieve-dry-skin"
+                  >AAD · Dry skin ingredients</a
+                >
+              </div>
+            </article>
+            <article class="panel guide">
+              <h3>Gentle cleanser</h3>
+              <p>
+                <strong>Look for</strong> a gentle, fragrance-free, soap-free
+                cleanser. Use your fingertips and lukewarm water, then pat dry.
+                Cleanse after heavy sweating.
+              </p>
+              <p>
+                <strong>Watch for</strong> scrub particles, strongly fragranced
+                washes and cleansers that leave your skin tight or stinging.
+                Choose a milder wash if that happens.
+              </p>
+              <div class="priority-links">
+                <a
+                  class="text-link"
+                  href="https://www.aad.org/public/everyday-care/skin-care-basics/care/face-washing-101"
+                  >AAD · Face washing</a
+                >
+              </div>
+            </article>
+          </div>
+        </section>
+        <section class="priorities" aria-labelledby="safety-title">
+          <div class="panel guide safety-panel">
+            <h2 id="safety-title">Singapore cosmetic safety warnings</h2>
+            <ul class="guide-list">
+              <li>
+                <strong>Skip unlabelled creams and miracle claims.</strong> Buy
+                from established retailers. Check for a full ingredient list and
+                batch number. Treat “HSA approved” claims on cosmetics or
+                promises of whitening in days as red flags.
+              </li>
+              <li>
+                <strong
+                  >Check HSA alerts before using a suspect product.</strong
+                >
+                HSA has found undeclared mercury, hydroquinone, tretinoin and
+                potent steroids in some cosmetic creams. Mercury is prohibited
+                as a cosmetic ingredient. Hydroquinone and tretinoin have
+                legitimate prescription uses under medical supervision.
+              </li>
+              <li>
+                <strong>Test one new product at a time.</strong> Try it on a
+                small area first, following the label’s rinse-off instructions.
+                If you develop a rash, stop using the product. Seek medical
+                advice if the reaction is severe or persists.
+              </li>
+            </ul>
+            <div class="priority-links">
+              <a
+                class="text-link"
+                href="https://www.hsa.gov.sg/announcements/stay-safe-whitening-products-contain-mercury/"
+                >HSA · Adulterated cosmetic products</a
+              >
+              <a
+                class="text-link"
+                href="https://www.hsa.gov.sg/announcements/staying-safe-cosmetic-products/"
+                >HSA · Buying cosmetics safely</a
+              >
+              <a class="text-link" href="food-labels.html#metal-exposure"
+                >What to do after suspected exposure</a
+              >
+              <a
+                class="text-link"
+                href="https://www.aad.org/public/everyday-care/skin-care-secrets/prevent-skin-problems/test-skin-care-products"
+                >AAD · Testing a new product</a
+              >
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script src="../js/register-sw.js?v=5" defer></script>
+    <script type="module" src="../js/section-nav.js?v=2"></script>
+  </body>
+</html>

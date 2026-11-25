@@ -1,8 +1,13 @@
-.PHONY: serve audit
+.DEFAULT_GOAL := run
+.PHONY: run serve audit
 
-serve:
-	fuser -k -TERM 8080/tcp 2>/dev/null || true
-	python3 -m http.server 8080 --bind 127.0.0.1
+PORT ?= 8081
+
+run:
+	@printf 'Macro Longevity: http://127.0.0.1:%s/\n' "$(PORT)"
+	python3 -m http.server $(PORT) --bind 127.0.0.1
+
+serve: run
 
 audit:
 	node scripts/audit.mjs

@@ -1,258 +1,197 @@
-// Shared local-first baseline workspace for the Home and Health routes.
-import { SG_MARKERS, SG_MARKER_GROUPS, SG_SCREENING_PATHS, SG_SOURCES, SG_ACTION_SOURCES } from './data/screening.js';
-import { escapeHTML } from './components/ui.js';
-import { mountHealthSearch } from './components/health-measurement-search.js';
+import { BASELINE_KEY, SG_MARKERS } from './data/screening.js?v=3';
 
-const STORAGE_KEY = 'sg-health-baseline-v1';
+const form = document.querySelector('#results-form');
+const fields = form.querySelector('[data-results]');
+const saveStatus = form.querySelector('[data-save-status]');
+
+function objectOrEmpty(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
 
 function readState() {
+  const raw = localStorage.getItem(BASELINE_KEY);
+  const state = objectOrEmpty(JSON.parse(raw));
+  return { ...state, values: objectOrEmpty(state.values), units: objectOrEmpty(state.units) };
+}
+
+let baseline = { values: {}, units: {} };
+try {
+  baseline = readState();
+} catch {
+  saveStatus.textContent = 'Could not load results. Try the full archive.';
+}
+
+const rows = SG_MARKERS.map(({ id, label, units, example, hint }) => {
+  const row = document.createElement('div');
+  row.className = 'result-field';
+  // Only source-controlled marker definitions enter the HTML template.
+  row.innerHTML = `
+    <label for="${id}">${label}</label>
+    <div class="reading-controls">
+      <input id="${id}" type="text" inputmode="${id === 'bp' ? 'text' : 'decimal'}" placeholder="e.g. ${example}"
+        aria-describedby="${id}-context ${id}-error" autocomplete="off">
+      ${units.length > 1
+        ? `<label class="visually-hidden" for="${id}-unit">${label} report unit</label><select id="${id}-unit"></select>`
+        : `<span class="fixed-unit" id="${id}-unit">${units[0]}</span>`}
+    </div>
+    <p class="hint" id="${id}-context">${hint}</p>
+    ${units.length > 1 ? `<label class="unit-confirm" hidden>
+      <input type="checkbox">
+      <span>I checked the report and confirmed this unit for ${label}.</span>
+    </label>` : ''}
+    <p class="field-error" id="${id}-error" hidden></p>`;
+  const input = row.querySelector('input');
+  const select = row.querySelector('select');
+  const confirmation = row.querySelector('.unit-confirm');
+  const confirmUnit = confirmation?.querySelector('input');
+  const error = row.querySelector('.field-error');
+  input.value = baseline.values[id] ?? '';
+  if (select) {
+    const unit = typeof baseline.units[id] === 'string' ? baseline.units[id] : units[0];
+    const options = new Set([...units, unit]);
+    for (const option of options) select.add(new Option(option, option));
+    select.value = unit;
+  } else {
+    input.setAttribute('aria-describedby', `${id}-unit ${id}-context ${id}-error`);
+  }
+  fields.append(row);
+  return { id, input, select, confirmation, confirmUnit, error, value: input.value, unit: select?.value };
+});
+
+function showFieldError(row, message) {
+  row.error.textContent = message;
+  row.error.hidden = !message;
+  if (message) row.input.setAttribute('aria-invalid', 'true');
+  else row.input.removeAttribute('aria-invalid');
+}
+
+function validate(id, value) {
+  if (!value) return '';
+  if (id === 'bp') {
+    const parts = /^(\d{2,3})\s*\/\s*(\d{2,3})$/.exec(value);
+    if (parts && Number(parts[1]) > Number(parts[2]) && Number(parts[2]) > 0) return '';
+    return 'Enter systolic/diastolic, for example 122/78.';
+  }
+  const reportValue = /^(<=|>=|[<>≤≥])?\s*(\d+(?:[.,]\d+)?|[.,]\d+)$/.exec(value);
+  if (reportValue && (!reportValue[1] || id !== 'waist')) {
+    const number = Number(reportValue[2].replace(',', '.'));
+    if (Number.isFinite(number) && (number > 0 || id === 'lpa')) return '';
+  }
+  return 'Enter a number as shown on your report.';
+}
+
+function changedRows() {
+  return rows.filter((row) => row.input.value.trim() !== row.value.trim() || row.select?.value !== row.unit);
+}
+
+function hasUnitCorrection(row) {
+  return Boolean(row.value.trim() && row.input.value.trim() === row.value.trim() && row.select?.value !== row.unit);
+}
+
+function warnAboutUnsavedChanges(event) {
+  event.preventDefault();
+  event.returnValue = true;
+}
+
+form.addEventListener('input', ({ target }) => {
+  const row = rows.find(({ input, select }) => target === input || target === select);
+  if (!row) return;
+  if (row.confirmation) {
+    row.confirmUnit.checked = false;
+    row.confirmation.hidden = !hasUnitCorrection(row);
+  }
+  if (row.input.hasAttribute('aria-invalid')) showFieldError(row, validate(row.id, row.input.value.trim()));
+  if (changedRows().length) {
+    window.addEventListener('beforeunload', warnAboutUnsavedChanges);
+    saveStatus.textContent = 'Unsaved changes.';
+  } else {
+    window.removeEventListener('beforeunload', warnAboutUnsavedChanges);
+    saveStatus.textContent = '';
+  }
+});
+
+function saveResults() {
+  const changed = changedRows();
+  let firstError;
+  for (const row of changed) {
+    const error = row.input.value.trim() !== row.value.trim() ? validate(row.id, row.input.value.trim()) : '';
+    showFieldError(row, error);
+    if (error) firstError ??= row.input;
+  }
+  if (firstError) {
+    firstError.focus();
+    saveStatus.textContent = 'Check the highlighted result.';
+    return;
+  }
+  if (!changed.length) {
+    if (saveStatus.textContent.startsWith('Could not load')) return;
+    saveStatus.textContent = 'No changes to save.';
+    return;
+  }
+  const correction = changed.find((row) => hasUnitCorrection(row) && !row.confirmUnit.checked);
+  if (correction) {
+    correction.confirmation.hidden = false;
+    correction.confirmUnit.focus();
+    saveStatus.textContent = 'Check the unit against your report and confirm the correction.';
+    return;
+  }
+
   try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    return { age: parsed?.age || '', sex: parsed?.sex || '', values: parsed?.values && typeof parsed.values === 'object' ? parsed.values : {}, units: parsed?.units && typeof parsed.units === 'object' ? parsed.units : {} };
+    const state = readState();
+    if (changed.some(({ id, value, unit, select }) =>
+      String(state.values[id] ?? '').trim() !== value.trim() ||
+      (select && (typeof state.units[id] === 'string' ? state.units[id] : select.options[0].value) !== unit))) {
+      saveStatus.textContent = 'A result changed in another tab. Copy your draft before reloading.';
+      return;
+    }
+    for (const { id, input, value, select } of changed) {
+      const next = input.value.trim();
+      if (next !== value.trim()) {
+        if (next) state.values[id] = next;
+        else delete state.values[id];
+      }
+      if (select) state.units[id] = select.value;
+    }
+    localStorage.setItem(BASELINE_KEY, JSON.stringify(state));
+    for (const row of changed) {
+      row.value = row.input.value;
+      row.unit = row.select?.value;
+      if (row.confirmation) {
+        row.confirmation.hidden = true;
+        row.confirmUnit.checked = false;
+      }
+    }
+    window.removeEventListener('beforeunload', warnAboutUnsavedChanges);
+    saveStatus.textContent = 'Results saved on this device.';
   } catch {
-    return { age: '', sex: '', values: {}, units: {} };
+    saveStatus.textContent = 'Could not save results. Your edits are still here.';
   }
 }
 
-function saveState(state) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
-  catch { return false; }
-}
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (navigator.locks) navigator.locks.request(BASELINE_KEY, saveResults);
+  else saveResults();
+});
 
-function toNumber(value) {
-  const text = String(value ?? '').trim().replace(',', '.');
-  return /^\d+(?:\.\d+)?$/.test(text) ? Number(text) : null;
-}
-
-function parseBloodPressure(value) {
-  const match = String(value).trim().match(/^(\d{2,3})\s*\/\s*(\d{2,3})$/);
-  return match ? { systolic: Number(match[1]), diastolic: Number(match[2]) } : null;
-}
-
-function markerUnit(marker, state) {
-  return marker.units?.includes(state.units[marker.id]) ? state.units[marker.id] : marker.suffix;
-}
-
-function markerTarget(marker, unit) {
-  return unit === marker.suffix ? marker.target : marker.unitTarget || marker.target;
-}
-
-function evaluate(marker, value, state) {
-  if (!value) return { tone: 'pending', label: 'Add a result' };
-  if (marker.id === 'bp') {
-    const bp = parseBloodPressure(value);
-    if (!bp || bp.systolic <= bp.diastolic || bp.systolic > 300 || bp.diastolic > 200) return { tone: 'attention', label: 'Check systolic/diastolic' };
-    if (bp.systolic < 90 || bp.diastolic < 60) return { tone: 'review', label: 'Low reading — discuss context' };
-    return bp.systolic < 130 && bp.diastolic < 80
-      ? { tone: 'on-track', label: 'Within the guide' }
-      : { tone: 'review', label: 'Worth a closer look' };
+const downloads = document.querySelector('[data-download]');
+downloads.addEventListener('click', async ({ target }) => {
+  if (!target.dataset.export) return;
+  const status = downloads.querySelector('[role=status]');
+  try {
+    const { downloadRecords } = await import('./export.js?v=3');
+    downloadRecords(target.dataset.export);
+    status.textContent = 'Download requested.';
+  } catch {
+    status.textContent = 'Could not download your data. Check browser storage.';
   }
-  let number = toNumber(value);
-  if (number === null || !Number.isFinite(number) || (number === 0 && !['uacr', 'lpa', 'hscrp'].includes(marker.id))) return { tone: 'attention', label: 'Check the value and units' };
-  const unit = markerUnit(marker, state);
-  if (marker.id === 'hscrp') {
-    const mgL = unit === 'mg/dL' ? number * 10 : number;
-    if (mgL > 10) return { tone: 'review', label: 'Possible acute inflammation — clinical review' };
-    if (mgL >= 2) return { tone: 'review', label: 'Risk-enhancing level — discuss' };
-    return { tone: 'recorded', label: mgL < 1 ? 'Lower relative-risk category' : 'Interpret with overall cardiovascular risk' };
-  }
-  if (marker.id === 'apob') return { tone: 'recorded', label: 'Review against your risk-based goal' };
-  if (marker.id === 'lpa') return number >= (unit === 'mg/dL' ? 50 : 125)
-    ? { tone: 'review', label: 'Risk-enhancing level — discuss' }
-    : { tone: 'recorded', label: 'Below risk-enhancing cut-off' };
-  if (marker.id === 'egfr') return number < 60
-    ? { tone: 'review', label: 'Needs clinical follow-up' }
-    : { tone: 'recorded', label: 'Interpret with urine ACR and trend' };
-  if (marker.id === 'uacr') return number >= (unit === 'mg/g' ? 30 : 3)
-    ? { tone: 'review', label: 'Repeat and review with your clinic' }
-    : { tone: 'recorded', label: 'Lower albumin category' };
-  if (['hba1c', 'nonhdl'].includes(marker.id)) return { tone: 'recorded', label: 'Discuss your personal target' };
-  if (marker.id === 'tg') return number < (unit === 'mg/dL' ? 150 : 1.7)
-    ? { tone: 'on-track', label: 'Within fasting reference' }
-    : { tone: 'review', label: 'Interpret fasting status and risk' };
-  if (marker.id === 'waist') {
-    if (!state.sex) return { tone: 'recorded', label: 'Recorded — add sex for context' };
-    const cutOff = state.sex === 'female' ? 80 : 90;
-    return number <= cutOff ? { tone: 'on-track', label: 'Within the guide' } : { tone: 'review', label: 'Worth a closer look' };
-  }
-  if (marker.id === 'bmi') {
-    return number >= 18.5 && number < 23 ? { tone: 'on-track', label: 'Lower-risk range' } : { tone: 'review', label: 'Use with other markers' };
-  }
-  if (marker.id === 'glucose') return number < (unit === 'mg/dL' ? 70 : 3.9) ? { tone: 'review', label: 'Low reading — discuss promptly' } : number < (unit === 'mg/dL' ? 110 : 6.1) ? { tone: 'on-track', label: 'Within the reference' } : { tone: 'review', label: 'Ask about follow-up' };
-  if (marker.id === 'ldl') return number < (unit === 'mg/dL' ? 100 : 2.6) ? { tone: 'on-track', label: 'Below common care target' } : { tone: 'review', label: 'Target is risk-based' };
-  return { tone: 'recorded', label: 'Recorded' };
-}
+});
 
-function icon(name) {
-  const paths = {
-    gauge: '<path d="M4 14a8 8 0 1 1 16 0"/><path d="m12 14 3-4"/><path d="M7 18h10"/>',
-    waist: '<path d="M8 4c1.2 2 1.2 5 0 7s-1.2 5 0 9"/><path d="M16 4c-1.2 2-1.2 5 0 7s1.2 5 0 9"/><path d="M7 8h10M7 16h10"/>',
-    scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-3 6h6L5 7ZM19 7l-3 6h6l-3-6Z"/>',
-    drop: '<path d="M12 3s5 5.3 5 10a5 5 0 0 1-10 0c0-4.7 5-10 5-10Z"/>',
-    heart: '<path d="M20.8 8.8c0 5.4-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.8A4.6 4.6 0 0 1 12 6.2a4.6 4.6 0 0 1 8.8 2.6Z"/>',
-  };
-  return `<svg class="sg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.gauge}</svg>`;
-}
+form.hidden = false;
+downloads.hidden = false;
 
-function markerCard(marker, state) {
-  const value = state.values[marker.id] || '';
-  const unit = markerUnit(marker, state);
-  const status = evaluate(marker, value, state);
-  return `<article class="sg-marker-card" data-marker-card="${marker.id}">
-    <div class="sg-marker-front">
-    <div class="sg-marker-head">
-      <span class="sg-marker-icon sg-marker-icon-${marker.icon}">${icon(marker.icon)}</span>
-      <div><p class="sg-marker-eyebrow">${escapeHTML(marker.eyebrow)}</p><h4>${escapeHTML(marker.label)}</h4></div>
-      <span class="sg-status sg-status-${status.tone}" data-marker-status>${escapeHTML(status.label)}</span>
-    </div>
-    <p class="sg-marker-why">${escapeHTML(marker.why)}</p>
-    <div class="sg-marker-input-row">
-      <label for="sg-${marker.id}">${escapeHTML(marker.inputLabel)}</label>
-      <div class="sg-value-input"><input id="sg-${marker.id}" data-marker-input="${marker.id}" inputmode="${marker.inputMode}" value="${escapeHTML(value)}" placeholder="${escapeHTML((unit !== marker.suffix && marker.alternatePlaceholder) || marker.placeholder)}" aria-describedby="sg-${marker.id}-target"><span data-marker-unit-label>${escapeHTML(unit || '')}</span></div>
-    </div>
-    ${marker.units ? `<div class="sg-unit-field"><label for="sg-${marker.id}-unit">Units on your report (values are not converted)</label><select id="sg-${marker.id}-unit" data-marker-unit="${marker.id}">${marker.units.map(value => `<option${unit === value ? ' selected' : ''}>${escapeHTML(value)}</option>`).join('')}</select></div>` : ''}
-    <p class="sg-marker-target" id="sg-${marker.id}-target"><span>Orientation</span><span data-marker-target>${escapeHTML(markerTarget(marker, unit))}</span></p>
-    </div>
-    <details class="sg-marker-details"><summary aria-label="View actions for ${escapeHTML(marker.label)}"><span class="sg-flip-open">View actions ↻</span><span class="sg-flip-close">← Back to result</span></summary><h4 class="sg-marker-back-title">${escapeHTML(marker.label)}</h4><div data-marker-actions><p>Loading practical actions…</p></div><p class="sg-marker-reference"><a href="${escapeHTML(marker.source)}" target="_blank" rel="noreferrer">Guidance and reference ↗</a>${marker.meaningSource ? ` · <a href="${escapeHTML(marker.meaningSource)}" target="_blank" rel="noreferrer">About this test ↗</a>` : ''}</p></details>
-  </article>`;
-}
-
-function profileSummary(state) {
-  if (!state.age) return 'Set your age to see the Singapore screening path that may apply.';
-  const age = Number(state.age);
-  if (age >= 50) return 'At 50+, add colorectal screening to your core cardiovascular checks.';
-  if (age >= 40) return 'At 40+, ask about Healthier SG cardiovascular screening if you are eligible.';
-  return 'Start with your yearly blood pressure, BMI and waist trend; earlier checks may fit your risk profile.';
-}
-
-function screeningCard(path, state) {
-  const active = path.matches({ age: Number(state.age) || 0, sex: state.sex });
-  return `<article class="sg-screening-card${active ? ' is-recommended' : ''}" data-screening-card="${path.id}">
-    <div class="sg-screening-card-head"><span class="sg-screening-tag">${escapeHTML(path.tag)}</span>${active ? '<span class="sg-recommended">May apply now</span>' : ''}</div>
-    <h3>${escapeHTML(path.title)}</h3>
-    <p>${escapeHTML(path.detail)}</p>
-    <dl><div><dt>Ask for</dt><dd>${escapeHTML(path.tests)}</dd></div><div><dt>Cadence</dt><dd>${escapeHTML(path.cadence)}</dd></div></dl>
-    <a href="${escapeHTML(path.source)}" target="_blank" rel="noreferrer">${escapeHTML(path.action)} <span aria-hidden="true">↗</span></a>
-  </article>`;
-}
-
-function updateWorkspace(root, state, markers) {
-  const completed = markers.filter((marker) => state.values[marker.id] && evaluate(marker, state.values[marker.id], state).tone !== 'attention').length;
-  const onTrack = markers.filter((marker) => evaluate(marker, state.values[marker.id], state).tone === 'on-track').length;
-  const score = root.querySelector('[data-baseline-score]');
-  const scoreCopy = root.querySelector('[data-baseline-copy]');
-  if (score) score.textContent = String(completed);
-  if (scoreCopy) scoreCopy.textContent = completed ? `${onTrack} results within the displayed guideposts. Other results need individual context. You do not need every test listed.` : 'Add the results you have. This is a record count, not a health score or a checklist of required tests.';
-  root.querySelectorAll('[data-marker-card]').forEach((card) => {
-    const marker = markers.find((item) => item.id === card.dataset.markerCard);
-    const status = evaluate(marker, state.values[marker.id], state);
-    const statusNode = card.querySelector('[data-marker-status]');
-    const unit = markerUnit(marker, state);
-    const input = card.querySelector('[data-marker-input]');
-    statusNode.className = `sg-status sg-status-${status.tone}`;
-    statusNode.textContent = status.label;
-    input.setAttribute('aria-invalid', String(status.tone === 'attention'));
-    card.querySelector('[data-marker-unit-label]').textContent = unit || '';
-    card.querySelector('[data-marker-target]').textContent = markerTarget(marker, unit);
-    input.placeholder = (unit !== marker.suffix && marker.alternatePlaceholder) || marker.placeholder;
+document.querySelector('[data-history]').ontoggle = ({ target }) => {
+  if (target.open) import('./a1c-history.js?v=2').catch(() => {
+    target.querySelector('[role=status]').textContent = 'Reopen the log to retry.';
   });
-  const profile = root.querySelector('[data-profile-summary]');
-  if (profile) profile.textContent = profileSummary(state);
-  root.querySelectorAll('[data-screening-card]').forEach((card) => {
-    const path = SG_SCREENING_PATHS.find((item) => item.id === card.dataset.screeningCard);
-    const active = path.matches({ age: Number(state.age) || 0, sex: state.sex });
-    card.classList.toggle('is-recommended', active);
-    const recommended = card.querySelector('.sg-recommended');
-    if (active && !recommended) card.querySelector('.sg-screening-card-head').insertAdjacentHTML('beforeend', '<span class="sg-recommended">May apply now</span>');
-    if (!active && recommended) recommended.remove();
-  });
-}
-
-export function mountHealthDashboard(mount, { compact = false } = {}) {
-  if (!mount) return;
-  const state = readState();
-  const markers = [...SG_MARKERS];
-  mount.innerHTML = `<section class="sg-workspace${compact ? ' sg-workspace-compact' : ''}" aria-labelledby="sg-baseline-title">
-    <div class="sg-workspace-intro"><div><p class="section-eyebrow">Your Singapore baseline</p><h2 id="sg-baseline-title">Track your baseline. Focus your next step.</h2><p>Record the results you already have to make follow-up more useful. This stays in your browser; it is not a diagnosis or a replacement for your doctor.</p></div><div class="sg-score-card"><span class="sg-score-label">Results recorded</span><strong data-baseline-score>0</strong><span data-baseline-copy>Add the results you have. You do not need every test listed.</span></div></div>
-    <form class="sg-health-search" role="search" aria-label="Find a result field"><label for="health-measurement-search">Find a result field</label><input id="health-measurement-search" type="search" data-health-search placeholder="HDL, grip, bone density, thyroid…" autocomplete="off" aria-describedby="health-search-status"><p id="health-search-status" data-health-search-status role="status"></p><ul data-health-results></ul></form>
-    <aside class="sg-priority-note" aria-label="High-value screening shortlist"><strong>Start with useful checks</strong><span><b>Why these first?</b> Blood pressure, BMI + waist, glucose and a full lipid panel help establish a baseline for common cardiovascular and metabolic risks. Ask whether ApoB, a one-time Lp(a), or kidney tests would change a decision for you; more tests do not automatically mean better screening. <a href="https://www.healthhub.sg/programmes/healthiersg-screening">See Singapore screening guidance ↗</a></span></aside>
-    <form class="sg-profile" data-profile-form><div><label for="sg-age">Age</label><input id="sg-age" data-profile-age type="number" min="18" max="120" inputmode="numeric" value="${escapeHTML(state.age)}" placeholder="e.g. 42"></div><div><label for="sg-sex">Sex for screening context</label><select id="sg-sex" data-profile-sex><option value="">Choose if useful</option><option value="female"${state.sex === 'female' ? ' selected' : ''}>Female</option><option value="male"${state.sex === 'male' ? ' selected' : ''}>Male</option></select></div><p data-profile-summary>${escapeHTML(profileSummary(state))}</p></form>
-    <div class="sg-marker-groups">${SG_MARKER_GROUPS.map(group => `<details class="sg-marker-group" data-marker-group="${group.id}"${group.open ? ' open' : ''}><summary><h3>${escapeHTML(group.title)}</h3></summary><p class="sg-group-copy">${escapeHTML(group.description)}</p><div class="sg-marker-grid">${group.ids.map(id => markerCard(SG_MARKERS.find(marker => marker.id === id), state)).join('')}</div></details>`).join('')}</div>
-    <details class="sg-marker-group" data-physical-measurements><summary><h3>Physical measurements · grip, bone density, fitness, body composition and sleep</h3></summary><div data-physical-mount><p>Open to record measurements beyond the blood draw.</p></div></details>
-    <details class="sg-marker-group" data-additional-screening><summary><h3>More lab results · insulin, liver, thyroid, iron, electrolytes, blood count and vitamin D</h3></summary><div data-additional-mount><p>Open to record additional results with units and practical guidance. These are optional context, not tests everyone needs.</p></div></details>
-    <details class="sg-marker-group sg-library" data-biomarker-library><summary><h3>Full Blueprint biomarker library · 144 measurements</h3></summary><div data-library-mount><p>Open to search the published blood-and-urine panel and record your results.</p></div></details>
-    <section class="sg-roadmap" aria-labelledby="sg-roadmap-title"><div class="sg-section-head"><div><p class="section-eyebrow">Screening roadmap</p><h2 id="sg-roadmap-title">Ask for the right checks at the right time.</h2></div><p>Eligibility can depend on age, sex, last screening date, diagnosis and risk. Use this as a conversation starter with a primary care clinic.</p></div><div class="sg-screening-grid">${SG_SCREENING_PATHS.map((path) => screeningCard(path, state)).join('')}</div></section>
-    <p class="sg-source-note">Built from <a href="${SG_SOURCES[0].href}" target="_blank" rel="noreferrer">MOH’s 2026 screening review</a> and <a href="${SG_SOURCES[1].href}" target="_blank" rel="noreferrer">HealthHub guidance</a>. Guidance changes; confirm the current recommendation with your clinic.</p>
-    <p class="sg-source-note">Action references: ${SG_ACTION_SOURCES.map(source => `<a href="${source.href}" target="_blank" rel="noreferrer">${escapeHTML(source.label)}</a>`).join(' · ')}. Start gradually and adapt to your health and mobility; 7,000 steps is a practical goal, not a guarantee of reaching a lab target. If your kidney care team has set diet, fluid or exercise limits, follow those instead.</p>
-    <p class="sg-source-note" data-baseline-storage role="status">Results are saved on this device.</p>
-  </section>`;
-
-  const form = mount.querySelector('[data-profile-form]');
-  function lazySection(selector, render) {
-    const details = mount.querySelector(selector);
-    const target = details.querySelector(':scope > div');
-    let task;
-    const load = () => task ||= (async () => {
-      target.setAttribute('aria-busy', 'true');
-      try { await render(target); return true; }
-      catch { target.textContent = 'Results could not load. Close and reopen to retry; reconnect once if offline files are missing.'; task = undefined; return false; }
-      finally { target.removeAttribute('aria-busy'); }
-    })();
-    details.addEventListener('toggle', () => { if (details.open) load(); });
-    return load;
-  }
-  const loadPhysical = lazySection('[data-physical-measurements]', async target => {
-    const { mountPhysicalMeasurements } = await import('./physical-measurements.js');
-    mountPhysicalMeasurements(target);
-  });
-  mount.addEventListener('toggle', async event => {
-    const details = event.target;
-    if (!details.matches('.sg-marker-details')) return;
-    const card = details.closest('[data-marker-card]');
-    const marker = markers.find(item => item.id === card.dataset.markerCard);
-    card.dataset.flipped = details.open ? 'back' : 'front';
-    details.querySelector('summary').setAttribute('aria-label', `${details.open ? 'Back to result' : 'View actions'} for ${marker.label}`);
-    details.querySelector('summary').scrollIntoView({ block: 'nearest', behavior: 'instant' });
-    if (!details.open || details.dataset.actionsLoaded) return;
-    details.dataset.actionsLoaded = 'loading';
-    const target = details.querySelector('[data-marker-actions]');
-    target.setAttribute('aria-busy', 'true');
-    try {
-      const { SG_MARKER_ACTIONS, SG_MARKER_CONTEXT } = await import('./data/screening-actions.js');
-      const key = marker.actionKey || marker.id;
-      const actions = marker.actions || SG_MARKER_ACTIONS[key];
-      target.innerHTML = `<ol>${actions.map(([title, text]) => `<li><strong>${escapeHTML(title)}</strong><span>${escapeHTML(text)}</span></li>`).join('')}</ol><p class="sg-marker-reference"><strong>Interpretation, separate from actions:</strong> ${escapeHTML(marker.context || SG_MARKER_CONTEXT[key])}</p>`;
-      details.dataset.actionsLoaded = 'true';
-    } catch {
-      target.textContent = 'Actions could not load. Close and reopen to retry.';
-      delete details.dataset.actionsLoaded;
-    } finally { target.removeAttribute('aria-busy'); }
-  }, true);
-  const loadAdditional = lazySection('[data-additional-screening]', async target => {
-      const { ADDITIONAL_MARKERS, ADDITIONAL_MARKER_GROUPS } = await import('./data/additional-screening.js');
-      const html = ADDITIONAL_MARKER_GROUPS.map(group => `<details class="sg-marker-group" data-marker-group="${group.id}"><summary><h3>${escapeHTML(group.title)}</h3></summary><p class="sg-group-copy">${escapeHTML(group.description)}</p><div class="sg-marker-grid">${ADDITIONAL_MARKERS.filter(marker => marker.group === group.id).map(marker => markerCard(marker, state)).join('')}</div></details>`).join('');
-      markers.push(...ADDITIONAL_MARKERS);
-      target.innerHTML = html;
-      target.classList.add('sg-marker-groups');
-      updateWorkspace(mount, state, markers);
-  });
-  if (Object.entries(state.values).some(([id, value]) => value && !SG_MARKERS.some(marker => marker.id === id))) loadAdditional();
-  const loadLibrary = lazySection('[data-biomarker-library]', async target => {
-      const { mountBiomarkerLibrary } = await import('./biomarker-library.js');
-      mountBiomarkerLibrary(target);
-  });
-  mountHealthSearch(mount, SG_MARKERS, { physical: loadPhysical, additional: loadAdditional, library: loadLibrary });
-  const persist = () => {
-    state.age = mount.querySelector('[data-profile-age]').value;
-    state.sex = mount.querySelector('[data-profile-sex]').value;
-    mount.querySelectorAll('[data-marker-input]').forEach((input) => { state.values[input.dataset.markerInput] = input.value.trim(); });
-    mount.querySelectorAll('[data-marker-unit]').forEach((input) => { state.units[input.dataset.markerUnit] = input.value; });
-    mount.querySelector('[data-baseline-storage]').textContent = saveState(state) ? 'Results are saved on this device.' : 'Browser storage is unavailable. Results are kept for this page session only.';
-    updateWorkspace(mount, state, markers);
-  };
-  form.addEventListener('input', persist);
-  form.addEventListener('submit', event => event.preventDefault());
-  mount.addEventListener('input', event => { if (event.target.matches('[data-marker-input]')) persist(); });
-  mount.addEventListener('change', event => { if (event.target.matches('[data-marker-unit]')) persist(); });
-  updateWorkspace(mount, state, markers);
-}
+};

@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html offline.html sw.js manifest.json favicon.svg robots.txt sitemap.xml .nojekyll _site/
-          cp -R css js fonts pages icons _site/
+          cp -R css js fonts pages icons images _site/
       - name: Upload static site
         if: steps.revision.outputs.current == 'true'
         uses: actions/upload-pages-artifact@v5

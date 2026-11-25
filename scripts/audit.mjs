@@ -1,143 +1,54 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
-const root = process.cwd();
-const pages = ['index.html', 'pages/stack.html', 'pages/blood.html', 'pages/protocol.html', 'pages/workout.html', 'pages/finance.html', 'pages/avoid.html'];
-const required = ['css/variables.css', 'css/style.css', 'sw.js', 'manifest.json', 'offline.html', 'robots.txt', 'sitemap.xml', '_headers', 'js/register-sw.js'];
-const failures = [];
+const routes = ['index.html', 'pages/stack.html', 'pages/food-labels.html', 'pages/blood.html', 'pages/supplements.html', 'pages/skin-care.html'];
+const read = (file) => readFileSync(file, 'utf8');
+const local = (file, reference) => new URL(reference, `https://example.test/app/${file}`);
+const cacheAssets = [...read('sw.js').split('const STATIC_ASSETS = [')[1].split('];')[0].matchAll(/['"]([^'"]+)['"]/g)]
+  .map(([, asset]) => local('index.html', asset).href);
 
-function read(relativePath) {
-  return fs.readFileSync(path.join(root, relativePath), 'utf8');
+for (const asset of cacheAssets) {
+  const file = new URL(asset).pathname.slice('/app/'.length) || 'index.html';
+  assert(existsSync(file), `Missing cached asset: ${file}`);
 }
 
-function check(condition, message) {
-  if (!condition) failures.push(message);
+for (const route of routes) {
+  const html = read(route);
+  assert.match(html, /rel="canonical"/, route);
+  assert.match(html, /rel="manifest"/, route);
+  assert.match(html, /script-src 'self';/u, route);
+  assert.doesNotMatch(html, /\son\w+="|<script>/iu, route);
+  assert.equal([...html.matchAll(/<h1\b/g)].length, 1, route);
+  assert.equal([...html.matchAll(/aria-current="page"/g)].length, 1, route);
+  const nav = html.match(/<nav\b[^>]*>(.*?)<\/nav>/s)?.[1] || '';
+  assert.deepEqual([...nav.matchAll(/<span>([^<]+)<\/span>/g)].map(([, label]) => label),
+    ['Overview', 'Food', 'Food Labels', 'Health', 'Supplements', 'Skin Care'], route);
+  const sectionNav = html.match(/<nav class="section-nav"[^>]*>(.*?)<\/nav>/s)?.[1] || '';
+  assert(sectionNav, `${route}: missing section-nav`);
+  for (const [, href] of sectionNav.matchAll(/href="([^"]+)"/g)) {
+    assert(href.startsWith('#'), `${route}: section-nav must only link to in-page sections (${href})`);
+  }
+  for (const [, reference] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
+    if (/^(?:https:|tel:|#)/.test(reference)) continue;
+    const url = local(route, reference);
+    url.hash = '';
+    assert(cacheAssets.includes(url.href), `${route}: cache is missing ${reference}`);
+  }
 }
 
-required.forEach((file) => check(fs.existsSync(path.join(root, file)), `Missing required file: ${file}`));
-
-pages.forEach((file) => {
-  const html = read(file);
-  const assetPrefix = file.startsWith('pages/') ? '../' : '';
-  check(!/<(?:button|select|form)[^>]+\bon(?:click|change|submit)\s*=/i.test(html), `${file}: inline event handler found`);
-  check(!/<script\s*>/i.test(html), `${file}: inline script block found`);
-  check(/script-src 'self'(?:;|')/.test(html), `${file}: strict script CSP missing`);
-  check(!/script-src 'self' 'unsafe-inline'/.test(html), `${file}: unsafe inline script CSP remains`);
-  check(/rel="canonical"/.test(html), `${file}: canonical URL missing`);
-  check(html.includes(`src="${assetPrefix}js/register-sw.js"`), `${file}: service-worker bootstrap missing`);
-  check(html.includes(`${assetPrefix}fonts/inter-latin.woff2`), `${file}: local Inter font preload missing`);
-  check(!/(?:href|src)="\/(?:css|js|pages|sw\.js|manifest\.json|favicon\.svg)/.test(html), `${file}: root-absolute project asset path breaks project Pages hosting`);
-  check(!html.includes('geist-'), `${file}: legacy Geist font reference remains`);
-  const primaryLabels = [...html.matchAll(/class="nav-link(?: active)?"[^>]*>([^<]+)<\/a>/g)].map((match) => match[1].trim());
-  const bottomLabels = [...html.matchAll(/class="bottom-nav-label">([^<]+)<\/span>/g)].map((match) => match[1].trim());
-  check(JSON.stringify(primaryLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: primary navigation must contain the five canonical destinations`);
-  check(JSON.stringify(bottomLabels) === JSON.stringify(['Home', 'Nutrition', 'Health', 'Training', 'Finance']), `${file}: bottom navigation must contain the five canonical destinations`);
-  check(!/>Avoid<\/a>|bottom-nav-label">Avoid</.test(html), `${file}: obsolete parent-level Avoid navigation remains`);
-  check(html.includes('<link rel="expect" href="#view-transition-anchor" blocking="render">'), `${file}: view-transition render expectation missing`);
-  check((html.match(/id="view-transition-anchor"/g) || []).length === 1, `${file}: expected exactly one view-transition anchor`);
-});
-
-const finance = read('pages/finance.html');
-const financeInputIds = [...finance.matchAll(/<input[^>]+id="([^"]+)"/g)].map((match) => match[1]);
-financeInputIds.forEach((id) => check(new RegExp(`<label[^>]+for="${id}"`).test(finance), `pages/finance.html: missing label for #${id}`));
-check((finance.match(/<h1\b/g) || []).length === 1, 'pages/finance.html: expected exactly one h1');
-check(finance.includes('aria-labelledby="fireChartTitle fireChartDesc"'), 'pages/finance.html: chart accessible naming missing');
-
-const stack = read('js/stack.js');
-check(!/onclick=|onchange=/.test(stack), 'js/stack.js: inline event handler found');
-check(stack.includes('role="tablist"'), 'js/stack.js: tablist semantics missing');
-
-const sw = read('sw.js');
-const staticAssetBlock = sw.match(/const STATIC_ASSETS = \[(.*?)\];/s)?.[1] || '';
-const assets = [...staticAssetBlock.matchAll(/'([^']+)'/g)].map((match) => match[1]);
-assets.forEach((asset) => check(fs.existsSync(path.join(root, asset.replace(/^\.\//, ''))), `sw.js: precached asset missing: ${asset}`));
-check(sw.includes("'fonts/inter-latin.woff2'") && sw.includes("'fonts/jetbrains-mono-latin.woff2'"), 'sw.js: Warm Canvas font assets missing from precache');
-check(!sw.includes('geist-'), 'sw.js: legacy Geist font remains precached');
-
-const variables = read('css/variables.css');
-check(!/url\(\/(?:fonts|css|js|pages)\//.test(variables), 'css/variables.css: root-absolute asset path breaks project Pages hosting');
-check(variables.includes('--color-primary: #0F766E'), 'css/variables.css: Warm Serenity teal primary token missing');
-check(variables.includes("font-family: 'Inter'"), 'css/variables.css: Inter font face missing');
-check(variables.includes("font-family: 'JetBrains Mono'"), 'css/variables.css: JetBrains Mono font face missing');
-check(!variables.includes('Geist'), 'css/variables.css: legacy Geist token remains');
-
-const styles = read('css/style.css');
-check(styles.includes('@view-transition') && styles.includes('navigation: auto'), 'css/style.css: cross-document view-transition opt-in missing');
-check(styles.includes('navigation: none') && styles.includes('prefers-reduced-motion: reduce'), 'css/style.css: reduced-motion view-transition opt-out missing');
-check(styles.includes('macro-page-view-transition-out') && styles.includes('macro-page-view-transition-in'), 'css/style.css: view-transition animations missing');
-
-const manifest = read('manifest.json');
-check(manifest.includes('"theme_color": "#FDFBF7"'), 'manifest.json: Warm Serenity theme color missing');
-check(manifest.includes('"background_color": "#FDFBF7"'), 'manifest.json: Warm Serenity background color missing');
-check(read('favicon.svg').includes('fill="#0F766E"'), 'favicon.svg: Warm Serenity primary fill missing');
-['fonts/geist-sans.woff2', 'fonts/geist-mono.woff2', 'fonts/dm-sans-latin.woff2'].forEach((file) => {
-  check(!fs.existsSync(path.join(root, file)), `${file}: retired font asset remains`);
-});
-
-const financeData = read('js/data/finance.js');
-check(!/Zero chance of loss/i.test(financeData), 'js/data/finance.js: absolute loss claim remains');
-check(read('css/variables.css').includes('--tint-secondary-12:'), 'css/variables.css: conditional tint token missing');
-
-try {
-  const homePriorities = JSON.parse(read('js/data/high-return-priorities.json'));
-  check(Array.isArray(homePriorities) && homePriorities.length === 5, 'js/data/high-return-priorities.json: expected five Home priorities');
-  check(homePriorities.every((priority) => priority.title && priority.action && priority.benefit && priority.sources?.length), 'js/data/high-return-priorities.json: priority content is incomplete');
-} catch {
-  check(false, 'js/data/high-return-priorities.json: invalid JSON');
+for (const [index, route] of routes.entries()) {
+  const pathname = index === 0 ? '' : route;
+  assert(read('sitemap.xml').includes(`https://hazelah.me/macro-longevity/${pathname}</loc>`));
 }
-
-const nutritionData = read('js/data/nutrition.js');
-['protein', 'leucine', 'ala', 'epaDha', 'magnesium', 'potassium', 'calcium', 'zinc', 'selenium', 'iron', 'iodine', 'vitaminD', 'vitaminC', 'folate', 'b12', 'b1', 'vitaminA', 'fiber', 'choline'].forEach((id) => {
-  check(nutritionData.includes(`id: "${id}"`), `js/data/nutrition.js: nutrient target missing: ${id}`);
-});
-check(nutritionData.includes('FOUNDATION_STACK'), 'js/data/nutrition.js: foundation preset missing');
-check(nutritionData.includes('MITOCHONDRIAL_SUPPORT'), 'js/data/nutrition.js: mitochondrial support module missing');
-check(nutritionData.includes('COMPOUND_TARGETS'), 'js/data/nutrition.js: minimal stack targets missing');
-check(nutritionData.includes('MEAL_PLANS'), 'js/data/nutrition.js: reusable meal plans missing');
-check(nutritionData.includes('label: "Fiber"'), 'js/data/nutrition.js: standalone Fiber group missing');
-check(nutritionData.includes('Protein powder (whey)'), 'js/data/nutrition.js: protein powder label missing');
-check(nutritionData.includes('actions: { food:'), 'js/data/nutrition.js: target action metadata missing');
-['creatine', 'epaDha', 'vitaminD', 'magnesium', 'choline', 'glycine', 'taurine'].forEach((id) => {
-  check(nutritionData.includes(`id: "${id}"`), `js/data/nutrition.js: minimal stack target missing: ${id}`);
-});
-
-const javascriptFiles = [
-  'js/data/stack.js', 'js/data/blood.js', 'js/data/workout.js', 'js/data/finance.js',
-  'js/data/pillars.js', 'js/data/protocol.js', 'js/data/singapore.js', 'js/data/nutrition.js', 'js/paths.js', 'js/stack.js',
-  'js/blood.js', 'js/render.js', 'js/export.js', 'js/protocol.js',
-  'js/finance.js', 'js/register-sw.js', 'sw.js',
-  'js/site.js', 'js/avoid.js', 'js/components/card-swipe.js',
-  'js/home-dashboard.js', 'js/health-dashboard.js', 'js/data/screening.js',
-  'js/data/reference-ranges.js',
-  'js/data/health-reference-groups.js',
-  'js/data/lab-references.js', 'js/components/reference-navigation.js',
-  'js/data/extended-references.js', 'js/data/specialist-references.js', 'js/data/protocol-measurement-mappings.js',
-  'js/biomarker-library.js', 'js/data/blueprint-markers.js',
-  'js/data/screening-actions.js',
-  'js/data/reference-actions.js',
-  'js/data/additional-screening.js',
-  'js/data/physical-measurements.js', 'js/data/physical-result-fields.js', 'js/data/measurement-index.js', 'js/data/measurement-sources.js',
-  'js/physical-measurements.js', 'js/components/measurement-search.js', 'js/components/health-measurement-search.js',
-  'js/components/coverage-pin.js', 'js/components/nutrition-totals.js', 'js/components/modal.js', 'js/components/coverage-dialog.js', 'js/components/confirm.js', 'js/components/sticky-pin.js',
-  'js/components/toast.js', 'js/components/tooltip.js',
-];
-javascriptFiles.forEach((file) => {
-  const result = spawnSync(process.execPath, ['--check', file], { cwd: root, encoding: 'utf8' });
-  check(result.status === 0, `${file}: node --check failed${result.stderr ? ` (${result.stderr.trim()})` : ''}`);
-});
-
-const coverage = spawnSync(process.execPath, ['scripts/audit-measurement-coverage.mjs'], { cwd: root, encoding: 'utf8' });
-check(coverage.status === 0, `Measurement coverage baseline failed: ${coverage.stderr}`);
-if (coverage.stdout) console.log(coverage.stdout.trim());
-const completeCoverage = spawnSync(process.execPath, ['scripts/reconcile-measurements.mjs', '--check-snapshot'], { cwd: root, encoding: 'utf8' });
-check(completeCoverage.status === 0, `Full versioned measurement reconciliation failed: ${completeCoverage.stderr}`);
-if (completeCoverage.stdout) console.log(`Reconciled coverage: ${completeCoverage.stdout.trim()}`);
-
-if (failures.length) {
-  console.error(`Audit failed with ${failures.length} issue(s):`);
-  failures.forEach((failure) => console.error(`- ${failure}`));
-  process.exitCode = 1;
-} else {
-  console.log(`Audit passed: ${pages.length} pages, ${javascriptFiles.length} JavaScript files, and ${assets.length} precached assets checked.`);
+assert.deepEqual(readdirSync('pages').filter((entry) => entry.endsWith('.html')).sort(), routes.slice(1).map((route) => route.split('/').at(-1)).sort());
+const manifest = JSON.parse(read('manifest.json'));
+for (const key of ['id', 'start_url', 'scope']) assert.equal(manifest[key], './');
+for (const { src } of manifest.icons) assert(cacheAssets.includes(local('index.html', src).href));
+for (const file of ['sw.js', ...readdirSync('js', { recursive: true })
+  .filter((entry) => entry.endsWith('.js')).map((entry) => `js/${entry}`)]) {
+  execFileSync(process.execPath, ['--check', file], { stdio: 'inherit' });
 }
+assert.match(read('_headers'), /script-src 'self';/);
+assert.match(read('.assetsignore'), /^reference\/$/m);
+console.log('Navigation, metadata, offline assets and JavaScript verified.');

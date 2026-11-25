@@ -1,89 +1,357 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Start with high-value health screening, track results in their reported units, and focus follow-up on risks you can act on.">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; media-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
-    <link rel="canonical" href="https://hazelah.me/macro-longevity/pages/blood.html">
-    <meta property="og:title" content="Health Prevention &amp; Baseline — Macro Longevity">
-    <meta property="og:description" content="Start with high-value health screening, track results in their reported units, and focus follow-up on risks you can act on.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://hazelah.me/macro-longevity/pages/blood.html">
-    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <link rel="manifest" href="../manifest.json">
-    <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
-    <meta name="theme-color" content="#FDFBF7">
-    <title>Health Prevention &amp; Baseline — Macro Longevity</title>
-    <link rel="stylesheet" href="../css/variables.css">
-    <link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/health-layout.css">
-    <link rel="stylesheet" href="../css/singapore-health.css">
-    <link rel="stylesheet" href="../css/tooltip.css">
-    <link rel="expect" href="#view-transition-anchor" blocking="render">
-    <link rel="stylesheet" href="../css/wellness.css">
-    <link rel="stylesheet" href="../css/section-navigation.css">
-</head>
-<body>
-    <a href="#main" class="skip-link">Skip to main content</a>
-    <nav class="nav" aria-label="Primary navigation">
-        <div class="nav-inner">
-            <a href="../" class="nav-logo">
-                <span class="nav-logo-text">MacroLongevity</span>
-            </a>
-            <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
-                <span></span><span></span><span></span>
-            </button>
-            <div class="nav-links">
-                <a href="../" class="nav-link">Home</a>
-                <a href="../pages/stack.html" class="nav-link">Nutrition</a>
-                <a href="../pages/blood.html" class="nav-link active" aria-current="page">Health</a>
-                <a href="../pages/workout.html" class="nav-link">Training</a>
-                <a href="../pages/finance.html" class="nav-link">Finance</a>
-            </div>
+<!doctype html>
+<html lang="en-SG">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="text-scale" content="scale" />
+    <meta
+      name="description"
+      content="Singapore screening, vaccinations and report results."
+    />
+    <meta name="theme-color" content="#f7f5ed" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'self'; form-action 'none'"
+    />
+    <link
+      rel="canonical"
+      href="https://hazelah.me/macro-longevity/pages/blood.html"
+    />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../manifest.json" />
+    <link
+      rel="preload"
+      href="../fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../css/variables.css?v=5" />
+    <link rel="stylesheet" href="../css/style.css?v=17" />
+    <title>Health · Macro Longevity</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="wordmark" href="../"
+          ><img src="../favicon.svg" width="34" height="34" alt="" /><span
+            >Macro Longevity</span
+          ></a
+        >
+        <nav class="site-nav" aria-label="Primary">
+          <ul>
+            <li>
+              <a href="../"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm6 11v-7h6v7"
+                  /></svg
+                ><span>Overview</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/stack.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M3 13h18a9 9 0 0 1-18 0Zm4-3c0-3 3-3 4-6m1 6c0-3 3-3 4-6m-7 18h6"
+                  /></svg
+                ><span>Food</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/food-labels.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20 13 13 20a2 2 0 0 1-3 0l-6-6V4h10l6 6a2 2 0 0 1 0 3Z"
+                  />
+                  <circle cx="8.5" cy="8.5" r="1" /></svg
+                ><span>Food Labels</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/blood.html" aria-current="page"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20.8 8.8c0 5.4-8.8 11-8.8 11S3.2 14.2 3.2 8.8A4.6 4.6 0 0 1 12 6.2a4.6 4.6 0 0 1 8.8 2.6Z"
+                  /></svg
+                ><span>Health</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/supplements.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="m8.5 19.5 11-11a4.24 4.24 0 0 0-6-6l-11 11a4.24 4.24 0 0 0 6 6Zm-.5-11 6 6"
+                  /></svg
+                ><span>Supplements</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/skin-care.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path
+                    d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"
+                  /></svg
+                ><span>Skin Care</span></a
+              >
+            </li>
+          </ul>
+        </nav>
+        <button class="button primary" type="button" data-update-app hidden>
+          Update app
+        </button>
+        <span class="visually-hidden" data-update-status role="status"></span>
+      </div>
+    </header>
+    <main id="main" class="wrap" tabindex="-1">
+      <section class="hero page-intro" aria-labelledby="health-title">
+        <div>
+          <p class="eyebrow">Health</p>
+          <h1 id="health-title">Screening and results</h1>
+          <p class="lede">
+            Keep the readings you already have together and know what to bring
+            up at your next clinic visit.
+          </p>
         </div>
-    </nav>
-
-    <main id="main">
-        <section id="view-transition-anchor" class="page-header health-page-header">
-            <div class="section-inner">
-                <p class="section-eyebrow">Prevention · baseline · practical next steps</p>
-                <h1 class="page-title">Focus on the risks worth acting on.</h1>
-                <p class="page-desc">
-                    Start with high-value screening, track results in your lab’s units and use personal clinical context to decide what comes next. These checks support care; they do not diagnose on their own.
+      </section>
+      <nav class="section-nav" aria-label="On this page">
+        <p>On this page</p>
+        <div class="section-links">
+          <a class="button" href="#screening">Check screening</a>
+          <a class="button" href="#vaccinations">Vaccinations</a>
+          <a class="button" href="#results-title">Record a result</a>
+          <a class="button" href="#hba1c-history">Dated HbA1c results</a>
+        </div>
+      </nav>
+      <div class="page-content">
+        <div class="layout">
+          <div class="health-column">
+            <section class="panel results" aria-labelledby="results-title">
+              <div class="panel-heading">
+                <h2 id="results-title">Core results</h2>
+                <p>
+                  Copy the value and unit from your report. This form keeps the
+                  last saved value for each measurement in this browser.
                 </p>
-            </div>
-        </section>
-        <nav class="context-nav" aria-label="Health"><div class="section-inner context-nav-inner"><div><a href="../pages/blood.html" class="context-nav-link is-active" data-context-link aria-current="page">Blood tests</a><a href="../pages/protocol.html" class="context-nav-link" data-context-link>Blueprint</a></div></div></nav>
-        <div class="sticky-pin-layout" data-sticky-pin-layout><div class="sticky-pin-content">
-
-        <section class="section section-compact">
-            <div class="section-inner">
-                <div id="sg-health-dashboard"></div>
-                <div id="blood-app"></div>
-            </div>
-        </section>
-        </div></div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <span>MacroLongevity</span>
-            </div>
-            <p class="footer-text">
-                Evidence-informed guidance for Singapore health screening and everyday longevity.
-                Not medical advice. Test results are for discussion with your physician.
-            </p>
-            <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
-            <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
+              </div>
+              <div class="report-example">
+                <img
+                  src="../images/infographics/report-pair.svg"
+                  width="64"
+                  height="64"
+                  alt=""
+                />
+                <div>
+                  <p>Example from an LDL report</p>
+                  <p class="report-reading">
+                    <strong>2.4</strong> <strong>mmol/L</strong>
+                  </p>
+                </div>
+              </div>
+              <form id="results-form" hidden>
+                <div class="result-grid" data-results></div>
+                <div class="form-actions">
+                  <button class="button primary" type="submit">
+                    Save results
+                  </button>
+                  <p data-save-status role="status"></p>
+                </div>
+              </form>
+              <noscript
+                ><p class="message">
+                  Enable JavaScript to use the results log.
+                </p></noscript
+              >
+            </section>
+            <section class="panel guide" aria-labelledby="hba1c-history">
+              <h2 id="hba1c-history">Dated HbA1c results</h2>
+              <p>
+                Keep a dated history using the date, number and unit on each
+                report. These entries are saved separately from Core results.
+              </p>
+              <details data-history>
+                <summary>Open the HbA1c log</summary>
+                <p role="status" data-history-status></p>
+                <div class="history-charts" data-history-charts hidden>
+                  <h3>Recorded HbA1c over time</h3>
+                  <p>
+                    Each dot is a saved result. Charts are grouped by report
+                    unit.
+                  </p>
+                  <div class="history-chart-grid"></div>
+                </div>
+                <form data-history-form hidden>
+                  <div class="result-grid">
+                    <div class="result-field">
+                      <label for="a1c-date">Date on the report</label
+                      ><input id="a1c-date" name="date" type="date" required />
+                    </div>
+                    <div class="result-field">
+                      <label for="a1c-value">HbA1c result on the report</label
+                      ><input
+                        id="a1c-value"
+                        name="value"
+                        inputmode="decimal"
+                        pattern="[0-9]+([.,][0-9]+)?"
+                        required
+                      />
+                    </div>
+                    <div class="result-field">
+                      <label for="a1c-unit">Unit on the report</label
+                      ><select id="a1c-unit" name="unit" required>
+                        <option value="">Select a unit</option>
+                        <option>%</option>
+                        <option>mmol/mol</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-actions">
+                    <button class="button primary" type="submit">
+                      Save dated HbA1c result
+                    </button>
+                  </div>
+                </form>
+                <ul class="guide-list" data-history-results></ul>
+              </details>
+            </section>
+            <section class="panel guide data-panel" data-download hidden>
+              <h2>Your saved data</h2>
+              <p>
+                The health download includes your core results and dated HbA1c
+                entries. The full archive may also contain private records from
+                older versions, including finance data.
+              </p>
+              <button class="button" type="button" data-export="health">
+                Download health results
+              </button>
+              <button class="button" type="button" data-export="all">
+                Download full archive
+              </button>
+              <p data-export-status role="status"></p>
+            </section>
+          </div>
+          <div class="health-column">
+            <section id="screening" class="panel guide">
+              <h2>Singapore screening</h2>
+              <p>
+                Use the Healthier SG eligibility check for your age, last test
+                and health history. These are typical starting ages and
+                intervals for eligible people. Ask your clinic about earlier
+                assessment if your risk is higher.
+              </p>
+              <ul class="guide-list">
+                <li>
+                  <strong>Cervical screening from 25.</strong> For eligible
+                  women, a Pap test every three years at 25–29 or an HPV test
+                  every five years from 30.
+                </li>
+                <li>
+                  <strong>Cardiovascular risk screening from 40.</strong>
+                  Typically every three years for eligible adults. Higher-risk
+                  adults aged 18–39 may qualify through the Diabetes Risk
+                  Assessment.
+                </li>
+                <li>
+                  <strong>Colorectal screening from 50.</strong> Typically one
+                  FIT stool test each year for eligible adults.
+                </li>
+                <li>
+                  <strong>Breast screening from 50.</strong> Typically a
+                  mammogram every two years for eligible women.
+                </li>
+              </ul>
+              <p>
+                Bring previous results and ask whether add-ons such as ApoB or
+                Lp(a) would change your care. If you already have high blood
+                pressure, diabetes or high cholesterol, review your treatment
+                and targets with your clinic.
+              </p>
+              <div class="priority-links">
+                <a
+                  class="text-link"
+                  href="https://www.healthhub.sg/programmes/healthiersg-screening/screening-journey"
+                  >Check eligibility and book</a
+                >
+                <a
+                  class="text-link"
+                  href="https://www.healthhub.sg/programmes/healthiersg-screening/screening-faq"
+                  >Healthier SG screening FAQ</a
+                >
+              </div>
+            </section>
+            <section id="vaccinations" class="panel guide">
+              <h2>Adult vaccinations</h2>
+              <p>
+                Bring your vaccination record. Ask which doses apply to you,
+                including influenza, COVID-19, hepatitis B or HPV, based on your
+                history and eligibility.
+              </p>
+              <a
+                class="text-link"
+                href="https://www.cda.gov.sg/public/vaccinations/"
+                >CDA · Adult vaccination <span aria-hidden="true">↗</span></a
+              >
+            </section>
+          </div>
         </div>
-    </footer>
-
-    <script type="module" src="../js/blood.js"></script>
-    <script type="module" src="../js/site.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="../" class="bottom-nav-item"><span class="bottom-nav-label">Home</span></a><a href="../pages/stack.html" class="bottom-nav-item"><span class="bottom-nav-label">Nutrition</span></a><a href="../pages/blood.html" class="bottom-nav-item active"><span class="bottom-nav-label">Health</span></a><a href="../pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="../pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
- <script src="../js/register-sw.js" defer></script>
-</body>
+      </div>
+    </main>
+    <script src="../js/register-sw.js?v=5" defer></script>
+    <script type="module" src="../js/health-dashboard.js?v=5"></script>
+    <script type="module" src="../js/section-nav.js?v=2"></script>
+  </body>
 </html>

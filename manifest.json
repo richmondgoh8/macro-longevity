@@ -1,13 +1,13 @@
 {
-  "name": "Macro Longevity — Singapore Baseline",
+  "name": "Macro Longevity",
   "short_name": "Macro Longevity",
-  "description": "A Singapore-focused health screening and longevity guide with local-first baseline tracking.",
+  "description": "A Singapore guide to high-impact habits, preventive care and core health results.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#FDFBF7",
-  "theme_color": "#FDFBF7",
+  "background_color": "#f7f5ed",
+  "theme_color": "#f7f5ed",
   "orientation": "any",
   "icons": [
     {

@@ -1,169 +1,109 @@
-const CACHE_NAME = 'macro-longevity-offline-v63-healthspan-priorities';
+const SITE_SCOPE = new URL("./", self.location.href);
+const CACHE_PREFIX = `macro-longevity:${SITE_SCOPE.pathname}:`;
+const CACHE_NAME = `${CACHE_PREFIX}v26`;
 const STATIC_ASSETS = [
-  './',
-  'index.html',
-  'pages/stack.html',
-  'pages/blood.html',
-  'pages/protocol.html',
-  'pages/workout.html',
-  'pages/finance.html',
-  'pages/avoid.html',
-  'css/variables.css',
-  'css/style.css',
-  'css/nutrition-layout.css',
-  'css/training-layout.css',
-  'css/finance-layout.css',
-  'css/health-layout.css',
-  'css/singapore-health.css',
-  'css/ingredients-layout.css',
-  'css/nutrition.css',
-  'css/wellness.css',
-  'css/section-navigation.css',
-  'css/tooltip.css',
-  'css/toast.css',
-  'js/register-sw.js',
-  'js/paths.js',
-  'js/site.js',
-  'js/components/tooltip.js',
-  'js/export.js',
-  'js/home-dashboard.js',
-  'js/data/high-return-priorities.json',
-  'js/components/reference-navigation.js',
-  'js/health-dashboard.js',
-  'js/biomarker-library.js',
-  'js/data/blueprint-markers.js',
-  'js/data/lab-references.js',
-  'js/data/core-lab-intervals.js',
-  'js/data/lab-intervals.js',
-  'js/data/extended-references.js',
-  'js/data/specialist-references.js',
-  'js/data/protocol-measurement-mappings.js',
-  'js/data/screening-actions.js',
-  'js/data/reference-actions.js',
-  'js/data/additional-screening.js',
-  'js/stack.js',
-  'js/components/coverage-pin.js',
-  'js/components/nutrition-totals.js',
-  'js/avoid.js',
-  'js/blood.js',
-  'js/protocol.js',
-  'js/render.js',
-  'js/finance.js',
-  'js/components/card-swipe.js',
-  'js/components/spotlight.js',
-  'js/components/sticky-pin.js',
-  'js/components/ui.js',
-  'js/components/toast.js',
-  'js/components/modal.js',
-  'js/components/coverage-dialog.js',
-  'js/components/confirm.js',
-  'js/data/core.js',
-  'js/data/stack.js',
-  'js/data/blood.js',
-  'js/data/workout.js',
-  'js/data/finance.js',
-  'js/data/pillars.js',
-  'js/data/protocol.js',
-  'js/data/singapore.js',
-  'js/data/screening.js',
-  'js/data/reference-ranges.js',
-  'js/data/health-reference-groups.js',
-  'js/data/physical-measurements.js',
-  'js/data/physical-result-fields.js',
-  'js/data/measurement-index.js',
-  'js/physical-measurements.js',
-  'js/components/measurement-search.js',
-  'js/components/health-measurement-search.js',
-  'js/data/nutrition.js',
-  'offline.html',
-  'favicon.svg',
-  'manifest.json',
-  'icons/app-192.png',
-  'icons/app-512.png',
-  'icons/apple-touch-icon.png',
-  'fonts/inter-latin.woff2',
-  'fonts/jetbrains-mono-latin.woff2',
+  "./",
+  "index.html",
+  "pages/stack.html",
+  "pages/food-labels.html",
+  "pages/blood.html",
+  "pages/supplements.html",
+  "pages/skin-care.html",
+  "offline.html",
+  "css/variables.css?v=5",
+  "css/style.css?v=17",
+  "js/register-sw.js?v=5",
+  "js/section-nav.js?v=2",
+  "js/health-dashboard.js?v=5",
+  "js/data/screening.js?v=3",
+  "js/export.js?v=3",
+  "js/a1c-history.js?v=2",
+  "images/weekday-meals.webp?v=2",
+  "fonts/inter-latin.woff2",
+  "favicon.svg",
+  "manifest.json",
+  "images/infographics/meal-plate.svg",
+  "images/infographics/sugar-scale.svg",
+  "images/infographics/report-pair.svg",
+  "images/infographics/walking-week.svg",
+  "icons/app-192.png",
+  "icons/app-512.png",
+  "icons/apple-touch-icon.png",
 ];
-const SITE_SCOPE = new URL('./', self.location.href);
+const urls = new Set(
+  STATIC_ASSETS.map((path) => new URL(path, SITE_SCOPE).href),
+);
+const offline = new URL("offline.html", SITE_SCOPE).href;
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS.map((asset) => new Request(new URL(asset, SITE_SCOPE), { cache: 'reload' }))))
-      .then(() => self.skipWaiting())
+    caches
+      .open(CACHE_NAME)
+      .then((cache) =>
+        cache.addAll(
+          [...urls].map((url) => new Request(url, { cache: "reload" })),
+        ),
+      ),
   );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") event.waitUntil(self.skipWaiting());
+});
+
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k.startsWith('macro-longevity-offline-') && k !== CACHE_NAME).map((k) => caches.delete(k)))
-    ).then(async () => {
-      if (self.registration.navigationPreload) await self.registration.navigationPreload.enable();
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter(
+            (key) =>
+              key !== CACHE_NAME &&
+              (key.startsWith(CACHE_PREFIX) ||
+                key.startsWith("macro-longevity-offline-")),
+          )
+          .map((key) => caches.delete(key)),
+      );
+      // Previous versions enabled navigation preload for network revalidation.
+      await self.registration.navigationPreload?.disable();
       await self.clients.claim();
-    })
+    })(),
   );
 });
 
-async function fetchWithTimeout(request, timeoutMs = 1200) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  try { return await fetch(request, { signal: controller.signal }); }
-  finally { clearTimeout(timeout); }
-}
-
-async function cacheResponse(request, response) {
-  if (response && response.status === 200 && response.type === 'basic') {
-    await (await caches.open(CACHE_NAME)).put(request, response.clone());
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
+  if (
+    url.origin !== SITE_SCOPE.origin ||
+    !url.pathname.startsWith(SITE_SCOPE.pathname)
+  )
+    return;
+  const navigate = request.mode === "navigate";
+  if (navigate) {
+    url.search = "";
+    url.hash = "";
   }
-  return response;
-}
 
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
-  const isNavigation = event.request.mode === 'navigate';
-  const isImmutable = url.pathname.endsWith('.woff2') || url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.png') || url.pathname.endsWith('.jpg');
-
-  if (isNavigation) {
-    event.respondWith((async () => {
-      const refresh = () => Promise.race([
-        event.preloadResponse.then((preloaded) => preloaded || fetchWithTimeout(event.request)),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('navigation timeout')), 1300)),
-      ]).then((response) => cacheResponse(event.request, response)).catch(() => null);
-      const cached = await caches.match(event.request);
-      if (cached) {
-        event.waitUntil(refresh());
-        return cached;
-      }
-      try {
-        const response = await refresh();
-        return response || (await caches.match(new URL('offline.html', SITE_SCOPE)));
-      } catch {
-        return (await caches.match(new URL('offline.html', SITE_SCOPE)));
-      }
-    })());
-  } else if (isImmutable) {
+  if (urls.has(url.href) || navigate) {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cached = urls.has(url.href) && (await cache.match(url.href));
         if (cached) return cached;
-        return fetch(event.request).then((response) => {
-          if (response && response.status === 200 && response.type === 'basic') {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        });
-      })
+
+        try {
+          return await fetch(request);
+        } catch {
+          return navigate &&
+            url.href !== offline &&
+            (await cache.match(offline))
+            ? Response.redirect(offline)
+            : Response.error();
+        }
+      })(),
     );
-  } else {
-    event.respondWith((async () => {
-      const cached = await caches.match(event.request);
-      const update = fetch(event.request).then((response) => cacheResponse(event.request, response)).catch(() => null);
-      if (cached) { event.waitUntil(update); return cached; }
-      return (await update) || Response.error();
-    })());
   }
 });

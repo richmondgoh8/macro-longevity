@@ -1,103 +1,462 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Build a practical food-first Daily Stack with nutrient coverage, simple bowls, conditional supplements and recovery habits.">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cdn.freesound.org; media-src 'self' https://cdn.freesound.org; img-src 'self' data:; base-uri 'self'; form-action 'none'">
-    <link rel="canonical" href="https://hazelah.me/macro-longevity/pages/stack.html">
-    <meta property="og:title" content="Daily Stack — Macro Longevity">
-    <meta property="og:description" content="Food-first daily nutrition, stack builder, high-ROI foods, evidence-based supplements and recovery protocols.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://hazelah.me/macro-longevity/pages/stack.html">
-    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <link rel="manifest" href="../manifest.json">
-    <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
-    <meta name="theme-color" content="#FDFBF7">
-    <title>Daily Stack — Macro Longevity</title>
-    <link rel="stylesheet" href="../css/variables.css">
-    <link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/nutrition-layout.css">
-    <link rel="stylesheet" href="../css/tooltip.css">
-    <link rel="stylesheet" href="../css/nutrition.css">
-
-    <link rel="expect" href="#view-transition-anchor" blocking="render">
-    <link rel="stylesheet" href="../css/wellness.css">
-    <style>
-      .meal-planner .planner-controls { margin-bottom: 0; }
-      .planner-export-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
-      .planner-export-actions .button { min-height: 44px; }
-      [data-plan-print] { display: none; }
-      @media (max-width: 599px) { .planner-export-actions .button { flex: 1; min-width: 0; } }
-      @media print {
-        body > :not([data-plan-print]) { display: none !important; }
-        body > [data-plan-print] { display: block; max-width: 720px; margin: 0 auto; color: #000; font: 12pt/1.5 Arial, sans-serif; }
-        [data-plan-print] h1 { font-size: 22pt; margin: 0 0 4px; }
-        [data-plan-print] h2 { font-size: 16pt; margin: 24px 0 8px; }
-        [data-plan-print] h3 { font-size: 12pt; margin: 12px 0 4px; }
-        [data-plan-print] p { margin: 0; }
-        [data-plan-print] ul { margin: 0 0 12px; padding-left: 24px; }
-        [data-plan-print] .plan-print-entry { break-inside: avoid; }
-      }
-    </style>
-</head>
-<body>
-    <a href="#main" class="skip-link">Skip to main content</a>
-    <nav class="nav" aria-label="Primary navigation">
-        <div class="nav-inner">
-            <a href="../" class="nav-logo">
-                <span class="nav-logo-text">MacroLongevity</span>
-            </a>
-            <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
-                <span></span><span></span><span></span>
-            </button>
-            <div class="nav-links">
-                <a href="../" class="nav-link">Home</a>
-                <a href="../pages/stack.html" class="nav-link active" aria-current="page">Nutrition</a>
-                <a href="../pages/blood.html" class="nav-link">Health</a>
-                <a href="../pages/workout.html" class="nav-link">Training</a>
-                <a href="../pages/finance.html" class="nav-link">Finance</a>
-            </div>
-        </div>
-    </nav>
-
-    <main id="main">
-        <section id="view-transition-anchor" class="page-header">
-            <div class="section-inner">
-                <h1 class="page-title">Your daily nutrition</h1>
-                <p class="page-desc">
-                    A simple food-first system for covering the basics, building repeatable meals and using supplements only when they have a defined job.
-                </p>
-            </div>
-        </section>
-        <nav class="context-nav" aria-label="Nutrition"><div class="section-inner context-nav-inner"><div><a href="../pages/stack.html" class="context-nav-link is-active" data-context-link data-context-planner-mode="meals" aria-current="page">Daily plan</a><a href="../pages/avoid.html" class="context-nav-link" data-context-link>Ingredient guide</a><a href="../pages/stack.html#deep-library" class="context-nav-link" data-context-link data-context-planner-mode="library">Deep library</a></div></div></nav>
-
-        <section class="section section-compact">
-            <div class="section-inner">
-                <div id="stack-app" aria-busy="true"><p class="planner-loading" role="status">Loading your daily plan…</p></div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <span>MacroLongevity</span>
-            </div>
-            <p class="footer-text">
-                Evidence-informed guidance for a low-cost, food-first longevity protocol.
-                Not medical advice. Consult your physician before starting any supplement
-                or dietary regimen, especially with existing conditions or medications.
+<!doctype html>
+<html lang="en-SG">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="text-scale" content="scale" />
+    <meta
+      name="description"
+      content="Simple weekday meals with lower-GI carbohydrate choices, plus HbA1c, fibre and hydration guidance."
+    />
+    <meta name="theme-color" content="#f7f5ed" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'self'; form-action 'none'"
+    />
+    <link
+      rel="canonical"
+      href="https://hazelah.me/macro-longevity/pages/stack.html"
+    />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../manifest.json" />
+    <link
+      rel="preload"
+      href="../fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="../css/variables.css?v=5" />
+    <link rel="stylesheet" href="../css/style.css?v=17" />
+    <title>Food · Macro Longevity</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="wordmark" href="../"
+          ><img src="../favicon.svg" width="34" height="34" alt="" /><span
+            >Macro Longevity</span
+          ></a
+        >
+        <nav class="site-nav" aria-label="Primary">
+          <ul>
+            <li>
+              <a href="../"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm6 11v-7h6v7"
+                  /></svg
+                ><span>Overview</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/stack.html" aria-current="page"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M3 13h18a9 9 0 0 1-18 0Zm4-3c0-3 3-3 4-6m1 6c0-3 3-3 4-6m-7 18h6"
+                  /></svg
+                ><span>Food</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/food-labels.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20 13 13 20a2 2 0 0 1-3 0l-6-6V4h10l6 6a2 2 0 0 1 0 3Z"
+                  />
+                  <circle cx="8.5" cy="8.5" r="1" /></svg
+                ><span>Food Labels</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/blood.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20.8 8.8c0 5.4-8.8 11-8.8 11S3.2 14.2 3.2 8.8A4.6 4.6 0 0 1 12 6.2a4.6 4.6 0 0 1 8.8 2.6Z"
+                  /></svg
+                ><span>Health</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/supplements.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="m8.5 19.5 11-11a4.24 4.24 0 0 0-6-6l-11 11a4.24 4.24 0 0 0 6 6Zm-.5-11 6 6"
+                  /></svg
+                ><span>Supplements</span></a
+              >
+            </li>
+            <li>
+              <a href="../pages/skin-care.html"
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path
+                    d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"
+                  /></svg
+                ><span>Skin Care</span></a
+              >
+            </li>
+          </ul>
+        </nav>
+        <button class="button primary" type="button" data-update-app hidden>
+          Update app
+        </button>
+        <span class="visually-hidden" data-update-status role="status"></span>
+      </div>
+    </header>
+    <main id="main" class="wrap" tabindex="-1">
+      <div class="page-intro meal-intro">
+        <section class="hero" aria-labelledby="food-title">
+          <div>
+            <p class="eyebrow">Food</p>
+            <h1 id="food-title">Weekday meals</h1>
+            <p class="lede">
+              Build meals around vegetables, protein and modest portions of
+              lower-GI carbs such as beans and lentils. Make plain water your
+              everyday drink.
             </p>
-            <button type="button" class="export-btn" data-export>Export all data (Markdown)</button>
-            <p class="footer-copy">&copy; 2026 Richmond Goh. MIT License.</p>
+          </div>
+        </section>
+        <img
+          class="food-image"
+          src="../images/weekday-meals.webp?v=2"
+          width="1120"
+          height="746"
+          fetchpriority="high"
+          alt="Overnight oats with berries alongside a fish, tofu and vegetable hotpot"
+        />
+      </div>
+      <nav class="section-nav" aria-label="On this page">
+        <p>On this page</p>
+        <div class="section-links">
+          <a class="button" href="#quick-meals">Quick meals</a>
+          <a class="button" href="#glucose">Glucose and HbA1c</a>
+          <a class="button" href="#food-safety">Cook and store safely</a>
+          <a class="button" href="#hydration">Hydration</a>
+          <a class="button" href="#oats">Overnight oats</a>
+          <a class="button" href="#hotpot">Hotpot</a>
         </div>
-    </footer>
-
-    <script type="module" src="../js/stack.js"></script>
-    <script type="module" src="../js/site.js"></script>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><a href="../" class="bottom-nav-item"><span class="bottom-nav-label">Home</span></a><a href="../pages/stack.html" class="bottom-nav-item active"><span class="bottom-nav-label">Nutrition</span></a><a href="../pages/blood.html" class="bottom-nav-item"><span class="bottom-nav-label">Health</span></a><a href="../pages/workout.html" class="bottom-nav-item"><span class="bottom-nav-label">Training</span></a><a href="../pages/finance.html" class="bottom-nav-item"><span class="bottom-nav-label">Finance</span></a></div></nav>
- <script src="../js/register-sw.js" defer></script>
-</body>
+      </nav>
+      <div class="page-content">
+        <div class="card-grid">
+          <section id="oats" class="panel guide">
+            <h2>Overnight oats</h2>
+            <ul class="guide-list">
+              <li>
+                <strong>Start with plain rolled oats.</strong> Try ⅓ cup dry
+                oats with chia seeds and a handful of berries. Choose plain oats
+                over sweetened sachets.
+              </li>
+              <li>
+                <strong>Soak the chia seeds overnight.</strong> Stir the oats
+                and seeds into plain milk or unsweetened fortified soy milk and
+                refrigerate. Add a spoonful of peanut butter without added
+                sugar.
+              </li>
+              <li>
+                <strong>Try a smaller oat portion if needed.</strong> Keep the
+                berries and chia and use plain, unsweetened yoghurt with live
+                cultures if you enjoy and tolerate it.
+              </li>
+            </ul>
+            <a
+              class="text-link"
+              href="https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/plan-your-meals-with-my-healthy-plate"
+              >HealthHub · My Healthy Plate <span aria-hidden="true">↗</span></a
+            >
+          </section>
+          <section id="hotpot" class="panel guide">
+            <h2>Hotpot</h2>
+            <ul class="guide-list">
+              <li>
+                <strong>Start with greens and mushrooms.</strong> Try chye sim,
+                kai lan, bok choy or broccoli.
+              </li>
+              <li>
+                <strong>Choose fresh fish, lean meat or firm tofu.</strong> Have
+                fishballs, luncheon meat and fatty slices less often.
+              </li>
+              <li>
+                <strong>Use edamame as your side.</strong> Add a small scoop of
+                shelled edamame in place of rice or noodles.
+              </li>
+              <li>
+                <strong>Leave most of the broth in the pot.</strong> Use less
+                sauce and choose a lower-sodium soup base when available.
+              </li>
+            </ul>
+            <div class="priority-links">
+              <a class="text-link" href="#food-safety">Safe hotpot handling</a>
+              <a
+                class="text-link"
+                href="https://www.healthhub.sg/programmes/nutrition-hub/eat-less"
+                >HealthHub · Lower-sodium choices
+                <span aria-hidden="true">↗</span></a
+              >
+            </div>
+          </section>
+        </div>
+        <section class="priorities" aria-labelledby="quick-meals">
+          <h2 id="quick-meals">Quick meals for lunch or dinner</h2>
+          <div class="card-grid">
+            <article class="panel guide">
+              <h3>Chickpea and cucumber salad</h3>
+              <ol class="guide-list">
+                <li>
+                  Drain and rinse ½ cup of canned chickpeas. Roughly mash with
+                  lemon juice, a little olive oil and black pepper.
+                </li>
+                <li>
+                  Toss with cucumber, tomato and leafy greens. Add an egg or
+                  some firm tofu if you want a more substantial lunch.
+                </li>
+              </ol>
+              <p>
+                <strong>Why choose it</strong> · Chickpeas are a lower-GI source
+                of carbs and fibre.
+              </p>
+            </article>
+            <article class="panel guide">
+              <h3>Salmon, lentils and greens</h3>
+              <ol class="guide-list">
+                <li>
+                  Cook a salmon fillet with lemon and pepper. Warm ½ cup of
+                  cooked lentils and steam frozen broccoli or fresh chye sim.
+                </li>
+                <li>For a pantry option, use lower-sodium canned sardines.</li>
+              </ol>
+              <figure class="meal-plate">
+                <img
+                  src="../images/infographics/meal-plate.svg"
+                  width="300"
+                  height="300"
+                  loading="lazy"
+                  alt=""
+                />
+                <figcaption>
+                  <strong>How to portion the plate</strong>
+                  <ul class="plate-key" role="list">
+                    <li><b>½</b> Greens</li>
+                    <li><b>¼</b> Cooked lentils</li>
+                    <li><b>¼</b> Fish</li>
+                  </ul>
+                </figcaption>
+              </figure>
+              <p>
+                <strong>Why choose it</strong> · Oily fish provides omega-3
+                fats. Lentils add fibre and replace the usual rice.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section class="priorities" aria-labelledby="glucose">
+          <div class="panel guide">
+            <h2 id="glucose">Build meals for steadier glucose</h2>
+            <ul class="guide-list">
+              <li>
+                <strong>Swap the staple.</strong> Choose chickpeas, lentils or
+                edamame in place of your usual rice, bread or noodles. Add
+                plenty of non-starchy vegetables and a protein such as fish,
+                eggs or tofu.
+              </li>
+              <li>
+                <strong>Check the portion as well as the GI.</strong> GI
+                compares how carbohydrate foods raise blood glucose. How much
+                carbohydrate you eat also matters. If you choose rice or bread,
+                try a smaller portion alongside vegetables and protein. Choose
+                whole fruit over juice.
+              </li>
+              <li>
+                <strong>Review HbA1c over time.</strong> It reflects roughly
+                three months of average blood glucose. Trials of lower-GI or
+                lower-glycaemic-load eating patterns found modest average HbA1c
+                improvements in people with diabetes. Ask your care team what
+                target and retest timing fit you.
+              </li>
+            </ul>
+            <p>
+              If you use insulin or a sulfonylurea such as gliclazide, check
+              with your care team before substantially cutting carbs because of
+              the risk of low blood glucose.
+            </p>
+            <div class="priority-links">
+              <a
+                class="text-link"
+                href="https://www.healthhub.sg/well-being-and-lifestyle/food-diet-and-nutrition/the-gi-values-of-common-foods"
+                >HealthHub · Common GI values</a
+              >
+              <a
+                class="text-link"
+                href="https://www.healthhub.sg/programmes/diabetes-hub/practical-tips-and-advice"
+                >HealthHub · Diabetes meal tips</a
+              >
+              <a
+                class="text-link"
+                href="https://www.bmj.com/content/374/bmj.n1651"
+                >BMJ · Lower-GI diets and HbA1c</a
+              >
+              <a class="text-link" href="blood.html#hba1c-history"
+                >Review dated HbA1c results</a
+              >
+            </div>
+          </div>
+        </section>
+        <section class="priorities" aria-labelledby="habits-title">
+          <h2 id="habits-title">What helps over time</h2>
+          <div class="priority-grid">
+            <article class="panel guide">
+              <h3>Rotate fibre-rich foods</h3>
+              <p>
+                Alternate oats, chickpeas, lentils and different fruits and
+                vegetables across the week. Fibre and enough fluid support
+                regular bowel movements. Build up gradually if you usually eat
+                little fibre.
+              </p>
+              <p>
+                Fermented foods are optional. In a small trial in healthy
+                adults, a diet higher in a variety of fermented foods increased
+                gut microbe diversity.
+              </p>
+              <div class="priority-links">
+                <a
+                  class="text-link"
+                  href="https://www.healthhub.sg/health-conditions/constipation"
+                  >HealthHub · Fibre and bowel regularity</a
+                >
+                <a
+                  class="text-link"
+                  href="https://pubmed.ncbi.nlm.nih.gov/34256014/"
+                  >Cell · Fermented foods trial</a
+                >
+                <a class="text-link" href="supplements.html#psyllium"
+                  >Psyllium husk and safe use</a
+                >
+              </div>
+            </article>
+            <article class="panel guide" id="hydration">
+              <h3>Drink water regularly</h3>
+              <p>
+                Start with a glass of plain water at meals and keep a refillable
+                bottle nearby between meals. Drink more when you sweat in the
+                heat or exercise. Follow your care team’s advice if you have a
+                fluid limit.
+              </p>
+              <a
+                class="text-link"
+                href="https://www.healthhub.sg/health-conditions/dehydration-adults"
+                >HealthHub · Everyday hydration</a
+              >
+            </article>
+            <article class="panel guide">
+              <h3>Repeat a Mediterranean-style pattern</h3>
+              <p>
+                Build most meals around vegetables, fruit, beans and whole
+                grains. Use unsaturated oils and include fish. A three-year
+                Mediterranean diet study in adults at higher cardiovascular risk
+                found improvements in some blood markers of inflammation.
+              </p>
+              <a class="text-link" href="https://www.mdpi.com/2227-9059/9/8/862"
+                >PREDIMED · Inflammation study</a
+              >
+            </article>
+          </div>
+        </section>
+        <section class="priorities" aria-labelledby="food-safety">
+          <div class="panel guide routine-card">
+            <h2 id="food-safety">Keep your meals safe</h2>
+            <ol class="routine-steps" role="list">
+              <li>
+                <strong>Clean and separate</strong> Wash hands with soap. Keep
+                raw meat and seafood apart from cooked food and salad. Use
+                separate boards or wash them thoroughly between tasks. At
+                hotpot, use separate utensils for raw and cooked food.
+              </li>
+              <li>
+                <strong>Cook through</strong> Cook meat and seafood thoroughly.
+                If batch cooking, put the portions you plan to save into clean,
+                covered containers and refrigerate promptly at 4°C or below.
+                Discard cooked food left at room temperature for more than two
+                hours.
+              </li>
+              <li>
+                <strong>Reheat once</strong> Heat leftovers to at least 75°C for
+                two minutes. Reheat only the portion you’ll eat, in a container
+                rated for the appliance you’re using.
+              </li>
+            </ol>
+            <div class="priority-links">
+              <a
+                class="text-link"
+                href="https://www.sfa.gov.sg/food-safety-tips/safe-food-practices/food-safety-tips"
+                >SFA · Home food safety</a
+              >
+              <a
+                class="text-link"
+                href="https://www.sfa.gov.sg/tools-and-resources/glossary-a-z-on-food-safety"
+                >SFA · Leftovers and storage</a
+              >
+              <a class="text-link" href="food-labels.html#packaging"
+                >Choose a reheating container</a
+              >
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script src="../js/register-sw.js?v=5" defer></script>
+    <script type="module" src="../js/section-nav.js?v=2"></script>
+  </body>
 </html>

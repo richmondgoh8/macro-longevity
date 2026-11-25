@@ -1,138 +1,294 @@
-import { chromium, expect, test } from '@playwright/test';
-import { createServer } from 'node:http';
-import { readFileSync } from 'node:fs';
+import { expect, test } from "@playwright/test";
 
-test('a new offline cache refreshes assets already fresh in the HTTP cache', async ({ browser }) => {
-  let latest = false;
-  const server = createServer((request, response) => {
-    const path = new URL(request.url, 'http://localhost').pathname;
-    const file = path === '/' ? 'index.html' : path.slice(1);
-    let body;
-    try { body = file === 'js/home-dashboard.js' && !latest ? '// obsolete HTTP-cached renderer' : readFileSync(new URL('../' + file, import.meta.url)); }
-    catch { response.writeHead(404); response.end(); return; }
-    response.writeHead(200, {
-      'Content-Type': file.endsWith('.js') ? 'application/javascript' : file.endsWith('.svg') ? 'image/svg+xml' : 'application/octet-stream',
-      'Cache-Control': file === 'sw.js' ? 'no-cache' : 'public, max-age=3600',
-    });
-    response.end(body);
-  });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const context = await browser.newContext({ serviceWorkers: 'allow' });
-  try {
-    const page = await context.newPage();
-    const origin = `http://127.0.0.1:${server.address().port}`;
-    await page.goto(origin + '/favicon.svg');
-    expect(await page.evaluate(async () => (await fetch('/js/home-dashboard.js')).text())).toContain('obsolete HTTP-cached renderer');
-    latest = true;
-    expect(await page.evaluate(async () => (await fetch('/js/home-dashboard.js')).text())).toContain('obsolete HTTP-cached renderer');
-    await page.evaluate(async () => { await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready; });
+test.use({ serviceWorkers: "allow" });
+
+for (const scope of ["/", "/macro-longevity/"]) {
+  test(`installed app serves all six destinations offline at ${scope}`, async ({
+    page,
+    context,
+  }) => {
+    await page.goto(scope);
     await page.waitForFunction(() => navigator.serviceWorker.controller);
-    const installed = await page.evaluate(async () => {
-      const response = await caches.match('/js/home-dashboard.js');
-      return response.text();
-    });
-    expect(installed).toBe(readFileSync(new URL('../js/home-dashboard.js', import.meta.url), 'utf8'));
-  } finally {
-    await context.close();
-    server.closeAllConnections();
-    await new Promise(resolve => server.close(resolve));
-  }
-});
-
-test('install metadata provides a stable identity and usable PNG icons on every route', async ({ page, context }) => {
-  await page.goto('/');
-  const session = await context.newCDPSession(page);
-  await session.send('Page.enable');
-  const { errors, data } = await session.send('Page.getAppManifest');
-  expect(errors).toEqual([]);
-  const manifest = JSON.parse(data);
-  expect(manifest.id).toBe('./');
-  expect(manifest.scope).toBe('./');
-  expect(manifest.display).toBe('standalone');
-  for (const size of [192, 512]) {
-    const icon = manifest.icons.find(item => item.type === 'image/png' && item.sizes === `${size}x${size}`);
-    expect(icon).toBeTruthy();
-    const actual = await page.evaluate(async src => {
-      const image = new Image();
-      image.src = src;
-      await image.decode();
-      return [image.naturalWidth, image.naturalHeight];
-    }, icon.src);
-    expect(actual).toEqual([size, size]);
-  }
-  expect(manifest.icons.some(icon => icon.purpose.includes('maskable'))).toBe(true);
-  for (const path of ['/', '/pages/stack.html', '/pages/blood.html', '/pages/protocol.html', '/pages/avoid.html', '/pages/workout.html', '/pages/finance.html']) {
-    await page.goto(path);
-    const icon = page.locator('link[rel="apple-touch-icon"]');
-    await expect(icon).toHaveAttribute('sizes', '180x180');
-    // Relative nested-page URLs are resolved against the document, not the test base URL.
-    const href = await icon.evaluate(node => node.href);
-    const resolved = await page.request.get(href);
-    expect(resolved.ok()).toBe(true);
-    expect(resolved.headers()['content-type']).toContain('image/png');
-  }
-});
-
-test('Chromium installability checks pass in a non-private browser profile', async ({ baseURL }, testInfo) => {
-  const context = await chromium.launchPersistentContext(testInfo.outputPath('install-profile'), {
-    channel: 'chromium', serviceWorkers: 'allow',
+    await expect(page.getByRole("button", { name: "Update app" })).toBeHidden();
+    await context.setOffline(true);
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    for (const [label, heading] of [
+      ["Food", "Weekday meals"],
+      ["Food Labels", "Read food labels"],
+      ["Health", "Screening and results"],
+      ["Supplements", "Supplements"],
+      ["Skin Care", "Skin care"],
+      ["Overview", "Live healthier for longer"],
+    ]) {
+      await nav.getByRole("link", { name: label, exact: true }).click();
+      await expect(
+        page.getByRole("heading", { level: 1, name: heading }),
+      ).toBeVisible();
+      expect(new URL(page.url()).pathname.startsWith(scope)).toBe(true);
+      if (label === "Food") {
+        expect(
+          await page
+            .locator(".food-image")
+            .evaluate((img) => img.decode().then(() => img.naturalWidth)),
+        ).toBeGreaterThan(0);
+        const plate = page.locator(".meal-plate img");
+        await plate.scrollIntoViewIfNeeded();
+        expect(
+          await plate.evaluate((img) =>
+            img.decode().then(() => img.naturalWidth),
+          ),
+        ).toBeGreaterThan(0);
+        await page
+          .getByRole("link", { name: "Glucose and HbA1c", exact: true })
+          .click();
+        await expect(
+          page.getByRole("heading", {
+            name: "Build meals for steadier glucose",
+          }),
+        ).toBeInViewport();
+        await expect(
+          page.getByRole("link", { name: "Glucose and HbA1c", exact: true }),
+        ).toHaveAttribute("aria-current", "location");
+        await page
+          .getByRole("link", { name: "Hydration", exact: true })
+          .click();
+        await expect(
+          page.getByRole("heading", { name: "Drink water regularly" }),
+        ).toBeInViewport();
+      }
+      if (label === "Food Labels") {
+        await expect(
+          page.getByRole("heading", { name: "Spot ultra-processed foods" }),
+        ).toBeVisible();
+        const scale = page.locator(".sugar-comparison img");
+        await scale.scrollIntoViewIfNeeded();
+        expect(
+          await scale.evaluate((img) =>
+            img.decode().then(() => img.naturalWidth),
+          ),
+        ).toBeGreaterThan(0);
+      }
+      if (label === "Supplements") {
+        await expect(
+          page.getByRole("heading", { name: "Creatine monohydrate" }),
+        ).toBeVisible();
+        await page
+          .getByRole("link", { name: "Psyllium husk", exact: true })
+          .click();
+        await expect(
+          page.getByRole("heading", { name: "Psyllium husk", exact: true }),
+        ).toBeInViewport();
+      }
+      if (label === "Skin Care") {
+        await expect(
+          page.getByRole("heading", {
+            name: "Singapore cosmetic safety warnings",
+          }),
+        ).toBeVisible();
+        await page
+          .getByRole("link", { name: "What to do after suspected exposure" })
+          .click();
+        expect(new URL(page.url()).pathname).toBe(
+          `${scope}pages/food-labels.html`,
+        );
+        await expect(
+          page.getByRole("heading", {
+            name: "Suspected mercury or heavy-metal exposure",
+          }),
+        ).toBeInViewport();
+      }
+      if (label === "Health") {
+        await expect(
+          page.getByRole("button", { name: "Save results" }),
+        ).toBeEnabled();
+        expect(
+          await page
+            .locator(".report-example img")
+            .evaluate((img) => img.decode().then(() => img.naturalWidth)),
+        ).toBeGreaterThan(0);
+        await page.getByText("Open the HbA1c log", { exact: true }).click();
+        await expect(page.getByLabel("Date on the report")).toBeVisible();
+        const [download] = await Promise.all([
+          page.waitForEvent("download"),
+          page.getByRole("button", { name: "Download health results" }).click(),
+        ]);
+        expect(download.suggestedFilename()).toBe(
+          "macro-longevity-health-results.json",
+        );
+      }
+    }
+    await expect(
+      page.getByRole("heading", { name: "Illness prevention and recovery" }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Moderate aerobic activity each week" })
+      .click();
+    const walkingWeek = page.locator(".walking-plan img");
+    await walkingWeek.scrollIntoViewIfNeeded();
+    expect(
+      await walkingWeek.evaluate((img) =>
+        img.decode().then(() => img.naturalWidth),
+      ),
+    ).toBeGreaterThan(0);
+    await page
+      .getByRole("link", { name: "Sleep and insomnia guide", exact: true })
+      .click();
+    await page
+      .getByRole("link", { name: "Chamomile, glycine and taurine" })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Tea and supplements for sleep" }),
+    ).toBeInViewport();
+    expect(new URL(page.url()).pathname).toBe(`${scope}pages/supplements.html`);
+    await page.goto(`${scope}pages/workout.html`);
+    await expect(
+      page.getByRole("heading", { name: "This page is unavailable offline" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Overview" }).click();
+    await expect(
+      page.getByRole("heading", { name: "High-impact priorities" }),
+    ).toBeVisible();
   });
-  try {
-    const page = await context.newPage();
-    await page.goto(baseURL);
-    await page.evaluate(() => navigator.serviceWorker.ready);
-    const session = await context.newCDPSession(page);
-    await session.send('Page.enable');
-    const { installabilityErrors } = await session.send('Page.getInstallabilityErrors');
-    expect(installabilityErrors).toEqual([]);
-  } finally {
-    await context.close();
-  }
-});
+}
 
-test('service worker installs the current cache and serves fast offline navigation', async ({ browser, baseURL }) => {
-  const context = await browser.newContext({ serviceWorkers: 'allow' });
-  const page = await context.newPage();
-  // CacheStorage is shared across an origin, even when app/service-worker scopes differ.
-  await page.goto(`${baseURL}/favicon.svg`);
-  await page.evaluate(async () => {
-    await caches.open('other-app-preserve-test');
-    await caches.open('macro-longevity-offline-v0-test');
+test("an open app checks for releases without a reload", async ({ page }) => {
+  await page.clock.install();
+  await page.addInitScript(() => {
+    window.updateChecks = 0;
+    const update = ServiceWorkerRegistration.prototype.update;
+    ServiceWorkerRegistration.prototype.update = function () {
+      window.updateChecks += 1;
+      return update.call(this);
+    };
   });
-  await page.goto(`${baseURL}/pages/stack.html`);
-  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.goto("/macro-longevity/");
   await page.waitForFunction(() => navigator.serviceWorker.controller);
-  const cacheKeys = await page.evaluate(() => caches.keys());
-  expect(cacheKeys).toContain('macro-longevity-offline-v63-healthspan-priorities');
-  expect(cacheKeys).toContain('other-app-preserve-test');
-  expect(cacheKeys).not.toContain('macro-longevity-offline-v0-test');
-  expect(cacheKeys.some((key) => /offline-v(?:13|14|15|16|17)$/.test(key))).toBe(false);
+  const initial = await page.evaluate(() => window.updateChecks);
+  await page.clock.fastForward(121_000);
+  await expect
+    .poll(() => page.evaluate(() => window.updateChecks))
+    .toBeGreaterThan(initial);
+  await expect(page.getByRole("button", { name: "Update app" })).toBeHidden();
+});
 
+test("Update app activates the waiting release and preserves saved results", async ({
+  page,
+  context,
+}) => {
+  const prefix = "/macro-longevity/";
+  const worker = `${prefix}sw.js`;
+  await page.goto(`${prefix}offline.html`);
+  await page.evaluate(async (worker) => {
+    localStorage.setItem(
+      "sg-health-baseline-v1",
+      JSON.stringify({
+        values: { ldl: "98" },
+        units: { ldl: "mg/dL" },
+      }),
+    );
+    await navigator.serviceWorker.register(`${worker}?legacy`);
+  }, worker);
+  await page.waitForFunction(() =>
+    navigator.serviceWorker.controller?.scriptURL.endsWith("?legacy"),
+  );
+  await page.goto(`${prefix}pages/finance.html`);
+  await expect(
+    page.getByRole("heading", { name: "Finance & FIRE" }),
+  ).toBeVisible();
+  await page.goto(`${prefix}pages/blood.html`);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        async () =>
+          (await navigator.serviceWorker.getRegistration())?.waiting?.state,
+      ),
+    )
+    .toBe("installed");
+
+  const update = page.getByRole("button", { name: "Update app" });
+  await expect(update).toBeVisible();
+  const viewport = page.viewportSize();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(viewport.width);
+  await page.setViewportSize({ ...viewport, width: 768 });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(768);
+  await page.setViewportSize(viewport);
+
+  const otherTab = await context.newPage();
+  await otherTab.goto(`${prefix}pages/blood.html`);
+  await expect(
+    otherTab.getByRole("button", { name: "Update app" }),
+  ).toBeVisible();
+  const otherReading = otherTab.getByLabel("LDL cholesterol", { exact: true });
+  await otherReading.fill("100");
+  const reading = page.getByLabel("LDL cholesterol", { exact: true });
+  await reading.fill("101");
+
+  // The waiting worker has already cached the release, so the update works offline.
   await context.setOffline(true);
-  const started = Date.now();
-  await page.goto(`${baseURL}/pages/avoid.html`, { waitUntil: 'domcontentloaded' });
-  expect(Date.now() - started).toBeLessThan(500);
-  await expect(page.getByRole('heading', { name: 'Ingredients to Avoid' })).toBeVisible();
-  await page.goto(`${baseURL}/pages/blood.html`);
-  await page.locator('[data-biomarker-library] > summary').click();
-  await page.getByLabel('Search all biomarkers').fill('ApoB');
-  await expect(page.locator('[data-library-marker="apolipoproteinb"]')).toBeVisible();
-  await page.locator('[data-additional-screening] > summary').click();
-  await expect(page.locator('[data-marker-card="ferritin"]')).toHaveCount(1);
-  await page.goto(`${baseURL}/`);
-  const reference = page.locator('[data-reference-card="apob"]');
-  await expect(reference.locator('.sg-card-action')).toContainText('unsaturated');
-  await expect(page.locator('[data-reference-card]')).toHaveCount(10);
-  await expect(page.locator('[data-reference-card="ferritin"]')).toHaveCount(0);
-  await page.goto(`${baseURL}/pages/blood.html`);
-  await page.locator('[data-health-search]').fill('ApoB');
-  await page.locator('[data-health-results] a[data-health-result="sg-apob"]').click();
-  await expect(page.locator('#sg-apob')).toBeFocused();
-  await page.goto(`${baseURL}/pages/blood.html#physical-bmd-hip`);
-  const bone = page.locator('[data-physical-card="bmd-hip"]');
-  await expect(bone).toBeVisible();
-  await bone.getByLabel('T-score', { exact: true }).fill('-1.3');
-  await page.reload();
-  await expect(bone.getByLabel('T-score', { exact: true })).toHaveValue('-1.3');
-  await context.close();
+  await Promise.all([
+    page.waitForEvent("dialog").then(async (dialog) => {
+      expect(dialog.type()).toBe("beforeunload");
+      await dialog.dismiss();
+    }),
+    update.click(),
+  ]);
+  await expect(reading).toHaveValue("101");
+  await expect(update).toBeEnabled();
+  await Promise.all([
+    page.waitForEvent("dialog").then(async (dialog) => {
+      expect(dialog.type()).toBe("beforeunload");
+      await dialog.accept();
+    }),
+    page.waitForEvent("framenavigated", (frame) => frame === page.mainFrame()),
+    update.click(),
+  ]);
+  await page.waitForFunction(
+    (worker) => navigator.serviceWorker.controller?.scriptURL.endsWith(worker),
+    worker,
+  );
+  await expect(update).toBeHidden();
+  await expect(page.getByLabel("LDL cholesterol", { exact: true })).toHaveValue(
+    "98",
+  );
+  await expect(page.getByLabel("LDL cholesterol report unit")).toHaveValue(
+    "mg/dL",
+  );
+  expect(await page.evaluate(() => caches.keys())).toEqual([
+    "macro-longevity:/macro-longevity/:v26",
+  ]);
+  expect(
+    await page.evaluate(
+      async () =>
+        (
+          await (
+            await navigator.serviceWorker.getRegistration()
+          ).navigationPreload.getState()
+        ).enabled,
+    ),
+  ).toBe(false);
+
+  // Applying the update in one tab leaves other open tabs and their drafts in place.
+  await expect(otherReading).toHaveValue("100");
+  const otherUpdate = otherTab.getByRole("button", { name: "Update app" });
+  await Promise.all([
+    otherTab.waitForEvent("dialog").then(async (dialog) => {
+      expect(dialog.type()).toBe("beforeunload");
+      await dialog.accept();
+    }),
+    otherTab.waitForEvent(
+      "framenavigated",
+      (frame) => frame === otherTab.mainFrame(),
+    ),
+    otherUpdate.click(),
+  ]);
+  await expect(otherUpdate).toBeHidden();
+  await expect(otherReading).toHaveValue("98");
+  await context.setOffline(false);
+  for (const path of ["finance", "protocol", "avoid", "workout"]) {
+    expect((await page.goto(`${prefix}pages/${path}.html`)).status()).toBe(404);
+  }
 });
