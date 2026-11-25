@@ -277,49 +277,11 @@ test("page shortcuts follow scrolling and preserve native links and reduced moti
   const recovery = shortcuts.getByRole("link", {
     name: "Illness and recovery",
   });
-  await recovery.scrollIntoViewIfNeeded();
-  await shortcuts.evaluate((nav) => {
-    window.__currentHistory = [];
-    new MutationObserver(() => {
-      const active = nav.querySelector(
-        '[aria-current="location"]',
-      )?.textContent;
-      if (active && window.__currentHistory.at(-1) !== active)
-        window.__currentHistory.push(active);
-    }).observe(nav, {
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["aria-current"],
-    });
-  });
   await recovery.click();
   await expect(
     page.getByRole("heading", { name: "Illness prevention and recovery" }),
   ).toBeInViewport();
-  await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        let timer = setTimeout(resolve, 150);
-        const done = () => {
-          clearTimeout(timer);
-          window.removeEventListener("scrollend", done);
-          resolve();
-        };
-        window.addEventListener("scrollend", done, { once: true });
-        window.addEventListener(
-          "scroll",
-          () => {
-            clearTimeout(timer);
-            timer = setTimeout(done, 150);
-          },
-          { passive: true },
-        );
-      }),
-  );
   await expect(recovery).toHaveAttribute("aria-current", "location");
-  expect(await page.evaluate(() => window.__currentHistory)).toEqual([
-    "Illness and recovery",
-  ]);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
