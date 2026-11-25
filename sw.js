@@ -1,6 +1,6 @@
 const SITE_SCOPE = new URL("./", self.location.href);
 const CACHE_PREFIX = `macro-longevity:${SITE_SCOPE.pathname}:`;
-const CACHE_NAME = `${CACHE_PREFIX}v26`;
+const CACHE_NAME = `${CACHE_PREFIX}v27`;
 const STATIC_ASSETS = [
   "./",
   "index.html",
@@ -13,7 +13,7 @@ const STATIC_ASSETS = [
   "css/variables.css?v=5",
   "css/style.css?v=17",
   "js/register-sw.js?v=5",
-  "js/section-nav.js?v=2",
+  "js/section-nav.js?v=3",
   "js/health-dashboard.js?v=5",
   "js/data/screening.js?v=3",
   "js/export.js?v=3",

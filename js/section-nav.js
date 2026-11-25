@@ -58,13 +58,6 @@ function updateCurrent() {
 }
 
 function queueUpdate() {
-  if (pendingLink) {
-    clearTimeout(pendingTimer);
-    pendingTimer = setTimeout(() => {
-      clearPending();
-      queueUpdate();
-    }, 250);
-  }
   frame ??= requestAnimationFrame(updateCurrent);
 }
 
@@ -93,7 +86,7 @@ for (const { link, target } of shortcuts) {
     pendingTimer = setTimeout(() => {
       clearPending();
       queueUpdate();
-    }, 1000);
+    }, 1500);
   });
 }
 const cancelPending = () => {

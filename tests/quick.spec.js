@@ -296,6 +296,26 @@ test("page shortcuts follow scrolling and preserve native links and reduced moti
   await expect(
     page.getByRole("heading", { name: "Illness prevention and recovery" }),
   ).toBeInViewport();
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let timer = setTimeout(resolve, 150);
+        const done = () => {
+          clearTimeout(timer);
+          window.removeEventListener("scrollend", done);
+          resolve();
+        };
+        window.addEventListener("scrollend", done, { once: true });
+        window.addEventListener(
+          "scroll",
+          () => {
+            clearTimeout(timer);
+            timer = setTimeout(done, 150);
+          },
+          { passive: true },
+        );
+      }),
+  );
   await expect(recovery).toHaveAttribute("aria-current", "location");
   expect(await page.evaluate(() => window.__currentHistory)).toEqual([
     "Illness and recovery",

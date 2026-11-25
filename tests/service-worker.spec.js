@@ -258,7 +258,7 @@ test("Update app activates the waiting release and preserves saved results", asy
     "mg/dL",
   );
   expect(await page.evaluate(() => caches.keys())).toEqual([
-    "macro-longevity:/macro-longevity/:v26",
+    "macro-longevity:/macro-longevity/:v27",
   ]);
   expect(
     await page.evaluate(
