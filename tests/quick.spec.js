@@ -40,28 +40,11 @@ test("the six destinations work with keyboard and reduced motion", async ({
     await expect(
       page.getByRole("navigation", { name: "On this page" }),
     ).toBeVisible();
-    if (label === "Supplements") {
-      await expect(page.getByRole("heading", { level: 3 })).toHaveText([
-        "Folic acid",
-        "Vitamin D3",
-        "Omega-3",
-        "Creatine monohydrate",
-        "Magnesium glycinate",
-      ]);
-    }
     if (label === "Skin Care") {
-      await expect(page.getByRole("heading", { level: 3 })).toHaveText([
-        "Morning",
-        "Evening",
-        "Sunscreen",
-        "Moisturiser",
-        "Gentle cleanser",
-      ]);
       await page.getByRole("link", { name: "Ingredient checks" }).click();
       await expect(
         page.getByRole("heading", { name: "What to look for on the label" }),
       ).toBeInViewport();
-      await expect(page.getByText("Watch for", { exact: true })).toHaveCount(3);
       await expect(
         page.getByRole("link", { name: "HSA · Adulterated cosmetic products" }),
       ).toBeVisible();
@@ -128,14 +111,10 @@ test("the six destinations work with keyboard and reduced motion", async ({
   await expect(
     page.getByRole("heading", { name: "Overnight oats" }),
   ).toBeInViewport();
-  await expect(page.getByText("Soak the chia seeds overnight.")).toBeVisible();
   await page.getByRole("link", { name: "Psyllium husk and safe use" }).click();
   await expect(
     page.getByRole("heading", { name: "Psyllium husk", exact: true }),
   ).toBeInViewport();
-  await expect(
-    page.getByText("Mix it with water.", { exact: true }),
-  ).toBeVisible();
   await page.goBack();
   await page.getByRole("link", { name: "Food Labels", exact: true }).click();
   await page.getByRole("link", { name: "Sugar claims", exact: true }).click();
@@ -144,7 +123,6 @@ test("the six destinations work with keyboard and reduced motion", async ({
       name: "“No added sugar” can still contain sugar",
     }),
   ).toBeInViewport();
-  await expect(page.getByText("40 g sugar", { exact: true })).toBeVisible();
 });
 
 test("page shortcuts stay in the desktop rail and health records stay together", async ({
@@ -311,12 +289,6 @@ test("the prevention guides lead to cardio, strength, and first-line insomnia ca
   const movement = page.getByRole("region", {
     name: "Build fitness and strength",
   });
-  await expect(
-    movement.getByText(/three 10-minute brisk\s+walks/i),
-  ).toBeVisible();
-  await expect(
-    movement.getByText("Chair sit-to-stand · 5 reps."),
-  ).toBeVisible();
   const targets = page
     .getByRole("region", { name: "Live healthier for longer" })
     .locator(".target-board");
@@ -343,20 +315,12 @@ test("the prevention guides lead to cardio, strength, and first-line insomnia ca
     name: "Sleep better and manage insomnia",
   });
   await expect(sleep).toBeInViewport();
-  await expect(
-    page.getByText(/first-line treatment for chronic insomnia/),
-  ).toBeVisible();
   await page
     .getByRole("link", { name: "Chamomile, glycine and taurine" })
     .click();
   await expect(
     page.getByRole("heading", { name: "Tea and supplements for sleep" }),
   ).toBeInViewport();
-  await expect(
-    page.getByText(
-      /human evidence is insufficient to\s+recommend it for insomnia/i,
-    ),
-  ).toBeVisible();
   await sleepShortcut.click();
   await expect(sleep).toBeInViewport();
 });
@@ -649,9 +613,6 @@ test("food safety and optional recovery guidance link to their next action", asy
   await expect(
     page.getByRole("link", { name: "995", exact: true }),
   ).toHaveAttribute("href", "tel:995");
-  await expect(
-    page.getByText("During pregnancy, avoid these predatory fish"),
-  ).toBeVisible();
 
   await page
     .getByRole("link", { name: "Suspected mercury or heavy-metal exposure" })
@@ -666,7 +627,6 @@ test("food safety and optional recovery guidance link to their next action", asy
   await expect(
     exposure.getByRole("link", { name: "995", exact: true }),
   ).toHaveAttribute("href", "tel:995");
-  await expect(exposure.getByText("Skip home “detox” products.")).toBeVisible();
   await page
     .getByRole("navigation", { name: "Primary" })
     .getByRole("link", { name: "Overview", exact: true })

@@ -1,4 +1,10 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+
+const swVersion = readFileSync("sw.js", "utf8").match(
+  /CACHE_PREFIX\}(v\d+)/,
+)?.[1];
+expect(swVersion).toBeTruthy();
 
 test.use({ serviceWorkers: "allow" });
 
@@ -258,7 +264,7 @@ test("Update app activates the waiting release and preserves saved results", asy
     "mg/dL",
   );
   expect(await page.evaluate(() => caches.keys())).toEqual([
-    "macro-longevity:/macro-longevity/:v27",
+    `macro-longevity:/macro-longevity/:${swVersion}`,
   ]);
   expect(
     await page.evaluate(
